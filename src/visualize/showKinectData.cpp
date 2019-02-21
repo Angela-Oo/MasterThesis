@@ -25,6 +25,8 @@ void ShowKinectData::initPoints(ml::GraphicsDevice & graphics)
 
 void ShowKinectData::init(ml::ApplicationData &app)
 {
+
+
 	initMesh(app.graphics);
 
 	initPoints(app.graphics);
