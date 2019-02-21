@@ -12,6 +12,7 @@ class ShowKinectData
 private:
 	void initMesh(ml::GraphicsDevice & graphics);
 	void initPoints(ml::GraphicsDevice & graphics);
+	void initKinectPoints(ml::GraphicsDevice & graphics);
 public:
 	void init(ml::ApplicationData &app);
 	void render(ml::Cameraf& camera);

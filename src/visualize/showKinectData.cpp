@@ -1,5 +1,6 @@
 #include "showKinectData.h"
-
+#include "kinect/BinaryDumpReader.h"
+#include "kinect/ImageReaderSensor.h"
 
 
 void ShowKinectData::initMesh(ml::GraphicsDevice & graphics)
@@ -23,6 +24,28 @@ void ShowKinectData::initPoints(ml::GraphicsDevice & graphics)
 	m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.01f), points));
 }
 
+void ShowKinectData::initKinectPoints(ml::GraphicsDevice & graphics)
+{
+	std::string filename = "fuu";
+	float windowWidth = 1200;
+	float windowHeight = 800;
+	//BinaryDumpReader reader(filename, windowWidth, windowHeight);
+	ImageReaderSensor reader;
+	reader.setBaseFilePath("D:/Studium/MasterThesis/input_data/desk_1/rgbd-scenes/desk/desk_1");
+	try {
+		reader.createFirstConnected();
+		reader.setNumFrames(98);
+		auto intrinsic = reader.getIntrinsics();
+		auto dh = reader.getDepthHeight();
+		reader.processDepth();
+		reader.processColor();
+	}
+	catch (...)
+	{
+		std::cout << "could not load file" << std::endl;
+	}
+}
+
 void ShowKinectData::init(ml::ApplicationData &app)
 {
 
@@ -30,6 +53,8 @@ void ShowKinectData::init(ml::ApplicationData &app)
 	initMesh(app.graphics);
 
 	initPoints(app.graphics);
+
+	initKinectPoints(app.graphics);
 
 	m_shaderManager.init(app.graphics);
 	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");

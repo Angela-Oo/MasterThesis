@@ -434,6 +434,9 @@
     <ClInclude Include="src\kinect\BinaryDumpReader.h">
       <Filter>kinect</Filter>
     </ClInclude>
+    <ClInclude Include="src\kinect\ImageReaderSensor.h">
+      <Filter>kinect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -451,6 +454,9 @@
       <Filter>kinect</Filter>
     </ClCompile>
     <ClCompile Include="src\kinect\BinaryDumpReader.cpp">
+      <Filter>kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kinect\ImageReaderSensor.cpp">
       <Filter>kinect</Filter>
     </ClCompile>
   </ItemGroup>
