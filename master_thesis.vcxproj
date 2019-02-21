@@ -208,10 +208,12 @@
     <ClInclude Include="..\include\ext-openmesh\loader.h" />
     <ClInclude Include="..\include\mLibCore.h" />
     <ClInclude Include="..\include\mLibD3D11.h" />
+    <ClInclude Include="src\appShowKinectData.h" />
     <ClInclude Include="src\appTest.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\mLibInclude.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\visualize\showKinectData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\include\application-d3d11\D3D11Buffer.cpp">
@@ -326,6 +328,7 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
+    <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\appTest.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mLibSource.cpp">
@@ -336,6 +339,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\visualize\showKinectData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\pointCloud.hlsl">

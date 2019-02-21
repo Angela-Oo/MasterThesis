@@ -37,6 +37,9 @@
     <Filter Include="mLibHeader\application-base">
       <UniqueIdentifier>{788999c5-3f16-4b1b-a30f-7cd3f171d545}</UniqueIdentifier>
     </Filter>
+    <Filter Include="visualize">
+      <UniqueIdentifier>{53d900cb-dbdf-49bc-99e2-f2dc6a70e268}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\mLibCore.h">
@@ -379,6 +382,10 @@
     <ClInclude Include="src\mLibInclude.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\appTest.h" />
+    <ClInclude Include="src\appShowKinectData.h" />
+    <ClInclude Include="src\visualize\showKinectData.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\include\core-graphics\polygon.cpp">
@@ -468,6 +475,10 @@
     </ClCompile>
     <ClCompile Include="..\..\include\application-d3d11\D3D11Texture3D.cpp">
       <Filter>mLibHeader\application-D3D11</Filter>
+    </ClCompile>
+    <ClCompile Include="src\appShowKinectData.cpp" />
+    <ClCompile Include="src\visualize\showKinectData.cpp">
+      <Filter>visualize</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

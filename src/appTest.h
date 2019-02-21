@@ -1,3 +1,5 @@
+#pragma once
+#include "mLibInclude.h"
 
 struct ConstantBuffer
 {
