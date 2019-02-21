@@ -1,6 +1,7 @@
 #include "showKinectData.h"
 #include "kinect/BinaryDumpReader.h"
 #include "kinect/ImageReaderSensor.h"
+#include "kinect/DX11DepthSensor.h"
 
 
 void ShowKinectData::initMesh(ml::GraphicsDevice & graphics)
@@ -26,19 +27,23 @@ void ShowKinectData::initPoints(ml::GraphicsDevice & graphics)
 
 void ShowKinectData::initKinectPoints(ml::GraphicsDevice & graphics)
 {
-	std::string filename = "fuu";
-	float windowWidth = 1200;
-	float windowHeight = 800;
-	//BinaryDumpReader reader(filename, windowWidth, windowHeight);
 	ImageReaderSensor reader;
-	reader.setBaseFilePath("D:/Studium/MasterThesis/input_data/desk_1/rgbd-scenes/desk/desk_1");
+	reader.setBaseFilePath("D:/Studium/MasterThesis/input_data/desk_1/rgbd-scenes/desk/desk_1/");
+	reader.setDepthFileName([](unsigned int idx) { return "desk_1_" + std::to_string(idx) + "_depth.png"; });
+	reader.setColorFileName([](unsigned int idx) { return "desk_1_" + std::to_string(idx) + ".png"; });
+
 	try {
 		reader.createFirstConnected();
 		reader.setNumFrames(98);
+
+		//DX11Sensor sensor;
+		//sensor.OnD3D11CreateDevice(graphics, &reader);
+
+		//sensor.OnD3D11DestroyDevice();
 		auto intrinsic = reader.getIntrinsics();
 		auto dh = reader.getDepthHeight();
 		reader.processDepth();
-		reader.processColor();
+		reader.processColor();		
 	}
 	catch (...)
 	{
@@ -48,8 +53,6 @@ void ShowKinectData::initKinectPoints(ml::GraphicsDevice & graphics)
 
 void ShowKinectData::init(ml::ApplicationData &app)
 {
-
-
 	initMesh(app.graphics);
 
 	initPoints(app.graphics);

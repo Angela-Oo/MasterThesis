@@ -5,13 +5,13 @@
 
 
 ImageReaderSensor::ImageReaderSensor()
+	: m_BasePath("")
 {
 	unsigned int windowWidth = 1000;
 	unsigned int windowHeight = 800;
 	init(windowWidth, windowHeight, 640, 480, 640, 480);
 
 	//default path should be actually overwritten
-	m_BaseFilename = "";
 	//m_BaseFilename = "../stanfordData/copyroom_png/";
 	m_NumFrames = 0;
 }
@@ -50,11 +50,7 @@ HRESULT ImageReaderSensor::processDepth()
 		return S_FALSE;
 	}
 	std::cout << "Processing Depth Frame " << m_CurrentFrameNumberDepth << std::endl;
-	char frameNumber_c[10];
-	sprintf_s(frameNumber_c,"%06d", m_CurrentFrameNumberDepth+1);
-	std::string frameNumber(frameNumber_c);
-	std::string currFileName = m_BaseFilename;
-	currFileName.append("depth/").append(frameNumber).append(".png");
+	std::string currFileName = m_BasePath + m_create_depth_file_name(m_CurrentFrameNumberDepth + 1);
 	ml::DepthImage16 image;
 	FreeImageWrapper::loadImage(currFileName, image);
 	image.flipY();
@@ -75,11 +71,7 @@ HRESULT ImageReaderSensor::processColor()
 	bool readColor = false;
 
 	if (readColor) {
-		char frameNumber_c[10];
-		sprintf_s(frameNumber_c,"%06d", m_CurrentFrameNumberDepth+1);
-		std::string frameNumber(frameNumber_c);
-		std::string currFileName = m_BaseFilename;
-		currFileName.append("color/").append(frameNumber).append(".png");
+		std::string currFileName = m_BasePath + m_create_color_file_name(m_CurrentFrameNumberDepth + 1);
 		ml::ColorImageR32G32B32 image;
 		FreeImageWrapper::loadImage(currFileName, image);
 		image.flipY();

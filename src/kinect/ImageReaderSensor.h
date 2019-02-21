@@ -28,7 +28,7 @@ public:
 	}
 
 	void setBaseFilePath(const std::string& basePath) {
-		m_BaseFilename = basePath;
+		m_BasePath = basePath;
 	}
 
 	void setNumFrames(unsigned int i) {
@@ -39,8 +39,18 @@ public:
 		return m_NumFrames;
 	}
 
+	void setDepthFileName(const std::function<std::string(unsigned int)> create_depth_file_name) {
+		m_create_depth_file_name = create_depth_file_name;
+	}
+
+	void setColorFileName(const std::function<std::string(unsigned int)> create_depth_file_name) {
+		m_create_color_file_name = create_depth_file_name;
+	}
+
 private:
-	std::string m_BaseFilename;
+	std::string m_BasePath;
+	std::function<std::string(unsigned int)> m_create_depth_file_name;
+	std::function<std::string(unsigned int)> m_create_color_file_name;
 	unsigned int m_CurrentFrameNumberDepth;
 	unsigned int m_CurrentFrameNumberColor;
 	unsigned int m_NumFrames;
