@@ -1,3 +1,9 @@
+mLibExternal
+bin
+.vs
+x64
+*.user
+
 # Prerequisites
 *.d
 
