@@ -40,6 +40,9 @@
     <Filter Include="visualize">
       <UniqueIdentifier>{53d900cb-dbdf-49bc-99e2-f2dc6a70e268}</UniqueIdentifier>
     </Filter>
+    <Filter Include="kinect">
+      <UniqueIdentifier>{c07f7c73-8c01-4440-b766-dfbd29b2d890}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\include\mLibCore.h">
@@ -386,6 +389,12 @@
     <ClInclude Include="src\visualize\showKinectData.h">
       <Filter>visualize</Filter>
     </ClInclude>
+    <ClInclude Include="src\kinect\KinectSensor.h">
+      <Filter>kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\kinect\DepthSensor.h">
+      <Filter>kinect</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\include\core-graphics\polygon.cpp">
@@ -479,6 +488,12 @@
     <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\visualize\showKinectData.cpp">
       <Filter>visualize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kinect\KinectSensor.cpp">
+      <Filter>kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="src\kinect\DepthSensor.cpp">
+      <Filter>kinect</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,9 @@ struct ConstantBuffer
 
 class ShowKinectData
 {
+private:
+	void initMesh(ml::GraphicsDevice & graphics);
+	void initPoints(ml::GraphicsDevice & graphics);
 public:
 	void init(ml::ApplicationData &app);
 	void render(ml::Cameraf& camera);
