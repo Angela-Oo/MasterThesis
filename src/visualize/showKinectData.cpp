@@ -1,7 +1,8 @@
 #include "showKinectData.h"
 #include "kinect/BinaryDumpReader.h"
 #include "kinect/ImageReaderSensor.h"
-#include "kinect/DX11DepthSensor.h"
+#include "ext-depthcamera/sensorData.h"
+#include <numeric>
 
 
 void ShowKinectData::initMesh(ml::GraphicsDevice & graphics)
@@ -28,22 +29,76 @@ void ShowKinectData::initPoints(ml::GraphicsDevice & graphics)
 void ShowKinectData::initKinectPoints(ml::GraphicsDevice & graphics)
 {
 	ImageReaderSensor reader;
-	reader.setBaseFilePath("D:/Studium/MasterThesis/input_data/desk_1/rgbd-scenes/desk/desk_1/");
-	reader.setDepthFileName([](unsigned int idx) { return "desk_1_" + std::to_string(idx) + "_depth.png"; });
-	reader.setColorFileName([](unsigned int idx) { return "desk_1_" + std::to_string(idx) + ".png"; });
+	reader.setBaseFilePath("C:/Users/Angela/Meins/Studium/MasterThesis/data/sokrates-ps/");
+	auto depth_file_name = [](unsigned int idx) {
+		char frameNumber_c[10];
+		sprintf_s(frameNumber_c, "%06d", idx);
+		return "frame-" + std::string(frameNumber_c) + ".depth.png";
+		// return "desk_1_" + std::to_string(idx) + "_depth.png";
+	};
+	auto color_file_name = [](unsigned int idx) {
+		char frameNumber_c[10];
+		sprintf_s(frameNumber_c, "%06d", idx);
+		return "frame-" + std::string(frameNumber_c) + ".color.png";
+		//return "desk_1_" + std::to_string(idx) + ".png"; 
+	};
+
+	reader.setDepthFileName(depth_file_name);
+	reader.setColorFileName(color_file_name);
 
 	try {
 		reader.createFirstConnected();
 		reader.setNumFrames(98);
 
-		//DX11Sensor sensor;
-		//sensor.OnD3D11CreateDevice(graphics, &reader);
-
-		//sensor.OnD3D11DestroyDevice();
 		auto intrinsic = reader.getIntrinsics();
 		auto dh = reader.getDepthHeight();
 		reader.processDepth();
 		reader.processColor();		
+
+		reader.recordFrame();
+		
+		std::vector<float> depth_data;
+		for (unsigned int i = 0; i < reader.getDepthHeight(); i++) {
+			for (unsigned int j = 0; j < reader.getDepthWidth(); j++) {
+				depth_data.push_back(reader.getDepth(j, i));
+			}
+		}
+
+		DepthImage32 depth_image(reader.getDepthWidth(), reader.getDepthHeight(), depth_data.data());
+
+		SensorData::CalibrationData calibrationColor;
+		SensorData::CalibrationData calibrationDepth;
+		SensorData data;
+		data.initDefault(reader.getColorWidth(), reader.getColorHeight(),
+						 reader.getDepthWidth(), reader.getDepthHeight(),
+						 calibrationColor, calibrationDepth);
+		auto color_rgbx = reader.getColorRGBX();
+		std::vector<vec3uc> color_data;
+		for (unsigned int i = 0; i < reader.getColorHeight(); i++) {
+			for (unsigned int j = 0; j < reader.getColorWidth(); j++) {
+				const unsigned int idx = (i * reader.getColorWidth() + j) * 4;	//4 bytes per entry
+				//vec4ui c = vec4ui(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2], color_rgbx[idx + 3]);
+				color_data.push_back(vec3uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2]));
+			}
+		}
+
+		data.addFrame(color_data.data(), reader.getDepthD16());// , intrinsic.converToMatrix());
+		auto point_cloud = data.computePointCloud(0);
+
+		auto points = point_cloud.m_points;
+		
+		auto max = std::max_element(points.begin(), points.end(), [](vec3f& a, vec3f & b) {return b > a; });
+		auto min = std::min(points.begin(), points.end());
+		vec3f range = vec3f(*max);// max->x - min->x, max->y - min->y, max->z - min->z);
+		//range.z = 1.;
+		std::for_each(points.begin(), points.end(), [&range](vec3f & p) { p = vec3f(p.x / range.x, p.y/range.y, p.z/range.z); });
+
+		auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / points.size();
+		std::for_each(points.begin(), points.end(), [&average](vec3f & p) { p = p - average; });
+
+		
+		m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.01f), points));
+		//data.loadFromFile();
 	}
 	catch (...)
 	{
@@ -55,7 +110,7 @@ void ShowKinectData::init(ml::ApplicationData &app)
 {
 	initMesh(app.graphics);
 
-	initPoints(app.graphics);
+	//initPoints(app.graphics);
 
 	initKinectPoints(app.graphics);
 
