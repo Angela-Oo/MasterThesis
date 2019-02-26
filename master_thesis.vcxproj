@@ -232,6 +232,7 @@
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\visualize\i_showData.h" />
     <ClInclude Include="src\visualize\PointsFromDepthSensor.h" />
+    <ClInclude Include="src\visualize\showRegisterTwoRigideFrames.h" />
     <ClInclude Include="src\visualize\showKinectData.h" />
     <ClInclude Include="src\visualize\showRGBDData.h" />
   </ItemGroup>
@@ -253,6 +254,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\visualize\PointsFromDepthSensor.cpp" />
+    <ClCompile Include="src\visualize\showRegisterTwoRigideFrames.cpp" />
     <ClCompile Include="src\visualize\showKinectData.cpp" />
     <ClCompile Include="src\visualize\showRGBDData.cpp" />
   </ItemGroup>
