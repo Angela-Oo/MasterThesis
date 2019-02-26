@@ -1,42 +1,64 @@
 #include "PointsFromDepthSensor.h"
 
 
-PointCloudf PointsFromDepthData::getPointCloudf()
+
+std::vector<vec3f> SensorDataWrapper::addFrame(unsigned int step)
 {
-	_depth_sensor.processDepth();
-	_depth_sensor.processColor();
+	std::vector<ml::vec3f> points;
+	HRESULT hr = _depth_sensor.processDepth();
+	if (hr == S_OK) {
+		_depth_sensor.processColor();
 
-	std::vector<unsigned short> depth_data(_depth_sensor.getDepthHeight() * _depth_sensor.getDepthWidth());
-	for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i++) {
-		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j++) {
-			float depth = _depth_sensor.getDepth(j, i);
-			if (depth != 0.)
-				depth = 350 - depth;
-			depth_data[i * _depth_sensor.getDepthWidth() + j] = static_cast<unsigned short>(depth);
-			//depth_data.push_back(static_cast<unsigned short>(depth));
+		std::vector<unsigned short> depth_data(_depth_sensor.getDepthHeight() * _depth_sensor.getDepthWidth());
+		for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i += step) {
+			for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j += step) {
+				float depth = _depth_sensor.getDepth(j, i);
+				if (depth != 0.)
+					depth = 350 - depth;
+				depth_data[i * _depth_sensor.getDepthWidth() + j] = static_cast<unsigned short>(depth);
+			}
 		}
-	}
 
-	//DepthImage32 depth_image(reader.getDepthWidth(), reader.getDepthHeight(), depth_data.data());
-	auto color_rgbx = _depth_sensor.getColorRGBX();
-	std::vector<vec3uc> color_data(_depth_sensor.getDepthHeight() * _depth_sensor.getDepthWidth());
-	for (unsigned int i = 0; i < _depth_sensor.getColorHeight(); i++) {
-		for (unsigned int j = 0; j < _depth_sensor.getColorWidth(); j++) {
-			const unsigned int idx = (i * _depth_sensor.getColorWidth() + j) * 4;	//4 bytes per entry
-			color_data[i * _depth_sensor.getDepthWidth() + j] = vec3uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2]);;
+		//DepthImage32 depth_image(reader.getDepthWidth(), reader.getDepthHeight(), depth_data.data());
+		auto color_rgbx = _depth_sensor.getColorRGBX();
+		std::vector<vec3uc> color_data(_depth_sensor.getDepthHeight() * _depth_sensor.getDepthWidth());
+		for (unsigned int i = 0; i < _depth_sensor.getColorHeight(); i += step) {
+			for (unsigned int j = 0; j < _depth_sensor.getColorWidth(); j += step) {
+				const unsigned int idx = (i * _depth_sensor.getColorWidth() + j) * 4;	//4 bytes per entry
+				color_data[i * _depth_sensor.getDepthWidth() + j] = vec3uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2]);;
+			}
 		}
+
+		_data.addFrame(color_data.data(), depth_data.data());
+		points = _data.computePointCloud(_data.m_frames.size() - 1).m_points;
 	}
-
-	SensorData::CalibrationData calibrationColor(_color_intrinsics);
-	SensorData::CalibrationData calibrationDepth(_depth_intrinsics);
-	SensorData data;
-	data.initDefault(_depth_sensor.getColorWidth(), _depth_sensor.getColorHeight(),
-					 _depth_sensor.getDepthWidth(), _depth_sensor.getDepthHeight(),
-					 calibrationColor, calibrationDepth);
-
-	data.addFrame(color_data.data(), depth_data.data());
-	return data.computePointCloud(0);
+	return points;
 }
+
+
+
+SensorDataWrapper::SensorDataWrapper(DepthSensor & depth_sensor,
+									 mat4f color_intrinsics,
+									 mat4f depth_intrinsics)
+	: _depth_sensor(depth_sensor)
+{
+	SensorData::CalibrationData calibrationColor(color_intrinsics);
+	SensorData::CalibrationData calibrationDepth(depth_intrinsics);
+
+	_data.initDefault(_depth_sensor.getColorWidth(), _depth_sensor.getColorHeight(),
+					  _depth_sensor.getDepthWidth(), _depth_sensor.getDepthHeight(),
+					  calibrationColor, calibrationDepth);
+}
+
+
+
+
+
+
+
+
+
+
 
 std::vector<vec3f> PointsFromDepthData::getPoints(unsigned int step)
 {

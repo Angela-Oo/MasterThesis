@@ -62,9 +62,7 @@ void configImageReaderSensor(ImageReaderSensor & reader, std::string filepath)
 
 std::vector<vec3f> ShowRGBDImageData::processFrame()
 {
-	_rgbd_frame_to_point_cloud = std::make_unique<PointsFromDepthData>(_reader, _reader.getColorIntrinsics(), _reader.getDepthIntrinsics());
-
-	auto points = _rgbd_frame_to_point_cloud->getPoints(5);
+	auto points = _rgbd_frame_to_point_cloud->addFrame(5);
 	//auto points = _rgbd_frame_to_point_cloud->getPoints();
 
 	auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / static_cast<float>(points.size());
@@ -76,6 +74,7 @@ std::vector<vec3f> ShowRGBDImageData::processFrame()
 	mat4f translate = transform * rotation * scale * center;
 	std::for_each(points.begin(), points.end(), [&translate](vec3f & p) { p = translate * p; });
 
+	_reader.recordFrame();
 	return points;
 }
 
@@ -87,8 +86,10 @@ void ShowRGBDImageData::init(ml::ApplicationData &app)
 	_reader.createFirstConnected();
 	_reader.setNumFrames(56);
 	_reader.toggleNearMode();
+	//_rgbd_frame_to_point_cloud = std::make_unique<PointsFromDepthData>(_reader, _reader.getColorIntrinsics(), _reader.getDepthIntrinsics());
+	_rgbd_frame_to_point_cloud = std::make_unique<SensorDataWrapper>(_reader, _reader.getColorIntrinsics(), _reader.getDepthIntrinsics());
 	auto points = processFrame();
-	m_pointCloud.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points));
+	m_pointCloud.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points));
 
 	m_shaderManager.init(app.graphics);
 	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
@@ -101,6 +102,11 @@ void ShowRGBDImageData::render(ml::Cameraf& camera)
 	if (!points.empty()) {
 		auto point_template = ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points);
 		m_pointCloud.init(*_graphics, point_template);
+	}
+	else {
+		_rgbd_frame_to_point_cloud->_data.saveToFile("D:/Studium/MasterThesis/input_data/recorded_frames/frames_rgbd.sens");
+		_reader.saveRecordedPointCloud("D:/Studium/MasterThesis/input_data/recorded_frames/point_cloud.txt");
+		_reader.saveRecordedFramesToFile("D:/Studium/MasterThesis/input_data/recorded_frames/frames.txt");
 	}
 
 	ConstantBuffer constants;

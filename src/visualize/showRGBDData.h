@@ -33,7 +33,8 @@ private:
 	ml::D3D11TriMesh m_pointCloud;
 	ml::D3D11ShaderManager m_shaderManager;
 	ml::D3D11ConstantBuffer<ConstantBuffer> m_constants;
-	std::unique_ptr<PointsFromDepthData> _rgbd_frame_to_point_cloud;
+	//std::unique_ptr<PointsFromDepthData> _rgbd_frame_to_point_cloud;
+	std::unique_ptr<SensorDataWrapper> _rgbd_frame_to_point_cloud;
 	ImageReaderSensor _reader;
 	ml::GraphicsDevice * _graphics;
 public:
