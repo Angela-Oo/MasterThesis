@@ -4,6 +4,20 @@
 #include "core-base/baseImage.h"
 
 
+mat4f loadIntrinsicFromFile(std::string filename)
+{
+	mat4f data = mat4f::identity();
+	std::ifstream file(filename);
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			float value;
+			file >> value;
+			data(i, j) = value;
+		}
+	}
+	return data;
+}
+
 ImageReaderSensor::ImageReaderSensor()
 	: m_BasePath("")
 {
@@ -21,22 +35,36 @@ ImageReaderSensor::~ImageReaderSensor()
 
 }
 
+
+ml::mat4f ImageReaderSensor::getColorIntrinsics()
+{
+	return loadIntrinsicFromFile(m_BasePath + m_ColorIntrinsicFileName);
+}
+
+ml::mat4f ImageReaderSensor::getDepthIntrinsics()
+{
+	return loadIntrinsicFromFile(m_BasePath + m_DepthIntrinsicFileName);
+}
+
 HRESULT ImageReaderSensor::createFirstConnected()
 {
 	HRESULT hr = S_OK;
 
-	//what Qian-Yi / Vladlen tell us
-	float focalLengthX = 525.0f;
-	float focalLengthY = 525.0f;
-	//float cx = 319.5f;
-	//float cy = 239.5f;
+	mat4f intrinsics = loadIntrinsicFromFile(m_BasePath + m_DepthIntrinsicFileName);
+	initializeIntrinsics(intrinsics(0, 0), intrinsics(1, 1), intrinsics(0, 2), intrinsics(1, 2));
 
-	//what the oni framework gives us
-	//float focalLengthX = 570.34f;
-	//float focalLengthY = 570.34f;
-	float cx = 320.0f;
-	float cy = 240.0f;
-	initializeIntrinsics(focalLengthX, focalLengthY, cx, cy);
+	//what Qian-Yi / Vladlen tell us
+	//float focalLengthX = 525.0f;
+	//float focalLengthY = 525.0f;
+	////float cx = 319.5f;
+	////float cy = 239.5f;
+
+	////what the oni framework gives us
+	////float focalLengthX = 570.34f;
+	////float focalLengthY = 570.34f;
+	//float cx = 320.0f;
+	//float cy = 240.0f;
+	//initializeIntrinsics(focalLengthX, focalLengthY, cx, cy);
 
 	m_CurrentFrameNumberColor = 0;
 	m_CurrentFrameNumberDepth = 0;
