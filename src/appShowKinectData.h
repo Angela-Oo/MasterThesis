@@ -1,6 +1,6 @@
 #pragma once
 #include "mLibInclude.h"
-#include "visualize/showKinectData.h"
+#include "visualize/i_showData.h"
 
 class AppShowKinectData : public ml::ApplicationCallback
 {
@@ -14,7 +14,7 @@ public:
 	void mouseWheel(ml::ApplicationData &app, int wheelDelta) override;
 	void resize(ml::ApplicationData &app) override;
 private:
-	ShowKinectData m_show_kinect_data;
+	std::unique_ptr<IShowData> m_render_data;
 
 	ml::D3D11Font m_font;
 	ml::FrameTimer m_timer;

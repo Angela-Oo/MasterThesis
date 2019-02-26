@@ -1,6 +1,8 @@
 
 #include "appShowKinectData.h"
 
+#include "visualize/showKinectData.h"
+#include "visualize/showRGBDData.h"
 
 
 //void backProjectGraphics(const DepthImage32& depth, const ColorImageR8G8B8A8& color, const Cameraf& camera) {
@@ -53,7 +55,8 @@
 
 void AppShowKinectData::init(ml::ApplicationData &app)
 {
-	m_show_kinect_data.init(app);
+	m_render_data = std::make_unique<ShowRGBDImageData>();
+	m_render_data->init(app);
 
 	ml::vec3f eye(-0.5f, -0.5f, 1.5f);
 	m_camera = Cameraf(eye, -vec3f::eY, vec3f::eZ, 60.0f, (float)app.window.getWidth() / app.window.getHeight(), 0.01f, 10.0f);
@@ -74,7 +77,7 @@ void AppShowKinectData::render(ml::ApplicationData& app)
 
 	//mat4f proj = Cameraf::visionToGraphicsProj(app.window.getWidth(), app.window.getHeight(), 1108.51f, 1108.51f, m_camera.getNearPlane(), m_camera.getFarPlane());
 
-	m_show_kinect_data.render(m_camera);
+	m_render_data->render(m_camera);
 
 	m_font.drawString("FPS: " + ml::convert::toString(m_timer.framesPerSecond()), ml::vec2i(10, 5), 24.0f, ml::RGBColor::Red);
 }

@@ -230,7 +230,10 @@
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\mLibInclude.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\visualize\i_showData.h" />
+    <ClInclude Include="src\visualize\PointsFromDepthSensor.h" />
     <ClInclude Include="src\visualize\showKinectData.h" />
+    <ClInclude Include="src\visualize\showRGBDData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\appShowKinectData.cpp" />
@@ -249,7 +252,9 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\visualize\PointsFromDepthSensor.cpp" />
     <ClCompile Include="src\visualize\showKinectData.cpp" />
+    <ClCompile Include="src\visualize\showRGBDData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\pointCloud.hlsl">

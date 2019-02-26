@@ -1,29 +1,19 @@
 #pragma once
 #include "../mLibInclude.h"
+#include "PointsFromDepthSensor.h"
+#include "i_showData.h"
 
-struct ConstantBuffer
-{
-	ml::mat4f worldViewProj;
-	ml::vec4f modelColor;
-};
 
-class ShowKinectData
+class ShowKinectData : public IShowData
 {
 private:
-	void initMesh(ml::GraphicsDevice & graphics);
-	void initPoints(ml::GraphicsDevice & graphics);
-	void initKinectPoints(ml::GraphicsDevice & graphics);
-	void initImagePoints(ml::GraphicsDevice & graphics);
-	void initSokratesPoints(ml::GraphicsDevice & graphics);
+	void initKinectPoints(ml::GraphicsDevice & graphics);	
 public:
-	void init(ml::ApplicationData &app);
-	void render(ml::Cameraf& camera);
+	void init(ml::ApplicationData &app) override;
+	void render(ml::Cameraf& camera) override;
 private:
-	ml::D3D11TriMesh m_mesh, m_pointCloud;
-
+	ml::D3D11TriMesh m_pointCloud;
 	ml::D3D11ShaderManager m_shaderManager;
-
 	ml::D3D11ConstantBuffer<ConstantBuffer> m_constants;
-
-	ml::D3D11Buffer<vec4f> m_buffer;
+	std::unique_ptr<PointsFromDepthData> _rgbd_frame_to_point_cloud;
 };

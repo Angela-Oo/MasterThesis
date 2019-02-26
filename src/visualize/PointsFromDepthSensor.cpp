@@ -11,7 +11,7 @@ PointCloudf PointsFromDepthData::getPoints()
 		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j++) {
 			float depth = _depth_sensor.getDepth(j, i);
 			if (depth != 0.)
-				depth = 200 - depth;
+				depth = 350 - depth;
 			depth_data.push_back(static_cast<unsigned short>(depth));
 		}
 	}
@@ -35,6 +35,30 @@ PointCloudf PointsFromDepthData::getPoints()
 
 	data.addFrame(color_data.data(), depth_data.data());
 	return data.computePointCloud(0);
+}
+
+std::vector<vec3f> PointsFromDepthData::getPointsWithoutSensorData()
+{
+	_depth_sensor.processDepth();
+	_depth_sensor.processColor();
+
+	mat4f depth_intrinsics_inv = _depth_intrinsics;
+	depth_intrinsics_inv.invert();
+
+	std::vector<ml::vec3f> points;
+	for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i++) {
+		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j++) {
+			float depth = _depth_sensor.getDepth(j, i);
+			//if (depth != 0.) {
+			vec3f p(static_cast<float>(j), static_cast<float>(i), 1.);
+			p = depth_intrinsics_inv * p;
+			depth = (200. - depth) / 20.;
+			p = p * depth;
+			points.push_back(p);
+			//}
+		}
+	}
+	return points;
 }
 
 PointsFromDepthData::PointsFromDepthData(DepthSensor & depth_sensor,

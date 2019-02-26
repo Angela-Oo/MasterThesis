@@ -440,6 +440,15 @@
     <ClInclude Include="src\kinect\PrimeSenseSensor.h">
       <Filter>kinect</Filter>
     </ClInclude>
+    <ClInclude Include="src\visualize\PointsFromDepthSensor.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\i_showData.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\showRGBDData.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -464,6 +473,12 @@
     </ClCompile>
     <ClCompile Include="src\kinect\PrimeSenseSensor.cpp">
       <Filter>kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\PointsFromDepthSensor.cpp">
+      <Filter>visualize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\showRGBDData.cpp">
+      <Filter>visualize</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
