@@ -181,7 +181,7 @@ void ShowKinectData::initImagePoints(ml::GraphicsDevice & graphics)
 			for (unsigned int j = 0; j < reader.getDepthWidth(); j++) {
 				float depth = reader.getDepth(j, i);
 				if (depth != 0.)
-					depth = 300 + depth;
+					depth = 200 - depth;
 				depth_data.push_back(static_cast<unsigned short>(depth));				
 			}
 		}
@@ -196,7 +196,7 @@ void ShowKinectData::initImagePoints(ml::GraphicsDevice & graphics)
 			}
 		}
 
-		SensorData::CalibrationData calibrationColor;
+		SensorData::CalibrationData calibrationColor(reader.getColorIntrinsics());
 		SensorData::CalibrationData calibrationDepth(reader.getDepthIntrinsics());
 		SensorData data;
 		data.initDefault(reader.getColorWidth(), reader.getColorHeight(),
@@ -207,11 +207,23 @@ void ShowKinectData::initImagePoints(ml::GraphicsDevice & graphics)
 		auto point_cloud = data.computePointCloud(0);
 
 		auto points = point_cloud.m_points;		
-		float scale_factor = 20.;
+
+
+		auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / points.size();
+		mat4f center = mat4f::translation(-average);
+		std::for_each(points.begin(), points.end(), [&center](vec3f & p) { p = center * p; });
+
+		float scale_factor = 10.;
 		mat3f scale({ scale_factor, 0., 0. }, { 0., scale_factor, 0. }, { 0., 0., scale_factor });
 		std::for_each(points.begin(), points.end(), [&scale](vec3f & p) { p = scale * p; });
+
+		mat4f rotation = mat4f::rotationX(90.) * mat4f::rotationY(180.);
+		std::for_each(points.begin(), points.end(), [&rotation](vec3f & p) { p = rotation * p; });
+
+		mat4f transform = mat4f::translation({ -2., -2., 1. });
+		std::for_each(points.begin(), points.end(), [&transform](vec3f & p) { p = transform * p; });
 		
-		m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.01f), points));
+		m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points));
 
 		//reader.recordFrame();
 	}
@@ -223,7 +235,7 @@ void ShowKinectData::initImagePoints(ml::GraphicsDevice & graphics)
 
 void ShowKinectData::init(ml::ApplicationData &app)
 {
-	initMesh(app.graphics);
+	//initMesh(app.graphics);
 
 	//initPoints(app.graphics);
 
