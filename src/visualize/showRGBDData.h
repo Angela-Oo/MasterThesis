@@ -25,8 +25,6 @@ private:
 class ShowRGBDImageData : public IShowData
 {
 private:
-	std::vector<vec3f> initImagePoints();
-	std::vector<vec3f> initSokratesPoints();
 	std::vector<vec3f> processFrame();
 public:
 	void init(ml::ApplicationData &app) override;
@@ -37,7 +35,7 @@ private:
 	ml::D3D11ConstantBuffer<ConstantBuffer> m_constants;
 	std::unique_ptr<PointsFromDepthData> _rgbd_frame_to_point_cloud;
 	ImageReaderSensor _reader;
-	//ml::GraphicsDevice & _graphics;
+	ml::GraphicsDevice * _graphics;
 public:
 	ShowRGBDImageData() {};
 	~ShowRGBDImageData() = default;

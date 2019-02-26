@@ -1,28 +1,29 @@
 #include "PointsFromDepthSensor.h"
 
 
-PointCloudf PointsFromDepthData::getPoints()
+PointCloudf PointsFromDepthData::getPointCloudf()
 {
 	_depth_sensor.processDepth();
 	_depth_sensor.processColor();
 
-	std::vector<unsigned short> depth_data;
+	std::vector<unsigned short> depth_data(_depth_sensor.getDepthHeight() * _depth_sensor.getDepthWidth());
 	for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i++) {
 		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j++) {
 			float depth = _depth_sensor.getDepth(j, i);
 			if (depth != 0.)
 				depth = 350 - depth;
-			depth_data.push_back(static_cast<unsigned short>(depth));
+			depth_data[i * _depth_sensor.getDepthWidth() + j] = static_cast<unsigned short>(depth);
+			//depth_data.push_back(static_cast<unsigned short>(depth));
 		}
 	}
 
 	//DepthImage32 depth_image(reader.getDepthWidth(), reader.getDepthHeight(), depth_data.data());
 	auto color_rgbx = _depth_sensor.getColorRGBX();
-	std::vector<vec3uc> color_data;
+	std::vector<vec3uc> color_data(_depth_sensor.getDepthHeight() * _depth_sensor.getDepthWidth());
 	for (unsigned int i = 0; i < _depth_sensor.getColorHeight(); i++) {
 		for (unsigned int j = 0; j < _depth_sensor.getColorWidth(); j++) {
 			const unsigned int idx = (i * _depth_sensor.getColorWidth() + j) * 4;	//4 bytes per entry
-			color_data.push_back(vec3uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2]));
+			color_data[i * _depth_sensor.getDepthWidth() + j] = vec3uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2]);;
 		}
 	}
 
@@ -37,25 +38,27 @@ PointCloudf PointsFromDepthData::getPoints()
 	return data.computePointCloud(0);
 }
 
-std::vector<vec3f> PointsFromDepthData::getPointsWithoutSensorData()
+std::vector<vec3f> PointsFromDepthData::getPoints(unsigned int step)
 {
-	_depth_sensor.processDepth();
-	_depth_sensor.processColor();
-
-	mat4f depth_intrinsics_inv = _depth_intrinsics;
-	depth_intrinsics_inv.invert();
-
 	std::vector<ml::vec3f> points;
-	for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i++) {
-		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j++) {
-			float depth = _depth_sensor.getDepth(j, i);
-			//if (depth != 0.) {
-			vec3f p(static_cast<float>(j), static_cast<float>(i), 1.);
-			p = depth_intrinsics_inv * p;
-			depth = (200. - depth) / 20.;
-			p = p * depth;
-			points.push_back(p);
-			//}
+	HRESULT hr = _depth_sensor.processDepth();
+	if (hr == S_OK) {
+		_depth_sensor.processColor();
+
+		mat4f depth_intrinsics_inv = _depth_intrinsics;
+		depth_intrinsics_inv.invert();
+		
+		for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i += step) {
+			for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j += step) {
+				float depth = _depth_sensor.getDepth(j, i);
+				if (depth != 0.) {
+					vec3f p(static_cast<float>(j), static_cast<float>(i), 1.);
+					p = depth_intrinsics_inv * p;
+					depth = (350.f - depth) / 1000.f;
+					p = p * depth;
+					points.push_back(p);
+				}
+			}
 		}
 	}
 	return points;

@@ -16,8 +16,7 @@ void ShowKinectData::initKinectPoints(ml::GraphicsDevice & graphics)
 		reader.toggleNearMode();
 
 		PointsFromDepthData pointGenerator(reader); // intrinsics ??
-		auto point_cloud = pointGenerator.getPoints();
-		auto points = point_cloud.m_points;
+		auto points = pointGenerator.getPoints();
 		m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.01f), points));
 		//data.loadFromFile();
 

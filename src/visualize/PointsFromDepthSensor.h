@@ -10,8 +10,8 @@ private:
 	mat4f _color_intrinsics;
 	mat4f _depth_intrinsics;
 public:
-	PointCloudf getPoints();
-	std::vector<vec3f> getPointsWithoutSensorData(); // test only
+	PointCloudf getPointCloudf();
+	std::vector<vec3f> getPoints(unsigned int step = 1);
 public:
 	PointsFromDepthData(DepthSensor & depth_sensor,
 						mat4f color_intrinsics = mat4f::identity(),
