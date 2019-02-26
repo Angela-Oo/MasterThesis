@@ -104,25 +104,20 @@ void ShowKinectData::initKinectPoints(ml::GraphicsDevice & graphics)
 	}
 }
 
-void ShowKinectData::initImagePoints(ml::GraphicsDevice & graphics)
+
+
+void ShowKinectData::initSokratesPoints(ml::GraphicsDevice & graphics)
 {
 	ImageReaderSensor reader;
 	reader.setBaseFilePath("D:/Studium/MasterThesis/input_data/sokrates-ps/");
-	auto depth_file_name = [](unsigned int idx) {
-		char frameNumber_c[10];
-		sprintf_s(frameNumber_c, "%06d", idx);
-		return "frame-" + std::string(frameNumber_c) + ".depth.png";
-		// return "desk_1_" + std::to_string(idx) + "_depth.png";
-	};
-	auto color_file_name = [](unsigned int idx) {
-		char frameNumber_c[10];
-		sprintf_s(frameNumber_c, "%06d", idx);
-		return "frame-" + std::string(frameNumber_c) + ".color.png";
-		//return "desk_1_" + std::to_string(idx) + ".png"; 
-	};
 
-	reader.setDepthFileName(depth_file_name);
-	reader.setColorFileName(color_file_name);
+	auto frame_number = [](unsigned int idx) {
+		char frameNumber_c[10];
+		sprintf_s(frameNumber_c, "%06d", idx);
+		return std::string(frameNumber_c);
+	};
+	reader.setDepthFileName([&frame_number](unsigned int idx) { return "frame-" + frame_number(idx) + ".depth.png";});
+	reader.setColorFileName([&frame_number](unsigned int idx) { return "frame-" + frame_number(idx) + ".color.png";});
 	reader.setDepthIntrinsicsFileName("depthIntrinsics.txt");
 	reader.setColorIntrinsicsFileName("colorIntrinsics.txt");
 
@@ -130,75 +125,95 @@ void ShowKinectData::initImagePoints(ml::GraphicsDevice & graphics)
 		reader.createFirstConnected();
 		reader.setNumFrames(98);
 
-		auto intrinsic = reader.getIntrinsics();
-		auto dh = reader.getDepthHeight();
-		reader.processDepth();
-		reader.processColor();		
-
-		reader.recordFrame();
-
 		reader.processDepth();
 		reader.processColor();
 
-		mat4f depth_intrinsics = reader.getDepthIntrinsics();
-		mat4f depth_intrinsics_inv = depth_intrinsics;
+		mat4f depth_intrinsics_inv = reader.getDepthIntrinsics();
 		depth_intrinsics_inv.invert();
-		std::vector<float> depth_data;
-		std::vector<ml::vec3f> points_Data;
+
+		std::vector<ml::vec3f> points;
 		for (unsigned int i = 0; i < reader.getDepthHeight(); i++) {
 			for (unsigned int j = 0; j < reader.getDepthWidth(); j++) {
-				depth_data.push_back(reader.getDepth(j, i));
 				float depth = reader.getDepth(j, i);
-				if (depth != 0.) {
-					//vec3f p(static_cast<float>(j) / static_cast<float>(reader.getDepthWidth()), // * depth_intrinsics(0, 0),
-					//		static_cast<float>(i) / static_cast<float>(reader.getDepthHeight()),// * depth_intrinsics(1, 1),
-					//		1.);
-					vec3f p(static_cast<float>(j),
-							static_cast<float>(i),
-							1.);
-					p = depth_intrinsics_inv * p;
-					depth = (200. - depth) /20.;
-					p = p * depth;
+				//if (depth != 0.) {
+				vec3f p(static_cast<float>(j), static_cast<float>(i), 1.);
+				p = depth_intrinsics_inv * p;
+				depth = (200. - depth) / 20.;
+				p = p * depth;
+				points.push_back(p);
+				//}
+			}
+		}
+		mat3f scale({ 0.5, 0., 0. }, { 0., 0.5, 0. }, { 0., 0., 0.5 });
+		std::for_each(points.begin(), points.end(), [&scale](vec3f & p) { p = scale * p; });
 
-					//p = depth_intrinsics_inv * p;
-					//p[0] /= depth_intrinsics(0, 0);
-					//p[1] /= depth_intrinsics(1, 1);
-					points_Data.push_back(p);
-				}
+		m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.01f), points));
+	}
+	catch (...)
+	{
+		std::cout << "could not load file" << std::endl;
+	}
+}
+
+void ShowKinectData::initImagePoints(ml::GraphicsDevice & graphics)
+{
+	ImageReaderSensor reader;
+	reader.setBaseFilePath("D:/Studium/MasterThesis/input_data/sokrates-ps/");
+	auto frame_number = [](unsigned int idx) {
+		char frameNumber_c[10];
+		sprintf_s(frameNumber_c, "%06d", idx);
+		return std::string(frameNumber_c);
+	};
+	reader.setDepthFileName([&frame_number](unsigned int idx) { return "frame-" + frame_number(idx) + ".depth.png"; });
+	reader.setColorFileName([&frame_number](unsigned int idx) { return "frame-" + frame_number(idx) + ".color.png"; });
+	reader.setDepthIntrinsicsFileName("depthIntrinsics.txt");
+	reader.setColorIntrinsicsFileName("colorIntrinsics.txt");
+
+	try {
+		reader.createFirstConnected();
+		reader.setNumFrames(98);
+		
+		reader.processDepth();
+		reader.processColor();
+		
+		std::vector<unsigned short> depth_data;
+		for (unsigned int i = 0; i < reader.getDepthHeight(); i++) {
+			for (unsigned int j = 0; j < reader.getDepthWidth(); j++) {
+				float depth = reader.getDepth(j, i);
+				if (depth != 0.)
+					depth = 300 + depth;
+				depth_data.push_back(static_cast<unsigned short>(depth));				
 			}
 		}
 
-		DepthImage32 depth_image(reader.getDepthWidth(), reader.getDepthHeight(), depth_data.data());
+		//DepthImage32 depth_image(reader.getDepthWidth(), reader.getDepthHeight(), depth_data.data());
+		auto color_rgbx = reader.getColorRGBX();
+		std::vector<vec3uc> color_data;
+		for (unsigned int i = 0; i < reader.getColorHeight(); i++) {
+			for (unsigned int j = 0; j < reader.getColorWidth(); j++) {
+				const unsigned int idx = (i * reader.getColorWidth() + j) * 4;	//4 bytes per entry
+				color_data.push_back(vec3uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2]));
+			}
+		}
 
-		//SensorData::CalibrationData calibrationColor;
-		//SensorData::CalibrationData calibrationDepth(intrinsic.converToMatrix());
+		SensorData::CalibrationData calibrationColor;
+		SensorData::CalibrationData calibrationDepth(reader.getDepthIntrinsics());
 		SensorData data;
-		//data.initDefault(reader.getColorWidth(), reader.getColorHeight(),
-		//				 reader.getDepthWidth(), reader.getDepthHeight(),
-		//				 calibrationColor, calibrationDepth);
-		//auto color_rgbx = reader.getColorRGBX();
-		//std::vector<vec3uc> color_data;
-		//for (unsigned int i = 0; i < reader.getColorHeight(); i++) {
-		//	for (unsigned int j = 0; j < reader.getColorWidth(); j++) {
-		//		const unsigned int idx = (i * reader.getColorWidth() + j) * 4;	//4 bytes per entry
-		//		//vec4ui c = vec4ui(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2], color_rgbx[idx + 3]);
-		//		color_data.push_back(vec3uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2]));
-		//	}
-		//}
+		data.initDefault(reader.getColorWidth(), reader.getColorHeight(),
+						 reader.getDepthWidth(), reader.getDepthHeight(),
+						 calibrationColor, calibrationDepth);
 
-		//auto intrinsics = intrinsic.converToMatrix();
-		//intrinsics.transpose();
-		//data.addFrame(color_data.data(), reader.getDepthD16());// , intrinsics);
-		//auto point_cloud = data.computePointCloud(0);
+		data.addFrame(color_data.data(), depth_data.data());
+		auto point_cloud = data.computePointCloud(0);
 
-		//auto points = point_cloud.m_points;
+		auto points = point_cloud.m_points;		
+		float scale_factor = 20.;
+		mat3f scale({ scale_factor, 0., 0. }, { 0., scale_factor, 0. }, { 0., 0., scale_factor });
+		std::for_each(points.begin(), points.end(), [&scale](vec3f & p) { p = scale * p; });
 		
-		mat3f scale({ 0.5, 0., 0. }, { 0., 0.5, 0. }, { 0., 0., 0.5 });
-		//std::for_each(points.begin(), points.end(), [&scale](vec3f & p) { p = scale * p; });
+		m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.01f), points));
 
-		std::for_each(points_Data.begin(), points_Data.end(), [&scale](vec3f & p) { p = scale * p; });
-		
-		m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.01f), points_Data));
+		//reader.recordFrame();
 	}
 	catch (...)
 	{

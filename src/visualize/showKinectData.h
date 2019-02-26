@@ -14,6 +14,7 @@ private:
 	void initPoints(ml::GraphicsDevice & graphics);
 	void initKinectPoints(ml::GraphicsDevice & graphics);
 	void initImagePoints(ml::GraphicsDevice & graphics);
+	void initSokratesPoints(ml::GraphicsDevice & graphics);
 public:
 	void init(ml::ApplicationData &app);
 	void render(ml::Cameraf& camera);
