@@ -1,6 +1,8 @@
 #include "showKinectData.h"
 #include "kinect/BinaryDumpReader.h"
 #include "kinect/ImageReaderSensor.h"
+#include "kinect/KinectSensor.h"
+#include "kinect/PrimeSenseSensor.h"
 #include "ext-depthcamera/sensorData.h"
 #include <numeric>
 
@@ -27,6 +29,82 @@ void ShowKinectData::initPoints(ml::GraphicsDevice & graphics)
 }
 
 void ShowKinectData::initKinectPoints(ml::GraphicsDevice & graphics)
+{
+	PrimeSenseSensor reader;
+	try {
+		reader.createFirstConnected();
+
+		auto intrinsic = reader.getIntrinsics();
+
+		reader.toggleNearMode();
+
+		for (int i = 0; i < 10; i++) {
+			reader.processDepth();
+			reader.processColor();
+
+			reader.recordFrame();
+			reader.recordPointCloud();
+		}
+		
+
+	
+
+		std::vector<float> depth_data;
+		std::vector<vec3f> skeleton;
+		for (unsigned int i = 0; i < reader.getDepthHeight(); i++) {
+			for (unsigned int j = 0; j < reader.getDepthWidth(); j++) {
+				depth_data.push_back(reader.getDepth(j, i));
+				skeleton.push_back(reader.depthToSkeleton(j, i));
+			}
+		}
+
+		DepthImage32 depth_image(reader.getDepthWidth(), reader.getDepthHeight(), depth_data.data());
+
+		SensorData::CalibrationData calibrationColor;
+		SensorData::CalibrationData calibrationDepth;
+		SensorData data;
+		data.initDefault(reader.getColorWidth(), reader.getColorHeight(),
+						 reader.getDepthWidth(), reader.getDepthHeight(),
+						 calibrationColor, calibrationDepth);
+		auto color_rgbx = reader.getColorRGBX();
+		std::vector<vec3uc> color_data;
+		for (unsigned int i = 0; i < reader.getColorHeight(); i++) {
+			for (unsigned int j = 0; j < reader.getColorWidth(); j++) {
+				const unsigned int idx = (i * reader.getColorWidth() + j) * 4;	//4 bytes per entry
+				//vec4ui c = vec4ui(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2], color_rgbx[idx + 3]);
+				color_data.push_back(vec3uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2]));
+			}
+		}
+
+		data.addFrame(color_data.data(), reader.getDepthD16());// , intrinsic.converToMatrix());
+		auto point_cloud = data.computePointCloud(0);
+
+		auto points = point_cloud.m_points;
+
+		//auto max = std::max_element(points.begin(), points.end(), [](vec3f& a, vec3f & b) {return b > a; });
+		//auto min = std::min(points.begin(), points.end());
+		//vec3f range = vec3f(*max);// max->x - min->x, max->y - min->y, max->z - min->z);
+		////range.z = 1.;
+		//std::for_each(points.begin(), points.end(), [&range](vec3f & p) { p = vec3f(p.x / range.x, p.y / range.y, p.z / range.z); });
+
+		//auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / points.size();
+		//std::for_each(points.begin(), points.end(), [&average](vec3f & p) { p = p - average; });
+
+		m_pointCloud.init(graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.01f), points));
+		//data.loadFromFile();
+
+		reader.writeDepthDataToFile("C:/Users/Angela/Meins/Studium/MasterThesis/data/test_depth.png");
+		reader.writeColorDataToFile("C:/Users/Angela/Meins/Studium/MasterThesis/data/test_color.png");
+		reader.saveRecordedPointCloud("C:/Users/Angela/Meins/Studium/MasterThesis/data/test_point.pt");
+
+	}
+	catch (...)
+	{
+		std::cout << "could not load file" << std::endl;
+	}
+}
+
+void ShowKinectData::initImagePoints(ml::GraphicsDevice & graphics)
 {
 	ImageReaderSensor reader;
 	reader.setBaseFilePath("C:/Users/Angela/Meins/Studium/MasterThesis/data/sokrates-ps/");
