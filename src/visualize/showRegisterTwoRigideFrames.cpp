@@ -47,18 +47,20 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	configImageReaderSensor("D:/Studium/MasterThesis/input_data/sokrates-ps/");	
 	_rgbd_frame_to_point_cloud = std::make_unique<SensorDataWrapper>(_depth_sensor, _depth_sensor.getColorIntrinsics(), _depth_sensor.getDepthIntrinsics());
 
-	auto points_frame_0 = processFrame();
-	std::vector<vec4f> color_frame_0(points_frame_0.size());
-	std::fill(color_frame_0.begin(), color_frame_0.end(), vec4f( 0.f, 0.f, 1.f, 1.f ));
-	m_pointCloudFrameA.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points_frame_0, color_frame_0));
+	auto points_frame_A = processFrame();
+	std::vector<vec4f> color_frame_A(points_frame_A.size());
+	std::fill(color_frame_A.begin(), color_frame_A.end(), RGBColor::Orange);
+	m_pointCloudFrameA.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_A, color_frame_A));
 
-	for (int i = 0; i < 19; i++) {
+	for (int i = 0; i < 9; i++) {
 		_depth_sensor.processDepth();
 		_depth_sensor.processColor();
 	}
 
-	auto points_frame_20 = processFrame();
-	m_pointCloudFrameB.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f, {0.,1.,0.,1.}), points_frame_20));
+	auto points_frame_B = processFrame();
+	std::vector<vec4f> color_frame_B(points_frame_B.size());
+	std::fill(color_frame_B.begin(), color_frame_B.end(), RGBColor::Green);
+	m_pointCloudFrameB.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_B, color_frame_B));
 
 	m_shaderManager.init(app.graphics);
 	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
@@ -75,11 +77,6 @@ void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
 	m_shaderManager.bindShaders("pointCloud");
 	m_constants.bind(0);
 	m_pointCloudFrameA.render();
-
-	//constants.modelColor = ml::vec4f(0.0f, 1.0f, 1.0f, 1.0f);
-	//m_constants.updateAndBind(constants, 1);
-	//m_shaderManager.bindShaders("pointCloud");
-	//m_constants.bind(1);
 	m_pointCloudFrameB.render();
 }
 

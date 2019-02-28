@@ -21,7 +21,7 @@ VertexShaderOutput vertexShaderMain( float4 position : position,
 {
     VertexShaderOutput output;
     output.position = mul( position, worldViewProj );
-	output.normal = normal;
+	output.normal = color;
     return output;
 }
 
