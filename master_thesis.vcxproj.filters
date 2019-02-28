@@ -452,6 +452,9 @@
     <ClInclude Include="src\visualize\showRegisterTwoRigideFrames.h">
       <Filter>visualize</Filter>
     </ClInclude>
+    <ClInclude Include="src\visualize\showSensData.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -484,6 +487,9 @@
       <Filter>visualize</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\showRegisterTwoRigideFrames.cpp">
+      <Filter>visualize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\showSensData.cpp">
       <Filter>visualize</Filter>
     </ClCompile>
   </ItemGroup>

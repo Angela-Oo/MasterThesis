@@ -71,7 +71,6 @@ void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
 {
 	ConstantBuffer constants;
 	constants.worldViewProj = camera.getViewProj();
-	//constants.modelColor = ml::vec4f(1.0f, 1.0f, 1.0f, 1.0f);
 
 	m_constants.updateAndBind(constants, 0);
 	m_shaderManager.bindShaders("pointCloud");

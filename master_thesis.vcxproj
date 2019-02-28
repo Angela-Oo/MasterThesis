@@ -235,6 +235,7 @@
     <ClInclude Include="src\visualize\showRegisterTwoRigideFrames.h" />
     <ClInclude Include="src\visualize\showKinectData.h" />
     <ClInclude Include="src\visualize\showRGBDData.h" />
+    <ClInclude Include="src\visualize\showSensData.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\appShowKinectData.cpp" />
@@ -257,6 +258,7 @@
     <ClCompile Include="src\visualize\showRegisterTwoRigideFrames.cpp" />
     <ClCompile Include="src\visualize\showKinectData.cpp" />
     <ClCompile Include="src\visualize\showRGBDData.cpp" />
+    <ClCompile Include="src\visualize\showSensData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\pointCloud.hlsl">
