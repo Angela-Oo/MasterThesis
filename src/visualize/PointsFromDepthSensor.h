@@ -11,6 +11,7 @@ public:
 	SensorData _data;
 public:
 	std::vector<vec3f> addFrame(unsigned int step = 1);
+	std::vector<vec3f> get3DPoints(unsigned int step = 1);
 public:
 	SensorDataWrapper(DepthSensor & depth_sensor,
 					  mat4f color_intrinsics = mat4f::identity(),

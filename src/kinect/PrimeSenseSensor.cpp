@@ -9,13 +9,13 @@
 PrimeSenseSensor::PrimeSenseSensor()
 {
 	m_streams = nullptr;
-	unsigned int depthWidth = 640;
-	unsigned int depthHeight = 480;
+	unsigned int depthWidth = 320;// 640;
+	unsigned int depthHeight = 240;// 480;
 
-	unsigned int colorWidth = 640;
-	unsigned int colorHeight = 480;
+	unsigned int colorWidth = 320;// 640;
+	unsigned int colorHeight = 240;// 480;
 
-	DepthSensor::init(1000, 800, depthWidth, depthHeight, colorWidth, colorHeight);
+	DepthSensor::init(640, 240, depthWidth, depthHeight, colorWidth, colorHeight);
 
 	m_bDepthReceived = false;
 	m_bColorReceived = false;
