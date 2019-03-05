@@ -1,3 +1,6 @@
 [submodule "mLib"]
 	path = mLib
 	url = https://github.com/niessner/mLib.git
+[submodule "ext/sophus"]
+	path = ext/sophus
+	url = https://github.com/stevenlovegrove/Sophus.git
