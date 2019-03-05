@@ -3,7 +3,7 @@
 #include "PointsFromDepthSensor.h"
 #include "i_showData.h"
 #include "kinect/PrimeSenseSensor.h"
-
+#include <chrono>
 
 class ShowKinectData : public IShowData
 {
@@ -19,4 +19,7 @@ private:
 	ml::GraphicsDevice * _graphics;
 	std::unique_ptr<SensorDataWrapper> _sensor_data_wrapper;
 	PrimeSenseSensor _depth_sensor;
+	unsigned int _frame = 0;
+	std::chrono::time_point<std::chrono::system_clock> _start_time;
+	std::vector<ml::vec3f> _all_points;
 };

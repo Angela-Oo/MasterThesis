@@ -20,7 +20,9 @@ void ShowKinectData::processFrame()
 	mat4f translate = transform * rotation * scale * center;
 	std::for_each(points.begin(), points.end(), [&translate](vec3f & p) { p = translate * p; });
 
-	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points));
+	//_all_points.insert(_all_points.end(), points.begin(), points.end());
+	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
+	_frame++;
 }
 
 
@@ -28,6 +30,8 @@ void ShowKinectData::processFrame()
 void ShowKinectData::init(ml::ApplicationData &app)
 {
 	_graphics = &app.graphics;
+	_start_time = std::chrono::system_clock::now();
+
 	if (_depth_sensor.createFirstConnected() == S_OK)
 	{
 		auto intrinsic = _depth_sensor.getIntrinsics();
@@ -35,10 +39,6 @@ void ShowKinectData::init(ml::ApplicationData &app)
 
 		_sensor_data_wrapper = std::make_unique<SensorDataWrapper>(_depth_sensor);// intrinsics ??
 		processFrame();
-
-		//reader.writeDepthDataToFile("C:/Users/Angela/Meins/Studium/MasterThesis/data/test_depth.png");
-		//reader.writeColorDataToFile("C:/Users/Angela/Meins/Studium/MasterThesis/data/test_color.png");
-		//reader.saveRecordedPointCloud("C:/Users/Angela/Meins/Studium/MasterThesis/data/test_point.pt");
 	}
 	else {
 		std::cout << "could not connect to camera" << std::endl;
@@ -51,7 +51,12 @@ void ShowKinectData::init(ml::ApplicationData &app)
 
 void ShowKinectData::render(ml::Cameraf& camera)
 {
-	processFrame();
+	auto end = std::chrono::system_clock::now();
+	auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - _start_time).count();
+	if (elapsed > 3) {
+		processFrame();
+		_start_time = std::chrono::system_clock::now();
+	}	
 	ConstantBuffer constants;
 	constants.worldViewProj = camera.getViewProj();
 	constants.modelColor = ml::vec4f(1.0f, 1.0f, 1.0f, 1.0f);
