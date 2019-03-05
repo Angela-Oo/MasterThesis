@@ -5,6 +5,15 @@
 
 #pragma once
 
+
+#define _USE_MATH_DEFINES
+#include <cmath>
+
+#ifndef GLOG_NO_ABBREVIATED_SEVERITIES
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+#endif // !GLOG_NO_ABBREVIATED_SEVERITIES
+
+#include "glog/logging.h"
 #include <stdio.h>
 #include <tchar.h>
 #include <math.h>

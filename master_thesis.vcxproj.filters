@@ -43,6 +43,9 @@
     <Filter Include="mLibHeader\ext-depthcamera">
       <UniqueIdentifier>{2031fa39-fab5-4514-bcb6-5748985b092d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algo">
+      <UniqueIdentifier>{5c07260c-18ae-4619-959d-c9ef841fe4a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -455,6 +458,18 @@
     <ClInclude Include="src\visualize\showSensData.h">
       <Filter>visualize</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\icp-ceres.h">
+      <Filter>algo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\icp-closedform.h">
+      <Filter>algo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\sophus_se3.h">
+      <Filter>algo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\eigen_quaternion.h">
+      <Filter>algo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -491,6 +506,12 @@
     </ClCompile>
     <ClCompile Include="src\visualize\showSensData.cpp">
       <Filter>visualize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\icp-ceres.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\icp-closedform.cpp">
+      <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

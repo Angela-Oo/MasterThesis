@@ -66,8 +66,8 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>FW1FontWrapper.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;Kinect10.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;FreeImage.lib;OpenMeshCored.lib;OpenMeshToolsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>C:\Program Files\OpenNI2\Lib;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(ProjectDir)mLibExternal\lib\Debug;C:\Program Files\Microsoft SDKs\Kinect\v1.8\lib\amd64;$(ProjectDir)mLibExternal\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>gflags_debug.lib;glogd.lib;ceres-debug.lib;OpenNI2.lib;FW1FontWrapper.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;Kinect10.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;FreeImage.lib;OpenMeshCored.lib;OpenMeshToolsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;C:\Program Files\Microsoft SDKs\Kinect\v1.8\lib\amd64;$(ProjectDir)mLibExternal\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -91,7 +91,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>FW1FontWrapper.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;Kinect10.lib;FreeImage.lib;OpenMeshCore.lib;OpenMeshTools.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glog.lib;gflags.lib;ceres.lib;OpenNI2.lib;FW1FontWrapper.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;Kinect10.lib;FreeImage.lib;OpenMeshCore.lib;OpenMeshTools.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Lib\x64;$(ProjectDir)mLibExternal\lib\Release;C:\Program Files\Microsoft SDKs\Kinect\v1.8\lib\amd64;$(ProjectDir)mLibExternal\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
@@ -220,6 +220,10 @@
     <ClInclude Include="mLib\include\mLibMBase.h" />
     <ClInclude Include="mLib\include\mLibOpenMesh.h" />
     <ClInclude Include="mLib\include\mLibZLib.h" />
+    <ClInclude Include="src\algo\eigen_quaternion.h" />
+    <ClInclude Include="src\algo\icp-ceres.h" />
+    <ClInclude Include="src\algo\icp-closedform.h" />
+    <ClInclude Include="src\algo\sophus_se3.h" />
     <ClInclude Include="src\appShowKinectData.h" />
     <ClInclude Include="src\appTest.h" />
     <ClInclude Include="src\kinect\BinaryDumpReader.h" />
@@ -238,6 +242,8 @@
     <ClInclude Include="src\visualize\showSensData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\algo\icp-ceres.cpp" />
+    <ClCompile Include="src\algo\icp-closedform.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\appTest.cpp" />
     <ClCompile Include="src\kinect\BinaryDumpReader.cpp" />
