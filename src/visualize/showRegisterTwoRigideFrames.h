@@ -9,6 +9,7 @@ class ShowTwoRigideRegisteredFrames : public IShowData
 private:
 	void configImageReaderSensor(std::string filepath);
 	std::vector<vec3f> processFrame();
+	void renderPoints(std::vector<vec3f> & points_frame_A, std::vector<vec3f> & points_frame_B);
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;

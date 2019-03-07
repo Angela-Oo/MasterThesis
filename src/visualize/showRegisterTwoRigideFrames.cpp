@@ -1,7 +1,39 @@
 #include "showRegisterTwoRigideFrames.h"
 #include <numeric>
+#include "algo/icp-ceres.h"
+#include "algo/eigen_quaternion.h"
+using namespace Eigen;
 
+Vector3d vec3f_to_vector3d(const vec3f &vec)
+{
+	return Vector3d(vec.x, vec.y, vec.z);
+}
 
+vec3f vector3d_to_vec3f(const Vector3d &vec)
+{
+	return vec3f(vec[0], vec[1], vec[2]);
+}
+
+std::vector<Vector3d> vector_vec3f_to_vector_vector3d(std::vector<vec3f> & vec)
+{
+	std::vector<Vector3d> converted_vec;
+	std::transform(vec.begin(), vec.end(),
+				   std::back_inserter(converted_vec), &vec3f_to_vector3d);
+	return converted_vec;
+}
+
+std::vector<vec3f> vector_vector3d_to_vector_vec3f(std::vector<Vector3d> & vec)
+{
+	std::vector<vec3f> converted_vec;
+	std::transform(vec.begin(), vec.end(),
+				   std::back_inserter(converted_vec), &vector3d_to_vec3f);
+	return converted_vec;
+}
+
+Vector4d to_vector4d(Vector3d vec)
+{
+	return Vector4d(vec[0], vec[1], vec[2], 1);
+}
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
@@ -26,7 +58,7 @@ void ShowTwoRigideRegisteredFrames::configImageReaderSensor(std::string filepath
 
 std::vector<vec3f> ShowTwoRigideRegisteredFrames::processFrame()
 {
-	auto points = _rgbd_frame_to_point_cloud->addFrame();
+	auto points = _rgbd_frame_to_point_cloud->addFrame(5);
 
 	auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / static_cast<float>(points.size());
 	mat4f center = mat4f::translation(-average);
@@ -41,30 +73,44 @@ std::vector<vec3f> ShowTwoRigideRegisteredFrames::processFrame()
 	return points;
 }
 
+void ShowTwoRigideRegisteredFrames::renderPoints(std::vector<vec3f> & points_frame_A, std::vector<vec3f> & points_frame_B)
+{
+	std::vector<vec4f> color_frame_A(points_frame_A.size());
+	std::fill(color_frame_A.begin(), color_frame_A.end(), RGBColor::Orange);
+	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_A, color_frame_A));
+
+	std::vector<vec4f> color_frame_B(points_frame_B.size());
+	std::fill(color_frame_B.begin(), color_frame_B.end(), RGBColor::Green);
+	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_B, color_frame_B));
+}
+
 void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 {
 	_graphics = &app.graphics;
+	m_shaderManager.init(app.graphics);
+	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
+	m_constants.init(app.graphics);
+
 	configImageReaderSensor("D:/Studium/MasterThesis/input_data/sokrates-ps/");	
 	_rgbd_frame_to_point_cloud = std::make_unique<SensorDataWrapper>(_depth_sensor, _depth_sensor.getColorIntrinsics(), _depth_sensor.getDepthIntrinsics());
 
 	auto points_frame_A = processFrame();
-	std::vector<vec4f> color_frame_A(points_frame_A.size());
-	std::fill(color_frame_A.begin(), color_frame_A.end(), RGBColor::Orange);
-	m_pointCloudFrameA.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_A, color_frame_A));
-
-	for (int i = 0; i < 9; i++) {
+	for (int i = 0; i < 2; i++) {
 		_depth_sensor.processDepth();
 		_depth_sensor.processColor();
 	}
-
 	auto points_frame_B = processFrame();
-	std::vector<vec4f> color_frame_B(points_frame_B.size());
-	std::fill(color_frame_B.begin(), color_frame_B.end(), RGBColor::Green);
-	m_pointCloudFrameB.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_B, color_frame_B));
 
-	m_shaderManager.init(app.graphics);
-	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
-	m_constants.init(app.graphics);
+	auto points_A = vector_vec3f_to_vector_vector3d(points_frame_A);
+	auto points_B = vector_vec3f_to_vector_vector3d(points_frame_B);
+	auto icp = ICP_Ceres::pointToPoint_SophusSE3(points_A, points_B);
+
+	Eigen::Matrix4d transform = icp.matrix();
+	std::for_each(points_B.begin(), points_B.end(), [&](Vector3d & p) { auto x = transform * to_vector4d(p); p = x.head<3>();  });
+	points_frame_A = vector_vector3d_to_vector_vec3f(points_A);
+	points_frame_B = vector_vector3d_to_vector_vec3f(points_B);
+
+	renderPoints(points_frame_A, points_frame_B);
 }
 
 void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
