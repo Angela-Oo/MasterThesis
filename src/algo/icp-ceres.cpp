@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "icp-ceres.h"
 
 #include <Eigen/Dense>

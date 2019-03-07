@@ -1,6 +1,8 @@
 #include "showSensData.h"
 #include <numeric>
 
+using namespace ml;
+
 void ShowSensData::showFrame()
 {
 	auto points = _sensor_data.computePointCloud(_frame).m_points;

@@ -9,6 +9,8 @@
 #include <list>
 #include <vector>
 #include <string>
+
+using namespace ml;
  
 BinaryDumpReader::BinaryDumpReader(std::string filename, unsigned int windowWidth, unsigned int windowHeight)
 	: m_filename(filename)

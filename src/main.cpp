@@ -1,4 +1,4 @@
-
+#include "stdafx.h"
 #include "main.h"
 #include "appShowKinectData.h"
 
@@ -13,7 +13,6 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
 
 int main()
 {
-	vec6f;
 	AppShowKinectData callback;
 	ml::ApplicationWin32 app(nullptr, 1280, 1024, "Test", ml::GraphicsDeviceTypeD3D11, callback, 100, 200);
     app.messageLoop();

@@ -1,6 +1,7 @@
 #include "showRGBDData.h"
 #include <numeric>
 
+using namespace ml;
 
 void RenderMesh::init(ml::ApplicationData &app)
 {

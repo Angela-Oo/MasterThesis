@@ -4,17 +4,17 @@
 #include "algo/eigen_quaternion.h"
 using namespace Eigen;
 
-Vector3d vec3f_to_vector3d(const vec3f &vec)
+Vector3d vec3f_to_vector3d(const ml::vec3f &vec)
 {
 	return Vector3d(vec.x, vec.y, vec.z);
 }
 
-vec3f vector3d_to_vec3f(const Vector3d &vec)
+ml::vec3f vector3d_to_vec3f(const Vector3d &vec)
 {
-	return vec3f(vec[0], vec[1], vec[2]);
+	return ml::vec3f(vec[0], vec[1], vec[2]);
 }
 
-std::vector<Vector3d> vector_vec3f_to_vector_vector3d(std::vector<vec3f> & vec)
+std::vector<Vector3d> vector_vec3f_to_vector_vector3d(std::vector<ml::vec3f> & vec)
 {
 	std::vector<Vector3d> converted_vec;
 	std::transform(vec.begin(), vec.end(),
@@ -22,9 +22,9 @@ std::vector<Vector3d> vector_vec3f_to_vector_vector3d(std::vector<vec3f> & vec)
 	return converted_vec;
 }
 
-std::vector<vec3f> vector_vector3d_to_vector_vec3f(std::vector<Vector3d> & vec)
+std::vector<ml::vec3f> vector_vector3d_to_vector_vec3f(std::vector<Vector3d> & vec)
 {
-	std::vector<vec3f> converted_vec;
+	std::vector<ml::vec3f> converted_vec;
 	std::transform(vec.begin(), vec.end(),
 				   std::back_inserter(converted_vec), &vector3d_to_vec3f);
 	return converted_vec;
@@ -56,31 +56,31 @@ void ShowTwoRigideRegisteredFrames::configImageReaderSensor(std::string filepath
 }
 
 
-std::vector<vec3f> ShowTwoRigideRegisteredFrames::processFrame()
+std::vector<ml::vec3f> ShowTwoRigideRegisteredFrames::processFrame()
 {
 	auto points = _rgbd_frame_to_point_cloud->addFrame(5);
 
-	auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / static_cast<float>(points.size());
-	mat4f center = mat4f::translation(-average);
+	auto average = std::accumulate(points.begin(), points.end(), ml::vec3f(0., 0., 0.)) / static_cast<float>(points.size());
+	ml::mat4f center = ml::mat4f::translation(-average);
 	float scale_factor = 5.;
-	mat4f scale = mat4f::scale({ scale_factor, scale_factor, scale_factor });
-	mat4f rotation = mat4f::rotationX(90.) * mat4f::rotationY(180.);
-	mat4f transform = mat4f::translation({ -0.5f, -2.f, 1.2f });
-	mat4f translate = transform * rotation * scale * center;
-	std::for_each(points.begin(), points.end(), [&translate](vec3f & p) { p = translate * p; });
+	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
+	ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
+	ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });
+	ml::mat4f translate = transform * rotation * scale * center;
+	std::for_each(points.begin(), points.end(), [&translate](ml::vec3f & p) { p = translate * p; });
 
 	_depth_sensor.recordFrame();
 	return points;
 }
 
-void ShowTwoRigideRegisteredFrames::renderPoints(std::vector<vec3f> & points_frame_A, std::vector<vec3f> & points_frame_B)
+void ShowTwoRigideRegisteredFrames::renderPoints(std::vector<ml::vec3f> & points_frame_A, std::vector<ml::vec3f> & points_frame_B)
 {
-	std::vector<vec4f> color_frame_A(points_frame_A.size());
-	std::fill(color_frame_A.begin(), color_frame_A.end(), RGBColor::Orange);
+	std::vector<ml::vec4f> color_frame_A(points_frame_A.size());
+	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
 	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_A, color_frame_A));
 
-	std::vector<vec4f> color_frame_B(points_frame_B.size());
-	std::fill(color_frame_B.begin(), color_frame_B.end(), RGBColor::Green);
+	std::vector<ml::vec4f> color_frame_B(points_frame_B.size());
+	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
 	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_B, color_frame_B));
 }
 

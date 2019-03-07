@@ -31,5 +31,5 @@ private:
 	ml::D3D11Canvas2D m_canvas;
 	ml::Cameraf m_camera;
 
-	ml::D3D11Buffer<vec4f> m_buffer;
+	ml::D3D11Buffer<ml::vec4f> m_buffer;
 };

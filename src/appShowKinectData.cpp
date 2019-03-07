@@ -6,6 +6,7 @@
 #include "visualize/showRegisterTwoRigideFrames.h"
 #include "visualize/showSensData.h"
 
+using namespace ml;
 
 //void backProjectGraphics(const DepthImage32& depth, const ColorImageR8G8B8A8& color, const Cameraf& camera) {
 //	PointCloudf pc;

@@ -15,7 +15,7 @@ private:
 	ml::D3D11TriMesh m_mesh;
 	ml::D3D11ShaderManager m_shaderManager;
 	ml::D3D11ConstantBuffer<ConstantBuffer> m_constants;
-	ml::D3D11Buffer<vec4f> m_buffer;
+	ml::D3D11Buffer<ml::vec4f> m_buffer;
 };
 
 //-----------------------------------------------------------------------------
@@ -25,7 +25,7 @@ private:
 class ShowRGBDImageData : public IShowData
 {
 private:
-	std::vector<vec3f> processFrame();
+	std::vector<ml::vec3f> processFrame();
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;

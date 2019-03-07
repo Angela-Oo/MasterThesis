@@ -41,7 +41,7 @@ public:
 		return true;
 	}
 
-	mat4f getRigidTransform() const {
+	ml::mat4f getRigidTransform() const {
 		if (m_CurrFrame-1 >= m_data.m_trajectory.size()) throw MLIB_EXCEPTION("invalid trajectory index " + std::to_string(m_CurrFrame-1));
 		return m_data.m_trajectory[m_CurrFrame-1];
 	}
@@ -49,7 +49,7 @@ private:
 	//! deletes all allocated data
 	void releaseData();
 
-	CalibratedSensorData m_data;
+	ml::CalibratedSensorData m_data;
 	
 	unsigned int	m_NumFrames;
 	unsigned int	m_CurrFrame;

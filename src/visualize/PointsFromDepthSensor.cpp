@@ -1,5 +1,6 @@
 #include "PointsFromDepthSensor.h"
 
+using namespace ml;
 
 
 std::vector<vec3f> SensorDataWrapper::addFrame(unsigned int step)

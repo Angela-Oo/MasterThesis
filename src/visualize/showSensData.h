@@ -15,7 +15,7 @@ private:
 	ml::D3D11TriMesh m_pointCloud;
 	ml::D3D11ShaderManager m_shaderManager;
 	ml::D3D11ConstantBuffer<ConstantBuffer> m_constants;
-	SensorData _sensor_data;
+	ml::SensorData _sensor_data;
 	ml::GraphicsDevice * _graphics;
 	unsigned int _frame = 0;
 	std::chrono::time_point<std::chrono::system_clock> _start_time;

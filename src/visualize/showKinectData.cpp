@@ -5,6 +5,8 @@
 #include "ext-depthcamera/sensorData.h"
 #include <numeric>
 
+using namespace ml;
+
 void ShowKinectData::processFrame()
 {
 	//auto points = _sensor_data_wrapper->addFrame(2);

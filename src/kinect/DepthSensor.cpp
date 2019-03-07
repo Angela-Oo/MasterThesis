@@ -5,6 +5,8 @@
 
 #include <limits>
 
+using namespace ml;
+
 DepthSensor::DepthSensor()
 	: m_windowWidth(0)
 	, m_windowHeight(0)

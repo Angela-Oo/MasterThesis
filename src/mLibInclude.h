@@ -16,4 +16,4 @@
 #include "mLibOpenMesh.h"
 #include "mLibFreeImage.h"
 
-using namespace ml;
+//using namespace ml;

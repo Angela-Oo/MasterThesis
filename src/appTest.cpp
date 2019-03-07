@@ -1,6 +1,7 @@
 
 #include "appTest.h"
 
+using namespace ml;
 
 unsigned int test0(unsigned int size) {
 	std::vector<std::vector<unsigned int>> faces(size, std::vector<unsigned int>(3));

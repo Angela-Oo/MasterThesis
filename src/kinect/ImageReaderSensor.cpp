@@ -3,6 +3,7 @@
 #include "ImageReaderSensor.h"
 #include "core-base/baseImage.h"
 
+using namespace ml;
 
 mat4f loadIntrinsicFromFile(std::string filename)
 {

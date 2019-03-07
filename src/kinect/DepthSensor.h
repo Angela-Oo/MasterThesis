@@ -26,8 +26,8 @@ struct Intrinsics {
 	};
 
 	//! returns an intrinsic matrix (warning: doesn't account for radial distortion)
-	mat4f converToMatrix() {
-		return mat4f(
+	ml::mat4f converToMatrix() {
+		return ml::mat4f(
 			fx  , 0.0f, mx  , 0.0f,
 			0.0f, fy  , my  , 0.0f,
 			0.0f, 0.0f, 1.0f, 0.0f,
@@ -101,18 +101,18 @@ class DepthSensor
 			return -FLT_MAX;
 		}
 
-		vec3f getNormal(unsigned int x, unsigned int y) const {
-			vec3f ret(-FLT_MAX,-FLT_MAX,-FLT_MAX);
+		ml::vec3f getNormal(unsigned int x, unsigned int y) const {
+			ml::vec3f ret(-FLT_MAX,-FLT_MAX,-FLT_MAX);
 			if (x > 0 && y > 0 && x < getDepthWidth() - 1 && y < getDepthWidth() - 1) {
-				vec3f cc = depthToSkeleton(x,y);
-				vec3f pc = depthToSkeleton(x+1,y+0);
-				vec3f cp = depthToSkeleton(x+0,y+1);
-				vec3f mc = depthToSkeleton(x-1,y+0);
-				vec3f cm = depthToSkeleton(x+0,y-1);
+				ml::vec3f cc = depthToSkeleton(x,y);
+				ml::vec3f pc = depthToSkeleton(x+1,y+0);
+				ml::vec3f cp = depthToSkeleton(x+0,y+1);
+				ml::vec3f mc = depthToSkeleton(x-1,y+0);
+				ml::vec3f cm = depthToSkeleton(x+0,y-1);
 
 				if (cc.x != -FLT_MAX && pc.x != -FLT_MAX && cp.x != -FLT_MAX && mc.x != -FLT_MAX && cm.x != -FLT_MAX)
 				{
-					vec3f n = (pc - mc) ^ (cp - cm);
+					ml::vec3f n = (pc - mc) ^ (cp - cm);
 					float l = n.length();
 					if (l > 0.0f) {
 						ret = n/l;
@@ -123,16 +123,16 @@ class DepthSensor
 		}
 
 		// Functions below are untested but might be useful
-		vec3f depthToSkeleton(unsigned int ux, unsigned int uy) const {
+		ml::vec3f depthToSkeleton(unsigned int ux, unsigned int uy) const {
 			return depthToSkeleton(ux, uy, getDepth(ux,uy));
 		}
 		
-		vec3f depthToSkeleton(unsigned int ux, unsigned int uy, float depth) const {
+		ml::vec3f depthToSkeleton(unsigned int ux, unsigned int uy, float depth) const {
 			//vec4f camera = m_intrinsicsInv*vec4f((float)ux*depth, (float)uy*depth, 0.0f, depth);
-			//return vec3f(camera.x, camera.y, camera.w);
+			//return ml::vec3f(camera.x, camera.y, camera.w);
 			float x = ((float)ux-m_intrinsics.mx) / m_intrinsics.fx;
 			float y = (m_intrinsics.my-(float)uy) / m_intrinsics.fy;
-			return vec3f(depth*x, depth*y, depth);
+			return ml::vec3f(depth*x, depth*y, depth);
 		}
 
 		//! gets the pointer to depth array
@@ -178,7 +178,7 @@ class DepthSensor
 		}
 
 		//! saves the current frame's input data as a point cloud
-		void savePointCloud(const std::string& filename, const mat4f& transform = mat4f::identity()) const;
+		void savePointCloud(const std::string& filename, const ml::mat4f& transform = ml::mat4f::identity()) const;
 
 
 		//! resets the cache of the sensor (mainly setting the frame counter back to zero, and frees potentially cached memory)
@@ -196,14 +196,14 @@ class DepthSensor
 			m_accumulatedPoints.clear();
 		}
 
-		void recordPointCloud(const mat4f& transform = mat4f::identity()) {
-			m_accumulatedPoints.push_back(PointCloudf());
+		void recordPointCloud(const ml::mat4f& transform = ml::mat4f::identity()) {
+			m_accumulatedPoints.push_back(ml::PointCloudf());
 			computePointCurrentPointCloud(m_accumulatedPoints.back(), transform);
 		}
 
 		void saveRecordedPointCloud(const std::string& filename) {
 
-			PointCloudf pc;
+			ml::PointCloudf pc;
 			
 			for (const auto& p : m_accumulatedPoints ) {
 				pc.m_points.insert(pc.m_points.end(), p.m_points.begin(), p.m_points.end());
@@ -211,7 +211,7 @@ class DepthSensor
 				pc.m_normals.insert(pc.m_normals.end(), p.m_normals.begin(), p.m_normals.end());
 			}
 
-			PointCloudIOf::saveToFile(filename,pc);
+			ml::PointCloudIOf::saveToFile(filename,pc);
 			//if (colors.size() > 0) {
 			//	assert(points.size() == colors.size());
 			//	PointCloudIOf::saveToFile(filename, &points, NULL, &colors);
@@ -234,13 +234,13 @@ class DepthSensor
 				m_colorRGBX = new BYTE[getColorBytesPerPixel()*m_colorWidth*m_colorHeight];
 			}
 		}
-		void recordTrajectory(const mat4f& transformation) {
+		void recordTrajectory(const ml::mat4f& transformation) {
 			m_RecordedTrajectory.push_back(transformation);
 		}
 
 		//TODO continue here
 		void saveRecordedFramesToFile(const std::string& filename) {
-			CalibratedSensorData cs;
+			ml::CalibratedSensorData cs;
 			cs.m_DepthImageWidth = m_depthWidth;
 			cs.m_DepthImageHeight = m_depthHeight;
 			cs.m_ColorImageWidth = m_colorWidth;
@@ -257,8 +257,8 @@ class DepthSensor
 			cs.m_ColorImages.resize(cs.m_ColorNumFrames);
 			unsigned int cFrame = 0;
 			for (auto a : m_RecordedColor) {
-				cs.m_ColorImages[cFrame] = new vec4uc[cs.m_ColorImageWidth*cs.m_ColorImageHeight];
-				memcpy(cs.m_ColorImages[cFrame], a, sizeof(vec4uc)*cs.m_ColorImageWidth*cs.m_ColorImageHeight);
+				cs.m_ColorImages[cFrame] = new ml::vec4uc[cs.m_ColorImageWidth*cs.m_ColorImageHeight];
+				memcpy(cs.m_ColorImages[cFrame], a, sizeof(ml::vec4uc)*cs.m_ColorImageWidth*cs.m_ColorImageHeight);
 				SAFE_DELETE_ARRAY(a);
 				cFrame++;
 			}
@@ -274,12 +274,12 @@ class DepthSensor
 
 			cs.m_trajectory = m_RecordedTrajectory;
 
-			std::string dir = util::directoryFromPath(filename);
-			if (!util::directoryExists(dir)) util::makeDirectory(dir);
+			std::string dir = ml::util::directoryFromPath(filename);
+			if (!ml::util::directoryExists(dir)) ml::util::makeDirectory(dir);
 
 			std::cout << cs << std::endl;
 			std::cout << "dumping recorded frames... ";
-			BinaryDataStreamFile outStream(filename, true);
+			ml::BinaryDataStreamFile outStream(filename, true);
 			//BinaryDataStreamZLibFile outStream(filename, true);
 			outStream << cs;
 			std::cout << "done" << std::endl;
@@ -290,8 +290,8 @@ class DepthSensor
 		}
 
 		//! returns the current rigid transform (if available; designed for binary dump sensor);
-		virtual mat4f getRigidTransform() const {
-			return mat4f::identity();
+		virtual ml::mat4f getRigidTransform() const {
+			return ml::mat4f::identity();
 		}
 	protected:
 		//! depth and color data filled by respective child classes
@@ -300,41 +300,41 @@ class DepthSensor
 
 	private:
 
-		std::list<PointCloudf> m_accumulatedPoints;
+		std::list<ml::PointCloudf> m_accumulatedPoints;
 
 
-		void computePointCurrentPointCloud(PointCloudf& pc, const mat4f& transform = mat4f::identity()) const {
+		void computePointCurrentPointCloud(ml::PointCloudf& pc, const ml::mat4f& transform = ml::mat4f::identity()) const {
 
 			if (!(getColorWidth() == getDepthWidth() && getColorHeight() == getDepthHeight()))	throw MLIB_EXCEPTION("invalid dimensions");
 
 			for (unsigned int i = 0; i < getDepthWidth()*getDepthHeight(); i++) {
 				unsigned int x = i % getDepthWidth();
 				unsigned int y = i / getDepthWidth();
-				vec3f p = depthToSkeleton(x,y);
+				ml::vec3f p = depthToSkeleton(x,y);
 				if (p.x != -FLT_MAX && p.x != 0.0f)	{
-					vec3f n = getNormal(x,y);
+					ml::vec3f n = getNormal(x,y);
 					if (n.x != -FLT_MAX) {
 						pc.m_points.push_back(p);
 						pc.m_normals.push_back(n);
-						vec4ui c = vec4ui(m_colorRGBX[4*i+0],m_colorRGBX[4*i+1],m_colorRGBX[4*i+2],m_colorRGBX[4*i+3]);
-						pc.m_colors.push_back(vec4f(c.z/255.0f, c.y/255.0f, c.x/255.0f, 1.0f));	//there's a swap... dunno why really
+						ml::vec4ui c = ml::vec4ui(m_colorRGBX[4*i+0],m_colorRGBX[4*i+1],m_colorRGBX[4*i+2],m_colorRGBX[4*i+3]);
+						pc.m_colors.push_back(ml::vec4f(c.z/255.0f, c.y/255.0f, c.x/255.0f, 1.0f));	//there's a swap... dunno why really
 					}
 				}
 			}
 
 			//if (getColorWidth() == getDepthWidth() && getColorHeight() == getDepthHeight()) {
 			//	for (unsigned int i = 0; i < getColorWidth()*getColorHeight(); i++) {
-			//		vec3f p = depthToSkeleton(i % getDepthWidth(), i / getDepthWidth());
+			//		ml::vec3f p = depthToSkeleton(i % getDepthWidth(), i / getDepthWidth());
 			//		if (p.x != -FLT_MAX && p.x != 0.0f)	{
 			//			vec4ui c = vec4ui(m_colorRGBX[4*i+0],m_colorRGBX[4*i+1],m_colorRGBX[4*i+2],m_colorRGBX[4*i+3]);
-			//			colors.push_back(vec3f(c.z/255.0f, c.y/255.0f, c.x/255.0f));	//there's a swap... dunno why really
+			//			colors.push_back(ml::vec3f(c.z/255.0f, c.y/255.0f, c.x/255.0f));	//there's a swap... dunno why really
 			//		}
 			//	}
 			//}  
 			for (auto& p : pc.m_points) {
 				p = transform * p;
 			}
-			mat4f invTranspose = transform.getInverse().getTranspose();
+			ml::mat4f invTranspose = transform.getInverse().getTranspose();
 			for (auto& n : pc.m_normals) {
 				n = invTranspose * n;
 				n.normalize();
@@ -344,19 +344,19 @@ class DepthSensor
 
 		bool writeDepthDataToFile( const std::string& filename, USHORT* depthData, unsigned int height, unsigned int width) const {
 			if (!depthData)	return false;
-			BaseImage<unsigned short>::saveBinaryMImage(filename, depthData, height, width);
+			ml::BaseImage<unsigned short>::saveBinaryMImage(filename, depthData, height, width);
 			return true;
 		}
 
 		bool writeColorDataToFile( const std::string& filename,  BYTE* colorData, unsigned int height, unsigned int width) const {
 			if (!colorData)	return false;
-			BaseImage<vec4uc>::saveBinaryMImage(filename, m_colorRGBX, m_depthHeight, m_depthWidth);
+			ml::BaseImage<ml::vec4uc>::saveBinaryMImage(filename, m_colorRGBX, m_depthHeight, m_depthWidth);
 			return true;
 		}
 
 		//! intrinsic matrix and its inverse of the sensor
-		//mat4f m_intrinsics;
-		//mat4f m_intrinsicsInv;
+		//ml::mat4f m_intrinsics;
+		//ml::mat4f m_intrinsicsInv;
 		Intrinsics m_intrinsics;
 		Intrinsics m_intrinsicsOriginal;
 
@@ -377,5 +377,5 @@ class DepthSensor
 
 		std::list<USHORT*>	m_RecordedDepth;
 		std::list<BYTE*>	m_RecordedColor;
-		std::vector<mat4f>	m_RecordedTrajectory;
+		std::vector<ml::mat4f>	m_RecordedTrajectory;
 };
