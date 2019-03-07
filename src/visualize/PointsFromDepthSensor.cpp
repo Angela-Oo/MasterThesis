@@ -14,10 +14,10 @@ std::vector<vec3f> SensorDataWrapper::addFrame(unsigned int step)
 		for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i += step) {
 			for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j += step) {
 				float depth = _depth_sensor.getDepth(j, i);
-				//if (depth != 0.)
-				//	depth = 350 - depth;
-				depth += 1.;
-				depth *= 1000.0;
+				if (depth != 0.)
+					depth = 350 - depth;
+				//depth += 1.;
+				//depth *= 1000.0;
 				depth_data[i * _depth_sensor.getDepthWidth() + j] = static_cast<unsigned short>(depth);
 			}
 		}
@@ -56,7 +56,7 @@ std::vector<vec3f> SensorDataWrapper::get3DPoints(unsigned int step)
 					vec3f p(static_cast<float>(j), static_cast<float>(i), 1.);
 					p = depth_intrinsics_inv * p;
 					//depth = (350.f - depth) / 1000.f;
-					depth = (1. + depth);
+					depth = (2. + depth);
 					p = p * depth;
 					points.push_back(p);
 				}
