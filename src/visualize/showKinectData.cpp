@@ -60,6 +60,8 @@ void ShowKinectData::render(ml::Cameraf& camera)
 		//auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - _start_time).count();
 		//if (elapsed > 3) {
 		renderPoints(_frame);
+
+		//_sensor_data_wrapper->_sensor_data.recordFrameToPointCloud(_frame, m_pointCloud., getWorldTransformation())
 		_frame++;
 		//_start_time = std::chrono::system_clock::now();
 		//}	
@@ -118,11 +120,20 @@ void ShowKinectData::key(UINT key) {
 	else if (key == KEY_P) {
 		std::cout << "save recorded frames as .sens file" << std::endl;
 		std::string file = ".\\data\\captured_data.sens";
-		_sensor_data_wrapper->_data.saveToFile(file);
+		std::ofstream output_file;
+		output_file.open(file);
+		_sensor_data_wrapper->_sensor_data.savePointCloud(file, 0);// .saveToFile(file);
+		output_file << _sensor_data_wrapper->_sensor_data;
 	}
 	else if (key == KEY_L) {
 		std::cout << "load recorded frames from .sens file" << std::endl;
 		std::string file = ".\\data\\captured_data.sens";
-		_sensor_data_wrapper->_data.loadFromFile(file);
+		std::ifstream input_file;
+		input_file.open(file);
+		//input_file >> _sensor_data_wrapper->_sensor_data;
+		//auto frame = _sensor_data_wrapper->_sensor_data.m_frames.size() - 1;
+		//auto points = _sensor_data_wrapper->getPoints(frame);
+		//m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
+
 	}
 }

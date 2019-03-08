@@ -23,10 +23,9 @@ public:
 class CalibrateSensorDataWrapper
 {
 private:
-	ml::CalibratedSensorData _sensor_data;
 	DepthSensor & _depth_sensor;
 public:
-	ml::SensorData _data;
+	ml::CalibratedSensorData _sensor_data;
 public:
 	void processFrame();
 	std::vector<ml::vec3f> getPoints(unsigned int frame, unsigned int step_size = 1);
