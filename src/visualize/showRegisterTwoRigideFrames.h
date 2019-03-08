@@ -13,6 +13,7 @@ private:
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;
+	void key(UINT key) override {};
 private:
 	ml::D3D11TriMesh m_pointCloudFrameA;
 	ml::D3D11TriMesh m_pointCloudFrameB;

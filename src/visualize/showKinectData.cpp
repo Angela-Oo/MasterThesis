@@ -4,38 +4,13 @@
 
 #include "ext-depthcamera/sensorData.h"
 #include <numeric>
-
+#include "algo/icp.h"
 using namespace ml;
-
-//void ShowKinectData::processFrame()
-//{
-//	//auto points = _sensor_data_wrapper->addFrame(2);
-//	auto points = _sensor_data_wrapper->get3DPoints(2);
-//
-//	auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / static_cast<float>(points.size());
-//	mat4f center = mat4f::translation(-average);
-//	float scale_factor = 1.;
-//	//float scale_factor = 0.01;
-//	mat4f scale = mat4f::scale({ scale_factor, scale_factor, scale_factor });
-//	mat4f rotation = mat4f::rotationX(90.) * mat4f::rotationZ(-90.);
-//	mat4f transform = mat4f::translation({ -0.5f, -2.f, 1.2f });
-//	mat4f translate = transform * rotation * scale * center;
-//	std::for_each(points.begin(), points.end(), [&translate](vec3f & p) { p = translate * p; });
-//
-//	//_all_points.insert(_all_points.end(), points.begin(), points.end());
-//	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
-//	_frame++;
-//}
 
 
 void ShowKinectData::renderPoints(int frame)
 {
 	auto points = _sensor_data_wrapper->getPoints(frame, 3);
-
-	//auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / static_cast<float>(points.size());
-	//mat4f center = mat4f::translation(-average);
-	//std::for_each(points.begin(), points.end(), [&center](vec3f & p) { p = center * p; });
-	
 	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
 }
 
@@ -56,8 +31,6 @@ void ShowKinectData::init(ml::ApplicationData &app)
 	if (_depth_sensor.createFirstConnected() == S_OK)
 	{
 		auto intrinsic = _depth_sensor.getIntrinsics();
-		//_depth_sensor.toggleNearMode();
-		//_sensor_data_wrapper = std::make_unique<SensorDataWrapper>(_depth_sensor);// intrinsics ??
 		auto depth_intrinsics = intrinsic.converToMatrix();
 		auto color_intrinsics = intrinsic.converToMatrix();
 		mat4f depth_extrinsics = getWorldTransformation();
@@ -81,14 +54,17 @@ void ShowKinectData::init(ml::ApplicationData &app)
 
 void ShowKinectData::render(ml::Cameraf& camera)
 {
-	_sensor_data_wrapper->processFrame();
-	auto end = std::chrono::system_clock::now();
-	auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - _start_time).count();
-	//if (elapsed > 3) {
+	if (_record_frames) {
+		_sensor_data_wrapper->processFrame();
+		//auto end = std::chrono::system_clock::now();
+		//auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - _start_time).count();
+		//if (elapsed > 3) {
 		renderPoints(_frame);
 		_frame++;
-		_start_time = std::chrono::system_clock::now();
-	//}	
+		//_start_time = std::chrono::system_clock::now();
+		//}	
+	}
+
 	ConstantBuffer constants;
 	constants.worldViewProj = camera.getViewProj();
 	constants.modelColor = ml::vec4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -97,5 +73,56 @@ void ShowKinectData::render(ml::Cameraf& camera)
 	m_shaderManager.bindShaders("pointCloud");
 	m_constants.bind(0);
 	m_pointCloud.render();
+	m_pointCloudB.render();
 }
 
+
+
+void ShowKinectData::icp(int frame_a, int frame_b)
+{
+	auto points_a = _sensor_data_wrapper->getPoints(frame_a, 3);
+	auto points_b = _sensor_data_wrapper->getPoints(frame_b, 3);
+
+	auto transformation = iterative_closest_point(points_a, points_b);
+	//transformation.invert();
+	std::for_each(points_b.begin(), points_b.end(), [&transformation](ml::vec3f & p) { p = transformation * p; });
+
+	std::vector<ml::vec4f> color_frame_A(points_a.size());
+	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
+	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_a, color_frame_A));
+
+	std::vector<ml::vec4f> color_frame_B(points_b.size());
+	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
+	m_pointCloudB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_b, color_frame_B));
+}
+
+void ShowKinectData::key(UINT key) {
+	if (key == KEY_R) {
+		auto end = std::chrono::system_clock::now();
+		auto elapse = std::chrono::duration_cast<std::chrono::milliseconds>(end - _start_time).count();
+		if (elapse > 500) {
+			_start_time = std::chrono::system_clock::now();
+			_record_frames = !_record_frames;
+			if (_record_frames)
+				std::cout << "start recording frames" << std::endl;
+			else
+				std::cout << "stop recording frames" << std::endl;
+		}
+	}
+	else if (key == KEY_I)
+	{
+		std::cout << "calculate icp between last two frames" << std::endl;
+		icp(_frame - 2, _frame-1);
+		std::cout << "finished icp" << std::endl;
+	}
+	else if (key == KEY_P) {
+		std::cout << "save recorded frames as .sens file" << std::endl;
+		std::string file = ".\\data\\captured_data.sens";
+		_sensor_data_wrapper->_data.saveToFile(file);
+	}
+	else if (key == KEY_L) {
+		std::cout << "load recorded frames from .sens file" << std::endl;
+		std::string file = ".\\data\\captured_data.sens";
+		_sensor_data_wrapper->_data.loadFromFile(file);
+	}
+}

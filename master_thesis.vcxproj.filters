@@ -470,6 +470,9 @@
     <ClInclude Include="src\algo\eigen_quaternion.h">
       <Filter>algo</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\icp.h">
+      <Filter>algo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -511,6 +514,9 @@
       <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\icp-closedform.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\icp.cpp">
       <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>

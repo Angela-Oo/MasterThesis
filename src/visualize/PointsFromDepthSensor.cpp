@@ -128,7 +128,7 @@ std::vector<ml::vec3f> CalibrateSensorDataWrapper::getPoints(unsigned int frame,
 	for (unsigned int y = 0; y < _depth_sensor.getDepthHeight(); y += step_size) {
 		for (unsigned int x = 0; x < _depth_sensor.getDepthWidth(); x += step_size) {
 			auto point = _sensor_data.getWorldPos(x, y, frame);
-			if (point != ml::vec3f::origin)
+			//if (point != ml::vec3f::origin)
 			{
 				points.push_back(_sensor_data.m_CalibrationDepth.m_Extrinsic * point);
 			}

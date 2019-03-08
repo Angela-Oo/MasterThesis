@@ -11,6 +11,7 @@ private:
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;
+	void key(UINT key) override {};
 private:
 	ml::D3D11TriMesh m_pointCloud;
 	ml::D3D11ShaderManager m_shaderManager;

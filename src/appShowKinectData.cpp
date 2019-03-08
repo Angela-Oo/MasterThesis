@@ -178,73 +178,7 @@ void AppShowKinectData::keyPressed(ml::ApplicationData& app, UINT key)
 		FreeImageWrapper::saveImage("depth.png", ml::ColorImageR32G32B32A32(depth));
 	}
 
-	if (key == 'R') {
-		mat4f intrinsics = m_camera.getIntrinsic(app.window.getWidth(), app.window.getHeight());
-
-		//std::cout << intrinsics << std::endl;
-		mat4f intrinsicsInverse = intrinsics.getInverse();
-
-		ml::mat4f projToCam = m_camera.getProj().getInverse();
-		ml::mat4f camToWorld = m_camera.getView().getInverse();
-		ml::ColorImageR32G32B32 image(app.window.getWidth(), app.window.getHeight());
-
-		const std::string testFilename = "scans/gates381.ply";
-		ml::MeshDataf meshData = ml::MeshIOf::loadFromFile(testFilename);
-		ml::TriMeshf triMesh(meshData);
-
-		ml::Timer c0;
-		c0.start();
-		ml::TriMeshAcceleratorBVHf accel(triMesh, false);
-		std::cout << "time construct " << c0.getElapsedTimeMS() << std::endl;
-
-		std::vector<const TriMeshRayAcceleratorf*> accelVec;
-		accelVec.push_back(&accel);
-		int s = sizeof(accel);
-
-		ml::Timer c;
-		c.start();
-#pragma omp parallel for
-		for (int y_ = 0; y_ < (int)app.window.getHeight(); y_++) {
-			unsigned int y = (unsigned int)y_;
-
-			for (unsigned int x = 0; x < app.window.getWidth(); x++) {
-
-				float depth0 = 0.5f;
-				float depth1 = 1.0f;
-				vec4f p0 = camToWorld * intrinsicsInverse*vec4f((float)x*depth0, (float)(y)*depth0, depth0, 1.0f);
-				vec4f p1 = camToWorld * intrinsicsInverse*vec4f((float)x*depth1, (float)(y)*depth1, depth1, 1.0f);
-
-				vec3f eye = m_camera.getEye();
-				Rayf r(m_camera.getEye(), (p1.getVec3() - p0.getVec3()).getNormalized());
-
-				Rayf _check = m_camera.getScreenRay((float)x / app.window.getWidth(), (float)y / app.window.getHeight());
-
-				int a = 5;
-				float t, u, v;
-				const ml::TriMeshf::Triangle* tri;
-				unsigned int objIdx;
-				TriMeshRayAcceleratorf::Intersection intersect = TriMeshRayAcceleratorf::getFirstIntersection(r, accelVec, objIdx);
-				t = intersect.t;
-				u = intersect.u;
-				v = intersect.v;
-				tri = intersect.triangle;
-
-				if (tri) {
-					image(x, y) = tri->getSurfaceColor(u, v).getVec3();
-				}
-				else {
-					image(x, y) = 0;
-				}
-
-			}
-		}
-		double elapsed = c.getElapsedTimeMS();
-		std::cout << "time trace " << elapsed << std::endl;
-		unsigned int raysPerSec = (unsigned int)((double)(app.window.getHeight()*app.window.getWidth()) / (elapsed / 1000.0));
-		std::cout << "million rays/s " << (float)raysPerSec / 1000000.0 << std::endl;
-
-		ml::FreeImageWrapper::saveImage("test.jpg", image);
-	}
+	m_render_data->key(key);
 }
 
 void AppShowKinectData::mouseDown(ml::ApplicationData &app, ml::MouseButtonType button)
