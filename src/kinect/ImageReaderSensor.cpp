@@ -22,9 +22,10 @@ mat4f loadIntrinsicFromFile(std::string filename)
 ImageReaderSensor::ImageReaderSensor()
 	: m_BasePath("")
 {
-	unsigned int windowWidth = 1000;
-	unsigned int windowHeight = 800;
-	init(windowWidth, windowHeight, 640, 480, 640, 480);
+	unsigned int windowWidth = 1280;
+	unsigned int windowHeight = 1024;
+	//init(windowWidth, windowHeight, 640, 480, 640, 480);
+	init(windowWidth, windowHeight, 640, 480, 1280, 1024);
 
 	//default path should be actually overwritten
 	//m_BaseFilename = "../stanfordData/copyroom_png/";

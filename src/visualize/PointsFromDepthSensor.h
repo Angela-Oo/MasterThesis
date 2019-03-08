@@ -19,6 +19,25 @@ public:
 	~SensorDataWrapper() = default;
 };
 
+
+class CalibrateSensorDataWrapper
+{
+private:
+	ml::CalibratedSensorData _sensor_data;
+	DepthSensor & _depth_sensor;
+public:
+	ml::SensorData _data;
+public:
+	void processFrame();
+	std::vector<ml::vec3f> getPoints(unsigned int frame);
+public:
+	CalibrateSensorDataWrapper(DepthSensor & depth_sensor, 
+							   ml::mat4f depth_intrinsics, ml::mat4f depth_extrinsics,
+							   ml::mat4f color_intrinsics, ml::mat4f color_extrinsics);
+	~CalibrateSensorDataWrapper() = default;
+};
+
+
 class PointsFromDepthData
 {
 private:

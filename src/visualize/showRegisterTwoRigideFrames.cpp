@@ -2,6 +2,7 @@
 #include <numeric>
 #include "algo/icp-ceres.h"
 #include "algo/eigen_quaternion.h"
+#include "ext-depthcamera/calibratedSensorData.h"
 using namespace Eigen;
 
 Vector3d vec3f_to_vector3d(const ml::vec3f &vec)
@@ -90,16 +91,32 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	m_shaderManager.init(app.graphics);
 	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
 	m_constants.init(app.graphics);
+	configImageReaderSensor("C:/Users/Angela/Meins/Studium/MasterThesis/data/sokrates-ps/");
 
-	configImageReaderSensor("D:/Studium/MasterThesis/input_data/sokrates-ps/");	
-	_rgbd_frame_to_point_cloud = std::make_unique<SensorDataWrapper>(_depth_sensor, _depth_sensor.getColorIntrinsics(), _depth_sensor.getDepthIntrinsics());
+	float scale_factor = 0.004;
+	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
+	ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
+	//ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });
+	ml::mat4f depth_extrinsics = /*transform */ rotation * scale;
+	//auto depth_extrinsics = ml::mat4f::identity();
+	auto sensor_data = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor, 
+																	_depth_sensor.getDepthIntrinsics(), depth_extrinsics,
+																	_depth_sensor.getColorIntrinsics(), ml::mat4f::identity());
+	
+	for(int i = 0; i < 10; i++)
+		sensor_data->processFrame();
+	auto points_frame_A = sensor_data->getPoints(0);
+	auto points_frame_B = sensor_data->getPoints(2);
 
-	auto points_frame_A = processFrame();
-	for (int i = 0; i < 2; i++) {
-		_depth_sensor.processDepth();
-		_depth_sensor.processColor();
-	}
-	auto points_frame_B = processFrame();
+
+	//_rgbd_frame_to_point_cloud = std::make_unique<SensorDataWrapper>(_depth_sensor, _depth_sensor.getColorIntrinsics(), _depth_sensor.getDepthIntrinsics());
+	//
+	//auto points_frame_A = processFrame();
+	//for (int i = 0; i < 2; i++) {
+	//	_depth_sensor.processDepth();
+	//	_depth_sensor.processColor();
+	//}
+	//auto points_frame_B = processFrame();
 
 	auto points_A = vector_vec3f_to_vector_vector3d(points_frame_A);
 	auto points_B = vector_vec3f_to_vector_vector3d(points_frame_B);

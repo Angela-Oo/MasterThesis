@@ -85,6 +85,67 @@ SensorDataWrapper::SensorDataWrapper(DepthSensor & depth_sensor,
 
 
 
+void CalibrateSensorDataWrapper::processFrame()
+{
+	_depth_sensor.processDepth();
+	_depth_sensor.processColor();
+
+	// todo free memory
+	float * depth_data = new float[_depth_sensor.getDepthWidth() * _depth_sensor.getDepthHeight()];
+	unsigned int step = 1;
+	for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i += step) {
+		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j += step) {
+			float depth = _depth_sensor.getDepth(j, i);
+			if (depth != 0.)
+				depth += 200.;
+			//float depth = 10. * (1. + _depth_sensor.getDepth(j, i));
+			depth_data[i * _depth_sensor.getDepthWidth() + j] = (depth);
+		}
+	}
+	auto color_rgbx = _depth_sensor.getColorRGBX();
+	ml::vec4uc* color_data = new ml::vec4uc[_depth_sensor.getColorHeight() * _depth_sensor.getColorWidth()];
+	for (unsigned int i = 0; i < _depth_sensor.getColorHeight(); i += step) {
+		for (unsigned int j = 0; j < _depth_sensor.getColorWidth(); j += step) {
+			const unsigned int idx = (i * _depth_sensor.getColorWidth() + j) * 4;	//4 bytes per entry
+			color_data[i * _depth_sensor.getColorWidth() + j] = ml::vec4uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2], 0);
+		}
+	}
+
+	_sensor_data.m_DepthImages.push_back(depth_data);
+	_sensor_data.m_ColorImages.push_back(color_data);
+	_sensor_data.m_DepthNumFrames++;
+	_sensor_data.m_ColorNumFrames++;
+}
+
+std::vector<ml::vec3f> CalibrateSensorDataWrapper::getPoints(unsigned int frame)
+{
+	std::vector<ml::vec3f> points;
+	if (frame >= _sensor_data.m_DepthNumFrames)
+		return points;
+	
+	int step = 4;
+	for (unsigned int y = 0; y < _depth_sensor.getDepthHeight(); y += step) {
+		for (unsigned int x = 0; x < _depth_sensor.getDepthWidth(); x += step) {
+			points.push_back(_sensor_data.m_CalibrationDepth.m_Extrinsic * _sensor_data.getWorldPos(x, y, frame));
+		}
+	}
+	return points;
+}
+
+CalibrateSensorDataWrapper::CalibrateSensorDataWrapper(DepthSensor & depth_sensor,
+													   ml::mat4f depth_intrinsics, ml::mat4f depth_extrinsics,
+													   ml::mat4f color_intrinsics, ml::mat4f color_extrinsics)
+	: _depth_sensor(depth_sensor)
+{
+	_sensor_data.m_CalibrationDepth.setMatrices(depth_intrinsics, depth_extrinsics);
+	_sensor_data.m_CalibrationColor.setMatrices(color_intrinsics, color_extrinsics);
+	_sensor_data.m_DepthImageWidth = _depth_sensor.getDepthWidth();
+	_sensor_data.m_DepthImageHeight = _depth_sensor.getDepthHeight();
+	_sensor_data.m_ColorImageWidth = _depth_sensor.getColorWidth();
+	_sensor_data.m_ColorImageHeight = _depth_sensor.getColorHeight();
+}
+
+
 
 
 
