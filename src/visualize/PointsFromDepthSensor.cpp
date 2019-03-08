@@ -96,9 +96,11 @@ void CalibrateSensorDataWrapper::processFrame()
 	for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i += step) {
 		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j += step) {
 			float depth = _depth_sensor.getDepth(j, i);
-			if (depth != 0.)
-				depth += 200.;
+			//if (depth != 0.)
+			//	depth += 200.;
 			//float depth = 10. * (1. + _depth_sensor.getDepth(j, i));
+			//if (depth != 0.)
+			//	depth += 1.;
 			depth_data[i * _depth_sensor.getDepthWidth() + j] = (depth);
 		}
 	}
@@ -126,7 +128,11 @@ std::vector<ml::vec3f> CalibrateSensorDataWrapper::getPoints(unsigned int frame)
 	int step = 4;
 	for (unsigned int y = 0; y < _depth_sensor.getDepthHeight(); y += step) {
 		for (unsigned int x = 0; x < _depth_sensor.getDepthWidth(); x += step) {
-			points.push_back(_sensor_data.m_CalibrationDepth.m_Extrinsic * _sensor_data.getWorldPos(x, y, frame));
+			auto point = _sensor_data.getWorldPos(x, y, frame);
+			if (point != ml::vec3f::origin)
+			{
+				points.push_back(_sensor_data.m_CalibrationDepth.m_Extrinsic * point);
+			}
 		}
 	}
 	return points;
