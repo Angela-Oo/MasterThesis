@@ -10,6 +10,7 @@ class ShowKinectData : public IShowData
 private:
 	//void processFrame();
 	void renderPoints(int frame);
+	ml::mat4f getWorldTransformation();
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;

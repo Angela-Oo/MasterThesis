@@ -29,7 +29,7 @@ public:
 	ml::SensorData _data;
 public:
 	void processFrame();
-	std::vector<ml::vec3f> getPoints(unsigned int frame);
+	std::vector<ml::vec3f> getPoints(unsigned int frame, unsigned int step_size = 1);
 public:
 	CalibrateSensorDataWrapper(DepthSensor & depth_sensor, 
 							   ml::mat4f depth_intrinsics, ml::mat4f depth_extrinsics,

@@ -30,7 +30,7 @@ using namespace ml;
 
 void ShowKinectData::renderPoints(int frame)
 {
-	auto points = _sensor_data_wrapper->getPoints(frame);
+	auto points = _sensor_data_wrapper->getPoints(frame, 3);
 
 	//auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / static_cast<float>(points.size());
 	//mat4f center = mat4f::translation(-average);
@@ -39,6 +39,14 @@ void ShowKinectData::renderPoints(int frame)
 	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
 }
 
+mat4f ShowKinectData::getWorldTransformation()
+{
+	float scale_factor = 2.0;
+	mat4f scale = mat4f::scale({ scale_factor, scale_factor, scale_factor });
+	mat4f rotation = mat4f::rotationY(180.) * mat4f::rotationX(90.);
+	mat4f transform = mat4f::translation({ -1.0f, -0.5f, 1.5f });
+	return transform * rotation * scale;
+}
 
 void ShowKinectData::init(ml::ApplicationData &app)
 {
@@ -52,18 +60,15 @@ void ShowKinectData::init(ml::ApplicationData &app)
 		//_sensor_data_wrapper = std::make_unique<SensorDataWrapper>(_depth_sensor);// intrinsics ??
 		auto depth_intrinsics = intrinsic.converToMatrix();
 		auto color_intrinsics = intrinsic.converToMatrix();
-
-		float scale_factor = 1.0;
-		//float scale_factor = 0.01;
-		mat4f scale = mat4f::scale({ scale_factor, scale_factor, scale_factor });
-		mat4f rotation = mat4f::rotationY(180.) * mat4f::rotationX(90.);
-		mat4f transform = mat4f::translation({ -0.5f, -1.f, 1.5f });
-		mat4f depth_extrinsics = transform * rotation * scale;
+		mat4f depth_extrinsics = getWorldTransformation();
 		auto color_extrinsics = ml::mat4f::identity();
 
 		_sensor_data_wrapper = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
 																			depth_intrinsics, depth_extrinsics,
 																			color_intrinsics, color_extrinsics);
+
+		_sensor_data_wrapper->processFrame();
+		_frame++;
 	}
 	else {
 		std::cout << "could not connect to camera" << std::endl;
@@ -79,7 +84,7 @@ void ShowKinectData::render(ml::Cameraf& camera)
 	_sensor_data_wrapper->processFrame();
 	auto end = std::chrono::system_clock::now();
 	auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(end - _start_time).count();
-	//if (elapsed > 1) {
+	//if (elapsed > 3) {
 		renderPoints(_frame);
 		_frame++;
 		_start_time = std::chrono::system_clock::now();

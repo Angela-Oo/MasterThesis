@@ -92,9 +92,8 @@ void CalibrateSensorDataWrapper::processFrame()
 
 	// todo free memory
 	float * depth_data = new float[_depth_sensor.getDepthWidth() * _depth_sensor.getDepthHeight()];
-	unsigned int step = 1;
-	for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i += step) {
-		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j += step) {
+	for (unsigned int i = 0; i < _depth_sensor.getDepthHeight(); i++) {
+		for (unsigned int j = 0; j < _depth_sensor.getDepthWidth(); j++) {
 			float depth = _depth_sensor.getDepth(j, i);
 			//if (depth != 0.)
 			//	depth += 200.;
@@ -106,8 +105,8 @@ void CalibrateSensorDataWrapper::processFrame()
 	}
 	auto color_rgbx = _depth_sensor.getColorRGBX();
 	ml::vec4uc* color_data = new ml::vec4uc[_depth_sensor.getColorHeight() * _depth_sensor.getColorWidth()];
-	for (unsigned int i = 0; i < _depth_sensor.getColorHeight(); i += step) {
-		for (unsigned int j = 0; j < _depth_sensor.getColorWidth(); j += step) {
+	for (unsigned int i = 0; i < _depth_sensor.getColorHeight(); i++) {
+		for (unsigned int j = 0; j < _depth_sensor.getColorWidth(); j++) {
 			const unsigned int idx = (i * _depth_sensor.getColorWidth() + j) * 4;	//4 bytes per entry
 			color_data[i * _depth_sensor.getColorWidth() + j] = ml::vec4uc(color_rgbx[idx + 0], color_rgbx[idx + 1], color_rgbx[idx + 2], 0);
 		}
@@ -119,15 +118,15 @@ void CalibrateSensorDataWrapper::processFrame()
 	_sensor_data.m_ColorNumFrames++;
 }
 
-std::vector<ml::vec3f> CalibrateSensorDataWrapper::getPoints(unsigned int frame)
+std::vector<ml::vec3f> CalibrateSensorDataWrapper::getPoints(unsigned int frame, unsigned int step_size)
 {
 	std::vector<ml::vec3f> points;
 	if (frame >= _sensor_data.m_DepthNumFrames)
 		return points;
 	
 	int step = 4;
-	for (unsigned int y = 0; y < _depth_sensor.getDepthHeight(); y += step) {
-		for (unsigned int x = 0; x < _depth_sensor.getDepthWidth(); x += step) {
+	for (unsigned int y = 0; y < _depth_sensor.getDepthHeight(); y += step_size) {
+		for (unsigned int x = 0; x < _depth_sensor.getDepthWidth(); x += step_size) {
 			auto point = _sensor_data.getWorldPos(x, y, frame);
 			if (point != ml::vec3f::origin)
 			{
