@@ -224,6 +224,7 @@
     <ClInclude Include="src\algo\icp-ceres.h" />
     <ClInclude Include="src\algo\icp-closedform.h" />
     <ClInclude Include="src\algo\icp.h" />
+    <ClInclude Include="src\algo\icp_ml.h" />
     <ClInclude Include="src\algo\sophus_se3.h" />
     <ClInclude Include="src\appShowKinectData.h" />
     <ClInclude Include="src\appTest.h" />
@@ -246,6 +247,7 @@
     <ClCompile Include="src\algo\icp-ceres.cpp" />
     <ClCompile Include="src\algo\icp-closedform.cpp" />
     <ClCompile Include="src\algo\icp.cpp" />
+    <ClCompile Include="src\algo\icp_ml.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\appTest.cpp" />
     <ClCompile Include="src\kinect\BinaryDumpReader.cpp" />
