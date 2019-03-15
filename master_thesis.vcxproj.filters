@@ -476,6 +476,9 @@
     <ClInclude Include="src\algo\icp_ml.h">
       <Filter>algo</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\knn.h">
+      <Filter>algo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -523,6 +526,9 @@
       <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\icp_ml.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\knn.cpp">
       <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>

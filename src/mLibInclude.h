@@ -15,5 +15,6 @@
 #include "mLibDepthCamera.h"
 #include "mLibOpenMesh.h"
 #include "mLibFreeImage.h"
+#include "mLibFLANN.h"
 
 //using namespace ml;
