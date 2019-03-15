@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "icp_ml.h"
+#include "icp.h"
 
 using namespace Eigen;
 
@@ -53,25 +53,91 @@ ICP::ICP(const std::vector<ml::vec3f>& src,
 
 
 
-
-
-ml::mat4f ICP::solve()
+void ICP::printOptions()
 {
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
+}
 
+ml::mat4f ICP::solve()
+{
+	printOptions();
 	auto start_time = std::chrono::system_clock::now();
 
 	KNN nn_search(_dst);
-
 	ml::vec6d rotation_translation(0., 0., 0., 0., 0., 0.);
-
 	ceres::Problem problem;
 	for (int i = 0; i < _src.size(); ++i) {
 		unsigned int index = nn_search.nearest_index(_src[i]);
 		ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(_dst[index], _src[i]);
+		problem.AddResidualBlock(cost_function, NULL, rotation_translation.array);
+	}
+	ceres::Solver::Summary summary;
+	ceres::Solve(_options, &problem, &summary);
+
+	std::cout << "Final report:\n" << summary.BriefReport() << std::endl;// FullReport();
+	auto end_time = std::chrono::system_clock::now();
+	auto elapse = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+	std::cout << "\nCeres Solver duration " << elapse << "s\n" << std::endl;
+
+	return rigid_transformation_from_se3(rotation_translation);
+}
+
+
+ml::mat4f ICP::solveNN2()
+{
+	printOptions();
+	auto start_time = std::chrono::system_clock::now();
+
+	ml::vec6d translation(0., 0., 0., 0., 0., 0.);
+	ml::mat4f test = ml::mat4f::identity();
+
+	double tol = 0.001;
+	double last_cost = 1.;
+	double cur_tol = last_cost;
+	for (int j = 0; (cur_tol > tol) && j < 50; j++) {
+		KNN nn_search(_dst);
+		ml::vec6d rotation_translation(0., 0., 0., 0., 0., 0.);
+		ceres::Problem problem;
+		for (int i = 0; i < _src.size(); ++i) {
+			unsigned int index = nn_search.nearest_index(_src[i]);
+			ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(_dst[index], _src[i]);
+			problem.AddResidualBlock(cost_function, NULL, rotation_translation.array);
+		}
+		ceres::Solver::Summary summary;
+		ceres::Solve(_options, &problem, &summary);
+
+		std::cout << "Final report:\n" << summary.BriefReport() << std::endl;// FullReport();		
+
+		ml::mat4f transform_matrix =  rigid_transformation_from_se3(rotation_translation);
+		std::for_each(_src.begin(), _src.end(), [&](ml::vec3f & p) { p = transform_matrix * p; });
+		translation += rotation_translation;
+		test = transform_matrix * test;
+
+		cur_tol = abs(last_cost - summary.final_cost);
+		last_cost = summary.final_cost;
+	}
+
+	auto end_time = std::chrono::system_clock::now();
+	auto elapse = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
+	std::cout << "\nCeres Solver duration " << elapse << "s\n" << std::endl;
+
+	return rigid_transformation_from_se3(translation);
+}
+
+
+ml::mat4f ICP::solveNN()
+{
+	printOptions();
+	auto start_time = std::chrono::system_clock::now();
+
+	KNN nn_search(_dst);
+	ml::vec6d rotation_translation(0., 0., 0., 0., 0., 0.);
+	ceres::Problem problem;
+	for (int i = 0; i < _src.size(); ++i) {
+		ceres::CostFunction* cost_function = PointToPointsErrorSE3NNSearch::Create(_src[i], std::bind(&KNN::nearest_f, &nn_search, std::placeholders::_1));
 		problem.AddResidualBlock(cost_function, NULL, rotation_translation.array);
 	}
 	ceres::Solver::Summary summary;
@@ -156,40 +222,6 @@ ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::
 
 
 
-ml::mat4f iterative_closest_points2(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &dst, const ceres::Solver::Options & options)
-{
-	std::cout << "\nCeres Solver" << std::endl;
-	std::cout << "Ceres preconditioner type: " << options.preconditioner_type << std::endl;
-	std::cout << "Ceres linear algebra type: " << options.sparse_linear_algebra_library_type << std::endl;
-	std::cout << "Ceres linear solver type: " << options.linear_solver_type << std::endl;
-
-	auto start_time = std::chrono::system_clock::now();
-
-	KNN nn_search(dst);
-
-	ml::vec6d rotation_translation(0., 0., 0., 0., 0., 0.);
-
-	for (int j = 0; j < 10; j++) {
-		auto transformation = rigid_transformation_from_se3(rotation_translation);
-		ceres::Problem problem;
-		for (int i = 0; i < src.size(); ++i) {
-			ml::vec3f src_transformed = transformation * src[i];
-			unsigned int index = nn_search.nearest_index(src_transformed);
-			ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(dst[index], src[i]);
-			problem.AddResidualBlock(cost_function, NULL, rotation_translation.array);
-		}
-		ceres::Solver::Summary summary;
-		ceres::Solve(options, &problem, &summary);
-		std::cout << "Final report:\n" << summary.BriefReport() << std::endl;// FullReport();
-	}
-
-	auto end_time = std::chrono::system_clock::now();
-	auto elapse = std::chrono::duration_cast<std::chrono::seconds>(end_time - start_time).count();
-	std::cout << "\nCeres Solver duration " << elapse << "s\n" << std::endl;
-
-	return rigid_transformation_from_se3(rotation_translation);
-}
-
 
 ml::mat4f pointToPointSE3(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &dst)
 {
@@ -200,7 +232,7 @@ ml::mat4f pointToPointSE3(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &d
 		options.preconditioner_type = ceres::SCHUR_JACOBI;
 		options.max_num_iterations = 50;
 
-		ml::mat4f translation = iterative_closest_points2(src, dst, options);
+		ml::mat4f translation = iterative_closest_points(src, dst, options);
 		return translation;
 	}
 	{

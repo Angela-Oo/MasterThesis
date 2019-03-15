@@ -461,10 +461,10 @@
     <ClInclude Include="src\algo\sophus_se3.h">
       <Filter>algo</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\icp_ml.h">
+    <ClInclude Include="src\algo\knn.h">
       <Filter>algo</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\knn.h">
+    <ClInclude Include="src\algo\icp.h">
       <Filter>algo</Filter>
     </ClInclude>
   </ItemGroup>
@@ -504,10 +504,10 @@
     <ClCompile Include="src\visualize\showSensData.cpp">
       <Filter>visualize</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\icp_ml.cpp">
+    <ClCompile Include="src\algo\knn.cpp">
       <Filter>algo</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\knn.cpp">
+    <ClCompile Include="src\algo\icp.cpp">
       <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>

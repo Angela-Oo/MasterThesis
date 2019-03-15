@@ -15,12 +15,16 @@ class ICP
 	std::vector<ml::vec3f> _src;
 	std::vector<ml::vec3f> _dst;
 	ceres::Solver::Options _options;
+private:
+	void printOptions();
 public:
 	ICP(const std::vector<ml::vec3f>& src,
 		const std::vector<ml::vec3f>& dst,
 		ceres::Solver::Options option);
 
 	ml::mat4f solve();
+	ml::mat4f solveNN();
+	ml::mat4f solveNN2();
 };
 
 struct PointToPointErrorSE3 {
@@ -113,7 +117,7 @@ struct NearestPoint {
 	//{}
 
 	std::function<ml::vec3f(const float *)> _nearest_point;
-	double tol = 0.01;
+	double tol = 0.1;
 	NearestPoint(std::function<ml::vec3f(const float *)> nearest_point)
 		: _nearest_point(nearest_point)
 	{}

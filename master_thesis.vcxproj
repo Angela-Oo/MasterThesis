@@ -220,7 +220,7 @@
     <ClInclude Include="mLib\include\mLibMBase.h" />
     <ClInclude Include="mLib\include\mLibOpenMesh.h" />
     <ClInclude Include="mLib\include\mLibZLib.h" />
-    <ClInclude Include="src\algo\icp_ml.h" />
+    <ClInclude Include="src\algo\icp.h" />
     <ClInclude Include="src\algo\knn.h" />
     <ClInclude Include="src\algo\sophus_se3.h" />
     <ClInclude Include="src\appShowKinectData.h" />
@@ -241,7 +241,7 @@
     <ClInclude Include="src\visualize\showSensData.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\algo\icp_ml.cpp" />
+    <ClCompile Include="src\algo\icp.cpp" />
     <ClCompile Include="src\algo\knn.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\appTest.cpp" />

@@ -1,8 +1,7 @@
 #include "showRegisterTwoRigideFrames.h"
 #include <numeric>
 #include "ext-depthcamera/calibratedSensorData.h"
-#include "algo/icp_ml.h"
-using namespace Eigen;
+#include "algo/icp.h"
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -118,8 +117,10 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 
 void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
 {
-	if (icp_active)
+	if (icp_active) {
 		icp();
+		icp_active = false;
+	}
 
 	ConstantBuffer constants;
 	constants.worldViewProj = camera.getViewProj();
@@ -141,7 +142,7 @@ void ShowTwoRigideRegisteredFrames::icp()
 
 	
 	ICP icp(_points_a_icp, _points_b_icp, options);
-	_transformation = icp.solve();
+	_transformation = icp.solveNN2();
 
 	std::for_each(_points_a_icp.begin(), _points_a_icp.end(), [&](ml::vec3f & p) { p = _transformation * p; });
 
