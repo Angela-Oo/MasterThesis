@@ -63,7 +63,8 @@ void configImageReaderSensor(ImageReaderSensor & reader, std::string filepath)
 
 std::vector<vec3f> ShowRGBDImageData::processFrame()
 {
-	auto points = _rgbd_frame_to_point_cloud->addFrame(5);
+	_rgbd_frame_to_point_cloud->processFrame();
+	auto points = _rgbd_frame_to_point_cloud->getPoints(0, 5);
 	//auto points = _rgbd_frame_to_point_cloud->getPoints();
 
 	auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / static_cast<float>(points.size());
@@ -105,7 +106,7 @@ void ShowRGBDImageData::render(ml::Cameraf& camera)
 		m_pointCloud.init(*_graphics, point_template);
 	}
 	else {
-		_rgbd_frame_to_point_cloud->_data.saveToFile("D:/Studium/MasterThesis/input_data/recorded_frames/frames_rgbd.sens");
+		_rgbd_frame_to_point_cloud->_sensor_data.saveToFile("D:/Studium/MasterThesis/input_data/recorded_frames/frames_rgbd.sens");
 		_reader.saveRecordedPointCloud("D:/Studium/MasterThesis/input_data/recorded_frames/point_cloud.txt");
 		_reader.saveRecordedFramesToFile("D:/Studium/MasterThesis/input_data/recorded_frames/frames.txt");
 	}

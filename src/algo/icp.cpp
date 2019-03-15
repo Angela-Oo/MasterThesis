@@ -97,8 +97,9 @@ ml::mat4f ICP::solveNN2()
 	double tol = 0.001;
 	double last_cost = 1.;
 	double cur_tol = last_cost;
-	for (int j = 0; (cur_tol > tol) && j < 50; j++) {
-		KNN nn_search(_dst);
+
+	KNN nn_search(_dst);
+	for (int j = 0; (cur_tol > tol) && j < 50; j++) {		
 		ml::vec6d rotation_translation(0., 0., 0., 0., 0., 0.);
 		ceres::Problem problem;
 		for (int i = 0; i < _src.size(); ++i) {

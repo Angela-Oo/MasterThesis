@@ -24,23 +24,25 @@ void ShowTwoRigideRegisteredFrames::configImageReaderSensor(std::string filepath
 	_depth_sensor.toggleNearMode();
 }
 
-
-std::vector<ml::vec3f> ShowTwoRigideRegisteredFrames::processFrame()
-{
-	auto points = _rgbd_frame_to_point_cloud->addFrame(5);
-
-	auto average = std::accumulate(points.begin(), points.end(), ml::vec3f(0., 0., 0.)) / static_cast<float>(points.size());
-	ml::mat4f center = ml::mat4f::translation(-average);
-	float scale_factor = 5.;
-	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
-	ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
-	ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });
-	ml::mat4f translate = transform * rotation * scale * center;
-	std::for_each(points.begin(), points.end(), [&translate](ml::vec3f & p) { p = translate * p; });
-
-	_depth_sensor.recordFrame();
-	return points;
-}
+//
+//std::vector<ml::vec3f> ShowTwoRigideRegisteredFrames::processFrame()
+//{
+//	_rgbd_frame_to_point_cloud->processFrame();
+//
+//	auto points = _rgbd_frame_to_point_cloud->getPoints();
+//
+//	auto average = std::accumulate(points.begin(), points.end(), ml::vec3f(0., 0., 0.)) / static_cast<float>(points.size());
+//	ml::mat4f center = ml::mat4f::translation(-average);
+//	float scale_factor = 5.;
+//	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
+//	ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
+//	ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });
+//	ml::mat4f translate = transform * rotation * scale * center;
+//	std::for_each(points.begin(), points.end(), [&translate](ml::vec3f & p) { p = translate * p; });
+//
+//	_depth_sensor.recordFrame();
+//	return points;
+//}
 
 void ShowTwoRigideRegisteredFrames::renderPoints(std::vector<ml::vec3f> points_frame_A, std::vector<ml::vec3f> points_frame_B)
 {
@@ -79,8 +81,8 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	for(int i = 0; i < 6; i++)
 		_sensor_data->processFrame();
 	
-	_points_a = _sensor_data->getPoints(0, 4);
-	_points_b = _sensor_data->getPoints(5, 4);
+	_points_a = _sensor_data->getPoints(0, 6);
+	_points_b = _sensor_data->getPoints(5, 6);
 
 	float scale_factor = 0.004;
 	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
@@ -134,15 +136,31 @@ void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
 
 void ShowTwoRigideRegisteredFrames::icp()
 {
+	//{
+	//	ceres::Solver::Options options;
+	//	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+	//	options.linear_solver_type = ceres::ITERATIVE_SCHUR;
+	//	options.preconditioner_type = ceres::SCHUR_JACOBI;
+	//	options.max_num_iterations = 50;
+
+	//	ICP icp(_points_a_icp, _points_b_icp, options);
+	//	_transformation = icp.solve();
+	//}
+
 	ceres::Solver::Options options;
 	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-	options.linear_solver_type = ceres::ITERATIVE_SCHUR;
-	options.preconditioner_type = ceres::SCHUR_JACOBI;
+	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;	
+	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
 	options.max_num_iterations = 50;
 
-	
 	ICP icp(_points_a_icp, _points_b_icp, options);
 	_transformation = icp.solveNN2();
+
+
+
 
 	std::for_each(_points_a_icp.begin(), _points_a_icp.end(), [&](ml::vec3f & p) { p = _transformation * p; });
 

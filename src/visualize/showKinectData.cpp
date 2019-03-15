@@ -85,9 +85,22 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 	auto points_a = _sensor_data_wrapper->getPoints(frame_a, 3);
 	auto points_b = _sensor_data_wrapper->getPoints(frame_b, 3);
 
-	auto transformation = pointToPointSE3(points_a, points_b);
-	//transformation.invert();
-	std::for_each(points_b.begin(), points_b.end(), [&transformation](ml::vec3f & p) { p = transformation * p; });
+
+	ceres::Solver::Options options;
+	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
+	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+	options.max_num_iterations = 50;
+
+	ICP icp(points_a, points_b, options);
+	auto transformation = icp.solveNN2();
+
+	std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
+
+
 
 	std::vector<ml::vec4f> color_frame_A(points_a.size());
 	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);

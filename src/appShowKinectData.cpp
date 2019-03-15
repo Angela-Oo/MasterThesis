@@ -8,53 +8,6 @@
 
 using namespace ml;
 
-//void backProjectGraphics(const DepthImage32& depth, const ColorImageR8G8B8A8& color, const Cameraf& camera) {
-//	PointCloudf pc;
-//	mat4f inv = camera.getProj().getInverse();
-//	for (auto& d : depth) {
-//		if (depth.isValidValue(d.value)) {
-//			vec2f p = D3D11GraphicsDevice::pixelToNDC(vec2i((int)d.x, (int)d.y), depth.getWidth(), depth.getHeight());
-//			vec3f v = (inv * vec3f((float)p.x, (float)p.y, d.value));
-//			pc.m_points.push_back(v);
-//			pc.m_colors.push_back(vec4f(color(d.x, d.y)) / 255.0f);
-//		}
-//	}
-//	PointCloudIOf::saveToFile("test_backproj_graphics.ply", pc);
-//}
-//
-//void backProjectVision(const DepthImage32& _depth, const ColorImageR8G8B8A8& color, const Cameraf& camera) {
-//	DepthImage32 depth = _depth;
-//
-//	{
-//		//first get it to world space z
-//		mat4f inv = camera.getProj().getInverse();
-//		for (auto& d : depth) {
-//			if (depth.isValidValue(d.value)) {
-//				vec2f p = D3D11GraphicsDevice::pixelToNDC(vec2i((int)d.x, (int)d.y), depth.getWidth(), depth.getHeight());
-//				vec3f v = (inv * vec3f((float)p.x, (float)p.y, d.value));
-//				d.value = v.z;
-//			}
-//			else {
-//				d.value = 0.0f;
-//			}
-//		}
-//		depth.setInvalidValue(0.0f);
-//	}
-//
-//	PointCloudf pc;
-//	mat4f inv = camera.getIntrinsic(depth.getWidth(), depth.getHeight()).getInverse();
-//	for (auto& d : depth) {
-//		if (depth.isValidValue(d.value)) {
-//			vec3f p((float)d.x * d.value, (float)d.y * d.value, d.value);
-//			p = inv * p;
-//
-//			pc.m_points.push_back(p);
-//			pc.m_colors.push_back(vec4f(color(d.x, d.y)) / 255.0f);
-//		}
-//	}
-//	PointCloudIOf::saveToFile("test_backproj_vision.ply", pc);
-//}
-//
 
 void AppShowKinectData::init(ml::ApplicationData &app)
 {

@@ -8,7 +8,7 @@ class ShowTwoRigideRegisteredFrames : public IShowData
 {
 private:
 	void configImageReaderSensor(std::string filepath);
-	std::vector<ml::vec3f> processFrame();
+	//std::vector<ml::vec3f> processFrame();
 	void renderPoints(std::vector<ml::vec3f> points_frame_A, std::vector<ml::vec3f> points_frame_B);
 	void icp();
 public:
