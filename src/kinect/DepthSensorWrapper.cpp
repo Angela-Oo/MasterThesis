@@ -15,10 +15,12 @@ std::vector<ml::vec3f> getPoints(const float* depth_data,
 
 	for (unsigned int y = 0; y < depth_height; y += step_size) {
 		for (unsigned int x = 0; x < depth_width; x += step_size) {
-			float depth = depth_data[x + y * depth_width];
-			vec3f p(static_cast<float>(x), static_cast<float>(y), 1.);
-			p = depth_intrinsics_inv * p;
-			p = p * depth;
+			const float depth = depth_data[x + y * depth_width];
+			vec4f world = depth_intrinsics_inv *vec4f((float)x*depth, (float)y*depth, depth, 0.0f);
+			auto p = world.getVec3();
+			//vec3f p(static_cast<float>(x), static_cast<float>(y), 1.);
+			//p = depth_intrinsics_inv * p;
+			//p = p * depth;
 			points.push_back(p);
 		}
 	}

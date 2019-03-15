@@ -6,8 +6,8 @@ using namespace ml;
 
 void SensorDataWrapper::processFrame()
 {
-	std::vector<unsigned short> depth_data(_depth_sensor._depth_sensor.getDepthWidth() * _depth_sensor._depth_sensor.getDepthHeight());
-	std::vector<ml::vec3uc> color_data(_depth_sensor._depth_sensor.getColorHeight() * _depth_sensor._depth_sensor.getColorWidth());
+	std::vector<unsigned short> depth_data(_depth_sensor.getDepthWidth() * _depth_sensor.getDepthHeight());
+	std::vector<ml::vec3uc> color_data(_depth_sensor.getColorHeight() * _depth_sensor.getColorWidth());
 
 	_depth_sensor.processFrame(depth_data.data(), color_data.data());
 	_sensor_data.addFrame(color_data.data(), depth_data.data());
@@ -19,9 +19,14 @@ std::vector<ml::vec3f> SensorDataWrapper::getPoints(unsigned int frame, unsigned
 	if (frame >= _sensor_data.m_frames.size())
 		return points;
 	
+
+	//return _sensor_data.computePointCloud(frame).m_points;
+
 	auto intrinsics = _depth_sensor._depth_sensor.getIntrinsics();
+	auto intrinsic_matrix = intrinsics.converToMatrix();
+	
 	auto depth_image = _sensor_data.computeDepthImage(frame);
-	return ::getPoints(depth_image, intrinsics.converToMatrix(), step_size);
+	return ::getPoints(depth_image, intrinsic_matrix, step_size);
 }
 
 SensorDataWrapper::SensorDataWrapper(DepthSensor & depth_sensor,
@@ -32,8 +37,8 @@ SensorDataWrapper::SensorDataWrapper(DepthSensor & depth_sensor,
 	SensorData::CalibrationData calibrationColor(color_intrinsics);
 	SensorData::CalibrationData calibrationDepth(depth_intrinsics);
 
-	_sensor_data.initDefault(_depth_sensor._depth_sensor.getColorWidth(), _depth_sensor._depth_sensor.getColorHeight(),
-							 _depth_sensor._depth_sensor.getDepthWidth(), _depth_sensor._depth_sensor.getDepthHeight(),
+	_sensor_data.initDefault(_depth_sensor.getColorWidth(), _depth_sensor.getColorHeight(),
+							 _depth_sensor.getDepthWidth(), _depth_sensor.getDepthHeight(),
 							 calibrationColor, calibrationDepth);
 }
 
@@ -45,8 +50,8 @@ SensorDataWrapper::SensorDataWrapper(DepthSensor & depth_sensor,
 
 void CalibrateSensorDataWrapper::processFrame()
 {
-	float * depth_data = new float[_depth_sensor._depth_sensor.getDepthWidth() * _depth_sensor._depth_sensor.getDepthHeight()];
-	ml::vec4uc* color_data = new ml::vec4uc[_depth_sensor._depth_sensor.getColorHeight() * _depth_sensor._depth_sensor.getColorWidth()];
+	float * depth_data = new float[_depth_sensor.getDepthWidth() * _depth_sensor.getDepthHeight()];
+	ml::vec4uc* color_data = new ml::vec4uc[_depth_sensor.getColorHeight() * _depth_sensor.getColorWidth()];
 
 	_depth_sensor.processFrame(depth_data, color_data);
 

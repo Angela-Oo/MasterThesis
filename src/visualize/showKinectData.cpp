@@ -36,10 +36,13 @@ void ShowKinectData::init(ml::ApplicationData &app)
 		mat4f depth_extrinsics = getWorldTransformation();
 		auto color_extrinsics = ml::mat4f::identity();
 
-		_sensor_data_wrapper = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
-																			depth_intrinsics, depth_extrinsics,
-																			color_intrinsics, color_extrinsics);
+		//_sensor_data_wrapper = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
+		//																	depth_intrinsics, depth_extrinsics,
+		//																	color_intrinsics, color_extrinsics);
 
+		_sensor_data_wrapper = std::make_unique<SensorDataWrapper>(_depth_sensor,
+																   depth_intrinsics,
+																   color_intrinsics);
 		_sensor_data_wrapper->processFrame();
 		_frame++;
 	}
@@ -135,8 +138,9 @@ void ShowKinectData::key(UINT key) {
 		std::string file = ".\\data\\captured_data.sens";
 		std::ofstream output_file;
 		output_file.open(file);
-		_sensor_data_wrapper->_sensor_data.savePointCloud(file, 0);// .saveToFile(file);
-		output_file << _sensor_data_wrapper->_sensor_data;
+		_sensor_data_wrapper->_sensor_data.saveToFile(file);
+		//_sensor_data_wrapper->_sensor_data.savePointCloud(file, 0);// .saveToFile(file);
+		//output_file << _sensor_data_wrapper->_sensor_data;
 	}
 	else if (key == KEY_L) {
 		std::cout << "load recorded frames from .sens file" << std::endl;
