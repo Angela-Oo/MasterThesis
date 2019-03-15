@@ -28,6 +28,11 @@ public:
 	// color/depth needs to point to array of size color/depth width * color/depth height
 	void processFrame(float * depth, ml::vec4uc * color);
 public:
+	unsigned int getDepthWidth();
+	unsigned int getDepthHeight();
+	unsigned int getColorWidth();
+	unsigned int getColorHeight();
+public:
 	template<typename T>
 	void processColorTemplate(T* color_data, std::function<T(BYTE*)> get_color)
 	{
@@ -62,51 +67,18 @@ public:
 
 
 
-class SensorDataWrapper
-{
-private:
-	DepthSensorWrapper _depth_sensor;
-public:
-	ml::SensorData _sensor_data;
-public:
-	//std::vector<ml::vec3f> addFrame(unsigned int step = 1);
-	//std::vector<ml::vec3f> get3DPoints(unsigned int step = 1);
-	void processFrame();
-	std::vector<ml::vec3f> getPoints(unsigned int frame, unsigned int step_size = 1);
-public:
-	SensorDataWrapper(DepthSensor & depth_sensor,
-					  ml::mat4f color_intrinsics = ml::mat4f::identity(),
-					  ml::mat4f depth_intrinsics = ml::mat4f::identity());
-	~SensorDataWrapper() = default;
-};
-
-
-class CalibrateSensorDataWrapper
-{
-private:
-	DepthSensorWrapper _depth_sensor;
-public:
-	ml::CalibratedSensorData _sensor_data;
-public:
-	void processFrame();
-	std::vector<ml::vec3f> getPoints(unsigned int frame, unsigned int step_size = 1);
-	ml::SensorData getSensorData();
-public:
-	CalibrateSensorDataWrapper(DepthSensor & depth_sensor, 
-							   ml::mat4f depth_intrinsics, ml::mat4f depth_extrinsics,
-							   ml::mat4f color_intrinsics, ml::mat4f color_extrinsics);
-	~CalibrateSensorDataWrapper();
-};
-
 
 class PointsFromDepthData
 {
 private:
-	DepthSensor & _depth_sensor;
+	DepthSensorWrapper _depth_sensor;
 	ml::mat4f _color_intrinsics;
 	ml::mat4f _depth_intrinsics;
+	std::vector<std::vector<float>> _depth_images;
+	std::vector<std::vector<ml::vec4uc>> _color_images;
 public:
-	std::vector<ml::vec3f> getPoints(unsigned int step = 1);
+	void processFrame();
+	std::vector<ml::vec3f> getPoints(unsigned int frame, unsigned int step_size = 1);
 public:
 	PointsFromDepthData(DepthSensor & depth_sensor,
 						ml::mat4f color_intrinsics = ml::mat4f::identity(),

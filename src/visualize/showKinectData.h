@@ -1,6 +1,6 @@
 #pragma once
 #include "../mLibInclude.h"
-#include "PointsFromDepthSensor.h"
+#include "kinect/SensorDataWrapper.h"
 #include "i_showData.h"
 #include "kinect/PrimeSenseSensor.h"
 #include <chrono>

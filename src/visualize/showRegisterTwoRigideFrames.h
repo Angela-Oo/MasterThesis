@@ -1,7 +1,7 @@
 #pragma once
 #include "../mLibInclude.h"
 #include "i_showData.h"
-#include "PointsFromDepthSensor.h"
+#include "kinect/SensorDataWrapper.h"
 #include "kinect/ImageReaderSensor.h"
 
 class ShowTwoRigideRegisteredFrames : public IShowData

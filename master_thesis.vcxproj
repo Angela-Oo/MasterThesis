@@ -227,14 +227,15 @@
     <ClInclude Include="src\appTest.h" />
     <ClInclude Include="src\kinect\BinaryDumpReader.h" />
     <ClInclude Include="src\kinect\DepthSensor.h" />
+    <ClInclude Include="src\kinect\DepthSensorWrapper.h" />
     <ClInclude Include="src\kinect\ImageReaderSensor.h" />
     <ClInclude Include="src\kinect\KinectSensor.h" />
     <ClInclude Include="src\kinect\PrimeSenseSensor.h" />
+    <ClInclude Include="src\kinect\SensorDataWrapper.h" />
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\mLibInclude.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\visualize\i_showData.h" />
-    <ClInclude Include="src\visualize\PointsFromDepthSensor.h" />
     <ClInclude Include="src\visualize\showRegisterTwoRigideFrames.h" />
     <ClInclude Include="src\visualize\showKinectData.h" />
     <ClInclude Include="src\visualize\showRGBDData.h" />
@@ -247,9 +248,11 @@
     <ClCompile Include="src\appTest.cpp" />
     <ClCompile Include="src\kinect\BinaryDumpReader.cpp" />
     <ClCompile Include="src\kinect\DepthSensor.cpp" />
+    <ClCompile Include="src\kinect\DepthSensorWrapper.cpp" />
     <ClCompile Include="src\kinect\ImageReaderSensor.cpp" />
     <ClCompile Include="src\kinect\KinectSensor.cpp" />
     <ClCompile Include="src\kinect\PrimeSenseSensor.cpp" />
+    <ClCompile Include="src\kinect\SensorDataWrapper.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mLibSource.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -259,7 +262,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\visualize\PointsFromDepthSensor.cpp" />
     <ClCompile Include="src\visualize\showRegisterTwoRigideFrames.cpp" />
     <ClCompile Include="src\visualize\showKinectData.cpp" />
     <ClCompile Include="src\visualize\showRGBDData.cpp" />
