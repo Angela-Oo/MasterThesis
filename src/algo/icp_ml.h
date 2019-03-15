@@ -5,7 +5,6 @@
 #include <vector>
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
-#include "sophus_se3.h"
 #include <functional>
 
 ml::mat4f pointToPointSE3(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &dst);

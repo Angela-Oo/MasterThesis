@@ -4,7 +4,7 @@
 
 #include "ext-depthcamera/sensorData.h"
 #include <numeric>
-#include "algo/icp.h"
+#include "algo/icp_ml.h"
 using namespace ml;
 
 
@@ -85,7 +85,7 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 	auto points_a = _sensor_data_wrapper->getPoints(frame_a, 3);
 	auto points_b = _sensor_data_wrapper->getPoints(frame_b, 3);
 
-	auto transformation = iterative_closest_point(points_a, points_b);
+	auto transformation = pointToPointSE3(points_a, points_b);
 	//transformation.invert();
 	std::for_each(points_b.begin(), points_b.end(), [&transformation](ml::vec3f & p) { p = transformation * p; });
 

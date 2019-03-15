@@ -220,10 +220,6 @@
     <ClInclude Include="mLib\include\mLibMBase.h" />
     <ClInclude Include="mLib\include\mLibOpenMesh.h" />
     <ClInclude Include="mLib\include\mLibZLib.h" />
-    <ClInclude Include="src\algo\eigen_quaternion.h" />
-    <ClInclude Include="src\algo\icp-ceres.h" />
-    <ClInclude Include="src\algo\icp-closedform.h" />
-    <ClInclude Include="src\algo\icp.h" />
     <ClInclude Include="src\algo\icp_ml.h" />
     <ClInclude Include="src\algo\knn.h" />
     <ClInclude Include="src\algo\sophus_se3.h" />
@@ -245,9 +241,6 @@
     <ClInclude Include="src\visualize\showSensData.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\algo\icp-ceres.cpp" />
-    <ClCompile Include="src\algo\icp-closedform.cpp" />
-    <ClCompile Include="src\algo\icp.cpp" />
     <ClCompile Include="src\algo\icp_ml.cpp" />
     <ClCompile Include="src\algo\knn.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />

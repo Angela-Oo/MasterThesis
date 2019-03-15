@@ -1,7 +1,5 @@
 #include "showRegisterTwoRigideFrames.h"
 #include <numeric>
-#include "algo/icp-ceres.h"
-//#include "algo/eigen_quaternion.h"
 #include "ext-depthcamera/calibratedSensorData.h"
 #include "algo/icp_ml.h"
 using namespace Eigen;
