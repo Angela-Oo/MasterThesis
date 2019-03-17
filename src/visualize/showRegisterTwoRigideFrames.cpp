@@ -120,8 +120,8 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
 {
 	if (icp_active) {
-		icp();
-		icp_active = false;
+		icptest();
+		//icp_active = false;
 	}
 
 	ConstantBuffer constants;
@@ -157,7 +157,7 @@ void ShowTwoRigideRegisteredFrames::icp()
 	options.max_num_iterations = 50;
 
 	ICP icp(_points_a_icp, _points_b_icp, options);
-	_transformation = icp.solveNN2();
+	_transformation = icp.solveNN3();
 
 
 
@@ -166,6 +166,37 @@ void ShowTwoRigideRegisteredFrames::icp()
 
 	auto render_points_a = _points_a_icp;
 	auto render_points_b = _points_b_icp;
+	render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
+	render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
+
+	renderPoints(render_points_a, render_points_b);
+}
+
+
+void ShowTwoRigideRegisteredFrames::icptest()
+{
+	if (!_icp_nn) {
+		ceres::Solver::Options options;
+		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
+		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+		options.max_num_iterations = 50;
+		options.logging_type = ceres::LoggingType::SILENT;
+		options.minimizer_progress_to_stdout = false;
+		_icp_nn = std::make_unique<ICPNN>(_points_a_icp, _points_b_icp, options);
+	}
+
+	_transformation = _icp_nn->solveNN3();
+	//_transformation = _icp_nn->solveNN2();	
+
+	auto render_points_a = _points_a_icp;
+	auto render_points_b = _points_b_icp;
+
+	std::for_each(render_points_a.begin(), render_points_a.end(), [&](ml::vec3f & p) { p = _transformation * p; });
+
 	render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
 	render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
 

@@ -3,6 +3,7 @@
 #include "i_showData.h"
 #include "kinect/SensorDataWrapper.h"
 #include "kinect/ImageReaderSensor.h"
+#include "algo/icp.h"
 
 class ShowTwoRigideRegisteredFrames : public IShowData
 {
@@ -11,6 +12,7 @@ private:
 	//std::vector<ml::vec3f> processFrame();
 	void renderPoints(std::vector<ml::vec3f> points_frame_A, std::vector<ml::vec3f> points_frame_B);
 	void icp();
+	void icptest();
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;
@@ -31,6 +33,8 @@ private:
 	ImageReaderSensor _depth_sensor;
 	ml::GraphicsDevice * _graphics;
 	bool icp_active = false;
+
+	std::unique_ptr<ICPNN> _icp_nn;
 public:
 	ShowTwoRigideRegisteredFrames() {};
 	~ShowTwoRigideRegisteredFrames() = default;

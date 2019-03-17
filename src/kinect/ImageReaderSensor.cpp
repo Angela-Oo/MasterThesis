@@ -85,7 +85,8 @@ HRESULT ImageReaderSensor::processDepth()
 	FreeImageWrapper::loadImage(currFileName, image);
 	image.flipY();
 	for (UINT i = 0; i < getDepthWidth() * getDepthHeight(); i++) {
-		m_depthD16[i] = (USHORT)(image.getData()[i] * 1000);
+		unsigned short depth = image.getData()[i];
+		m_depthD16[i] = depth * 1000u;
 	}
 	m_CurrentFrameNumberDepth++;
 	return hr;

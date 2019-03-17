@@ -15,6 +15,7 @@ class ICP
 	std::vector<ml::vec3f> _src;
 	std::vector<ml::vec3f> _dst;
 	ceres::Solver::Options _options;
+	
 private:
 	void printOptions();
 public:
@@ -22,9 +23,34 @@ public:
 		const std::vector<ml::vec3f>& dst,
 		ceres::Solver::Options option);
 
+	ml::vec6d solve_transformation(ml::vec6d transformation_se3 = ml::vec6d(0., 0., 0., 0., 0., 0.));
+	ml::mat4f solve(ml::vec6d transformation_se3 = ml::vec6d(0., 0., 0., 0., 0., 0.));
+	ml::mat4f solveNN();
+	ml::mat4f solveNN2();
+	ml::mat4f solveNN3();
+};
+
+
+class ICPNN
+{
+	std::vector<ml::vec3f> _src;
+	std::vector<ml::vec3f> _dst;
+	ceres::Solver::Options _options;
+	ml::vec6d _transformation_se3 = ml::vec6d(0., 0., 0., 0., 0., 0.);
+	size_t _solve_iteration = 0;
+	double _current_cost = 1.;
+	double _current_tol = 1.;
+	long long _total_time_in_ms = 0;
+private:
+	void printOptions();
+public:
+	ICPNN(const std::vector<ml::vec3f>& src,
+		  const std::vector<ml::vec3f>& dst,
+		  ceres::Solver::Options option);
 	ml::mat4f solve();
 	ml::mat4f solveNN();
 	ml::mat4f solveNN2();
+	ml::mat4f solveNN3();
 };
 
 struct PointToPointErrorSE3 {
@@ -45,6 +71,12 @@ struct PointToPointErrorSE3 {
 	bool operator()(const T* const rotation_translation, T* residuals) const {
 
 		T p[3] = { T(p_src[0]), T(p_src[1]), T(p_src[2]) };
+		T R[9];
+		ceres::AngleAxisToRotationMatrix(rotation_translation, R);
+		T rotation_matrix_rotated_p[3];
+		rotation_matrix_rotated_p[0] = R[0] * p[0] + R[3] * p[1] + R[6] * p[2];
+		rotation_matrix_rotated_p[1] = R[1] * p[0] + R[4] * p[1] + R[7] * p[2];
+		rotation_matrix_rotated_p[2] = R[2] * p[0] + R[5] * p[1] + R[8] * p[2];
 		ceres::AngleAxisRotatePoint(rotation_translation, p, p);
 
 		// camera[3,4,5] are the translation.
