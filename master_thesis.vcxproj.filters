@@ -455,9 +455,6 @@
     <ClInclude Include="src\visualize\showSensData.h">
       <Filter>visualize</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\sophus_se3.h">
-      <Filter>algo</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\knn.h">
       <Filter>algo</Filter>
     </ClInclude>
@@ -469,6 +466,9 @@
     </ClInclude>
     <ClInclude Include="src\kinect\SensorDataWrapper.h">
       <Filter>kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\icp_cost_function.h">
+      <Filter>algo</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

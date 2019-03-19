@@ -11,6 +11,7 @@ using namespace Eigen;
 #include <ceres/loss_function.h>
 #include "ext-flann/nearestNeighborSearchFLANN.h"
 #include "core-util/nearestNeighborSearch.h"
+#include "icp_cost_function.h"
 
 #include "knn.h"
 
@@ -177,16 +178,16 @@ ml::mat4f ICPNN::solve()
 {
 	ml::mat4f transformation = ml::mat4f::identity();
 	while (!finished()) {
-		transformation = solveIterationTransformDataset();
+		transformation = solveIteration();
 	}
 	return transformation;
 }
 
-ml::mat4f ICPNN::solvetest()
+ml::mat4f ICPNN::solveTransformDataset()
 {
 	ml::mat4f transformation = ml::mat4f::identity();
 	while (!finished()) {
-		transformation = solveIteration();
+		transformation = solveIterationTransformDataset();
 	}
 	return transformation;
 }
@@ -219,7 +220,7 @@ ml::mat4f ICPNN::solveIteration() // working
 
 
 
-ml::mat4f ICPNN::solveIterationTransformDataset() // working
+ml::mat4f ICPNN::solveIterationTransformDataset()
 {
 	if (!finished()) {
 		ceres::Solver::Summary summary;
@@ -300,38 +301,6 @@ bool ICPNN::finished()
 
 
 
-//ml::mat4f matrix4d_to_mat4f_tmp(Eigen::Matrix4d mat)
-//{
-//	return ml::mat4f(mat(0, 0), mat(0, 1), mat(0, 2), mat(0, 3),
-//					 mat(1, 0), mat(1, 1), mat(1, 2), mat(1, 3),
-//					 mat(2, 0), mat(2, 1), mat(2, 2), mat(2, 3),
-//					 mat(3, 0), mat(3, 1), mat(3, 2), mat(3, 3));
-//}
-//
-
-ceres::Solver::Options getSolveOptions() {
-	// Set a few options
-	ceres::Solver::Options options;
-
-#ifdef _WIN32
-	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-	options.linear_solver_type = ceres::ITERATIVE_SCHUR;
-	options.preconditioner_type = ceres::SCHUR_JACOBI;
-#else
-	//options.sparse_linear_algebra_library_type = ceres::SUITE_SPARSE;
-	options.linear_solver_type = ceres::SPARSE_NORMAL_CHOLESKY;
-#endif // _WIN32
-
-	//If you are solving small to medium sized problems, consider setting Solver::Options::use_explicit_schur_complement to true, it can result in a substantial performance boost.
-	options.use_explicit_schur_complement = true;
-	options.max_num_iterations = 50;
-
-	return options;
-}
-
-
-
-
 
 
 ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &dst) 
@@ -353,7 +322,7 @@ ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::
 	}
 	{
 		ICPNN icp(src, dst, options);
-		ml::mat4f translation = icp.solvetest();
+		ml::mat4f translation = icp.solveTransformDataset();
 		return translation;
 	}
 

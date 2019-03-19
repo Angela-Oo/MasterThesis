@@ -221,8 +221,8 @@
     <ClInclude Include="mLib\include\mLibOpenMesh.h" />
     <ClInclude Include="mLib\include\mLibZLib.h" />
     <ClInclude Include="src\algo\icp.h" />
+    <ClInclude Include="src\algo\icp_cost_function.h" />
     <ClInclude Include="src\algo\knn.h" />
-    <ClInclude Include="src\algo\sophus_se3.h" />
     <ClInclude Include="src\appShowKinectData.h" />
     <ClInclude Include="src\appTest.h" />
     <ClInclude Include="src\kinect\BinaryDumpReader.h" />
