@@ -34,7 +34,7 @@ private:
 	ml::GraphicsDevice * _graphics;
 	bool icp_active = false;
 
-	std::unique_ptr<ICPNN> _icp_nn;
+	std::unique_ptr<ICP> _icp_nn;
 public:
 	ShowTwoRigideRegisteredFrames() {};
 	~ShowTwoRigideRegisteredFrames() = default;

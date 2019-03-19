@@ -81,8 +81,8 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	for(int i = 0; i < 6; i++)
 		_sensor_data->processFrame();
 	
-	_points_a = _sensor_data->getPoints(0, 6);
-	_points_b = _sensor_data->getPoints(5, 6);
+	_points_a = _sensor_data->getPoints(0, 10);
+	_points_b = _sensor_data->getPoints(5, 10);
 
 	float scale_factor = 0.004;
 	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
@@ -99,50 +99,11 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	std::for_each(_points_b_icp.begin(), _points_b_icp.end(), [&](ml::vec3f & p) { p = (translation * _transformation) * p; });
 }
 
-void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
-{
-	if (icp_active) {
-		icptest();
-		//icp_active = false;
-	}
 
-	ConstantBuffer constants;
-	constants.worldViewProj = camera.getViewProj();
-
-	m_constants.updateAndBind(constants, 0);
-	m_shaderManager.bindShaders("pointCloud");
-	m_constants.bind(0);
-	m_pointCloudFrameA.render();
-	m_pointCloudFrameB.render();
-}
 
 void ShowTwoRigideRegisteredFrames::icp()
 {
-	//{
-	//	ceres::Solver::Options options;
-	//	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-	//	options.linear_solver_type = ceres::ITERATIVE_SCHUR;
-	//	options.preconditioner_type = ceres::SCHUR_JACOBI;
-	//	options.max_num_iterations = 50;
-
-	//	ICP icp(_points_a_icp, _points_b_icp, options);
-	//	_transformation = icp.solve();
-	//}
-
-	ceres::Solver::Options options;
-	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;	
-	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-	options.max_num_iterations = 50;
-
-	ICP icp(_points_a_icp, _points_b_icp, options);
-	_transformation = icp.solveNN();
-
-
-
+	_transformation = iterative_closest_points(_points_a_icp, _points_b_icp);
 
 	std::for_each(_points_a_icp.begin(), _points_a_icp.end(), [&](ml::vec3f & p) { p = _transformation * p; });
 
@@ -157,7 +118,6 @@ void ShowTwoRigideRegisteredFrames::icp()
 
 void ShowTwoRigideRegisteredFrames::icptest()
 {
-	//iterative_closest_points(_points_a_icp, _points_b_icp);
 	if (!_icp_nn) {
 		ceres::Solver::Options options;
 		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
@@ -169,36 +129,12 @@ void ShowTwoRigideRegisteredFrames::icptest()
 		options.max_num_iterations = 50;
 		options.logging_type = ceres::LoggingType::SILENT;
 		options.minimizer_progress_to_stdout = false;
-		_icp_nn = std::make_unique<ICPNN>(_points_a_icp, _points_b_icp, options);
-	}
+		_icp_nn = std::make_unique<ICP>(_points_a_icp, _points_b_icp, options);
+	//}
 
-	if (!_icp_nn->finished()) {
-		//for (int i = 0; i < 20; i++) {
-			_transformation = _icp_nn->solveIteration();
-		//}
-		// 20 iterations 62s 553ms (last episode 14s 136ms
-		//for (int i = 0; i < 20; i++) {
-		//	_transformation = _icp_nn->solveNN3();
-		//}
-
-		// 20 iterations 46s 967ms (last episode 9s 480ms
-		//for (int i = 0; i < 20; i++) {
-		//	_transformation = _icp_nn->solveNN3optimized();
-		//}
-
-		// 10 iterations 148s 279ms (last episode 10s 366ms 
-		//for (int i = 0; i < 20; i++) {
-		//	_transformation = _icp_nn->solveNN2();
-		//}
-
-		// 12 iterations 157s 929ms (last episode 9s 561ms 
-		//for (int i = 0; i < 20; i++) {
-		//	_transformation = _icp_nn->solveNN2optimized();
-		//}
-
-
-		//_transformation = _icp_nn->solveNN3();
-		//_transformation = _icp_nn->solveNN2();	
+	//if (!_icp_nn->finished()) {
+		//_transformation = _icp_nn->solveIteration();
+		_transformation = _icp_nn->solveNN();
 
 		auto render_points_a = _points_a_icp;
 		auto render_points_b = _points_b_icp;
@@ -211,6 +147,24 @@ void ShowTwoRigideRegisteredFrames::icptest()
 		renderPoints(render_points_a, render_points_b);
 	}
 }
+
+void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
+{
+	if (icp_active) {
+		icptest();
+		icp_active = false;
+	}
+
+	ConstantBuffer constants;
+	constants.worldViewProj = camera.getViewProj();
+
+	m_constants.updateAndBind(constants, 0);
+	m_shaderManager.bindShaders("pointCloud");
+	m_constants.bind(0);
+	m_pointCloudFrameA.render();
+	m_pointCloudFrameB.render();
+}
+
 
 void ShowTwoRigideRegisteredFrames::key(UINT key)
 {

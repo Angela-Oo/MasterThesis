@@ -93,66 +93,32 @@ struct PointToPointsErrorSE3LinearNNSearch {
 
 
 struct NearestPoint {
-	//std::function<ml::vec3f(const ml::vec3f &)> _nearest_point;
-	//NearestPoint(std::function<ml::vec3f(const ml::vec3f &)> nearest_point)
-	//	: _nearest_point(nearest_point)
-	//{}
-
 	std::function<ml::vec3f(const float *)> _nearest_point;
-	double tol = 0.1;
 	NearestPoint(std::function<ml::vec3f(const float *)> nearest_point)
 		: _nearest_point(nearest_point)
 	{}
-
 
 	bool operator()(const double* point,
 					double* nn_point) const
 	{
 		ml::vec3f p = ml::vec3f(float(point[0]), point[1], point[2]);
-		//ml::vec3f nn_point = _nearest_point(p);
 		ml::vec3f nn_p = _nearest_point(p.array);
-		if (ml::dist(p, nn_p) < tol) {
-			nn_point[0] = double(nn_p[0]);
-			nn_point[1] = double(nn_p[1]);
-			nn_point[2] = double(nn_p[2]);
-			return true;
-		}
-		else {
-			nn_point[0] = point[0];
-			nn_point[1] = point[1];
-			nn_point[2] = point[2];
-			return false;
-		}
+		nn_point[0] = double(nn_p[0]);
+		nn_point[1] = double(nn_p[1]);
+		nn_point[2] = double(nn_p[2]);
+		return true;
 	}
 };
 
 struct PointToPointsErrorSE3NNSearch {
 private:
 	const ml::vec3f& _point;
-	//const std::function<ml::vec3f(float *)>& _nearest_point;
 	ceres::CostFunctionToFunctor<3, 3> _nearest_point_cost;
 public:
-
-	//PointToPointsErrorSE3NNSearch(const ml::vec3f &point, std::function<ml::vec3f(const ml::vec3f &)> nearest_point)
-	//	: _point(point)
-	//	//, _nearest_point(nearest_point)
-	//	, _nearest_point_cost(new ceres::NumericDiffCostFunction<NearestPoint, ceres::CENTRAL, 3, 3>(new NearestPoint(nearest_point)))
-	//{
-	//	
-	//}
-
 	PointToPointsErrorSE3NNSearch(const ml::vec3f &point, std::function<ml::vec3f(const float *)> nearest_point)
 		: _point(point)
-		//, _nearest_point(nearest_point)
 		, _nearest_point_cost(new ceres::NumericDiffCostFunction<NearestPoint, ceres::CENTRAL, 3, 3>(new NearestPoint(nearest_point)))
-	{
-
-	}
-
-	// Factory to hide the construction of the CostFunction object from the client code.
-	//static ceres::CostFunction* Create(const ml::vec3f &observed, std::function<ml::vec3f(const ml::vec3f &)> worldPoint) {
-	//	return (new ceres::AutoDiffCostFunction<PointToPointsErrorSE3NNSearch, 3, 6>(new PointToPointsErrorSE3NNSearch(observed, worldPoint)));
-	//}
+	{}
 
 	static ceres::CostFunction* Create(const ml::vec3f &observed, std::function<ml::vec3f(const float *)> worldPoint) {
 		return (new ceres::AutoDiffCostFunction<PointToPointsErrorSE3NNSearch, 3, 6>(new PointToPointsErrorSE3NNSearch(observed, worldPoint)));

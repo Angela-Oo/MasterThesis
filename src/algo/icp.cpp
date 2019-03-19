@@ -46,22 +46,22 @@ ml::mat4f rigid_transformation_from_se3(ml::vec6d & rotation_translation)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-ml::vec6d solve_icp(const std::vector<ml::vec3f>& src,
-					const std::vector<ml::vec3f>& dst,
-					const ceres::Solver::Options& options,
-					ml::vec6d initial_transformation_se3,
-					ceres::Solver::Summary & summary)
-{
-	KNN nn_search(dst);
-	ceres::Problem problem;
-	for (int i = 0; i < src.size(); ++i) {
-		unsigned int index = nn_search.nearest_index(src[i]);
-		ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(dst[index], src[i]);
-		problem.AddResidualBlock(cost_function, NULL, initial_transformation_se3.array);
-	}
-	ceres::Solve(options, &problem, &summary);
-	return initial_transformation_se3;
-}
+//ml::vec6d solve_icp(const std::vector<ml::vec3f>& src,
+//					const std::vector<ml::vec3f>& dst,
+//					const ceres::Solver::Options& options,
+//					ml::vec6d initial_transformation_se3,
+//					ceres::Solver::Summary & summary)
+//{
+//	KNN nn_search(dst);
+//	ceres::Problem problem;
+//	for (int i = 0; i < src.size(); ++i) {
+//		unsigned int index = nn_search.nearest_index(src[i]);
+//		ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(dst[index], src[i]);
+//		problem.AddResidualBlock(cost_function, NULL, initial_transformation_se3.array);
+//	}
+//	ceres::Solve(options, &problem, &summary);
+//	return initial_transformation_se3;
+//}
 
 
 
@@ -97,7 +97,7 @@ ICPLogIterationGuard::~ICPLogIterationGuard()
 	};
 	
 	
-	std::cout << "Ceres Solver Iteration: " << _iteration << ", Duration " << time_to_string(elapse) << ", Total time: " << time_to_string(_total_time_in_ms) 
+	std::cout << "Ceres Solver Iteration: " << _iteration << " sub iterations: " << _summary.num_inner_iteration_steps << ", Duration " << time_to_string(elapse) << ", Total time: " << time_to_string(_total_time_in_ms) 
 		<< ", Initial cost: "<< _summary.initial_cost << ", Final cost: " << _summary.final_cost << ", Termination: " << _summary.termination_type << std::endl << std::endl;
 }
 
@@ -124,7 +124,14 @@ ml::vec6d ICP::solve_transformation(ml::vec6d transformation_se3)
 {
 	ceres::Solver::Summary summary;
 	ICPLogIterationGuard log_guard(summary);
-	transformation_se3 = solve_icp(_src, _dst, _options, transformation_se3, summary);
+	KNN nn_search(_dst);
+	ceres::Problem problem;
+	for (int i = 0; i < _src.size(); ++i) {
+		unsigned int index = nn_search.nearest_index(_src[i]);
+		ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(_dst[index], _src[i]);
+		problem.AddResidualBlock(cost_function, NULL, transformation_se3.array);
+	}
+	ceres::Solve(_options, &problem, &summary);
 	return transformation_se3;
 }
 
@@ -158,7 +165,6 @@ ml::mat4f ICP::solveNN()
 //-----------------------------------------------------------------------------
 
 
-
 ICPNN::ICPNN(const std::vector<ml::vec3f>& src,
 			 const std::vector<ml::vec3f>& dst,
 			 ceres::Solver::Options options)
@@ -172,7 +178,6 @@ ICPNN::ICPNN(const std::vector<ml::vec3f>& src,
 	std::cout << "Ceres linear algebra type: " << options.sparse_linear_algebra_library_type << std::endl;
 	std::cout << "Ceres linear solver type: " << options.linear_solver_type << std::endl;
 }
-
 
 ml::mat4f ICPNN::solve()
 {
@@ -218,8 +223,6 @@ ml::mat4f ICPNN::solveIteration() // working
 	return rigid_transformation_from_se3(_transformation_se3);
 }
 
-
-
 ml::mat4f ICPNN::solveIterationTransformDataset()
 {
 	if (!finished()) {
@@ -251,9 +254,50 @@ ml::mat4f ICPNN::solveIterationTransformDataset()
 	return rigid_transformation_from_se3(_transformation_se3);
 }
 
+bool ICPNN::finished()
+{
+	double tol = 0.001;
+	return (_solve_iteration >= _max_iterations || _current_tol < tol);
+}
 
 
-ml::mat4f ICPNN::solveIterationUsePointSubset()
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+ICPPointSubset::ICPPointSubset(const std::vector<ml::vec3f>& src,
+							   const std::vector<ml::vec3f>& dst,
+							   ceres::Solver::Options options)
+	: _src(src)
+	, _dst(dst)
+	, _options(options)
+	, _nn_search(dst)
+{
+	std::cout << "\nCeres Solver" << std::endl;
+	std::cout << "Ceres preconditioner type: " << options.preconditioner_type << std::endl;
+	std::cout << "Ceres linear algebra type: " << options.sparse_linear_algebra_library_type << std::endl;
+	std::cout << "Ceres linear solver type: " << options.linear_solver_type << std::endl;
+}
+
+
+ml::mat4f ICPPointSubset::solve()
+{
+	ml::mat4f transformation = ml::mat4f::identity();
+	while (!finished()) {
+		transformation = solveIteration();
+	}
+	return transformation;
+}
+
+ml::mat4f ICPPointSubset::solveTransformDataset()
+{
+	ml::mat4f transformation = ml::mat4f::identity();
+	while (!finished()) {
+		transformation = solveIterationTransformDataset();
+	}
+	return transformation;
+}
+
+ml::mat4f ICPPointSubset::solveIteration()
 {
 	if (!finished()) {
 		ceres::Solver::Summary summary;
@@ -263,7 +307,38 @@ ml::mat4f ICPNN::solveIterationUsePointSubset()
 
 		//int step = std::pow(15 - _solve_iteration, 2);
 		int step = 20 - _solve_iteration;
-		int step_size = std::max(step, 1);		
+		int step_size = std::max(step, 1);
+
+		// icp
+		ceres::Problem problem;
+		for (int i = 0; i < _src.size(); i += step_size) {
+			ml::mat4f transform_matrix = rigid_transformation_from_se3(_transformation_se3);
+			unsigned int index = _nn_search.nearest_index((transform_matrix * _src[i]));
+			ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(_dst[index], _src[i]);
+			problem.AddResidualBlock(cost_function, NULL, _transformation_se3.array);
+		}
+		ceres::Solve(_options, &problem, &summary);
+
+		_current_tol = abs(_current_cost - summary.final_cost);
+		_current_cost = summary.final_cost;
+
+		_total_time_in_ms += logger.get_time_in_ms();
+	}
+
+	return rigid_transformation_from_se3(_transformation_se3);
+}
+
+ml::mat4f ICPPointSubset::solveIterationTransformDataset()
+{
+	if (!finished()) {
+		ceres::Solver::Summary summary;
+		ICPLogIterationGuard logger(summary, _total_time_in_ms, _solve_iteration);
+
+		_solve_iteration++;
+
+		//int step = std::pow(15 - _solve_iteration, 2);
+		int step = 20 - _solve_iteration;
+		int step_size = std::max(step, 1);
 
 		// icp
 		ml::vec6d transformation(0., 0., 0., 0., 0., 0.);
@@ -275,10 +350,8 @@ ml::mat4f ICPNN::solveIterationUsePointSubset()
 		}
 		ceres::Solve(_options, &problem, &summary);
 
-		// 
 		_transformation_se3 += transformation;
 
-		// why necessary
 		ml::mat4f transform_matrix = rigid_transformation_from_se3(transformation);
 		std::for_each(_src.begin(), _src.end(), [&](ml::vec3f & p) { p = transform_matrix * p; });
 
@@ -292,16 +365,14 @@ ml::mat4f ICPNN::solveIterationUsePointSubset()
 	return rigid_transformation_from_se3(_transformation_se3);
 }
 
-
-bool ICPNN::finished()
+bool ICPPointSubset::finished()
 {
 	double tol = 0.001;
-	return !(_solve_iteration < _max_iterations && _current_tol > tol);
+	return (_solve_iteration >= _max_iterations || (_current_tol < tol && _solve_iteration > 15));
 }
 
-
-
-
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
 
 ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &dst) 
 {
@@ -317,11 +388,11 @@ ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::
 	options.preconditioner_type = ceres::PreconditionerType::JACOBI;
 
 	{
-		ICPNN icp(src, dst, options);
+		ICPPointSubset icp(src, dst, options);
 		ml::mat4f translation = icp.solve();
 	}
 	{
-		ICPNN icp(src, dst, options);
+		ICPPointSubset icp(src, dst, options);
 		ml::mat4f translation = icp.solveTransformDataset();
 		return translation;
 	}
