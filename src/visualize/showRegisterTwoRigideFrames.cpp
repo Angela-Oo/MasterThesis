@@ -24,25 +24,6 @@ void ShowTwoRigideRegisteredFrames::configImageReaderSensor(std::string filepath
 	_depth_sensor.toggleNearMode();
 }
 
-//
-//std::vector<ml::vec3f> ShowTwoRigideRegisteredFrames::processFrame()
-//{
-//	_rgbd_frame_to_point_cloud->processFrame();
-//
-//	auto points = _rgbd_frame_to_point_cloud->getPoints();
-//
-//	auto average = std::accumulate(points.begin(), points.end(), ml::vec3f(0., 0., 0.)) / static_cast<float>(points.size());
-//	ml::mat4f center = ml::mat4f::translation(-average);
-//	float scale_factor = 5.;
-//	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
-//	ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
-//	ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });
-//	ml::mat4f translate = transform * rotation * scale * center;
-//	std::for_each(points.begin(), points.end(), [&translate](ml::vec3f & p) { p = translate * p; });
-//
-//	_depth_sensor.recordFrame();
-//	return points;
-//}
 
 void ShowTwoRigideRegisteredFrames::renderPoints(std::vector<ml::vec3f> points_frame_A, std::vector<ml::vec3f> points_frame_B)
 {
@@ -134,7 +115,7 @@ void ShowTwoRigideRegisteredFrames::icptest()
 
 	//if (!_icp_nn->finished()) {
 		//_transformation = _icp_nn->solveIteration();
-		_transformation = _icp_nn->solveNN();
+		_transformation = _icp_nn->solve();
 
 		auto render_points_a = _points_a_icp;
 		auto render_points_b = _points_b_icp;

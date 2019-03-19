@@ -86,7 +86,7 @@ long long ICPLogIterationGuard::get_time_in_ms()
 
 ICPLogIterationGuard::~ICPLogIterationGuard()
 {
-	//std::cout << "Final report:\n" << _summary.BriefReport() << std::endl << std::endl;
+	std::cout << "Final report:\n" << _summary.BriefReport() << std::endl;
 	auto elapse = get_time_in_ms();
 	_total_time_in_ms += elapse;
 
@@ -119,8 +119,7 @@ ICP::ICP(const std::vector<ml::vec3f>& src,
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
 }
 
-
-ml::vec6d ICP::solve_transformation(ml::vec6d transformation_se3)
+ml::mat4f ICP::solveFixNN(ml::vec6d transformation_se3)
 {
 	ceres::Solver::Summary summary;
 	ICPLogIterationGuard log_guard(summary);
@@ -132,18 +131,11 @@ ml::vec6d ICP::solve_transformation(ml::vec6d transformation_se3)
 		problem.AddResidualBlock(cost_function, NULL, transformation_se3.array);
 	}
 	ceres::Solve(_options, &problem, &summary);
-	return transformation_se3;
-}
 
-
-ml::mat4f ICP::solve(ml::vec6d transformation_se3)
-{
-	transformation_se3 = solve_transformation(transformation_se3);
 	return rigid_transformation_from_se3(transformation_se3);
 }
 
-
-ml::mat4f ICP::solveNN()
+ml::mat4f ICP::solve()
 {
 	ceres::Solver::Summary summary;
 	ICPLogIterationGuard log_guard(summary);

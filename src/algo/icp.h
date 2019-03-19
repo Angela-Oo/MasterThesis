@@ -42,10 +42,9 @@ public:
 		const std::vector<ml::vec3f>& dst,
 		ceres::Solver::Options option);
 
-	ml::vec6d solve_transformation(ml::vec6d transformation_se3 = ml::vec6d(0., 0., 0., 0., 0., 0.));
-	ml::mat4f solve(ml::vec6d transformation_se3 = ml::vec6d(0., 0., 0., 0., 0., 0.));
+	ml::mat4f solveFixNN(ml::vec6d transformation_se3 = ml::vec6d(0., 0., 0., 0., 0., 0.));
 	// Ceres Solver Iteration: 0, Duration 494s 980ms, Total time: 494s 980ms, Initial cost: 0.982676, Final cost: 0.412166, Termination: 0
-	ml::mat4f solveNN();
+	ml::mat4f solve();
 };
 
 

@@ -36,13 +36,13 @@ void ShowKinectData::init(ml::ApplicationData &app)
 		mat4f depth_extrinsics = getWorldTransformation();
 		auto color_extrinsics = ml::mat4f::identity();
 
-		//_sensor_data_wrapper = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
-		//																	depth_intrinsics, depth_extrinsics,
-		//																	color_intrinsics, color_extrinsics);
+		_sensor_data_wrapper = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
+																			depth_intrinsics, depth_extrinsics,
+																			color_intrinsics, color_extrinsics);
 
-		_sensor_data_wrapper = std::make_unique<SensorDataWrapper>(_depth_sensor,
-																   depth_intrinsics,
-																   color_intrinsics);
+		//_sensor_data_wrapper = std::make_unique<SensorDataWrapper>(_depth_sensor,
+		//														   depth_intrinsics,
+		//														   color_intrinsics);
 		_sensor_data_wrapper->processFrame();
 		_frame++;
 	}
@@ -59,15 +59,9 @@ void ShowKinectData::render(ml::Cameraf& camera)
 {
 	if (_record_frames) {
 		_sensor_data_wrapper->processFrame();
-		//auto end = std::chrono::system_clock::now();
-		//auto elapsed = std::chrono::duration_cast<std::chrono::milliseconds>(end - _start_time).count();
-		//if (elapsed > 3) {
 		renderPoints(_frame);
 
-		//_sensor_data_wrapper->_sensor_data.recordFrameToPointCloud(_frame, m_pointCloud., getWorldTransformation())
 		_frame++;
-		//_start_time = std::chrono::system_clock::now();
-		//}	
 	}
 
 	ConstantBuffer constants;
@@ -85,21 +79,43 @@ void ShowKinectData::render(ml::Cameraf& camera)
 
 void ShowKinectData::icp(int frame_a, int frame_b)
 {
-	auto points_a = _sensor_data_wrapper->getPoints(frame_a, 3);
-	auto points_b = _sensor_data_wrapper->getPoints(frame_b, 3);
+	auto points_a = _sensor_data_wrapper->getPoints(frame_a);
+	auto points_b = _sensor_data_wrapper->getPoints(frame_b);
+
 
 
 	ceres::Solver::Options options;
 	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
 	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
 	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+	options.max_num_iterations = 50;
+	options.logging_type = ceres::LoggingType::SILENT;
+	options.minimizer_progress_to_stdout = false;
 	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
 	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
-	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-	options.max_num_iterations = 50;
+	options.preconditioner_type = ceres::PreconditionerType::JACOBI;
 
-	ICP icp(points_a, points_b, options);
-	auto transformation = icp.solveNN2();
+	//ICPPointSubset icp(points_a, points_b, options);
+	//ml::mat4f transformation = icp.solve();
+
+	//every 6. point Ceres Solver Iteration: 1 sub iterations: -1, Duration 2s 747ms, Total time: 4s 992ms, Initial cost: 0.185432, Final cost: 0.185105, Termination: 0
+	//every 3. point Ceres Solver Iteration: 2 sub iterations: -1, Duration 12s 39ms, Total time: 33s 132ms, Initial cost: 0.406642, Final cost: 0.406586, Termination: 0
+	//every 2. point Ceres Solver Iteration: 3 sub iterations: -1, Duration 29s 881ms, Total time: 113s 438ms, Initial cost: 1.38022, Final cost: 1.3802, Termination: 0
+	ICPNN icpnn(points_a, points_b, options);
+	ml::mat4f transformation = icpnn.solve();
+
+	//every 6. point Ceres Solver Iteration: 0 sub iterations: -1, Duration 2s 618ms, Total time: 2s 618ms, Initial cost: 0.185864, Final cost: 0.185661, Termination: 0
+	//every 3. point Ceres Solver Iteration: 0 sub iterations: -1, Duration 10s 858ms, Total time: 10s 858ms, Initial cost: 0.409008, Final cost: 0.408678, Termination: 0
+	//every 2. point Ceres Solver Iteration: 0 sub iterations: -1, Duration 27s 415ms, Total time: 27s 415ms, Initial cost: 1.37843, Final cost: 1.3725, Termination: 0
+	//ICP icp(points_a, points_b, options);
+	//transformation = icp.solveFixNN();
+
+	// debug
+	//every 6. point Ceres Solver Iteration: 0 sub iterations: -1, Duration 10s 492ms, Total time: 10s 492ms, Initial cost: 0.25272, Final cost: 0.25272, Termination: 0
+	//every 3. point  Ceres Solver Iteration: 0 sub iterations: 6, Duration 46s 824ms, Total time: 46s 824ms, Initial cost: 0.405029, Final cost: 0.405028, Termination: 0
+	//every 2. point Ceres Solver Iteration: 0 sub iterations: 7, Duration 125s 500ms, Total time: 125s 500ms, Initial cost: 0.458941, Final cost: 0.458941, Termination: 0
+	//ICP icp(points_a, points_b, options);
+	//ml::mat4f transformation = icp.solve();
 
 	std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
 
@@ -138,7 +154,7 @@ void ShowKinectData::key(UINT key) {
 		std::string file = ".\\data\\captured_data.sens";
 		std::ofstream output_file;
 		output_file.open(file);
-		_sensor_data_wrapper->_sensor_data.saveToFile(file);
+		//_sensor_data_wrapper->_sensor_data.saveToFile(file);
 		//_sensor_data_wrapper->_sensor_data.savePointCloud(file, 0);// .saveToFile(file);
 		//output_file << _sensor_data_wrapper->_sensor_data;
 	}

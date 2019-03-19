@@ -49,6 +49,11 @@ void DepthSensorWrapper::processDepth(unsigned short * depth_data)
 
 void DepthSensorWrapper::processDepth(float * depth_data)
 {
+	//auto get_depth = [](float depth) {
+	//	if (depth != 0.)
+	//		depth += 200.;
+	//	return depth; 
+	//};
 	auto get_depth = [](float depth) { return depth; };
 	processDepthTemplate<float>(depth_data, get_depth);
 }
