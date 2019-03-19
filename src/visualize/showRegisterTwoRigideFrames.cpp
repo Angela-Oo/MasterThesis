@@ -97,24 +97,6 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	auto translation = ml::mat4f::translation({ 1.f, 0., 0. });
 	std::for_each(_points_a_icp.begin(), _points_a_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
 	std::for_each(_points_b_icp.begin(), _points_b_icp.end(), [&](ml::vec3f & p) { p = (translation * _transformation) * p; });
-
-
-	//auto transformation = pointToPointSE3(points_frame_A, points_frame_B);
-	//auto translation = ml::mat4f::translation({ 1.f, 0., 0. });
-	//std::for_each(points_icp_A.begin(), points_icp_A.end(), [&](ml::vec3f & p) { p = translation  * p; });
-	//std::for_each(points_icp_B.begin(), points_icp_B.end(), [&](ml::vec3f & p) { p = (translation * transformation) * p; });
-
-	//points_frame_A.insert(points_frame_A.end(), points_icp_A.begin(), points_icp_A.end());
-	//points_frame_B.insert(points_frame_B.end(), points_icp_B.begin(), points_icp_B.end());
-
-
-	//ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
-	//ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });
-	//ml::mat4f depth_extrinsics = transform * rotation;// *scale;
-	//std::for_each(points_frame_A.begin(), points_frame_A.end(), [&](ml::vec3f & p) { p = depth_extrinsics * p; });
-	//std::for_each(points_frame_B.begin(), points_frame_B.end(), [&](ml::vec3f & p) { p = depth_extrinsics * p; });
-
-	//renderPoints(points_frame_A, points_frame_B);
 }
 
 void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
@@ -157,7 +139,7 @@ void ShowTwoRigideRegisteredFrames::icp()
 	options.max_num_iterations = 50;
 
 	ICP icp(_points_a_icp, _points_b_icp, options);
-	_transformation = icp.solveNN3();
+	_transformation = icp.solveNN();
 
 
 
@@ -175,6 +157,7 @@ void ShowTwoRigideRegisteredFrames::icp()
 
 void ShowTwoRigideRegisteredFrames::icptest()
 {
+	//iterative_closest_points(_points_a_icp, _points_b_icp);
 	if (!_icp_nn) {
 		ceres::Solver::Options options;
 		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
@@ -189,18 +172,44 @@ void ShowTwoRigideRegisteredFrames::icptest()
 		_icp_nn = std::make_unique<ICPNN>(_points_a_icp, _points_b_icp, options);
 	}
 
-	_transformation = _icp_nn->solveNN3();
-	//_transformation = _icp_nn->solveNN2();	
+	if (!_icp_nn->finished()) {
+		//for (int i = 0; i < 20; i++) {
+			_transformation = _icp_nn->solveIteration();
+		//}
+		// 20 iterations 62s 553ms (last episode 14s 136ms
+		//for (int i = 0; i < 20; i++) {
+		//	_transformation = _icp_nn->solveNN3();
+		//}
 
-	auto render_points_a = _points_a_icp;
-	auto render_points_b = _points_b_icp;
+		// 20 iterations 46s 967ms (last episode 9s 480ms
+		//for (int i = 0; i < 20; i++) {
+		//	_transformation = _icp_nn->solveNN3optimized();
+		//}
 
-	std::for_each(render_points_a.begin(), render_points_a.end(), [&](ml::vec3f & p) { p = _transformation * p; });
+		// 10 iterations 148s 279ms (last episode 10s 366ms 
+		//for (int i = 0; i < 20; i++) {
+		//	_transformation = _icp_nn->solveNN2();
+		//}
 
-	render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
-	render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
+		// 12 iterations 157s 929ms (last episode 9s 561ms 
+		//for (int i = 0; i < 20; i++) {
+		//	_transformation = _icp_nn->solveNN2optimized();
+		//}
 
-	renderPoints(render_points_a, render_points_b);
+
+		//_transformation = _icp_nn->solveNN3();
+		//_transformation = _icp_nn->solveNN2();	
+
+		auto render_points_a = _points_a_icp;
+		auto render_points_b = _points_b_icp;
+
+		std::for_each(render_points_a.begin(), render_points_a.end(), [&](ml::vec3f & p) { p = _transformation * p; });
+
+		render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
+		render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
+
+		renderPoints(render_points_a, render_points_b);
+	}
 }
 
 void ShowTwoRigideRegisteredFrames::key(UINT key)

@@ -1,3 +1,4 @@
+#pragma once
 #include <vector>
 #include "mLibInclude.h"
 #include "ext-flann/nearestNeighborSearchFLANN.h"
