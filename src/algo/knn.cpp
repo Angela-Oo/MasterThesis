@@ -50,7 +50,7 @@ KNN::KNN(const std::vector<ml::vec3f> & points)
 		point[2] = p[2];
 		nn_points.push_back(point);
 	}
-	_neares_neighbor_search.init(nn_points, 3, 3);
+	_neares_neighbor_search.init(nn_points, 3, 1);
 
 	for (auto & p : nn_points)
 	{
