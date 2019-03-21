@@ -8,6 +8,8 @@
 #include <functional>
 #include "knn.h"
 
+ml::mat4f rigid_transformation_from_se3(ml::vec6d & rotation_translation);
+
 ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &dst);
 //
 //ml::vec6d solve_icp(const std::vector<ml::vec3f>& src,
