@@ -2,7 +2,7 @@
 #include "ceres_iteration_logger.h"
 
 
-ICPLogIterationGuard::ICPLogIterationGuard(const ceres::Solver::Summary& summary, long long total_time_in_ms, size_t iteration)
+CeresIterationLoggerGuard::CeresIterationLoggerGuard(const ceres::Solver::Summary& summary, long long total_time_in_ms, size_t iteration)
 	: _summary(summary)
 	, _total_time_in_ms(total_time_in_ms)
 	, _iteration(iteration)
@@ -11,13 +11,13 @@ ICPLogIterationGuard::ICPLogIterationGuard(const ceres::Solver::Summary& summary
 
 }
 
-long long ICPLogIterationGuard::get_time_in_ms()
+long long CeresIterationLoggerGuard::get_time_in_ms()
 {
 	auto end_time = std::chrono::system_clock::now();
 	return std::chrono::duration_cast<std::chrono::milliseconds>(end_time - _start_time).count();
 }
 
-ICPLogIterationGuard::~ICPLogIterationGuard()
+CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 {
 	std::cout << "Final report:\n" << _summary.BriefReport() << std::endl;
 	auto elapse = get_time_in_ms();

@@ -32,7 +32,7 @@ ICP::ICP(const std::vector<ml::vec3f>& src,
 ml::mat4f ICP::solveFixNN(ml::vec6d transformation_se3)
 {
 	ceres::Solver::Summary summary;
-	ICPLogIterationGuard log_guard(summary);
+	CeresIterationLoggerGuard log_guard(summary);
 	KNN nn_search(_dst);
 	ceres::Problem problem;
 	for (int i = 0; i < _src.size(); ++i) {
@@ -48,7 +48,7 @@ ml::mat4f ICP::solveFixNN(ml::vec6d transformation_se3)
 ml::mat4f ICP::solve()
 {
 	ceres::Solver::Summary summary;
-	ICPLogIterationGuard log_guard(summary);
+	CeresIterationLoggerGuard log_guard(summary);
 
 	KNN nn_search(_dst);
 	ml::vec6d rotation_translation(0., 0., 0., 0., 0., 0.);
@@ -103,7 +103,7 @@ ml::mat4f ICPNN::solveIteration() // working
 {
 	if (!finished()) {
 		ceres::Solver::Summary summary;
-		ICPLogIterationGuard logger(summary, _total_time_in_ms, _solve_iteration);
+		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
 
 		_solve_iteration++;
 		
@@ -129,7 +129,7 @@ ml::mat4f ICPNN::solveIterationTransformDataset()
 {
 	if (!finished()) {
 		ceres::Solver::Summary summary;
-		ICPLogIterationGuard logger(summary, _total_time_in_ms, _solve_iteration);
+		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
 
 		_solve_iteration++;
 
@@ -203,7 +203,7 @@ ml::mat4f ICPPointSubset::solveIteration()
 {
 	if (!finished()) {
 		ceres::Solver::Summary summary;
-		ICPLogIterationGuard logger(summary, _total_time_in_ms, _solve_iteration);
+		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
 
 		_solve_iteration++;
 
@@ -234,7 +234,7 @@ ml::mat4f ICPPointSubset::solveIterationTransformDataset()
 {
 	if (!finished()) {
 		ceres::Solver::Summary summary;
-		ICPLogIterationGuard logger(summary, _total_time_in_ms, _solve_iteration);
+		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
 
 		_solve_iteration++;
 
