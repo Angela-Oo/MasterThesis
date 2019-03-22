@@ -12,17 +12,28 @@ private:
 	std::vector<ml::vec3f> _points_a;
 	std::vector<ml::vec3f> _points_b;
 	ml::mat4f _transformation;
-private:
-	std::vector<ml::vec3f> transform(std::vector<ml::vec3f> points);
 public:
 	void icp();
 	void icp_calc_nn_in_cost_function();
-
 	std::vector<ml::vec3f> getPointsA();
 	std::vector<ml::vec3f> getPointsB();
 public:
 	RigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b);
+};
 
+class NonRigidRegistration
+{
+private:
+	std::unique_ptr<ICP> _icp_nn;
+	std::vector<ml::vec3f> _points_a;
+	std::vector<ml::vec3f> _points_b;
+	ml::mat4f _transformation;
+public:
+	void non_rigid_registration();
+	std::vector<ml::vec3f> getPointsA();
+	std::vector<ml::vec3f> getPointsB();
+public:
+	NonRigidRegistration();
 };
 
 class ShowTwoRigideRegisteredFrames : public IShowData
@@ -43,6 +54,8 @@ private:
 	void transform(std::vector<ml::vec3f>& points);
 	void configImageReaderSensor(std::string filepath);
 	void renderPoints();
+	void initICP();
+	void initNonRigidRegistration();
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;

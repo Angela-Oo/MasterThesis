@@ -3,6 +3,7 @@
 #include <numeric>
 #include "ext-depthcamera/calibratedSensorData.h"
 #include "algo/icp.h"
+#include "algo/non_rigid_deformation.h"
 
 
 
@@ -33,15 +34,11 @@ void RigidRegistration::icp_calc_nn_in_cost_function()
 	}
 }
 
-std::vector<ml::vec3f> RigidRegistration::transform(std::vector<ml::vec3f> points)
-{
-	std::for_each(points.begin(), points.end(), [&](ml::vec3f & p) { p = _transformation * p; });
-	return points;
-}
-
 std::vector<ml::vec3f> RigidRegistration::getPointsA()
 {
-	return transform(_points_a);
+	auto transformed_points = _points_a;
+	std::for_each(transformed_points.begin(), transformed_points.end(), [&](ml::vec3f & p) { p = _transformation * p; });
+	return transformed_points;
 }
 
 std::vector<ml::vec3f> RigidRegistration::getPointsB()
@@ -54,6 +51,39 @@ RigidRegistration::RigidRegistration(const std::vector<ml::vec3f> & points_a, co
 	, _points_b(points_b)
 	, _transformation(ml::mat4f::identity())
 {}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
+void NonRigidRegistration::non_rigid_registration()
+{
+	_transformation = iterative_closest_points(_points_a, _points_b);
+}
+
+
+std::vector<ml::vec3f> NonRigidRegistration::getPointsA()
+{
+	return _points_a;
+}
+
+std::vector<ml::vec3f> NonRigidRegistration::getPointsB()
+{
+	return _points_b;
+}
+
+NonRigidRegistration::NonRigidRegistration()
+	: _transformation(ml::mat4f::identity())
+{
+	_points_a.push_back({ 0.,0.,0. });
+	_points_a.push_back({ 0.2,0.,0. });
+	_points_a.push_back({ 0.4,0.,0. });
+	_points_a.push_back({ 0.6,0.,0. });
+	_points_a.push_back({ 0.8,0.,0. });
+	_points_a.push_back({ 0.9,0.,0. });
+
+	_points_b = _points_a;
+	_points_b[5].z = 1.;
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -107,22 +137,40 @@ void ShowTwoRigideRegisteredFrames::renderPoints()
 	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_b, color_frame_B));
 }
 
-void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
+void ShowTwoRigideRegisteredFrames::initICP()
 {
-	_graphics = &app.graphics;
-	m_shaderManager.init(app.graphics);
-	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
-	m_constants.init(app.graphics);
 	//configImageReaderSensor("C:/Users/Angela/Meins/Studium/MasterThesis/data/sokrates-ps/");
 	configImageReaderSensor("D:/Studium/MasterThesis/input_data/sokrates-ps/");
 
-	
 	_sensor_data = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
 																_depth_sensor.getDepthIntrinsics(), ml::mat4f::identity(),
 																_depth_sensor.getColorIntrinsics(), ml::mat4f::identity());
 
-	for(int i = 0; i < 6; i++)
+	for (int i = 0; i < 6; i++)
 		_sensor_data->processFrame();
+
+	_points_a = _sensor_data->getPoints(0);
+	_points_b = _sensor_data->getPoints(5);
+
+	float scale_factor = 0.004;
+	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
+	std::for_each(_points_a.begin(), _points_a.end(), [&](ml::vec3f & p) { p = scale * p; });
+	std::for_each(_points_b.begin(), _points_b.end(), [&](ml::vec3f & p) { p = scale * p; });
+
+	auto points_a_icp = _points_a;
+	auto points_b_icp = _points_b;
+
+	auto translation = ml::mat4f::translation({ 1.f, 0., 0. });
+	std::for_each(points_a_icp.begin(), points_a_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
+	std::for_each(points_b_icp.begin(), points_b_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
+
+	_rigid_registration = std::make_unique<RigidRegistration>(points_a_icp, points_b_icp);
+}
+
+
+
+void ShowTwoRigideRegisteredFrames::initNonRigidRegistration()
+{
 	
 
 	_points_a = _sensor_data->getPoints(0);
@@ -141,15 +189,24 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	std::for_each(points_b_icp.begin(), points_b_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
 
 	_rigid_registration = std::make_unique<RigidRegistration>(points_a_icp, points_b_icp);
+}
+
+void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
+{
+	_graphics = &app.graphics;
+	m_shaderManager.init(app.graphics);
+	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
+	m_constants.init(app.graphics);	
+
+	initICP();
 
 	renderPoints();
 }
 
 
-
 void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
 {
-	if (icp_active) {
+	if (icp_active && _rigid_registration) {
 		_rigid_registration->icp();
 		renderPoints();
 		icp_active = false;
