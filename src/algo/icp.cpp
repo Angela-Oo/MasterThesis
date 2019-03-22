@@ -7,103 +7,13 @@ using namespace Eigen;
 #include <ceres/autodiff_local_parameterization.h>
 #include <ceres/types.h>
 #include <ceres/rotation.h>
-
 #include <ceres/loss_function.h>
 #include "ext-flann/nearestNeighborSearchFLANN.h"
 #include "core-util/nearestNeighborSearch.h"
 #include "icp_cost_function.h"
-
+#include "se3.h"
+#include "ceres_iteration_logger.h"
 #include "knn.h"
-
-
-ml::mat4f rigid_transformation_from_se3(ml::vec6d & rotation_translation)
-{
-	double rotation_matrix[9];
-	ceres::AngleAxisToRotationMatrix(rotation_translation.array, rotation_matrix);
-
-	// rotation
-	//ml::vec3d angle_axis = { rotation_translation[0], rotation_translation[1], rotation_translation[2] };
-	ml::mat4f rotation = ml::mat4f::identity();
-	rotation(0, 0) = rotation_matrix[0];
-	rotation(1, 0) = rotation_matrix[1];
-	rotation(2, 0) = rotation_matrix[2];
-	rotation(0, 1) = rotation_matrix[3];
-	rotation(1, 1) = rotation_matrix[4];
-	rotation(2, 1) = rotation_matrix[5];
-	rotation(0, 2) = rotation_matrix[6];
-	rotation(1, 2) = rotation_matrix[7];
-	rotation(2, 2) = rotation_matrix[8];
-	//if (angle_axis != ml::vec3f::origin)
-	//	rotation = ml::mat4f::rotation(angle_axis.getNormalized(), angle_axis.length());
-
-	// translation
-	ml::vec3d translation_vector = { rotation_translation[3], rotation_translation[4], rotation_translation[5] };
-	ml::mat4f translation = ml::mat4f::translation(translation_vector);
-
-	return translation * rotation;
-}
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-
-//ml::vec6d solve_icp(const std::vector<ml::vec3f>& src,
-//					const std::vector<ml::vec3f>& dst,
-//					const ceres::Solver::Options& options,
-//					ml::vec6d initial_transformation_se3,
-//					ceres::Solver::Summary & summary)
-//{
-//	KNN nn_search(dst);
-//	ceres::Problem problem;
-//	for (int i = 0; i < src.size(); ++i) {
-//		unsigned int index = nn_search.nearest_index(src[i]);
-//		ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(dst[index], src[i]);
-//		problem.AddResidualBlock(cost_function, NULL, initial_transformation_se3.array);
-//	}
-//	ceres::Solve(options, &problem, &summary);
-//	return initial_transformation_se3;
-//}
-
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-
-
-ICPLogIterationGuard::ICPLogIterationGuard(const ceres::Solver::Summary& summary, long long total_time_in_ms, size_t iteration)
-	: _summary(summary)
-	, _total_time_in_ms(total_time_in_ms)
-	, _iteration(iteration)
-{
-	_start_time = std::chrono::system_clock::now();
-
-}
-
-long long ICPLogIterationGuard::get_time_in_ms()
-{
-	auto end_time = std::chrono::system_clock::now();
-	return std::chrono::duration_cast<std::chrono::milliseconds>(end_time - _start_time).count();
-}
-
-ICPLogIterationGuard::~ICPLogIterationGuard()
-{
-	std::cout << "Final report:\n" << _summary.BriefReport() << std::endl;
-	auto elapse = get_time_in_ms();
-	_total_time_in_ms += elapse;
-
-	auto time_to_string = [](long long time_in_ms) {
-		long long s = floor(static_cast<double>(time_in_ms) / 1000.);
-		long long ms = time_in_ms - (s * 1000);
-		return std::to_string(s) + "s " + std::to_string(ms) + "ms";
-	};
-	
-	
-	std::cout << "Ceres Solver Iteration: " << _iteration << " sub iterations: " << _summary.num_inner_iteration_steps << ", Duration " << time_to_string(elapse) << ", Total time: " << time_to_string(_total_time_in_ms) 
-		<< ", Initial cost: "<< _summary.initial_cost << ", Final cost: " << _summary.final_cost << ", Termination: " << _summary.termination_type << std::endl << std::endl;
-}
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 
 
 ICP::ICP(const std::vector<ml::vec3f>& src,

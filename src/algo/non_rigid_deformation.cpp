@@ -1,6 +1,6 @@
 #include "non_rigid_deformation.h"
 #include "as_rigid_as_possible_cost_function.h"
-#include "icp.h"
+#include "se3.h"
 
 AsRigidAsPossible::AsRigidAsPossible(const std::vector<ml::vec3f>& src,
 									 const std::vector<ml::vec3f>& dst,
