@@ -19,9 +19,6 @@ std::vector<ml::vec3f> SensorDataWrapper::getPoints(unsigned int frame, unsigned
 	if (frame >= _sensor_data.m_frames.size())
 		return points;
 	
-
-	//return _sensor_data.computePointCloud(frame).m_points;
-
 	auto intrinsics = _depth_sensor._depth_sensor.getIntrinsics();
 	auto intrinsic_matrix = intrinsics.converToMatrix();
 	
@@ -54,15 +51,7 @@ void CalibrateSensorDataWrapper::processFrame()
 	ml::vec4uc* color_data = new ml::vec4uc[_depth_sensor.getColorHeight() * _depth_sensor.getColorWidth()];
 
 	_depth_sensor.processFrame(depth_data, color_data);
-
-	//		//if (depth != 0.)
-	//		//	depth += 200.;
-	//		//float depth = 10. * (1. + _depth_sensor.getDepth(j, i));
-	//		//if (depth != 0.)
-	//		//	depth += 1.;
-	//		depth_data[i * _depth_sensor.getDepthWidth() + j] = (depth);
-
-
+	
 	_sensor_data.m_DepthImages.push_back(depth_data);
 	_sensor_data.m_ColorImages.push_back(color_data);
 	_sensor_data.m_DepthNumFrames++;
@@ -91,12 +80,6 @@ std::vector<ml::vec3f> CalibrateSensorDataWrapper::getPoints(unsigned int frame,
 ml::SensorData CalibrateSensorDataWrapper::getSensorData()
 {
 	ml::SensorData data;
-	//data.initDefault(_sensor_data.m_ColorImageWidth, 
-	//				 _sensor_data.m_ColorImageHeight,
-	//				 _sensor_data.m_DepthImageWidth,
-	//				 _sensor_data.m_DepthImageHeight,
-	//				 _sensor_data.m_CalibrationColor, 
-	//				 _sensor_data.m_CalibrationDepth);
 
 	for (int frame = 0; frame < _sensor_data.m_ColorNumFrames; frame++) {
 		ml::vec4uc* sensor_color = _sensor_data.m_ColorImages[frame];

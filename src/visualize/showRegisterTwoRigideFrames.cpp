@@ -1,10 +1,63 @@
+#include "stdafx.h"
 #include "showRegisterTwoRigideFrames.h"
 #include <numeric>
 #include "ext-depthcamera/calibratedSensorData.h"
 #include "algo/icp.h"
 
+
+
+void RigidRegistration::icp()
+{
+	_transformation = iterative_closest_points(_points_a, _points_b);
+}
+
+
+void RigidRegistration::icp_calc_nn_in_cost_function()
+{
+	if (!_icp_nn) {
+		ceres::Solver::Options options;
+		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
+		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+		options.max_num_iterations = 50;
+		options.logging_type = ceres::LoggingType::SILENT;
+		options.minimizer_progress_to_stdout = false;
+		_icp_nn = std::make_unique<ICP>(_points_a, _points_b, options);
+
+		//if (!_icp_nn->finished())
+			//_transformation = _icp_nn->solveIteration();
+		_transformation = _icp_nn->solve();
+	}
+}
+
+std::vector<ml::vec3f> RigidRegistration::transform(std::vector<ml::vec3f> points)
+{
+	std::for_each(points.begin(), points.end(), [&](ml::vec3f & p) { p = _transformation * p; });
+	return points;
+}
+
+std::vector<ml::vec3f> RigidRegistration::getPointsA()
+{
+	return transform(_points_a);
+}
+
+std::vector<ml::vec3f> RigidRegistration::getPointsB()
+{
+	return _points_b;
+}
+
+RigidRegistration::RigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b)
+	: _points_a(points_a)
+	, _points_b(points_b)
+	, _transformation(ml::mat4f::identity())
+{}
+
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+
 
 void ShowTwoRigideRegisteredFrames::configImageReaderSensor(std::string filepath)
 {
@@ -24,29 +77,38 @@ void ShowTwoRigideRegisteredFrames::configImageReaderSensor(std::string filepath
 	_depth_sensor.toggleNearMode();
 }
 
-
-void ShowTwoRigideRegisteredFrames::renderPoints(std::vector<ml::vec3f> points_frame_A, std::vector<ml::vec3f> points_frame_B)
+void ShowTwoRigideRegisteredFrames::transform(std::vector<ml::vec3f>& points)
 {
 	ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
 	ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });
-	ml::mat4f depth_extrinsics = transform * rotation;// *scale;
-	std::for_each(points_frame_A.begin(), points_frame_A.end(), [&](ml::vec3f & p) { p = depth_extrinsics * p; });
-	std::for_each(points_frame_B.begin(), points_frame_B.end(), [&](ml::vec3f & p) { p = depth_extrinsics * p; });
+	ml::mat4f depth_extrinsics = transform * rotation;
+	std::for_each(points.begin(), points.end(), [&](ml::vec3f & p) { p = depth_extrinsics * p; });
+}
 
+void ShowTwoRigideRegisteredFrames::renderPoints()
+{
+	std::vector<ml::vec3f> render_points_a = _rigid_registration->getPointsA();
+	std::vector<ml::vec3f> render_points_b = _rigid_registration->getPointsB();
 
-	std::vector<ml::vec4f> color_frame_A(points_frame_A.size());
+	render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
+	render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
+
+	// transform
+	transform(render_points_a);
+	transform(render_points_b);
+
+	// render point clouds
+	std::vector<ml::vec4f> color_frame_A(render_points_a.size());
 	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
-	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_A, color_frame_A));
+	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_a, color_frame_A));
 
-	std::vector<ml::vec4f> color_frame_B(points_frame_B.size());
+	std::vector<ml::vec4f> color_frame_B(render_points_b.size());
 	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
-	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_frame_B, color_frame_B));
+	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_b, color_frame_B));
 }
 
 void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 {
-	_transformation = ml::mat4f::identity();
-
 	_graphics = &app.graphics;
 	m_shaderManager.init(app.graphics);
 	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
@@ -62,77 +124,34 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	for(int i = 0; i < 6; i++)
 		_sensor_data->processFrame();
 	
-	_points_a = _sensor_data->getPoints(0, 10);
-	_points_b = _sensor_data->getPoints(5, 10);
+
+	_points_a = _sensor_data->getPoints(0);
+	_points_b = _sensor_data->getPoints(5);
 
 	float scale_factor = 0.004;
 	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
 	std::for_each(_points_a.begin(), _points_a.end(), [&](ml::vec3f & p) { p = scale * p; });
 	std::for_each(_points_b.begin(), _points_b.end(), [&](ml::vec3f & p) { p = scale * p; });
 
-	renderPoints(_points_a, _points_b);
-
-	_points_a_icp = _points_a;
-	_points_b_icp = _points_b;
+	auto points_a_icp = _points_a;
+	auto points_b_icp = _points_b;
 
 	auto translation = ml::mat4f::translation({ 1.f, 0., 0. });
-	std::for_each(_points_a_icp.begin(), _points_a_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
-	std::for_each(_points_b_icp.begin(), _points_b_icp.end(), [&](ml::vec3f & p) { p = (translation * _transformation) * p; });
+	std::for_each(points_a_icp.begin(), points_a_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
+	std::for_each(points_b_icp.begin(), points_b_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
+
+	_rigid_registration = std::make_unique<RigidRegistration>(points_a_icp, points_b_icp);
+
+	renderPoints();
 }
 
 
-
-void ShowTwoRigideRegisteredFrames::icp()
-{
-	_transformation = iterative_closest_points(_points_a_icp, _points_b_icp);
-
-	std::for_each(_points_a_icp.begin(), _points_a_icp.end(), [&](ml::vec3f & p) { p = _transformation * p; });
-
-	auto render_points_a = _points_a_icp;
-	auto render_points_b = _points_b_icp;
-	render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
-	render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
-
-	renderPoints(render_points_a, render_points_b);
-}
-
-
-void ShowTwoRigideRegisteredFrames::icptest()
-{
-	if (!_icp_nn) {
-		ceres::Solver::Options options;
-		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
-		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-		options.max_num_iterations = 50;
-		options.logging_type = ceres::LoggingType::SILENT;
-		options.minimizer_progress_to_stdout = false;
-		_icp_nn = std::make_unique<ICP>(_points_a_icp, _points_b_icp, options);
-	//}
-
-	//if (!_icp_nn->finished()) {
-		//_transformation = _icp_nn->solveIteration();
-		_transformation = _icp_nn->solve();
-
-		auto render_points_a = _points_a_icp;
-		auto render_points_b = _points_b_icp;
-
-		std::for_each(render_points_a.begin(), render_points_a.end(), [&](ml::vec3f & p) { p = _transformation * p; });
-
-		render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
-		render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
-
-		renderPoints(render_points_a, render_points_b);
-	}
-}
 
 void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
 {
 	if (icp_active) {
-		icptest();
+		_rigid_registration->icp();
+		renderPoints();
 		icp_active = false;
 	}
 
