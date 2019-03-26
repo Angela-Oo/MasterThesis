@@ -57,7 +57,18 @@ RigidRegistration::RigidRegistration(const std::vector<ml::vec3f> & points_a, co
 
 void NonRigidRegistration::non_rigid_registration()
 {
-	_transformation = iterative_closest_points(_points_a, _points_b);
+	ceres::Solver::Options options;
+	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
+	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+	options.max_num_iterations = 50;
+	options.logging_type = ceres::LoggingType::SILENT;
+	options.minimizer_progress_to_stdout = false;
+	AsRigidAsPossible arap(_points_a, _points_b, options);
+	_transformation = arap.solve();
 }
 
 
