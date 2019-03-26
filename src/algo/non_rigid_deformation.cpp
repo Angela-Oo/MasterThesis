@@ -9,30 +9,75 @@ AsRigidAsPossible::AsRigidAsPossible(const std::vector<ml::vec3f>& src,
 	, _dst(dst)
 	, _options(option)
 {
+	for (int i = 0; i < _src.size(); ++i) {
+		_rotations.push_back(ml::vec3d(0., 0., 0.));
+	}
+	for (int i = 0; i < _dst.size(); ++i) {
+		_solved_points.push_back(ml::vec3d(_dst[i].x, _dst[i].y, _dst[i].z));
+	}
+
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
 }
 
-
-ml::mat4f AsRigidAsPossible::solve()
+std::vector<size_t> AsRigidAsPossible::getNeighborIndices(size_t i)
 {
+	std::vector<size_t> indices;
+	int j = i - 1;
+	if (j >= 0)
+		indices.push_back(static_cast<size_t>(j));
+	j = i + 1;
+	if (j < _src.size())
+		indices.push_back(static_cast<size_t>(j));
+	return indices;
+}
+
+std::vector<ml::vec3f> AsRigidAsPossible::solve()
+{
+	for (int i = 0; i < _rotations.size(); ++i) {
+		_rotations[i] = ml::vec3d(0., 0., 0.);
+	}
+
 	ceres::Solver::Summary summary;
 
-	ml::vec6d rotation_translation(0., 0., 0., 0., 0., 0.);
-	ceres::Problem problem;
-	for (int i = 0; i < _src.size() - 1; ++i) {
-		ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(_dst[i], _dst[i+1], _src[i], _src[i+1]);
-		problem.AddResidualBlock(cost_function, NULL, rotation_translation.array);		
-	}
-	ml::vec3d error(0., 0., 0.);
-	for (int i = 0; i < _src.size(); ++i)
 	{
-		ceres::CostFunction* cost_function = FitCostFunction::Create(_dst[i], _src[i]);
-		problem.AddResidualBlock(cost_function, NULL, error.array);
+		ceres::Problem problem;
+		for (int i = 0; i < _src.size(); ++i) {
+			auto neighbors = getNeighborIndices(i);
+			ml::vec3d * r_i = &_rotations[i];
+			for (auto & j : neighbors) {
+				ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(_solved_points[i], _solved_points[j], _src[i], _src[j]);
+				problem.AddResidualBlock(cost_function, NULL, r_i->array);
+			}
+		}
+		ceres::Solve(_options, &problem, &summary);
 	}
-	ceres::Solve(_options, &problem, &summary);
-	return rigid_transformation_from_se3(rotation_translation);
+
+
+	{
+		ceres::Problem problem;
+		for (int i = 0; i < _src.size() -1; ++i) {
+			ml::vec3d * dst_i = &_solved_points[i];
+			auto neighbors = getNeighborIndices(i);
+			for (auto & j : neighbors) {
+				ceres::CostFunction* cost_function = AsRigidAsPossiblePointCostFunction::Create(_src[i], _src[j], _rotations[i], _solved_points[j]);
+				problem.AddResidualBlock(cost_function, NULL, dst_i->array);
+			}
+		}
+		for (int i = 0; i < _src.size() -1; ++i)
+		{
+			ceres::CostFunction* cost_function = FitCostFunction::Create(_src[i]);
+			problem.AddResidualBlock(cost_function, NULL, (&_solved_points[i])->array);
+		}
+		ceres::Solve(_options, &problem, &summary);
+	}
+
+	std::vector<ml::vec3f> solved_points;
+	for (int i = 0; i < _solved_points.size(); ++i) {
+		solved_points.push_back(ml::vec3d(_solved_points[i].x, _solved_points[i].y, _solved_points[i].z));
+	}
+	return solved_points;
 }
 

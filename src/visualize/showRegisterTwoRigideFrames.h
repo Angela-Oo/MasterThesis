@@ -5,7 +5,17 @@
 #include "kinect/ImageReaderSensor.h"
 #include "algo/icp.h"
 
-class RigidRegistration
+
+class IRegistration
+{
+public:
+	virtual void solve() = 0;
+	virtual std::vector<ml::vec3f> getPointsA() = 0;
+	virtual std::vector<ml::vec3f> getPointsB() = 0;
+	virtual ~IRegistration() = default;
+};
+
+class RigidRegistration : public IRegistration
 {
 private:
 	std::unique_ptr<ICP> _icp_nn;
@@ -13,25 +23,25 @@ private:
 	std::vector<ml::vec3f> _points_b;
 	ml::mat4f _transformation;
 public:
-	void icp();
+	void solve() override;
 	void icp_calc_nn_in_cost_function();
-	std::vector<ml::vec3f> getPointsA();
-	std::vector<ml::vec3f> getPointsB();
+	std::vector<ml::vec3f> getPointsA() override;
+	std::vector<ml::vec3f> getPointsB() override;
 public:
 	RigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b);
 };
 
-class NonRigidRegistration
+class NonRigidRegistration : public IRegistration
 {
 private:
 	std::unique_ptr<ICP> _icp_nn;
 	std::vector<ml::vec3f> _points_a;
 	std::vector<ml::vec3f> _points_b;
-	ml::mat4f _transformation;
+	std::vector<ml::vec6d> _transformation;
 public:
-	void non_rigid_registration();
-	std::vector<ml::vec3f> getPointsA();
-	std::vector<ml::vec3f> getPointsB();
+	void solve() override;
+	std::vector<ml::vec3f> getPointsA() override;
+	std::vector<ml::vec3f> getPointsB() override;
 public:
 	NonRigidRegistration();
 };
@@ -49,7 +59,7 @@ private:
 	ImageReaderSensor _depth_sensor;
 	ml::GraphicsDevice * _graphics;
 	bool icp_active = false;
-	std::unique_ptr<RigidRegistration> _rigid_registration;
+	std::unique_ptr<IRegistration> _registration;
 private:
 	void transform(std::vector<ml::vec3f>& points);
 	void configImageReaderSensor(std::string filepath);
