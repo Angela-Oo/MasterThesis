@@ -485,6 +485,15 @@
     <ClInclude Include="src\algo\ceres_iteration_logger.h">
       <Filter>algo</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\as_rigid_as_possible.h">
+      <Filter>algo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\embedded_deformation.h">
+      <Filter>algo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\ceres_math.h">
+      <Filter>algo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -538,6 +547,12 @@
       <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\ceres_iteration_logger.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\as_rigid_as_possible.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\embedded_deformation.cpp">
       <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>
