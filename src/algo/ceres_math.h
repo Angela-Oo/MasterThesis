@@ -38,6 +38,22 @@ void multiply(const T * const m, const T * const v, T* result)
 }
 
 template<typename T>
+void substract(const T * const v1, const T * const v2, T* result)
+{
+	result[0] = v1[0] - v2[0];
+	result[1] = v1[1] - v2[1];
+	result[2] = v1[2] - v2[2];
+}
+
+template<typename T>
+void addition(const T * const v1, const T * const v2, T* result)
+{
+	result[0] = v1[0] + v2[0];
+	result[1] = v1[1] + v2[1];
+	result[2] = v1[2] + v2[2];
+}
+
+template<typename T>
 T dot(const T * const v1, const T * const v2)
 {
 	T result = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];

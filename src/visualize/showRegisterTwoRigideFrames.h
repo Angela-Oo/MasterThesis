@@ -38,12 +38,14 @@ private:
 	std::vector<ml::vec3f> _points_a;
 	std::vector<ml::vec3f> _points_b;
 	std::vector<ml::vec6d> _transformation;
+	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
 public:
 	void solve() override;
 	std::vector<ml::vec3f> getPointsA() override;
 	std::vector<ml::vec3f> getPointsB() override;
 public:
 	NonRigidRegistration();
+	NonRigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b);
 };
 
 class ShowTwoRigideRegisteredFrames : public IShowData

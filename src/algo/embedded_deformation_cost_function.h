@@ -80,6 +80,10 @@ struct EmbeddedDeformationPointsCostFunction {
 	}
 };
 
+
+
+
+
 struct RotationCostFunction {
 	RotationCostFunction()
 	{ }
@@ -109,3 +113,93 @@ struct RotationCostFunction {
 	}
 };
 
+
+
+struct SmoothCostFunction {
+	const ml::vec3f& _vi;
+	const ml::vec3f& _vj;
+
+	SmoothCostFunction(const ml::vec3f & vi, const ml::vec3f & vj)
+		: _vi(vi)
+		, _vj(vj)
+	{ }
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(const ml::vec3f & vi, const ml::vec3f & vj) {
+		return (new ceres::AutoDiffCostFunction<SmoothCostFunction, 3, 9, 3, 3>(new SmoothCostFunction(vi, vj)));
+	}
+
+	// E_arap = sum_{i} sum_{j in N} |(vi-vj) - Ri(vi' - vj')|^2
+	//template <typename T>
+	//bool operator()(const T* const rotation_matrix, T* residuals) const
+	//{
+	//	T vi[3];
+	//	T vj[3];
+	//	vec3f_to_T(_vi, vi);
+	//	vec3f_to_T(_vj, vj);
+	//	T edge[3];
+	//	T result[3];			
+	//	substract(vj, vi, edge);
+	//	multiply(rotation_matrix, edge, result);
+	//	residuals[0] = result[0] + vi[0] - (vj[0]);
+	//	residuals[1] = result[1] + vi[1] - (vj[1]);
+	//	residuals[2] = result[2] + vi[2] - (vj[2]);
+	//	return true;
+	//}
+
+	template <typename T>
+	bool operator()(const T* const rotation_matrix, const T* const bi, const T* const bj, T* residuals) const
+	{
+		T vi[3];
+		T vj[3];
+		vec3f_to_T(_vi, vi);
+		vec3f_to_T(_vj, vj);
+		T edge[3];
+		T result[3];
+
+		substract(vj, vi, edge);
+		multiply(rotation_matrix, edge, result);
+
+		residuals[0] = result[0] + vi[0] + bi[0] - (vj[0] + bj[0]);
+		residuals[1] = result[1] + vi[1] + bi[1] - (vj[1] + bj[1]);
+		residuals[2] = result[2] + vi[2] + bi[2] - (vj[2] + bj[2]);
+
+		return true;
+	}
+};
+
+
+struct FitEDCostFunction {
+	const ml::vec3f& p_dst;
+	const ml::vec3f& p_src;
+
+	FitEDCostFunction(const ml::vec3f &dst, const ml::vec3f & src) :
+		p_dst(dst), p_src(src)
+	{ }
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(const ml::vec3f &observed, const ml::vec3f &worldPoint) {
+		return (new ceres::AutoDiffCostFunction<FitEDCostFunction, 3, 9, 3>(new FitEDCostFunction(observed, worldPoint)));
+	}
+
+	template <typename T>
+	bool operator()(const T* const rotation, const T* const translation, T* residuals) const {
+
+		T p[3] = { T(p_src[0]), T(p_src[1]), T(p_src[2]) };
+
+		multiply(rotation, p, p);
+		//ceres::AngleAxisRotatePoint(rotation_translation, p, p);
+
+		//// camera[3,4,5] are the translation.
+		p[0] += translation[0];
+		p[1] += translation[1];
+		p[2] += translation[2];
+
+		// The error is the difference between the predicted and observed position.
+		residuals[0] = p[0] - T(p_dst[0]);
+		residuals[1] = p[1] - T(p_dst[1]);
+		residuals[2] = p[2] - T(p_dst[2]);
+
+		return true;
+	}
+};

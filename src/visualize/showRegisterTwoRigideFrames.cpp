@@ -57,18 +57,27 @@ RigidRegistration::RigidRegistration(const std::vector<ml::vec3f> & points_a, co
 
 void NonRigidRegistration::solve()
 {
-	ceres::Solver::Options options;
-	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
-	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-	options.max_num_iterations = 50;
-	options.logging_type = ceres::LoggingType::SILENT;
-	options.minimizer_progress_to_stdout = false;
-	AsRigidAsPossible arap(_points_a, _points_b, options);
-	_points_b = arap.solve();
+
+	//AsRigidAsPossible arap(_points_a, _points_b, options);
+	//_points_b = arap.solve();
+	if (!_embedded_deformation) {
+		ceres::Solver::Options options;
+		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
+		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+		options.max_num_iterations = 50;
+		options.logging_type = ceres::LoggingType::SILENT;
+		options.minimizer_progress_to_stdout = false;
+
+		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options);
+	}
+	if (!_embedded_deformation->finished()) {
+		_embedded_deformation->solveIteration();
+		_points_a = _embedded_deformation->getDeformedPoints();
+	}
 }
 
 
@@ -96,6 +105,11 @@ NonRigidRegistration::NonRigidRegistration()
 	_points_b[5].y = 0.1;
 	_points_b[5].x = 0.2;
 }
+
+NonRigidRegistration::NonRigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b)
+	: _points_a(points_a)
+	, _points_b(points_b)
+{}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
@@ -161,8 +175,8 @@ void ShowTwoRigideRegisteredFrames::initICP()
 	for (int i = 0; i < 6; i++)
 		_sensor_data->processFrame();
 
-	_points_a = _sensor_data->getPoints(0);
-	_points_b = _sensor_data->getPoints(5);
+	_points_a = _sensor_data->getPoints(0, 8);
+	_points_b = _sensor_data->getPoints(5, 8);
 
 	float scale_factor = 0.004;
 	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
@@ -176,7 +190,8 @@ void ShowTwoRigideRegisteredFrames::initICP()
 	std::for_each(points_a_icp.begin(), points_a_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
 	std::for_each(points_b_icp.begin(), points_b_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
 
-	_registration = std::make_unique<RigidRegistration>(points_a_icp, points_b_icp);
+	//_registration = std::make_unique<RigidRegistration>(points_a_icp, points_b_icp);
+	_registration = std::make_unique<NonRigidRegistration>(points_a_icp, points_b_icp);
 }
 
 
@@ -192,8 +207,8 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
 	m_constants.init(app.graphics);	
 
-	//initICP();
-	initNonRigidRegistration();
+	initICP();
+	//initNonRigidRegistration();
 
 	renderPoints();
 }

@@ -494,6 +494,9 @@
     <ClInclude Include="src\algo\ceres_math.h">
       <Filter>algo</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\deformation_graph.h">
+      <Filter>algo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -553,6 +556,9 @@
       <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\embedded_deformation.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\deformation_graph.cpp">
       <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>

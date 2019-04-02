@@ -1,158 +1,60 @@
 #include "non_rigid_deformation.h"
-
-
+#include "ceres_iteration_logger.h"
+#include "se3.h"
 //
-//std::vector<size_t> getNeighborIndices(size_t i, size_t size)
-//{
-//	std::vector<size_t> indices;
-//	int j = i - 1;
-//	if (j >= 0)
-//		indices.push_back(static_cast<size_t>(j));
-//	j = i + 1;
-//	if (j < size)
-//		indices.push_back(static_cast<size_t>(j));
-//	return indices;
-//}
-//
-//void AsRigidAsPossible::solveRotation()
-//{
-//	ceres::Solver::Summary summary;
-//	ceres::Problem problem;
-//	for (int i = 0; i < _src.size(); ++i) {
-//		auto neighbors = getNeighborIndices(i, _src.size());
-//		ml::vec3d * r_i = &_rotations[i];
-//		for (auto & j : neighbors) {
-//			ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(_solved_points[i], _solved_points[j], _src[i], _src[j]);
-//			problem.AddResidualBlock(cost_function, NULL, r_i->array);
-//		}
-//	}
-//	ceres::Solve(_options, &problem, &summary);
-//}
-//
-//void AsRigidAsPossible::solvePositions()
-//{
-//	ceres::Solver::Summary summary;
-//	ceres::Problem problem;
-//	for (int i = 0; i < _src.size() - 1; ++i) {
-//		ml::vec3d * dst_i = &_solved_points[i];
-//		auto neighbors = getNeighborIndices(i, _src.size());
-//		for (auto & j : neighbors) {
-//			ceres::CostFunction* cost_function = AsRigidAsPossiblePointCostFunction::Create(_src[i], _src[j], _rotations[i], _solved_points[j]);
-//			problem.AddResidualBlock(cost_function, NULL, dst_i->array);
-//		}
-//	}
-//	for (int i = 0; i < _src.size() - 1; ++i)
-//	{
-//		ceres::CostFunction* cost_function = FitCostFunction::Create(_src[i]);
-//		problem.AddResidualBlock(cost_function, NULL, (&_solved_points[i])->array);
-//	}
-//	ceres::Solve(_options, &problem, &summary);
-//}
-//
-//
-//std::vector<ml::vec3f> AsRigidAsPossible::solve()
-//{
-//	for (int i = 0; i < _rotations.size(); ++i) {
-//		_rotations[i] = ml::vec3d(0., 0., 0.);
-//	}	
-//
-//	solveRotation();
-//	solvePositions();
-//	
-//	std::vector<ml::vec3f> solved_points;
-//	for (int i = 0; i < _solved_points.size(); ++i) {
-//		solved_points.push_back(ml::vec3d(_solved_points[i].x, _solved_points[i].y, _solved_points[i].z));
-//	}
-//	return solved_points;
-//}
-//
-//AsRigidAsPossible::AsRigidAsPossible(const std::vector<ml::vec3f>& src,
-//									 const std::vector<ml::vec3f>& dst,
-//									 ceres::Solver::Options option)
+//NonRigidICP::NonRigidICP(const std::vector<ml::vec3f>& src,
+//						 const std::vector<ml::vec3f>& dst,
+//						 ceres::Solver::Options options)
 //	: _src(src)
 //	, _dst(dst)
-//	, _options(option)
+//	, _options(options)
+//	, _nn_search(dst)
 //{
-//	for (int i = 0; i < _src.size(); ++i) {
-//		_rotations.push_back(ml::vec3d(0., 0., 0.));
-//	}
-//	for (int i = 0; i < _dst.size(); ++i) {
-//		_solved_points.push_back(ml::vec3d(_dst[i].x, _dst[i].y, _dst[i].z));
-//	}
-//
 //	std::cout << "\nCeres Solver" << std::endl;
-//	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
-//	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
-//	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
+//	std::cout << "Ceres preconditioner type: " << options.preconditioner_type << std::endl;
+//	std::cout << "Ceres linear algebra type: " << options.sparse_linear_algebra_library_type << std::endl;
+//	std::cout << "Ceres linear solver type: " << options.linear_solver_type << std::endl;
 //}
 //
-////-----------------------------------------------------------------------------
-////-----------------------------------------------------------------------------
-//
-//
-//void EmbeddedDeformation::solveMatrix()
+//ml::mat4f NonRigidICP::solve()
 //{
-//	ceres::Solver::Summary summary;
-//	ceres::Problem problem;
-//	for (int i = 0; i < _src.size(); ++i) {
-//		auto neighbors = getNeighborIndices(i, _src.size());
-//		ml::mat3d * m_i = &_matrix[i];
-//		for (auto & j : neighbors) {
-//			ceres::CostFunction* cost_function = EmbeddedDeformationCostFunction::Create(_solved_points[i], _solved_points[j], _src[i], _src[j]);
-//			problem.AddResidualBlock(cost_function, NULL, m_i->getData());
+//	ml::mat4f transformation = ml::mat4f::identity();
+//	while (!finished()) {
+//		transformation = solveIteration();
+//	}
+//	return transformation;
+//}
+//
+//
+//ml::mat4f NonRigidICP::solveIteration() // working
+//{
+//	if (!finished()) {
+//		ceres::Solver::Summary summary;
+//		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
+//
+//		_solve_iteration++;
+//
+//		ceres::Problem problem;
+//		for (int i = 0; i < _src.size(); i++) {
+//			ml::mat4f transform_matrix = rigid_transformation_from_se3(_transformation_se3);
+//			unsigned int index = _nn_search.nearest_index((transform_matrix * _src[i]));
+//			ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(_dst[index], _src[i]);
+//			problem.AddResidualBlock(cost_function, NULL, _transformation_se3.array);
 //		}
+//		ceres::Solve(_options, &problem, &summary);
+//
+//		_current_tol = abs(_current_cost - summary.final_cost);
+//		_current_cost = summary.final_cost;
+//
+//		_total_time_in_ms += logger.get_time_in_ms();
 //	}
-//	ceres::Solve(_options, &problem, &summary);
+//
+//	return rigid_transformation_from_se3(_transformation_se3);
 //}
 //
-//void EmbeddedDeformation::solvePositions()
+//
+//bool NonRigidICP::finished()
 //{
-//	ceres::Solver::Summary summary;
-//	ceres::Problem problem;
-//	for (int i = 0; i < _src.size() - 1; ++i) {
-//		ml::vec3d * dst_i = &_solved_points[i];
-//		auto neighbors = getNeighborIndices(i, _src.size());
-//		for (auto & j : neighbors) {
-//			ceres::CostFunction* cost_function = EmbeddedDeformationPointsCostFunction::Create(_src[i], _src[j], _matrix[i], _solved_points[j]);
-//			problem.AddResidualBlock(cost_function, NULL, dst_i->array);
-//		}
-//	}
-//	for (int i = 0; i < _src.size() - 1; ++i)
-//	{
-//		ceres::CostFunction* cost_function = FitCostFunction::Create(_src[i]);
-//		problem.AddResidualBlock(cost_function, NULL, (&_solved_points[i])->array);
-//	}
-//	ceres::Solve(_options, &problem, &summary);
-//}
-//
-//std::vector<ml::vec3f> EmbeddedDeformation::solve()
-//{
-//	solveMatrix();
-//	solvePositions();
-//
-//	std::vector<ml::vec3f> solved_points;
-//	for (int i = 0; i < _solved_points.size(); ++i) {
-//		solved_points.push_back(ml::vec3d(_solved_points[i].x, _solved_points[i].y, _solved_points[i].z));
-//	}
-//	return solved_points;
-//}
-//
-//EmbeddedDeformation::EmbeddedDeformation(const std::vector<ml::vec3f>& src,
-//										 const std::vector<ml::vec3f>& dst,
-//										 ceres::Solver::Options option)
-//	: _src(src)
-//	, _dst(dst)
-//	, _options(option)
-//{
-//	for (int i = 0; i < _src.size(); ++i) {
-//		_matrix.push_back(ml::mat3d::identity());
-//	}
-//	for (int i = 0; i < _dst.size(); ++i) {
-//		_solved_points.push_back(ml::vec3d(_dst[i].x, _dst[i].y, _dst[i].z));
-//	}
-//
-//	std::cout << "\nCeres Solver" << std::endl;
-//	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
-//	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
-//	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
+//	double tol = 0.001;
+//	return (_solve_iteration >= _max_iterations || _current_tol < tol);
 //}

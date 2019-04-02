@@ -2,46 +2,28 @@
 
 #include "as_rigid_as_possible.h"
 #include "embedded_deformation.h"
+#include <vector>
+#include "knn.h"
 //
-//#include "../mLibInclude.h"
-//#include <vector>
-//#include <ceres/ceres.h>
-//
-//
-//class AsRigidAsPossible
+//class NonRigidICP
 //{
 //	std::vector<ml::vec3f> _src;
 //	std::vector<ml::vec3f> _dst;
 //	ceres::Solver::Options _options;
-//	std::vector<ml::vec3d> _rotations;
-//	std::vector<ml::vec3d> _solved_points;
-//private:
-//	void solvePositions();
-//	void solveRotation();
+//	ml::vec6d _transformation_se3 = ml::vec6d(0., 0., 0., 0., 0., 0.);
+//	size_t _solve_iteration = 0;
+//	double _current_cost = 1.;
+//	double _current_tol = 1.;
+//	long long _total_time_in_ms = 0;
+//	size_t _max_iterations = 20;
+//	KNN _nn_search;
 //public:
-//	std::vector<ml::vec3f> solve();
-//	// expect src and dst points to match at the same array position
-//	AsRigidAsPossible(const std::vector<ml::vec3f>& src,
-//					  const std::vector<ml::vec3f>& dst,
-//					  ceres::Solver::Options option);
-//};
-//
-//
-//class EmbeddedDeformation
-//{
-//	std::vector<ml::vec3f> _src;
-//	std::vector<ml::vec3f> _dst;
-//	ceres::Solver::Options _options;
-//	std::vector<ml::mat3d> _matrix;
-//	std::vector<ml::vec3d> _solved_points;
-//private:
-//	void solvePositions();
-//	void solveMatrix();
+//	NonRigidICP(const std::vector<ml::vec3f>& src,
+//				const std::vector<ml::vec3f>& dst,
+//				ceres::Solver::Options option);
 //public:
-//	// expect src and dst points to match at the same array position
-//	EmbeddedDeformation(const std::vector<ml::vec3f>& src,
-//					  const std::vector<ml::vec3f>& dst,
-//					  ceres::Solver::Options option);
-//
-//	std::vector<ml::vec3f> solve();
+//	ml::mat4f solve();
+//public:
+//	ml::mat4f solveIteration();
+//	bool finished();
 //};
