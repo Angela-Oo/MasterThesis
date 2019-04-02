@@ -3,6 +3,7 @@
 #include "se3.h"
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"
+#include "ceres_iteration_logger.h"
 
 std::vector<size_t> EmbeddedDeformationLine::getNeighborIndices(size_t i, size_t size)
 {
@@ -86,17 +87,20 @@ void EmbeddedDeformation::solveIteration()
 		_solve_iteration++;
 
 		ceres::Solver::Summary summary;
+		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
+
 		ceres::Problem problem;
 		//for (int i = 0; i < _deformation_graph._graph.m_vertices.size(); ++i) {
 		auto & g = _deformation_graph._graph;
+		auto & global_node = _deformation_graph._global_rigid_deformation;
 
 		auto & nodes = boost::get(node_t(), g);
 
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];
 			unsigned int i = _nn_search.nearest_index(src_i.deformedPosition());
-			ceres::CostFunction* cost_function = FitEDCostFunction::Create(_dst[i], src_i._g);
-			problem.AddResidualBlock(cost_function, NULL, (&src_i._r)->getData(), (&src_i._t)->getData());
+			ceres::CostFunction* cost_function = FitEDCostFunction::Create(_dst[i], src_i._g, global_node._g);
+			problem.AddResidualBlock(cost_function, NULL, (&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._r)->getData(), (&src_i._t)->getData());
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];
@@ -113,10 +117,15 @@ void EmbeddedDeformation::solveIteration()
 			ceres::CostFunction* cost_function = RotationCostFunction::Create();
 			problem.AddResidualBlock(cost_function, NULL, (&src_i._r)->getData());
 		}
+		ceres::CostFunction* cost_function = RotationCostFunction::Create();
+		problem.AddResidualBlock(cost_function, NULL, (&global_node._r)->getData());
+
 		ceres::Solve(_options, &problem, &summary);
 
 		_current_tol = abs(_current_cost - summary.final_cost);
 		_current_cost = summary.final_cost;
+
+		_total_time_in_ms += logger.get_time_in_ms();
 	}
 
 	//return getDeformedPoints();
@@ -133,8 +142,8 @@ std::vector<ml::vec3f> EmbeddedDeformation::solve()
 
 bool EmbeddedDeformation::finished()
 {
-	double tol = 0.001;
-	return (_solve_iteration >= _max_iterations || _current_tol < tol);
+	double tol = 0.00001;
+	return (_solve_iteration >= _max_iterations);// || _current_tol < tol);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const std::vector<ml::vec3f>& src,

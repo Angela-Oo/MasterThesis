@@ -36,7 +36,8 @@ class EmbeddedDeformation
 	double _current_cost = 1.;
 	double _current_tol = 1.;
 	size_t _solve_iteration = 0;
-	size_t _max_iterations = 20;
+	size_t _max_iterations = 50;
+	long long _total_time_in_ms = 0;
 public:
 	std::vector<ml::vec3f> getDeformedPoints();
 	bool finished();

@@ -28,8 +28,9 @@ class DeformationGraph
 private:
 	const std::vector<ml::vec3f> & _points;
 	const int k = 4;
-	std::vector<std::vector<vertex_index>> _k_nearest_nodes_of_points;
+	std::vector<std::vector<vertex_index>> _k_nearest_nodes_of_points;	
 public:
+	Node _global_rigid_deformation;
 	Graph _graph;	
 public:
 	double weight(const ml::vec3f & point, Node & node, double dmax);

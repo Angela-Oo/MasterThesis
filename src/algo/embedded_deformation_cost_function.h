@@ -172,28 +172,30 @@ struct SmoothCostFunction {
 struct FitEDCostFunction {
 	const ml::vec3f& p_dst;
 	const ml::vec3f& p_src;
+	const ml::vec3f& _g;
 
-	FitEDCostFunction(const ml::vec3f &dst, const ml::vec3f & src) :
-		p_dst(dst), p_src(src)
+	FitEDCostFunction(const ml::vec3f &dst, const ml::vec3f & src, const ml::vec3f &g) :
+		p_dst(dst), p_src(src), _g(g)
 	{ }
 
 	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create(const ml::vec3f &observed, const ml::vec3f &worldPoint) {
-		return (new ceres::AutoDiffCostFunction<FitEDCostFunction, 3, 9, 3>(new FitEDCostFunction(observed, worldPoint)));
+	static ceres::CostFunction* Create(const ml::vec3f &dst, const ml::vec3f &src, const ml::vec3f &g) {
+		return (new ceres::AutoDiffCostFunction<FitEDCostFunction, 3, 9, 3, 9, 3>(new FitEDCostFunction(dst, src, g)));
 	}
 
 	template <typename T>
-	bool operator()(const T* const rotation, const T* const translation, T* residuals) const {
+	bool operator()(const T* const global_rotation, const T* const global_translation, const T* const rotation, const T* const translation, T* residuals) const {
 
 		T p[3] = { T(p_src[0]), T(p_src[1]), T(p_src[2]) };
+		T g[3] = { T(_g[0]), T(_g[1]), T(_g[2]) };
+
+		substract(p, g, p);
+		multiply(global_rotation, p, p);
+		addition(p, g, p);
+		addition(p, global_translation, p);
 
 		multiply(rotation, p, p);
-		//ceres::AngleAxisRotatePoint(rotation_translation, p, p);
-
-		//// camera[3,4,5] are the translation.
-		p[0] += translation[0];
-		p[1] += translation[1];
-		p[2] += translation[2];
+		addition(p, translation, p);
 
 		// The error is the difference between the predicted and observed position.
 		residuals[0] = p[0] - T(p_dst[0]);

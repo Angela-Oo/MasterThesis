@@ -64,13 +64,15 @@ ml::vec3f DeformationGraph::deformPoint(const ml::vec3f & point, std::vector<ver
 		nodes.push_back(all_nodes[k_nearest_node_indices[i]]);
 	}
 
-	std::vector<double> w = weights(point, nodes);
+	ml::vec3f global_point = (_global_rigid_deformation._r*(point - _global_rigid_deformation._g)) + _global_rigid_deformation._g + _global_rigid_deformation._t;
+
+	std::vector<double> w = weights(global_point, nodes);
 
 	ml::vec3f deformed_point = ml::vec3f::origin;
 	for (size_t i = 0; i < nodes.size() - 1; ++i)
 	{
 		auto & node = nodes[i];
-		ml::vec3f transformed_point = ((node._r *(point - node._g)) + node._g + node._t) * w[i];
+		ml::vec3f transformed_point = ((node._r *(global_point - node._g)) + node._g + node._t) * w[i];
 		deformed_point += transformed_point;
 	}
 	return deformed_point;
@@ -100,7 +102,9 @@ DeformationGraph::DeformationGraph(const std::vector<ml::vec3f> & points, size_t
 		node_positions.push_back(_points[index]);
 		Node n(_points[index]);
 		boost::put(boost::get(node_t(), _graph), v, n);
+		_global_rigid_deformation._g += _points[index];
 	}
+	_global_rigid_deformation._g /= node_point_indices.size();
 
 	KNN knn(node_positions, k);
 	for (auto & p : _points) {

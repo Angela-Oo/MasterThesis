@@ -4,7 +4,7 @@
 #include "kinect/SensorDataWrapper.h"
 #include "kinect/ImageReaderSensor.h"
 #include "algo/icp.h"
-
+#include "algo/embedded_deformation.h"
 
 class IRegistration
 {
