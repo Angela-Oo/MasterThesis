@@ -3,8 +3,8 @@
 #include "i_showData.h"
 #include "kinect/SensorDataWrapper.h"
 #include "kinect/ImageReaderSensor.h"
-#include "algo/icp.h"
-#include "algo/embedded_deformation.h"
+#include "algo/rigid_registration/icp.h"
+#include "algo/non_rigid_registration/embedded_deformation.h"
 
 class IRegistration
 {

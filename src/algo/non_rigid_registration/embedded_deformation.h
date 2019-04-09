@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../mLibInclude.h"
+#include "../../mLibInclude.h"
 #include <vector>
 #include <ceres/ceres.h>
 #include "deformation_graph.h"
-#include "knn.h"
+#include "../knn.h"
 
 class EmbeddedDeformationLine
 {

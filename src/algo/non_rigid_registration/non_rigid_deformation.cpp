@@ -1,6 +1,6 @@
 #include "non_rigid_deformation.h"
-#include "ceres_iteration_logger.h"
-#include "se3.h"
+#include "../ceres_iteration_logger.h"
+#include "../se3.h"
 //
 //NonRigidICP::NonRigidICP(const std::vector<ml::vec3f>& src,
 //						 const std::vector<ml::vec3f>& dst,

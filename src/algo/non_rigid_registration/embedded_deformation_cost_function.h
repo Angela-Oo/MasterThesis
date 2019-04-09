@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../mLibInclude.h"
+#include "../../mLibInclude.h"
 #include <vector>
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
-#include "ceres_math.h"
+#include "../ceres_math.h"
 
 
 struct EmbeddedDeformationCostFunction {

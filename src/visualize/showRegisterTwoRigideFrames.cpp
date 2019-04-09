@@ -2,8 +2,8 @@
 #include "showRegisterTwoRigideFrames.h"
 #include <numeric>
 #include "ext-depthcamera/calibratedSensorData.h"
-#include "algo/icp.h"
-#include "algo/non_rigid_deformation.h"
+#include "algo/rigid_registration/icp.h"
+#include "algo/non_rigid_registration/non_rigid_deformation.h"
 #include "algo/se3.h"
 
 

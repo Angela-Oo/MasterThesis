@@ -1,7 +1,7 @@
 #include "non_rigid_deformation.h"
 #include "as_rigid_as_possible_cost_function.h"
 #include "embedded_deformation_cost_function.h"
-#include "se3.h"
+#include "../se3.h"
 
 
 

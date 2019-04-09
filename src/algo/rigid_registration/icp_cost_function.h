@@ -1,12 +1,12 @@
 #pragma once
 
 
-#include "../mLibInclude.h"
+#include "../../mLibInclude.h"
 #include <vector>
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
 #include <functional>
-#include "knn.h"
+#include "../knn.h"
 
 
 struct PointToPointErrorSE3 {

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "../mLibInclude.h"
+#include "../../mLibInclude.h"
 #include <vector>
 #include <ceres/ceres.h>
 #include <functional>
-#include "knn.h"
+#include "../knn.h"
 
 ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &dst);
 

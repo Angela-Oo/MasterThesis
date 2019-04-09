@@ -1,9 +1,9 @@
 #include "embedded_deformation.h"
 #include "embedded_deformation_cost_function.h"
-#include "se3.h"
+#include "../se3.h"
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"
-#include "ceres_iteration_logger.h"
+#include "../ceres_iteration_logger.h"
 
 std::vector<size_t> EmbeddedDeformationLine::getNeighborIndices(size_t i, size_t size)
 {

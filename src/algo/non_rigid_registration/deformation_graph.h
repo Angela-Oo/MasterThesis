@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../mLibInclude.h"
+#include "../../mLibInclude.h"
 #include "boost/graph/adjacency_list.hpp"
 
 struct node_t {

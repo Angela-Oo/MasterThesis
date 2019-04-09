@@ -1,6 +1,6 @@
 #include "deformation_graph.h"
 #include <random>
-#include "knn.h"
+#include "../knn.h"
 
 ml::vec3d Node::deformedPosition()
 {

@@ -3,7 +3,7 @@
 #include "as_rigid_as_possible.h"
 #include "embedded_deformation.h"
 #include <vector>
-#include "knn.h"
+#include "../knn.h"
 //
 //class NonRigidICP
 //{

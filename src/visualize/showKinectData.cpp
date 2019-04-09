@@ -4,7 +4,7 @@
 
 #include "ext-depthcamera/sensorData.h"
 #include <numeric>
-#include "algo/icp.h"
+#include "algo/rigid_registration/icp.h"
 using namespace ml;
 
 
