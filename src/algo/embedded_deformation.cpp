@@ -78,7 +78,6 @@ EmbeddedDeformationLine::EmbeddedDeformationLine(const std::vector<ml::vec3f>& s
 std::vector<ml::vec3f> EmbeddedDeformation::getDeformedPoints()
 {
 	return _deformation_graph.deformPoints(_src);
-	//return _deformation_graph.getDeformedPoints();
 }
 
 std::vector<ml::vec3f> EmbeddedDeformation::getDeformationGraph()
@@ -87,12 +86,9 @@ std::vector<ml::vec3f> EmbeddedDeformation::getDeformationGraph()
 	auto & nodes = boost::get(node_t(), _deformation_graph._graph);
 
 	for (auto vp = boost::vertices(_deformation_graph._graph); vp.first != vp.second; ++vp.first) {
-		Node& src_i = nodes[*vp.first];
-		//ml::vec3f deformed = src_i.deformedPosition();
-		
-		ml::vec3f pos = src_i.deformedPosition();// .deformPosition(src_i._g);
+		Node& src_i = nodes[*vp.first];		
+		ml::vec3f pos = src_i.deformedPosition();
 		ml::vec3f global_pos = _deformation_graph._global_rigid_deformation.deformPosition(pos);
-		//ml::vec3f test_pos = src_i.deformPosition(src_i._g);
 		points.push_back(global_pos);
 	}
 	return points;
@@ -107,7 +103,6 @@ void EmbeddedDeformation::solveIteration()
 		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
 
 		ceres::Problem problem;
-		//for (int i = 0; i < _deformation_graph._graph.m_vertices.size(); ++i) {
 		auto & g = _deformation_graph._graph;
 		auto & global_node = _deformation_graph._global_rigid_deformation;
 
@@ -118,41 +113,12 @@ void EmbeddedDeformation::solveIteration()
 
 		auto & nodes = boost::get(node_t(), g);
 
-		//for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-		//	Node& src_i = nodes[*vp.first];
-
-		//	ml::vec3f pos = src_i.deformPosition(src_i._g);
-		//	ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
-		//	unsigned int i = _nn_search.nearest_index(pos_deformed);
-
-		//	std::vector<Node> neighbor_nodes_w;
-		//	std::vector<Node*> neighbor_nodes;
-		//	for (auto & n_id : src_i._nearestNeighbors) {
-		//		neighbor_nodes_w.push_back(nodes[n_id]);	
-		//		neighbor_nodes.push_back(&nodes[n_id]);
-		//	}
-		//	auto weights = _deformation_graph.weights(src_i._g, neighbor_nodes_w);
-
-		//	
-		//	ceres::CostFunction* cost_function = FitEDCostFunction::Create(_dst[i], src_i._g, global_node._g, neighbor_nodes[0]->_g, neighbor_nodes[1]->_g, neighbor_nodes[2]->_g, weights);
-		//	//auto loss_function = ceres::ScaledLoss(NULL, src_i._w, ceres::TAKE_OWNERSHIP);
-		//	double weight = a_fit * std::pow(src_i._w, 2);
-		//	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-		//	//auto loss_function = new ceres::ScaledLoss(NULL, a_fit, ceres::TAKE_OWNERSHIP);			
-		//	problem.AddResidualBlock(cost_function, loss_function, 
-		//							(&global_node._r)->getData(), (&global_node._t)->getData(), 
-		//							(&(neighbor_nodes[0])->_r)->getData(), (&(neighbor_nodes[0])->_t)->getData(),
-		//							(&(neighbor_nodes[1])->_r)->getData(), (&(neighbor_nodes[1])->_t)->getData(),
-		//							(&(neighbor_nodes[2])->_r)->getData(), (&(neighbor_nodes[2])->_t)->getData());
-		//	
-		//}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];
 
-			ml::vec3f pos = src_i.deformedPosition();// .deformPosition(src_i._g);
+			ml::vec3f pos = src_i.deformedPosition();
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 			unsigned int i = _nn_search.nearest_index(pos_deformed);
-			//unsigned int i = _nn_search.nearest_index(src_i._g);
 			
 			ceres::CostFunction* cost_function = FitStarCostFunction::Create(_dst[i], src_i._g, global_node._g);
 			double weight = a_fit * std::pow(src_i._w, 2);
@@ -193,8 +159,6 @@ void EmbeddedDeformation::solveIteration()
 
 		_total_time_in_ms += logger.get_time_in_ms();
 	}
-
-	//return getDeformedPoints();
 }
 
 std::vector<ml::vec3f> EmbeddedDeformation::solve()
@@ -218,7 +182,7 @@ EmbeddedDeformation::EmbeddedDeformation(const std::vector<ml::vec3f>& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, 10)//00)
+	, _deformation_graph(src, 600)//10
 	, _nn_search(dst)
 {
 	std::cout << "\nCeres Solver" << std::endl;

@@ -5,7 +5,6 @@
 ml::vec3d Node::deformedPosition()
 {
 	return _g + _t;
-	//return (_r * _g) + _t;
 }
 
 ml::vec3d Node::deformPosition(ml::vec3f pos)
@@ -83,9 +82,7 @@ ml::vec3f DeformationGraph::deformPoint(const ml::vec3f & point, std::vector<ver
 	{
 		nodes.push_back(all_nodes[k_nearest_node_indices[i]]);
 	}
-
-
-	//global_point = point;
+	
 	std::vector<double> w = weights(point, nodes);
 	
 	ml::vec3f deformed_point = ml::vec3f::origin;

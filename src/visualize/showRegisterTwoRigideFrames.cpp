@@ -111,19 +111,12 @@ NonRigidRegistration::NonRigidRegistration()
 		float x = 0.01 *static_cast<float>(i);
 		_points_a.push_back({ x,0.,0. });
 	}
-	//_points_a.push_back({ 0.05,0.,0. });
-	//_points_a.push_back({ 0.1,0.,0. });
-	//_points_a.push_back({ 0.15,0.,0. });
-	//_points_a.push_back({ 0.2,0.,0. });
-	//_points_a.push_back({ 0.25,0.,0. });
 
 	_points_b = _points_a;
 	for (int i = 25; i < 50; i++) {
 		float z = 0.005 *static_cast<double>(i-24);
 		_points_b[i].y = z;
 	}
-	//_points_b[5].y = 0.1;
-	//_points_b[5].x = 0.2;
 }
 
 NonRigidRegistration::NonRigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b)
@@ -176,6 +169,10 @@ void ShowTwoRigideRegisteredFrames::renderPoints()
 	transform(render_points_dg);
 
 	// render point clouds
+	std::vector<ml::vec4f> color_frame_dg(render_points_dg.size());
+	std::fill(color_frame_dg.begin(), color_frame_dg.end(), ml::RGBColor::Blue);
+	m_pointCloudFrameDG.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_dg, color_frame_dg));
+
 	std::vector<ml::vec4f> color_frame_A(render_points_a.size());
 	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Yellow);
 	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_a, color_frame_A));
@@ -184,9 +181,7 @@ void ShowTwoRigideRegisteredFrames::renderPoints()
 	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
 	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_b, color_frame_B));
 
-	std::vector<ml::vec4f> color_frame_dg(render_points_dg.size());
-	std::fill(color_frame_dg.begin(), color_frame_dg.end(), ml::RGBColor::Blue);
-	m_pointCloudFrameDG.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_dg, color_frame_dg));
+
 }
 
 void ShowTwoRigideRegisteredFrames::initICP()
@@ -201,8 +196,8 @@ void ShowTwoRigideRegisteredFrames::initICP()
 	for (int i = 0; i < 6; i++)
 		_sensor_data->processFrame();
 
-	_points_a = _sensor_data->getPoints(0, 4);
-	_points_b = _sensor_data->getPoints(5, 4);
+	_points_a = _sensor_data->getPoints(0);
+	_points_b = _sensor_data->getPoints(4);
 
 	float scale_factor = 0.004;
 	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
@@ -233,8 +228,8 @@ void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
 	m_constants.init(app.graphics);	
 
-	//initICP();
-	initNonRigidRegistration();
+	initICP();
+	//initNonRigidRegistration();
 
 	renderPoints();
 }
