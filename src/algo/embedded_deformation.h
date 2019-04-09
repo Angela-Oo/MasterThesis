@@ -43,6 +43,7 @@ public:
 	bool finished();
 	void solveIteration();
 	std::vector<ml::vec3f> solve();
+	std::vector<ml::vec3f> getDeformationGraph();
 public:
 	// expect src and dst points to match at the same array position
 	EmbeddedDeformation(const std::vector<ml::vec3f>& src,

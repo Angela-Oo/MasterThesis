@@ -4,19 +4,27 @@
 
 ml::vec3d Node::deformedPosition()
 {
-	return (_r * _g) + _t;
+	return _g + _t;
+	//return (_r * _g) + _t;
+}
+
+ml::vec3d Node::deformPosition(ml::vec3f pos)
+{
+	return (_r*(pos - _g)) + _g + _t;
 }
 
 Node::Node(ml::vec3f g)
 	: _g(g)
 	, _r(ml::mat3d::identity())
 	, _t(ml::vec3d::origin)
+	, _w(1.)
 {}
 
 Node::Node()
 	: _g(ml::vec3f::origin)
 	, _r(ml::mat3d::identity())
 	, _t(ml::vec3d::origin)
+	, _w(1.)
 {}
 
 std::vector<int> uniform_sample_node_indices(size_t number_of_points, size_t number_of_nodes)
@@ -28,6 +36,18 @@ std::vector<int> uniform_sample_node_indices(size_t number_of_points, size_t num
 	std::vector<int> node_indices;
 	for (size_t i = 0; i < number_of_nodes; ++i) {
 		node_indices.push_back(distribution(gen));
+	}
+	return node_indices;
+}
+
+std::vector<int> uniform_sample_node_indices_test(size_t number_of_points, size_t number_of_nodes)
+{
+	size_t step_size = floor(number_of_points / number_of_nodes);
+
+	std::vector<int> node_indices;
+	for (size_t i = 0; i < number_of_nodes; ++i) {
+		size_t x = step_size * i;
+		node_indices.push_back(x);
 	}
 	return node_indices;
 }
@@ -64,18 +84,47 @@ ml::vec3f DeformationGraph::deformPoint(const ml::vec3f & point, std::vector<ver
 		nodes.push_back(all_nodes[k_nearest_node_indices[i]]);
 	}
 
-	ml::vec3f global_point = (_global_rigid_deformation._r*(point - _global_rigid_deformation._g)) + _global_rigid_deformation._g + _global_rigid_deformation._t;
 
-	std::vector<double> w = weights(global_point, nodes);
-
+	//global_point = point;
+	std::vector<double> w = weights(point, nodes);
+	
 	ml::vec3f deformed_point = ml::vec3f::origin;
 	for (size_t i = 0; i < nodes.size() - 1; ++i)
 	{
 		auto & node = nodes[i];
-		ml::vec3f transformed_point = ((node._r *(global_point - node._g)) + node._g + node._t) * w[i];
+		ml::vec3f transformed_point = node.deformPosition(point) * w[i];
 		deformed_point += transformed_point;
 	}
-	return deformed_point;
+
+	ml::vec3f global_deformed_point = _global_rigid_deformation.deformPosition(deformed_point);
+	return global_deformed_point;
+}
+
+
+std::vector<ml::vec3f> DeformationGraph::deformPoints(const std::vector<ml::vec3f> & points)
+{
+	std::vector<ml::vec3f> node_positions;
+	std::vector<vertex_index> node_indices;
+	auto all_nodes = boost::get(node_t(), _graph);
+	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
+		Node n = all_nodes[*vp.first];
+		node_positions.push_back(n._g);
+		node_indices.push_back(*vp.first);
+	}
+
+	KNN knn(node_positions, k);
+
+	std::vector<ml::vec3f> deformed_points;
+	for (auto & p : points)
+	{
+		std::vector<unsigned int> kni = knn.k_nearest_indices(p, k);
+		std::vector<vertex_index> nn;
+		for (auto n : kni) {
+			nn.push_back(node_indices[n]);
+		}
+		deformed_points.push_back(deformPoint(p, nn));
+	}
+	return deformed_points;
 }
 
 std::vector<ml::vec3f> DeformationGraph::getDeformedPoints()
@@ -91,7 +140,7 @@ DeformationGraph::DeformationGraph(const std::vector<ml::vec3f> & points, size_t
 	: _points(points)
 	, _graph(0)
 {
-	std::vector<int> node_point_indices = uniform_sample_node_indices(points.size(), number_of_nodes);
+	std::vector<int> node_point_indices = uniform_sample_node_indices_test(points.size(), number_of_nodes);
 
 	std::vector<ml::vec3f> node_positions;
 	std::vector<vertex_index> node_indices;
@@ -107,6 +156,15 @@ DeformationGraph::DeformationGraph(const std::vector<ml::vec3f> & points, size_t
 	_global_rigid_deformation._g /= node_point_indices.size();
 
 	KNN knn(node_positions, k);
+	auto& nodes = boost::get(node_t(), _graph);
+	for (auto & i : node_indices)
+	{	
+		Node& node = nodes[i];
+		std::vector<unsigned int> kni = knn.k_nearest_indices(node._g, k);		
+		for (auto n : kni) {
+			node._nearestNeighbors.push_back(node_indices[n]);
+		}
+	}
 	for (auto & p : _points) {
 		std::vector<unsigned int> nodes = knn.k_nearest_indices(p, k);
 		std::vector<vertex_index> k_nearest_node_indices_of_p;
@@ -115,7 +173,7 @@ DeformationGraph::DeformationGraph(const std::vector<ml::vec3f> & points, size_t
 		}
 		_k_nearest_nodes_of_points.push_back(k_nearest_node_indices_of_p);
 		
-		for (size_t i = 0; i < nodes.size() - 1; ++i) {
+		for (size_t i = 0; i < nodes.size() - 2; ++i) {
 			auto n1 = node_indices[nodes[i]];
 			auto n2 = node_indices[nodes[i + 1]];
 			if(boost::edge(n1, n2, _graph).second == false)

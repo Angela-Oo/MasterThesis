@@ -12,6 +12,7 @@ public:
 	virtual void solve() = 0;
 	virtual std::vector<ml::vec3f> getPointsA() = 0;
 	virtual std::vector<ml::vec3f> getPointsB() = 0;
+	virtual std::vector<ml::vec3f> getPointsDeformationGraph() = 0;
 	virtual ~IRegistration() = default;
 };
 
@@ -27,6 +28,7 @@ public:
 	void icp_calc_nn_in_cost_function();
 	std::vector<ml::vec3f> getPointsA() override;
 	std::vector<ml::vec3f> getPointsB() override;
+	std::vector<ml::vec3f> getPointsDeformationGraph() override;
 public:
 	RigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b);
 };
@@ -43,6 +45,7 @@ public:
 	void solve() override;
 	std::vector<ml::vec3f> getPointsA() override;
 	std::vector<ml::vec3f> getPointsB() override;
+	std::vector<ml::vec3f> getPointsDeformationGraph() override;
 public:
 	NonRigidRegistration();
 	NonRigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b);
@@ -55,6 +58,7 @@ private:
 	std::vector<ml::vec3f> _points_b;
 	ml::D3D11TriMesh m_pointCloudFrameA;
 	ml::D3D11TriMesh m_pointCloudFrameB;
+	ml::D3D11TriMesh m_pointCloudFrameDG;
 	ml::D3D11ShaderManager m_shaderManager;
 	ml::D3D11ConstantBuffer<ConstantBuffer> m_constants;
 	std::unique_ptr<CalibrateSensorDataWrapper> _sensor_data;
