@@ -34,10 +34,15 @@ class EmbeddedDeformation
 	DeformationGraph _deformation_graph;
 	KNN _nn_search;
 	double _current_cost = 1.;
-	double _current_tol = 1.;
+	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 50;
 	long long _total_time_in_ms = 0;
+
+	double a_rigid = 1000.;// 1.;// 1000;
+	double a_smooth = 100.;// 0.1;// 100;
+	double a_conf = 100.;// 1.;// 100;
+	double a_fit = 0.1;
 public:
 	std::vector<ml::vec3f> getDeformedPoints();
 	bool finished();

@@ -106,10 +106,6 @@ void EmbeddedDeformation::solveIteration()
 		auto & g = _deformation_graph._graph;
 		auto & global_node = _deformation_graph._global_rigid_deformation;
 
-		double a_rigid = 1.;// 1000;
-		double a_smooth = 0.1;// 100;
-		double a_conf = 1.;// 100;
-		double a_fit = 0.1;
 
 		auto & nodes = boost::get(node_t(), g);
 
@@ -154,8 +150,16 @@ void EmbeddedDeformation::solveIteration()
 
 		ceres::Solve(_options, &problem, &summary);
 
-		_current_tol = abs(_current_cost - summary.final_cost);
+		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
+
+		if (abs(_current_cost - _last_cost) < 0.00001 *(1 + _current_cost) &&
+			(a_rigid > 1 || a_smooth > 0.1 || a_conf > 1.))
+		{
+			a_rigid /= 2.;
+			a_smooth /= 2.;
+			a_conf /= 2.;
+		}
 
 		_total_time_in_ms += logger.get_time_in_ms();
 	}
@@ -172,8 +176,9 @@ std::vector<ml::vec3f> EmbeddedDeformation::solve()
 
 bool EmbeddedDeformation::finished()
 {
-	double tol = 0.00001;
-	return (_solve_iteration >= _max_iterations);// || _current_tol < tol);
+	double tol = 0.000001;
+	return (_solve_iteration >= _max_iterations) || 
+		abs(_last_cost - _current_cost) < (tol * _current_cost);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const std::vector<ml::vec3f>& src,
