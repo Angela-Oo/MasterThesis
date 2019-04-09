@@ -573,6 +573,12 @@
     <ClCompile Include="src\algo\se3.cpp">
       <Filter>algo</Filter>
     </ClCompile>
+    <ClCompile Include="src\algo\non_rigid_registration\node.cpp">
+      <Filter>algo\non rigid registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\non_rigid_registration\deformation_graph_knn.cpp">
+      <Filter>algo\non rigid registration</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\pointCloud.hlsl">
