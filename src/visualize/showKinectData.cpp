@@ -5,6 +5,7 @@
 #include "ext-depthcamera/sensorData.h"
 #include <numeric>
 #include "algo/rigid_registration/icp.h"
+#include "algo/non_rigid_registration/embedded_deformation.h"
 using namespace ml;
 
 
@@ -60,8 +61,8 @@ void ShowKinectData::render(ml::Cameraf& camera)
 	if (_record_frames) {
 		_sensor_data_wrapper->processFrame();
 		renderPoints(_frame);
-
 		_frame++;
+		_current_frame = _frame;
 	}
 
 	ConstantBuffer constants;
@@ -82,7 +83,35 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 	auto points_a = _sensor_data_wrapper->getPoints(frame_a);
 	auto points_b = _sensor_data_wrapper->getPoints(frame_b);
 
+	ceres::Solver::Options options;
+	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+	options.max_num_iterations = 50;
+	options.logging_type = ceres::LoggingType::SILENT;
+	options.minimizer_progress_to_stdout = false;
+	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
+	options.preconditioner_type = ceres::PreconditionerType::JACOBI;
 
+	ICPNN icpnn(points_a, points_b, options);
+	ml::mat4f transformation = icpnn.solve();
+
+	std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
+
+	std::vector<ml::vec4f> color_frame_A(points_a.size());
+	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
+	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_a, color_frame_A));
+
+	std::vector<ml::vec4f> color_frame_B(points_b.size());
+	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
+	m_pointCloudB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_b, color_frame_B));
+}
+
+void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
+{
+	auto points_a = _sensor_data_wrapper->getPoints(frame_a);
+	auto points_b = _sensor_data_wrapper->getPoints(frame_b);
 
 	ceres::Solver::Options options;
 	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
@@ -95,31 +124,9 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
 	options.preconditioner_type = ceres::PreconditionerType::JACOBI;
 
-	//ICPPointSubset icp(points_a, points_b, options);
-	//ml::mat4f transformation = icp.solve();
-
-	//every 6. point Ceres Solver Iteration: 1 sub iterations: -1, Duration 2s 747ms, Total time: 4s 992ms, Initial cost: 0.185432, Final cost: 0.185105, Termination: 0
-	//every 3. point Ceres Solver Iteration: 2 sub iterations: -1, Duration 12s 39ms, Total time: 33s 132ms, Initial cost: 0.406642, Final cost: 0.406586, Termination: 0
-	//every 2. point Ceres Solver Iteration: 3 sub iterations: -1, Duration 29s 881ms, Total time: 113s 438ms, Initial cost: 1.38022, Final cost: 1.3802, Termination: 0
-	ICPNN icpnn(points_a, points_b, options);
-	ml::mat4f transformation = icpnn.solve();
-
-	//every 6. point Ceres Solver Iteration: 0 sub iterations: -1, Duration 2s 618ms, Total time: 2s 618ms, Initial cost: 0.185864, Final cost: 0.185661, Termination: 0
-	//every 3. point Ceres Solver Iteration: 0 sub iterations: -1, Duration 10s 858ms, Total time: 10s 858ms, Initial cost: 0.409008, Final cost: 0.408678, Termination: 0
-	//every 2. point Ceres Solver Iteration: 0 sub iterations: -1, Duration 27s 415ms, Total time: 27s 415ms, Initial cost: 1.37843, Final cost: 1.3725, Termination: 0
-	//ICP icp(points_a, points_b, options);
-	//transformation = icp.solveFixNN();
-
-	// debug
-	//every 6. point Ceres Solver Iteration: 0 sub iterations: -1, Duration 10s 492ms, Total time: 10s 492ms, Initial cost: 0.25272, Final cost: 0.25272, Termination: 0
-	//every 3. point  Ceres Solver Iteration: 0 sub iterations: 6, Duration 46s 824ms, Total time: 46s 824ms, Initial cost: 0.405029, Final cost: 0.405028, Termination: 0
-	//every 2. point Ceres Solver Iteration: 0 sub iterations: 7, Duration 125s 500ms, Total time: 125s 500ms, Initial cost: 0.458941, Final cost: 0.458941, Termination: 0
-	//ICP icp(points_a, points_b, options);
-	//ml::mat4f transformation = icp.solve();
-
-	std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
-
-
+	auto embedded_deformation = std::make_unique<EmbeddedDeformation>(points_a, points_b, options);
+	points_a = embedded_deformation->solve();
+	//std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
 
 	std::vector<ml::vec4f> color_frame_A(points_a.size());
 	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
@@ -143,11 +150,35 @@ void ShowKinectData::key(UINT key) {
 				std::cout << "stop recording frames" << std::endl;
 		}
 	}
+	else if (key == KEY_2) 
+	{
+		_current_frame++;
+		if (_current_frame == _frame)
+			_current_frame = 0;
+		renderPoints(_current_frame);
+	}
+	else if (key == KEY_1)
+	{
+		if (_current_frame == 0)
+			_current_frame = _frame - 1;
+		else
+			_current_frame--;
+		renderPoints(_current_frame);
+	}
 	else if (key == KEY_I)
 	{
-		std::cout << "calculate icp between last two frames" << std::endl;
-		icp(_frame - 2, _frame-1);
-		std::cout << "finished icp" << std::endl;
+		if (_selected_frame_for_registration.size() < 2) {
+			if (_selected_frame_for_registration.empty() || (_selected_frame_for_registration.size() == 1 && _selected_frame_for_registration[0] != _current_frame)) {
+				std::cout << "select frame " << _current_frame << " for non rigid registration" << std::endl;
+				_selected_frame_for_registration.push_back(_current_frame);
+			}
+		}
+		else {
+			std::cout << "calculate icp between the two selected frames" << std::endl;
+			icp(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
+			std::cout << "finished icp" << std::endl;
+			_selected_frame_for_registration.clear();
+		}
 	}
 	else if (key == KEY_P) {
 		std::cout << "save recorded frames as .sens file" << std::endl;

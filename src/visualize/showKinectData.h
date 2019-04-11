@@ -11,6 +11,7 @@ private:
 	void renderPoints(int frame);
 	ml::mat4f getWorldTransformation();
 	void icp(int frame_a, int frame_b);
+	void non_rigid_registration(int frame_a, int frame_b);
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;
@@ -25,6 +26,8 @@ private:
 	//std::unique_ptr<SensorDataWrapper> _sensor_data_wrapper;
 	PrimeSenseSensor _depth_sensor;
 	unsigned int _frame = 0;
+	unsigned int _current_frame = 0;
+	std::vector<unsigned int> _selected_frame_for_registration;
 	std::chrono::time_point<std::chrono::system_clock> _start_time;
 	std::vector<ml::vec3f> _all_points;
 
