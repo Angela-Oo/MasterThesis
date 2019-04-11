@@ -5,6 +5,7 @@
 #include "kinect/ImageReaderSensor.h"
 #include "algo/rigid_registration/icp.h"
 #include "algo/non_rigid_registration/embedded_deformation.h"
+#include "algo/non_rigid_registration/as_rigid_as_possible.h"
 
 class IRegistration
 {
@@ -41,6 +42,7 @@ private:
 	std::vector<ml::vec3f> _points_b;
 	std::vector<ml::vec6d> _transformation;
 	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
+	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
 public:
 	void solve() override;
 	std::vector<ml::vec3f> getPointsA() override;

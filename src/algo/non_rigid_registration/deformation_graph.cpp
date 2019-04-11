@@ -110,7 +110,19 @@ std::vector<ml::vec3f> DeformationGraph::deformPoints(const std::vector<ml::vec3
 	return deformed_points;
 }
 
+std::vector<ml::vec3f> DeformationGraph::getDeformationGraph()
+{
+	std::vector<ml::vec3f> points;
+	auto & nodes = boost::get(node_t(), _graph);
 
+	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
+		Node& src_i = nodes[*vp.first];
+		ml::vec3f pos = src_i.deformedPosition();
+		ml::vec3f global_pos = _global_rigid_deformation.deformPosition(pos);
+		points.push_back(global_pos);
+	}
+	return points;
+}
 
 DeformationGraph::DeformationGraph(const std::vector<ml::vec3f> & points, size_t number_of_nodes)
 	: _graph(0)

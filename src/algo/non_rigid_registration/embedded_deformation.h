@@ -1,29 +1,10 @@
 #pragma once
 
-#include "../../mLibInclude.h"
+#include "mLibInclude.h"
 #include <vector>
 #include <ceres/ceres.h>
 #include "deformation_graph.h"
 #include "../knn.h"
-
-class EmbeddedDeformationLine
-{
-	std::vector<ml::vec3f> _src;
-	std::vector<ml::vec3f> _dst;
-	ceres::Solver::Options _options;
-	std::vector<ml::mat3d> _matrix;
-	std::vector<ml::vec3d> _solved_points;
-private:
-	std::vector<size_t> getNeighborIndices(size_t i, size_t size);
-public:
-	// expect src and dst points to match at the same array position
-	EmbeddedDeformationLine(const std::vector<ml::vec3f>& src,
-							const std::vector<ml::vec3f>& dst,
-							ceres::Solver::Options option);
-
-	std::vector<ml::vec3f> solve();
-};
-
 
 
 class EmbeddedDeformation
@@ -53,5 +34,6 @@ public:
 	// expect src and dst points to match at the same array position
 	EmbeddedDeformation(const std::vector<ml::vec3f>& src,
 						const std::vector<ml::vec3f>& dst,
-						ceres::Solver::Options option);	
+						ceres::Solver::Options option,
+						unsigned int number_of_deformation_nodes = 1000);
 };

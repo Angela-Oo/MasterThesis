@@ -18,6 +18,7 @@ private:
 	ml::vec3f deformPoint(const ml::vec3f & point, std::vector<Node> & k_plus_1_nearest_nodes);
 public:
 	std::vector<ml::vec3f> deformPoints(const std::vector<ml::vec3f> & points);
+	std::vector<ml::vec3f> getDeformationGraph();
 public:
 	DeformationGraph(const std::vector<ml::vec3f> & nodes, size_t number_of_nodes);
 };

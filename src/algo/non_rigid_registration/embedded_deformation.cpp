@@ -5,75 +5,7 @@
 #include "boost/graph/connected_components.hpp"
 #include "../ceres_iteration_logger.h"
 
-std::vector<size_t> EmbeddedDeformationLine::getNeighborIndices(size_t i, size_t size)
-{
-	std::vector<size_t> indices;
-	int j = static_cast<int>(i) - 1;
-	if (j >= 0)
-		indices.push_back(static_cast<size_t>(j));
-	j = static_cast<int>(i) + 1;
-	if (j < size)
-		indices.push_back(static_cast<size_t>(j));
-	return indices;
-}
 
-std::vector<ml::vec3f> EmbeddedDeformationLine::solve()
-{
-	ceres::Solver::Summary summary;
-	ceres::Problem problem;
-	for (int i = 0; i < _src.size(); ++i) {
-		auto neighbors = getNeighborIndices(i, _src.size());
-		for (auto & j : neighbors) {
-			ceres::CostFunction* cost_function = EmbeddedDeformationCostFunction::Create(_solved_points[i], _solved_points[j], _src[i], _src[j]);
-			problem.AddResidualBlock(cost_function, NULL, (&_matrix[i])->getData());
-		}
-	}
-	for (int i = 0; i < _src.size() - 1; ++i)
-	{
-		ceres::CostFunction* cost_function = RotationCostFunction::Create();
-		problem.AddResidualBlock(cost_function, NULL, (&_matrix[i])->getData());
-	}
-	for (int i = 1; i < _src.size() - 1; ++i) {
-		ml::vec3d * dst_i = &_solved_points[i];
-		auto neighbors = getNeighborIndices(i, _src.size());
-		for (auto & j : neighbors) {
-			ceres::CostFunction* cost_function = EmbeddedDeformationPointsCostFunction::Create(_src[i], _src[j], _matrix[i], _solved_points[j]);
-			problem.AddResidualBlock(cost_function, NULL, dst_i->array);
-		}
-	}
-	ceres::Solve(_options, &problem, &summary);
-
-	std::vector<ml::vec3f> solved_points;
-	for (int i = 0; i < _solved_points.size(); ++i) {
-		solved_points.push_back(ml::vec3d(_solved_points[i].x, _solved_points[i].y, _solved_points[i].z));
-	}
-	return solved_points;
-}
-
-EmbeddedDeformationLine::EmbeddedDeformationLine(const std::vector<ml::vec3f>& src,
-										 const std::vector<ml::vec3f>& dst,
-										 ceres::Solver::Options option)
-	: _src(src)
-	, _dst(dst)
-	, _options(option)
-{
-	for (int i = 0; i < _src.size(); ++i) {
-		_matrix.push_back(ml::mat3d::identity());
-	}
-	for (int i = 0; i < _dst.size(); ++i) {
-		_solved_points.push_back(ml::vec3d(_dst[i].x, _dst[i].y, _dst[i].z));
-	}
-
-	std::cout << "\nCeres Solver" << std::endl;
-	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
-	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
-	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
-}
-
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 
 std::vector<ml::vec3f> EmbeddedDeformation::getDeformedPoints()
 {
@@ -82,16 +14,7 @@ std::vector<ml::vec3f> EmbeddedDeformation::getDeformedPoints()
 
 std::vector<ml::vec3f> EmbeddedDeformation::getDeformationGraph()
 {
-	std::vector<ml::vec3f> points;
-	auto & nodes = boost::get(node_t(), _deformation_graph._graph);
-
-	for (auto vp = boost::vertices(_deformation_graph._graph); vp.first != vp.second; ++vp.first) {
-		Node& src_i = nodes[*vp.first];		
-		ml::vec3f pos = src_i.deformedPosition();
-		ml::vec3f global_pos = _deformation_graph._global_rigid_deformation.deformPosition(pos);
-		points.push_back(global_pos);
-	}
-	return points;
+	return _deformation_graph.getDeformationGraph();
 }
 
 void EmbeddedDeformation::solveIteration()
@@ -183,11 +106,12 @@ bool EmbeddedDeformation::finished()
 
 EmbeddedDeformation::EmbeddedDeformation(const std::vector<ml::vec3f>& src,
 										 const std::vector<ml::vec3f>& dst,
-										 ceres::Solver::Options option)
+										 ceres::Solver::Options option,
+										 unsigned int number_of_deformation_nodes)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, 600)//10
+	, _deformation_graph(src, number_of_deformation_nodes)
 	, _nn_search(dst)
 {
 	std::cout << "\nCeres Solver" << std::endl;

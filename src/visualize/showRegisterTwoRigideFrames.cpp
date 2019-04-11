@@ -77,11 +77,16 @@ void NonRigidRegistration::solve()
 		options.logging_type = ceres::LoggingType::SILENT;
 		options.minimizer_progress_to_stdout = false;
 
-		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options);
+		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options);
+		_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, 1000);
 	}
-	if (!_embedded_deformation->finished()) {
+	if (_embedded_deformation && !_embedded_deformation->finished()) {
 		_embedded_deformation->solveIteration();
 		_points_a = _embedded_deformation->getDeformedPoints();
+	}
+	if (_as_rigid_as_possible && !_as_rigid_as_possible->finished()) {
+		_as_rigid_as_possible->solveIteration();
+		_points_a = _as_rigid_as_possible->getDeformedPoints();
 	}
 }
 
@@ -100,6 +105,8 @@ std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
 {
 	if (_embedded_deformation)
 		return _embedded_deformation->getDeformationGraph();
+	else if (_as_rigid_as_possible)
+		return _as_rigid_as_possible->getDeformationGraph();
 	else
 		return std::vector<ml::vec3f>();
 }

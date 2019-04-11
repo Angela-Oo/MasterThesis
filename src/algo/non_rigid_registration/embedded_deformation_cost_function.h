@@ -187,19 +187,6 @@ struct FitStarCostFunction {
 };
 
 
-template<typename T>
-void deform(const T * const p, const T * const g, const T * const r, const T * const t, const T const w, T* result)
-{
-	substract(p, g, result);
-	multiply(r, result, result);
-	addition(result, g, result);
-	addition(result, t, result);
-	result[0] *= w;
-	result[1] *= w;
-	result[2] *= w;
-}
-
-
 struct ConfCostFunction {
 
 	ConfCostFunction() 
