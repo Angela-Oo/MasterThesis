@@ -147,44 +147,44 @@ struct SmoothCostFunction {
 	}
 };
 
-
-struct FitStarCostFunction {
-	const ml::vec3f& _v;
-	const ml::vec3f& _n;
-	const ml::vec3f& _g;
-
-	FitStarCostFunction(const ml::vec3f &v, const ml::vec3f &n, const ml::vec3f &g) :
-		_v(v), _n(n), _g(g)
-	{ }
-
-	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create(const ml::vec3f &v, const ml::vec3f &n, const ml::vec3f &g) {
-		return (new ceres::AutoDiffCostFunction<FitStarCostFunction, 3, 9, 3, 3>(new FitStarCostFunction(v, n, g)));
-	}
-
-	template <typename T>
-	bool operator()(const T* const global_rotation, const T* const global_translation, const T* const translation, T* residuals) const
-	{
-		T n[3] = { T(_n[0]), T(_n[1]), T(_n[2]) };
-		T g[3] = { T(_g[0]), T(_g[1]), T(_g[2]) };
-
-		// local deformation of node position
-		addition(n, translation, n);
-
-		// global deformation of node position
-		substract(n, g, n);
-		multiply(global_rotation, n, n);
-		addition(n, g, n);
-		addition(n, global_translation, n);
-
-		// The error is the difference between the predicted and observed position.
-		residuals[0] = n[0] - T(_v[0]);
-		residuals[1] = n[1] - T(_v[1]);
-		residuals[2] = n[2] - T(_v[2]);
-
-		return true;
-	}
-};
+//
+//struct FitStarCostFunction {
+//	const ml::vec3f& _v;
+//	const ml::vec3f& _n;
+//	const ml::vec3f& _g;
+//
+//	FitStarCostFunction(const ml::vec3f &v, const ml::vec3f &n, const ml::vec3f &g) :
+//		_v(v), _n(n), _g(g)
+//	{ }
+//
+//	// Factory to hide the construction of the CostFunction object from the client code.
+//	static ceres::CostFunction* Create(const ml::vec3f &v, const ml::vec3f &n, const ml::vec3f &g) {
+//		return (new ceres::AutoDiffCostFunction<FitStarCostFunction, 3, 9, 3, 3>(new FitStarCostFunction(v, n, g)));
+//	}
+//
+//	template <typename T>
+//	bool operator()(const T* const global_rotation, const T* const global_translation, const T* const translation, T* residuals) const
+//	{
+//		T n[3] = { T(_n[0]), T(_n[1]), T(_n[2]) };
+//		T g[3] = { T(_g[0]), T(_g[1]), T(_g[2]) };
+//
+//		// local deformation of node position
+//		addition(n, translation, n);
+//
+//		// global deformation of node position
+//		substract(n, g, n);
+//		multiply(global_rotation, n, n);
+//		addition(n, g, n);
+//		addition(n, global_translation, n);
+//
+//		// The error is the difference between the predicted and observed position.
+//		residuals[0] = n[0] - T(_v[0]);
+//		residuals[1] = n[1] - T(_v[1]);
+//		residuals[2] = n[2] - T(_v[2]);
+//
+//		return true;
+//	}
+//};
 
 
 struct FitStarWCostFunction {

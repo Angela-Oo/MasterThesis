@@ -39,13 +39,9 @@ void EmbeddedDeformation::solveIteration()
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 			unsigned int i = _nn_search.nearest_index(pos_deformed);
 			
-			//ceres::CostFunction* cost_function = FitStarCostFunction::Create(_dst[i], src_i._g, global_node._g);
 			ceres::CostFunction* cost_function = FitStarWCostFunction::Create(_dst[i], src_i._g, global_node._g);
-			//double weight = a_fit * std::pow(src_i._w, 2);
 			double weight = a_fit;
-			auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);		
-			//problem.AddResidualBlock(cost_function, loss_function, 
-			//						(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData());
+			auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function, loss_function,
 				(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData(), &src_i._w);
 		}

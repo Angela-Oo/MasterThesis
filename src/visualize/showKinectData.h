@@ -40,4 +40,5 @@ private:
 	std::vector<ml::vec3f> _all_points;
 
 	bool _record_frames = false;
+	bool _solve_non_rigid_registration = false;
 };

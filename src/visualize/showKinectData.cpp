@@ -67,7 +67,7 @@ void ShowKinectData::render(ml::Cameraf& camera)
 		_current_frame = _frame;
 		_frame++;
 	}
-	else if (_registration && _selected_frame_for_registration.size() == 2) {
+	else if (_solve_non_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
 		non_rigid_registration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
 	}
 
@@ -117,8 +117,8 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 {
 	if (!_registration) {
-		_points_a = _sensor_data_wrapper->getPoints(frame_a);
-		_points_b = _sensor_data_wrapper->getPoints(frame_b);
+		_points_a = _sensor_data_wrapper->getPoints(frame_a, 2);
+		_points_b = _sensor_data_wrapper->getPoints(frame_b, 2);
 
 		auto points_a_icp = _points_a;
 		auto points_b_icp = _points_b;
@@ -136,7 +136,9 @@ void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 		}
 		else {
 			_selected_frame_for_registration.clear();
-			std::cout << "select next two frames" << std::endl;
+			_solve_non_rigid_registration = false;
+			_registration.reset();
+			std::cout << "finished, select next two frames" << std::endl;
 		}
 	}	
 }
@@ -200,13 +202,12 @@ void ShowKinectData::key(UINT key) {
 				_selected_frame_for_registration.push_back(_current_frame);
 			}
 		}
-		else {
-			//std::cout << "calculate icp between the two selected frames" << std::endl;
-			//icp(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
+		else if(!_registration){
 			std::cout << "init non rigid registration between the two selected frames" << std::endl;
 			non_rigid_registration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
-			//std::cout << "finished icp" << std::endl;
-			//_selected_frame_for_registration.clear();
+		}
+		else {
+			_solve_non_rigid_registration = true;
 		}
 	}
 	else if (key == KEY_P) {
