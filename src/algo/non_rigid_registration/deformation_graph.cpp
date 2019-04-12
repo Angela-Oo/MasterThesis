@@ -132,8 +132,10 @@ DeformationGraph::DeformationGraph(const std::vector<ml::vec3f> & points, size_t
 	for (int index : node_point_indices)
 	{
 		vertex_index v = boost::add_vertex(_graph);
-		Node n(points[index]);
-		boost::put(boost::get(node_t(), _graph), v, n);
+		if (points.size() > index) {
+			Node n(points[index]);
+			boost::put(boost::get(node_t(), _graph), v, n);
+		}
 	}
 
 	_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);

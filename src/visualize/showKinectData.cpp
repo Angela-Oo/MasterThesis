@@ -6,13 +6,16 @@
 #include <numeric>
 #include "algo/rigid_registration/icp.h"
 #include "algo/non_rigid_registration/embedded_deformation.h"
+#include "algo/registration.h"
+
+
 using namespace ml;
 
 
 void ShowKinectData::renderPoints(int frame)
 {
 	auto points = _sensor_data_wrapper->getPoints(frame, 3);
-	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
+	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
 }
 
 mat4f ShowKinectData::getWorldTransformation()
@@ -61,8 +64,11 @@ void ShowKinectData::render(ml::Cameraf& camera)
 	if (_record_frames) {
 		_sensor_data_wrapper->processFrame();
 		renderPoints(_frame);
-		_frame++;
 		_current_frame = _frame;
+		_frame++;
+	}
+	else if (_registration && _selected_frame_for_registration.size() == 2) {
+		non_rigid_registration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
 	}
 
 	ConstantBuffer constants;
@@ -72,8 +78,8 @@ void ShowKinectData::render(ml::Cameraf& camera)
 	m_constants.updateAndBind(constants, 0);
 	m_shaderManager.bindShaders("pointCloud");
 	m_constants.bind(0);
-	m_pointCloud.render();
-	m_pointCloudB.render();
+	m_pointCloudFrameA.render();
+	m_pointCloudFrameB.render();
 }
 
 
@@ -101,40 +107,61 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 
 	std::vector<ml::vec4f> color_frame_A(points_a.size());
 	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
-	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_a, color_frame_A));
+	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_a, color_frame_A));
 
 	std::vector<ml::vec4f> color_frame_B(points_b.size());
 	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
-	m_pointCloudB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_b, color_frame_B));
+	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_b, color_frame_B));
 }
 
 void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 {
-	auto points_a = _sensor_data_wrapper->getPoints(frame_a);
-	auto points_b = _sensor_data_wrapper->getPoints(frame_b);
+	if (!_registration) {
+		_points_a = _sensor_data_wrapper->getPoints(frame_a);
+		_points_b = _sensor_data_wrapper->getPoints(frame_b);
 
-	ceres::Solver::Options options;
-	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-	options.max_num_iterations = 50;
-	options.logging_type = ceres::LoggingType::SILENT;
-	options.minimizer_progress_to_stdout = false;
-	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
-	options.preconditioner_type = ceres::PreconditionerType::JACOBI;
+		auto points_a_icp = _points_a;
+		auto points_b_icp = _points_b;
 
-	auto embedded_deformation = std::make_unique<EmbeddedDeformation>(points_a, points_b, options);
-	points_a = embedded_deformation->solve();
-	//std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
+		auto translation = ml::mat4f::translation({ 1.f, 0., 0. });
+		std::for_each(points_a_icp.begin(), points_a_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
+		std::for_each(points_b_icp.begin(), points_b_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
+		_registration = std::make_unique<NonRigidRegistration>(points_a_icp, points_b_icp);
+		renderRegisteredPoints();
+	}
+	else {		
+		if (_registration->solve()) {
+			std::cout << "solve non rigid registration" << std::endl;
+			renderRegisteredPoints();
+		}
+		else {
+			_selected_frame_for_registration.clear();
+			std::cout << "select next two frames" << std::endl;
+		}
+	}	
+}
 
-	std::vector<ml::vec4f> color_frame_A(points_a.size());
-	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
-	m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_a, color_frame_A));
+void ShowKinectData::renderRegisteredPoints()
+{
+	std::vector<ml::vec3f> render_points_a = _registration->getPointsA();
+	std::vector<ml::vec3f> render_points_b = _registration->getPointsB();
+	std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
 
-	std::vector<ml::vec4f> color_frame_B(points_b.size());
+	render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
+	render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
+	
+	// render point clouds
+	std::vector<ml::vec4f> color_frame_dg(render_points_dg.size());
+	std::fill(color_frame_dg.begin(), color_frame_dg.end(), ml::RGBColor::Blue);
+	m_pointCloudFrameDG.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_dg, color_frame_dg));
+
+	std::vector<ml::vec4f> color_frame_A(render_points_a.size());
+	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Yellow);
+	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_a, color_frame_A));
+
+	std::vector<ml::vec4f> color_frame_B(render_points_b.size());
 	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
-	m_pointCloudB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_b, color_frame_B));
+	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_b, color_frame_B));
 }
 
 void ShowKinectData::key(UINT key) {
@@ -174,10 +201,12 @@ void ShowKinectData::key(UINT key) {
 			}
 		}
 		else {
-			std::cout << "calculate icp between the two selected frames" << std::endl;
-			icp(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
-			std::cout << "finished icp" << std::endl;
-			_selected_frame_for_registration.clear();
+			//std::cout << "calculate icp between the two selected frames" << std::endl;
+			//icp(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
+			std::cout << "init non rigid registration between the two selected frames" << std::endl;
+			non_rigid_registration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
+			//std::cout << "finished icp" << std::endl;
+			//_selected_frame_for_registration.clear();
 		}
 	}
 	else if (key == KEY_P) {

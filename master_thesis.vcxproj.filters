@@ -509,6 +509,9 @@
     <ClInclude Include="src\algo\se3.h">
       <Filter>algo</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration.h">
+      <Filter>algo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -578,6 +581,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\non_rigid_registration\deformation_graph_knn.cpp">
       <Filter>algo\non rigid registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration.cpp">
+      <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
