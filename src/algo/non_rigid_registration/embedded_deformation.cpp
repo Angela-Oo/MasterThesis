@@ -39,11 +39,15 @@ void EmbeddedDeformation::solveIteration()
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 			unsigned int i = _nn_search.nearest_index(pos_deformed);
 			
-			ceres::CostFunction* cost_function = FitStarCostFunction::Create(_dst[i], src_i._g, global_node._g);
-			double weight = a_fit * std::pow(src_i._w, 2);
+			//ceres::CostFunction* cost_function = FitStarCostFunction::Create(_dst[i], src_i._g, global_node._g);
+			ceres::CostFunction* cost_function = FitStarWCostFunction::Create(_dst[i], src_i._g, global_node._g);
+			//double weight = a_fit * std::pow(src_i._w, 2);
+			double weight = a_fit;
 			auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);		
-			problem.AddResidualBlock(cost_function, loss_function, 
-									(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData());			
+			//problem.AddResidualBlock(cost_function, loss_function, 
+			//						(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData());
+			problem.AddResidualBlock(cost_function, loss_function,
+				(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData(), &src_i._w);
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];
@@ -100,8 +104,8 @@ std::vector<ml::vec3f> EmbeddedDeformation::solve()
 bool EmbeddedDeformation::finished()
 {
 	double tol = 0.000001;
-	return (_solve_iteration >= _max_iterations) || 
-		abs(_last_cost - _current_cost) < (tol * _current_cost);
+	return (_solve_iteration >= _max_iterations) ||
+		(abs(_last_cost - _current_cost) < (tol * _current_cost) && _solve_iteration > 3);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const std::vector<ml::vec3f>& src,

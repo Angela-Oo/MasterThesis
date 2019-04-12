@@ -156,7 +156,7 @@ void ShowKinectData::renderRegisteredPoints()
 	m_pointCloudFrameDG.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_dg, color_frame_dg));
 
 	std::vector<ml::vec4f> color_frame_A(render_points_a.size());
-	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Yellow);
+	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
 	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_a, color_frame_A));
 
 	std::vector<ml::vec4f> color_frame_B(render_points_b.size());

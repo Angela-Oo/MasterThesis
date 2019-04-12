@@ -71,7 +71,7 @@ bool NonRigidRegistration::solve()
 		options.logging_type = ceres::LoggingType::SILENT;
 		options.minimizer_progress_to_stdout = false;
 
-		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options);
+		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options, 1000);
 		//_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, 1000);
 	}
 	if (_embedded_deformation && !_embedded_deformation->finished()) {
