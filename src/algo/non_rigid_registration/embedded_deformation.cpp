@@ -99,9 +99,10 @@ std::vector<ml::vec3f> EmbeddedDeformation::solve()
 
 bool EmbeddedDeformation::finished()
 {
-	double tol = 0.000001;
+	//double tol = 0.000001;
+	double tol = 0.0000001;
 	return (_solve_iteration >= _max_iterations) ||
-		(abs(_last_cost - _current_cost) < (tol * _current_cost) && _solve_iteration > 3);
+		(abs(_last_cost - _current_cost) < (tol * _current_cost) && _solve_iteration > 5);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const std::vector<ml::vec3f>& src,
