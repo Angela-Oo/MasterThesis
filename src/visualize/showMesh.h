@@ -3,7 +3,7 @@
 #include "i_showData.h"
 #include "input_reader/i_reader.h"
 #include "meshRenderer.h"
-#include "input_reader/obj_reader.h"
+#include "input_reader/mesh_reader.h"
 
 
 class ShowMesh : public IShowData

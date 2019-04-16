@@ -240,7 +240,7 @@
     <ClInclude Include="src\input_reader\depth_image_reader.h" />
     <ClInclude Include="src\input_reader\i_reader.h" />
     <ClInclude Include="src\input_reader\kinect_reader.h" />
-    <ClInclude Include="src\input_reader\obj_reader.h" />
+    <ClInclude Include="src\input_reader\mesh_reader.h" />
     <ClInclude Include="src\kinect\BinaryDumpReader.h" />
     <ClInclude Include="src\kinect\DepthSensor.h" />
     <ClInclude Include="src\kinect\DepthSensorWrapper.h" />
@@ -276,7 +276,7 @@
     <ClCompile Include="src\appTest.cpp" />
     <ClCompile Include="src\input_reader\depth_image_reader.cpp" />
     <ClCompile Include="src\input_reader\kinect_reader.cpp" />
-    <ClCompile Include="src\input_reader\obj_reader.cpp" />
+    <ClCompile Include="src\input_reader\mesh_reader.cpp" />
     <ClCompile Include="src\kinect\BinaryDumpReader.cpp" />
     <ClCompile Include="src\kinect\DepthSensor.cpp" />
     <ClCompile Include="src\kinect\DepthSensorWrapper.cpp" />

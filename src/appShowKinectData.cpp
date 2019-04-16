@@ -5,20 +5,22 @@
 #include "visualize/showRGBDData.h"
 #include "visualize/showRegisterTwoRigideFrames.h"
 #include "visualize/showSensData.h"
+#include "visualize/showMesh.h"
 
 using namespace ml;
 
 
 void AppShowKinectData::init(ml::ApplicationData &app)
 {
-	//m_render_data = std::make_unique<ShowRGBDImageData>();#
+	m_render_data = std::make_unique<ShowMesh>();
+	//m_render_data = std::make_unique<ShowRGBDImageData>();
 	//m_render_data = std::make_unique<ShowTwoRigideRegisteredFrames>();
 	//m_render_data = std::make_unique<ShowSensData>();
-	m_render_data = std::make_unique<ShowKinectData>();
+	//m_render_data = std::make_unique<ShowKinectData>();
 	m_render_data->init(app);
 
 	ml::vec3f eye(-0.5f, -0.5f, 1.5f);
-	m_camera = Cameraf(eye, -vec3f::eY, vec3f::eZ, 60.0f, (float)app.window.getWidth() / app.window.getHeight(), 0.01f, 10.0f);
+	m_camera = Cameraf(eye, vec3f::eY, vec3f::eZ, 60.0f, (float)app.window.getWidth() / app.window.getHeight(), 0.01f, 10.0f);
 
 	m_font.init(app.graphics, "Calibri");
 	m_canvas.init(app.graphics);

@@ -521,9 +521,6 @@
     <ClInclude Include="src\input_reader\kinect_reader.h">
       <Filter>input_reader</Filter>
     </ClInclude>
-    <ClInclude Include="src\input_reader\obj_reader.h">
-      <Filter>input_reader</Filter>
-    </ClInclude>
     <ClInclude Include="src\input_reader\i_reader.h">
       <Filter>input_reader</Filter>
     </ClInclude>
@@ -535,6 +532,9 @@
     </ClInclude>
     <ClInclude Include="src\visualize\meshRenderer.h">
       <Filter>visualize</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input_reader\mesh_reader.h">
+      <Filter>input_reader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -615,9 +615,6 @@
     <ClCompile Include="src\input_reader\kinect_reader.cpp">
       <Filter>input_reader</Filter>
     </ClCompile>
-    <ClCompile Include="src\input_reader\obj_reader.cpp">
-      <Filter>input_reader</Filter>
-    </ClCompile>
     <ClCompile Include="src\visualize\pointsRenderer.cpp">
       <Filter>visualize</Filter>
     </ClCompile>
@@ -626,6 +623,9 @@
     </ClCompile>
     <ClCompile Include="src\visualize\meshRenderer.cpp">
       <Filter>visualize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_reader\mesh_reader.cpp">
+      <Filter>input_reader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
