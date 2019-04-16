@@ -1,5 +1,6 @@
 #include "showRGBDData.h"
 #include <numeric>
+#include "input_reader/depth_image_reader.h"
 
 using namespace ml;
 
@@ -46,80 +47,29 @@ void RenderMesh::render(ml::Cameraf& camera)
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-void configImageReaderSensor(ImageReaderSensor & reader, std::string filepath)
-{
-	reader.setBaseFilePath(filepath);
-	auto frame_number = [](unsigned int idx) {
-		char frameNumber_c[10];
-		sprintf_s(frameNumber_c, "%06d", idx);
-		return std::string(frameNumber_c);
-	};
-	reader.setDepthFileName([&frame_number](unsigned int idx) { return "frame-" + frame_number(idx) + ".depth.png"; });
-	reader.setColorFileName([&frame_number](unsigned int idx) { return "frame-" + frame_number(idx) + ".color.png"; });
-	reader.setDepthIntrinsicsFileName("depthIntrinsics.txt");
-	reader.setColorIntrinsicsFileName("colorIntrinsics.txt");
-}
-
-
-std::vector<vec3f> ShowRGBDImageData::processFrame()
-{
-	_rgbd_frame_to_point_cloud->processFrame();
-	auto points = _rgbd_frame_to_point_cloud->getPoints(0, 5);
-	//auto points = _rgbd_frame_to_point_cloud->getPoints();
-
-	auto average = std::accumulate(points.begin(), points.end(), vec3f(0., 0., 0.)) / static_cast<float>(points.size());
-	mat4f center = mat4f::translation(-average);
-	float scale_factor = 5.;
-	mat4f scale = mat4f::scale({ scale_factor, scale_factor, scale_factor });
-	mat4f rotation = mat4f::rotationX(90.) * mat4f::rotationY(180.);
-	mat4f transform = mat4f::translation({ -0.5f, -2.f, 1.2f });
-	mat4f translate = transform * rotation * scale * center;
-	std::for_each(points.begin(), points.end(), [&translate](vec3f & p) { p = translate * p; });
-
-	_reader.recordFrame();
-	return points;
-}
 
 void ShowRGBDImageData::init(ml::ApplicationData &app)
 {
-	_graphics = &app.graphics;
+	_point_renderer = std::make_unique<PointsRenderer>(app);
 
-	configImageReaderSensor(_reader, { "D:/Studium/MasterThesis/input_data/sokrates-ps/" });
-	_reader.createFirstConnected();
-	_reader.setNumFrames(56);
-	_reader.toggleNearMode();
-	//_rgbd_frame_to_point_cloud = std::make_unique<PointsFromDepthData>(_reader, _reader.getColorIntrinsics(), _reader.getDepthIntrinsics());
-	_rgbd_frame_to_point_cloud = std::make_unique<SensorDataWrapper>(_reader, _reader.getColorIntrinsics(), _reader.getDepthIntrinsics());
-	auto points = processFrame();
-	m_pointCloud.init(app.graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points));
+	float scale_factor = 0.004;
+	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
+	ml::mat4f rotation = ml::mat4f::rotationX(90.);
+	ml::mat4f transform = ml::mat4f::translation({ -0.5f, -0.7f, 1.6f });
+	ml::mat4f transformation_camera_extrinsics = transform * rotation * scale;
+	_reader = std::make_unique<DepthImageReader>("D:/Studium/MasterThesis/input_data/sokrates-ps/", transformation_camera_extrinsics);
 
-	m_shaderManager.init(app.graphics);
-	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
-	m_constants.init(app.graphics);
+	_reader->processFrame();
+	auto points = _reader->getPoints(0);
+	_point_renderer->insertPoints("points", points, ml::RGBColor::Red);
 }
 
 void ShowRGBDImageData::render(ml::Cameraf& camera)
 {
-	auto points = processFrame();
-	if (!points.empty()) {
-		auto point_template = ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points);
-		m_pointCloud.init(*_graphics, point_template);
-	}
-	else {
-		_rgbd_frame_to_point_cloud->_sensor_data.saveToFile("D:/Studium/MasterThesis/input_data/recorded_frames/frames_rgbd.sens");
-		_reader.saveRecordedPointCloud("D:/Studium/MasterThesis/input_data/recorded_frames/point_cloud.txt");
-		_reader.saveRecordedFramesToFile("D:/Studium/MasterThesis/input_data/recorded_frames/frames.txt");
-	}
-
-	ConstantBuffer constants;
-	constants.worldViewProj = camera.getViewProj();
-	constants.modelColor = ml::vec4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-
-	m_constants.updateAndBind(constants, 0);
-	m_shaderManager.bindShaders("pointCloud");
-	m_constants.bind(0);
-	m_pointCloud.render();
+	_reader->processFrame();
+	auto points = _reader->getPoints(_reader->frame());
+	_point_renderer->insertPoints("points", points, ml::RGBColor::Red);
+	_point_renderer->render(camera);
 }
 
 

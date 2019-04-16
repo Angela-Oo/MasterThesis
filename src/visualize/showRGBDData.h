@@ -3,7 +3,8 @@
 #include "i_showData.h"
 #include "kinect/SensorDataWrapper.h"
 #include "kinect/ImageReaderSensor.h"
-
+#include "input_reader/i_reader.h"
+#include "pointsRenderer.h"
 
 
 class RenderMesh : public IShowData
@@ -25,21 +26,14 @@ private:
 
 class ShowRGBDImageData : public IShowData
 {
-private:
-	std::vector<ml::vec3f> processFrame();
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;
 	void key(UINT key) override {};
 private:
-	ml::D3D11TriMesh m_pointCloud;
-	ml::D3D11ShaderManager m_shaderManager;
-	ml::D3D11ConstantBuffer<ConstantBuffer> m_constants;
-	//std::unique_ptr<PointsFromDepthData> _rgbd_frame_to_point_cloud;
-	std::unique_ptr<SensorDataWrapper> _rgbd_frame_to_point_cloud;
-	ImageReaderSensor _reader;
-	ml::GraphicsDevice * _graphics;
+	std::unique_ptr<IReader> _reader;
+	std::unique_ptr<PointsRenderer> _point_renderer;
 public:
-	ShowRGBDImageData() {};
+	ShowRGBDImageData() = default;
 	~ShowRGBDImageData() = default;
 };
