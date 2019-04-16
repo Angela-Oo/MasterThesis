@@ -8,11 +8,15 @@
 
 class ShowMesh : public IShowData
 {
-public:
-	void init(ml::ApplicationData &app) override;
-	void render(ml::Cameraf& camera) override;
-	void key(UINT key) override {};
 private:
 	std::unique_ptr<MeshRenderer> _mesh_renderer;
 	std::unique_ptr<MeshReader> _mesh_reader;
+	unsigned int _current_frame = 0;
+private:
+	void renderPoints(unsigned int frame);
+public:
+	void init(ml::ApplicationData &app) override;
+	void render(ml::Cameraf& camera) override;
+	void key(UINT key) override;
+
 };

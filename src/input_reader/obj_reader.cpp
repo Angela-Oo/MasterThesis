@@ -9,19 +9,23 @@ std::string MeshReader::getFileName(unsigned int index)
 		sprintf_s(frameNumber_c, "%06d", idx);
 		return std::string(frameNumber_c);
 	};
-	return _file_path + "meshOfFrame" + frame_number(index) + ".obj";
+	return _file_path + _file_name + frame_number(index) + ".obj";
 }
 
 ml::TriMeshf& MeshReader::getMesh(unsigned int frame)
 {
-	assert(frame <= _meshes.size());
-	return _meshes[frame - 1];
+	assert(frame < _meshes.size());
+	return _meshes[frame];
 }
 
-void MeshReader::processFrame()
+bool MeshReader::processFrame()
 {
 	std::string filename = getFileName(frame() + 1);
-	try {
+
+	std::fstream file_stream;
+	file_stream.open(filename);
+	if (file_stream) {
+		std::cout << "load mesh " << filename << std::endl;
 		ml::MeshDataf meshData = ml::MeshIOf::loadFromFile(filename);
 		ml::TriMeshf triMesh(meshData);
 
@@ -34,10 +38,20 @@ void MeshReader::processFrame()
 		triMesh.computeNormals();
 		triMesh.computeMeshData();
 		_meshes.push_back(triMesh);
+		return true;
 	}
-	catch (...) {
-		std::cout << "could not load file " << filename << std::endl;
+	else {
+		return false;
 	}
+}
+
+bool MeshReader::processAllFrames()
+{
+	bool successfull = true;
+	while (successfull) {
+		successfull = processFrame();
+	}
+	return true;
 }
 
 unsigned int MeshReader::frame()
@@ -56,8 +70,9 @@ void MeshReader::save(std::string filename)
 }
 
 
-MeshReader::MeshReader(std::string filepath, ml::mat4f transformation)
+MeshReader::MeshReader(std::string filepath, std::string filename, ml::mat4f transformation)
 	: _file_path(filepath)
+	, _file_name(filename)
 	, _transformation(transformation)
 {
 }

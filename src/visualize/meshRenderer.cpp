@@ -8,13 +8,11 @@ ml::vec4f NormalShader::operator()(ml::vec3f normal)
 
 ml::vec4f PhongShader::operator()(ml::vec3f normal)
 {
-
 	ml::vec3f diffuse = _diffuse * (ml::vec3f::dot(normal, _incomming_light_direction.getNormalized())) * _incomming_light_color;
 	ml::vec3f ambient = _ambient * _incomming_light_color;
 	ml::vec3f color = ambient + diffuse;
 	return ml::vec4f(color);
 }
-
 
 
 void MeshRenderer::render(ml::Cameraf& camera)
