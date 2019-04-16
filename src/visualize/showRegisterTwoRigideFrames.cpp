@@ -2,157 +2,12 @@
 #include "showRegisterTwoRigideFrames.h"
 #include <numeric>
 #include "ext-depthcamera/calibratedSensorData.h"
-//#include "algo/rigid_registration/icp.h"
-//#include "algo/non_rigid_registration/non_rigid_deformation.h"
 #include "algo/registration.h"
 #include "algo/se3.h"
-//
-//
-//void RigidRegistration::solve()
-//{
-//	_transformation = iterative_closest_points(_points_a, _points_b);
-//}
-//
-//
-//void RigidRegistration::icp_calc_nn_in_cost_function()
-//{
-//	if (!_icp_nn) {
-//		ceres::Solver::Options options;
-//		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-//		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-//		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-//		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-//		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
-//		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-//		options.max_num_iterations = 50;
-//		options.logging_type = ceres::LoggingType::SILENT;
-//		options.minimizer_progress_to_stdout = false;
-//		_icp_nn = std::make_unique<ICP>(_points_a, _points_b, options);
-//
-//		//if (!_icp_nn->finished())
-//			//_transformation = _icp_nn->solveIteration();
-//		_transformation = _icp_nn->solve();
-//	}
-//}
-//
-//std::vector<ml::vec3f> RigidRegistration::getPointsA()
-//{
-//	auto transformed_points = _points_a;
-//	std::for_each(transformed_points.begin(), transformed_points.end(), [&](ml::vec3f & p) { p = _transformation * p; });
-//	return transformed_points;
-//}
-//
-//std::vector<ml::vec3f> RigidRegistration::getPointsB()
-//{
-//	return _points_b;
-//}
-//
-//std::vector<ml::vec3f> RigidRegistration::getPointsDeformationGraph()
-//{
-//	return std::vector<ml::vec3f>();
-//}
-//
-//RigidRegistration::RigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b)
-//	: _points_a(points_a)
-//	, _points_b(points_b)
-//	, _transformation(ml::mat4f::identity())
-//{}
-//
-////-----------------------------------------------------------------------------
-////-----------------------------------------------------------------------------
-//
-//void NonRigidRegistration::solve()
-//{
-//
-//	//AsRigidAsPossible arap(_points_a, _points_b, options);
-//	//_points_b = arap.solve();
-//	if (!_embedded_deformation) {
-//		ceres::Solver::Options options;
-//		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-//		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-//		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-//		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-//		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
-//		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-//		options.max_num_iterations = 50;
-//		options.logging_type = ceres::LoggingType::SILENT;
-//		options.minimizer_progress_to_stdout = false;
-//
-//		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options);
-//		_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, 1000);
-//	}
-//	if (_embedded_deformation && !_embedded_deformation->finished()) {
-//		_embedded_deformation->solveIteration();
-//		_points_a = _embedded_deformation->getDeformedPoints();
-//	}
-//	if (_as_rigid_as_possible && !_as_rigid_as_possible->finished()) {
-//		_as_rigid_as_possible->solveIteration();
-//		_points_a = _as_rigid_as_possible->getDeformedPoints();
-//	}
-//}
-//
-//
-//std::vector<ml::vec3f> NonRigidRegistration::getPointsA()
-//{
-//	return _points_a;
-//}
-//
-//std::vector<ml::vec3f> NonRigidRegistration::getPointsB()
-//{
-//	return _points_b;
-//}
-//
-//std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
-//{
-//	if (_embedded_deformation)
-//		return _embedded_deformation->getDeformationGraph();
-//	else if (_as_rigid_as_possible)
-//		return _as_rigid_as_possible->getDeformationGraph();
-//	else
-//		return std::vector<ml::vec3f>();
-//}
-//
-//NonRigidRegistration::NonRigidRegistration()
-//	: _transformation()
-//{
-//	for (int i = 0; i < 50; i++) {
-//		float x = 0.01 *static_cast<float>(i);
-//		_points_a.push_back({ x,0.,0. });
-//	}
-//
-//	_points_b = _points_a;
-//	for (int i = 25; i < 50; i++) {
-//		float z = 0.005 *static_cast<double>(i-24);
-//		_points_b[i].y = z;
-//	}
-//}
-//
-//NonRigidRegistration::NonRigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b)
-//	: _points_a(points_a)
-//	, _points_b(points_b)
-//{}
-
+#include "input_reader/depth_image_reader.h"
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-
-void ShowTwoRigideRegisteredFrames::configImageReaderSensor(std::string filepath)
-{
-	_depth_sensor.setBaseFilePath(filepath);
-	auto frame_number = [](unsigned int idx) {
-		char frameNumber_c[10];
-		sprintf_s(frameNumber_c, "%06d", idx);
-		return std::string(frameNumber_c);
-	};
-	_depth_sensor.setDepthFileName([&frame_number](unsigned int idx) { return "frame-" + frame_number(idx) + ".depth.png"; });
-	_depth_sensor.setColorFileName([&frame_number](unsigned int idx) { return "frame-" + frame_number(idx) + ".color.png"; });
-	_depth_sensor.setDepthIntrinsicsFileName("depthIntrinsics.txt");
-	_depth_sensor.setColorIntrinsicsFileName("colorIntrinsics.txt");
-
-	_depth_sensor.createFirstConnected();
-	_depth_sensor.setNumFrames(56);
-	_depth_sensor.toggleNearMode();
-}
 
 void ShowTwoRigideRegisteredFrames::transform(std::vector<ml::vec3f>& points)
 {
@@ -177,35 +32,21 @@ void ShowTwoRigideRegisteredFrames::renderPoints()
 	transform(render_points_dg);
 
 	// render point clouds
-	std::vector<ml::vec4f> color_frame_dg(render_points_dg.size());
-	std::fill(color_frame_dg.begin(), color_frame_dg.end(), ml::RGBColor::Blue);
-	m_pointCloudFrameDG.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_dg, color_frame_dg));
-
-	std::vector<ml::vec4f> color_frame_A(render_points_a.size());
-	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Yellow);
-	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_a, color_frame_A));
-
-	std::vector<ml::vec4f> color_frame_B(render_points_b.size());
-	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
-	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_b, color_frame_B));
-
-
+	_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue, 0.002f);
+	_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Orange);
+	_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
 }
 
 void ShowTwoRigideRegisteredFrames::initICP()
 {
-	//configImageReaderSensor("C:/Users/Angela/Meins/Studium/MasterThesis/data/sokrates-ps/");
-	configImageReaderSensor("D:/Studium/MasterThesis/input_data/sokrates-ps/");
-
-	_sensor_data = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
-																_depth_sensor.getDepthIntrinsics(), ml::mat4f::identity(),
-																_depth_sensor.getColorIntrinsics(), ml::mat4f::identity());
+	_reader = std::make_unique<DepthImageReader>("D:/Studium/MasterThesis/input_data/sokrates-ps/");
+	
 
 	for (int i = 0; i < 6; i++)
-		_sensor_data->processFrame();
+		_reader->processFrame();
 
-	_points_a = _sensor_data->getPoints(0);
-	_points_b = _sensor_data->getPoints(4);
+	_points_a = _reader->getPoints(0);
+	_points_b = _reader->getPoints(4);
 
 	float scale_factor = 0.004;
 	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
@@ -231,11 +72,8 @@ void ShowTwoRigideRegisteredFrames::initNonRigidRegistration()
 
 void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 {
-	_graphics = &app.graphics;
-	m_shaderManager.init(app.graphics);
-	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
-	m_constants.init(app.graphics);	
-
+	_point_renderer = std::make_unique<PointsRenderer>(app);
+	
 	initICP();
 	//initNonRigidRegistration();
 
@@ -251,15 +89,7 @@ void ShowTwoRigideRegisteredFrames::render(ml::Cameraf& camera)
 		icp_active = false;
 	}
 
-	ConstantBuffer constants;
-	constants.worldViewProj = camera.getViewProj();
-
-	m_constants.updateAndBind(constants, 0);
-	m_shaderManager.bindShaders("pointCloud");
-	m_constants.bind(0);
-	m_pointCloudFrameA.render();
-	m_pointCloudFrameB.render();
-	m_pointCloudFrameDG.render();
+	_point_renderer->render(camera);
 }
 
 
