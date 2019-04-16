@@ -1,33 +1,34 @@
 #include "showKinectData.h"
-//#include "kinect/BinaryDumpReader.h"
-#include "kinect/KinectSensor.h"
-
-#include "ext-depthcamera/sensorData.h"
 #include <numeric>
 #include "algo/rigid_registration/icp.h"
 #include "algo/non_rigid_registration/embedded_deformation.h"
-#include "algo/registration.h"
 #include "input_reader/kinect_reader.h"
 
 using namespace ml;
 
+void ShowKinectData::init(ml::ApplicationData &app)
+{
+	_start_time = std::chrono::system_clock::now();
+	_reader = std::make_unique<KinectReader>();
+	_point_renderer = std::make_unique<PointsRenderer>(app);
+}
 
 void ShowKinectData::renderPoints(int frame)
 {
 	auto points = _reader->getPoints(frame, 3);
-	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
+	_point_renderer->insertPoints("frameA", points, ml::RGBColor::Orange);
 }
 
-void ShowKinectData::init(ml::ApplicationData &app)
+void ShowKinectData::renderRegisteredPoints()
 {
-	_graphics = &app.graphics;
-	_start_time = std::chrono::system_clock::now();
+	std::vector<ml::vec3f> render_points_a = _registration->getPointsA();
+	std::vector<ml::vec3f> render_points_b = _registration->getPointsB();
+	std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
 
-	_reader = std::make_unique<KinectReader>();
-
-	m_shaderManager.init(app.graphics);
-	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
-	m_constants.init(app.graphics);
+	// render point clouds
+	_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue);
+	_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Orange);
+	_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
 }
 
 void ShowKinectData::render(ml::Cameraf& camera)
@@ -41,18 +42,8 @@ void ShowKinectData::render(ml::Cameraf& camera)
 		non_rigid_registration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
 	}
 
-	ConstantBuffer constants;
-	constants.worldViewProj = camera.getViewProj();
-	constants.modelColor = ml::vec4f(1.0f, 1.0f, 1.0f, 1.0f);
-
-	m_constants.updateAndBind(constants, 0);
-	m_shaderManager.bindShaders("pointCloud");
-	m_constants.bind(0);
-	m_pointCloudFrameA.render();
-	m_pointCloudFrameB.render();
-	m_pointCloudFrameDG.render();
+	_point_renderer->render(camera);
 }
-
 
 void ShowKinectData::icp(int frame_a, int frame_b)
 {
@@ -75,23 +66,21 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 
 	std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
 
-	std::vector<ml::vec4f> color_frame_A(points_a.size());
-	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
-	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_a, color_frame_A));
-
-	std::vector<ml::vec4f> color_frame_B(points_b.size());
-	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
-	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), points_b, color_frame_B));
+	_point_renderer->insertPoints("frameA", points_a, ml::RGBColor::Orange);
+	_point_renderer->insertPoints("frameB", points_b, ml::RGBColor::Green);
 }
 
 void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 {
 	if (!_registration) {
-		_points_a = _reader->getPoints(frame_a, 2);
-		_points_b = _reader->getPoints(frame_b, 2);
+		auto points_a = _reader->getPoints(frame_a, 2);
+		auto points_b = _reader->getPoints(frame_b, 2);
 
-		auto points_a_icp = _points_a;
-		auto points_b_icp = _points_b;
+		_point_renderer->insertPoints("frameA", points_a, ml::RGBColor::Orange);
+		_point_renderer->insertPoints("frameB", points_b, ml::RGBColor::Green);
+
+		auto points_a_icp = points_a;
+		auto points_b_icp = points_b;
 
 		auto translation = ml::mat4f::translation({ 1.f, 0., 0. });
 		std::for_each(points_a_icp.begin(), points_a_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
@@ -111,29 +100,6 @@ void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 			std::cout << "finished, select next two frames" << std::endl;
 		}
 	}	
-}
-
-void ShowKinectData::renderRegisteredPoints()
-{
-	std::vector<ml::vec3f> render_points_a = _registration->getPointsA();
-	std::vector<ml::vec3f> render_points_b = _registration->getPointsB();
-	std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
-
-	render_points_a.insert(render_points_a.end(), _points_a.begin(), _points_a.end());
-	render_points_b.insert(render_points_b.end(), _points_b.begin(), _points_b.end());
-	
-	// render point clouds
-	std::vector<ml::vec4f> color_frame_dg(render_points_dg.size());
-	std::fill(color_frame_dg.begin(), color_frame_dg.end(), ml::RGBColor::Blue);
-	m_pointCloudFrameDG.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), render_points_dg, color_frame_dg));
-
-	std::vector<ml::vec4f> color_frame_A(render_points_a.size());
-	std::fill(color_frame_A.begin(), color_frame_A.end(), ml::RGBColor::Orange);
-	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_a, color_frame_A));
-
-	std::vector<ml::vec4f> color_frame_B(render_points_b.size());
-	std::fill(color_frame_B.begin(), color_frame_B.end(), ml::RGBColor::Green);
-	m_pointCloudFrameB.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.001f), render_points_b, color_frame_B));
 }
 
 void ShowKinectData::key(UINT key) {

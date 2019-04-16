@@ -527,6 +527,9 @@
     <ClInclude Include="src\input_reader\i_reader.h">
       <Filter>input_reader</Filter>
     </ClInclude>
+    <ClInclude Include="src\visualize\pointsRenderer.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -608,6 +611,9 @@
     </ClCompile>
     <ClCompile Include="src\input_reader\obj_reader.cpp">
       <Filter>input_reader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\pointsRenderer.cpp">
+      <Filter>visualize</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
