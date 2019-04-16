@@ -29,6 +29,7 @@ public:
 	ml::CalibratedSensorData _sensor_data;
 public:
 	void processFrame();
+	unsigned int getNumberFrames();
 	std::vector<ml::vec3f> getPoints(unsigned int frame, unsigned int step_size = 1);
 	ml::SensorData getSensorData();
 public:

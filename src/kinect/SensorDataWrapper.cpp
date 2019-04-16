@@ -58,6 +58,11 @@ void CalibrateSensorDataWrapper::processFrame()
 	_sensor_data.m_ColorNumFrames++;
 }
 
+unsigned int CalibrateSensorDataWrapper::getNumberFrames()
+{
+	return _sensor_data.m_DepthNumFrames;
+}
+
 std::vector<ml::vec3f> CalibrateSensorDataWrapper::getPoints(unsigned int frame, unsigned int step_size)
 {
 	std::vector<ml::vec3f> points;

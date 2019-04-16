@@ -52,6 +52,9 @@
     <Filter Include="algo\rigid registration">
       <UniqueIdentifier>{b9a48aea-592a-4152-bb5e-3beb74e50087}</UniqueIdentifier>
     </Filter>
+    <Filter Include="input_reader">
+      <UniqueIdentifier>{22720d91-d5bc-49a1-b65d-8948508484d7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -512,6 +515,18 @@
     <ClInclude Include="src\algo\registration.h">
       <Filter>algo</Filter>
     </ClInclude>
+    <ClInclude Include="src\input_reader\depth_image_reader.h">
+      <Filter>input_reader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input_reader\kinect_reader.h">
+      <Filter>input_reader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input_reader\obj_reader.h">
+      <Filter>input_reader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\input_reader\i_reader.h">
+      <Filter>input_reader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -584,6 +599,15 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration.cpp">
       <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_reader\depth_image_reader.cpp">
+      <Filter>input_reader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_reader\kinect_reader.cpp">
+      <Filter>input_reader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_reader\obj_reader.cpp">
+      <Filter>input_reader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -7,24 +7,15 @@
 #include "algo/rigid_registration/icp.h"
 #include "algo/non_rigid_registration/embedded_deformation.h"
 #include "algo/registration.h"
-
+#include "input_reader/kinect_reader.h"
 
 using namespace ml;
 
 
 void ShowKinectData::renderPoints(int frame)
 {
-	auto points = _sensor_data_wrapper->getPoints(frame, 3);
+	auto points = _reader->getPoints(frame, 3);
 	m_pointCloudFrameA.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
-}
-
-mat4f ShowKinectData::getWorldTransformation()
-{
-	float scale_factor = 2.0;
-	mat4f scale = mat4f::scale({ scale_factor, scale_factor, scale_factor });
-	mat4f rotation = mat4f::rotationY(180.) * mat4f::rotationX(90.);
-	mat4f transform = mat4f::translation({ -1.0f, -0.5f, 1.5f });
-	return transform * rotation * scale;
 }
 
 void ShowKinectData::init(ml::ApplicationData &app)
@@ -32,27 +23,7 @@ void ShowKinectData::init(ml::ApplicationData &app)
 	_graphics = &app.graphics;
 	_start_time = std::chrono::system_clock::now();
 
-	if (_depth_sensor.createFirstConnected() == S_OK)
-	{
-		auto intrinsic = _depth_sensor.getIntrinsics();
-		auto depth_intrinsics = intrinsic.converToMatrix();
-		auto color_intrinsics = intrinsic.converToMatrix();
-		mat4f depth_extrinsics = getWorldTransformation();
-		auto color_extrinsics = ml::mat4f::identity();
-
-		_sensor_data_wrapper = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
-																			depth_intrinsics, depth_extrinsics,
-																			color_intrinsics, color_extrinsics);
-
-		//_sensor_data_wrapper = std::make_unique<SensorDataWrapper>(_depth_sensor,
-		//														   depth_intrinsics,
-		//														   color_intrinsics);
-		_sensor_data_wrapper->processFrame();
-		_frame++;
-	}
-	else {
-		std::cout << "could not connect to camera" << std::endl;
-	}
+	_reader = std::make_unique<KinectReader>();
 
 	m_shaderManager.init(app.graphics);
 	m_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
@@ -62,10 +33,9 @@ void ShowKinectData::init(ml::ApplicationData &app)
 void ShowKinectData::render(ml::Cameraf& camera)
 {
 	if (_record_frames) {
-		_sensor_data_wrapper->processFrame();
-		renderPoints(_frame);
-		_current_frame = _frame;
-		_frame++;
+		_reader->processFrame();
+		renderPoints(_reader->frame());
+		_current_frame = _reader->frame();
 	}
 	else if (_solve_non_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
 		non_rigid_registration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
@@ -84,11 +54,10 @@ void ShowKinectData::render(ml::Cameraf& camera)
 }
 
 
-
 void ShowKinectData::icp(int frame_a, int frame_b)
 {
-	auto points_a = _sensor_data_wrapper->getPoints(frame_a);
-	auto points_b = _sensor_data_wrapper->getPoints(frame_b);
+	auto points_a = _reader->getPoints(frame_a);
+	auto points_b = _reader->getPoints(frame_b);
 
 	ceres::Solver::Options options;
 	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
@@ -118,8 +87,8 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 {
 	if (!_registration) {
-		_points_a = _sensor_data_wrapper->getPoints(frame_a, 2);
-		_points_b = _sensor_data_wrapper->getPoints(frame_b, 2);
+		_points_a = _reader->getPoints(frame_a, 2);
+		_points_b = _reader->getPoints(frame_b, 2);
 
 		auto points_a_icp = _points_a;
 		auto points_b_icp = _points_b;
@@ -183,14 +152,14 @@ void ShowKinectData::key(UINT key) {
 	else if (key == KEY_2) 
 	{
 		_current_frame++;
-		if (_current_frame == _frame)
+		if (_current_frame > _reader->frame())
 			_current_frame = 0;
 		renderPoints(_current_frame);
 	}
 	else if (key == KEY_1)
 	{
 		if (_current_frame == 0)
-			_current_frame = _frame - 1;
+			_current_frame = _reader->frame();
 		else
 			_current_frame--;
 		renderPoints(_current_frame);
@@ -212,23 +181,9 @@ void ShowKinectData::key(UINT key) {
 		}
 	}
 	else if (key == KEY_P) {
-		std::cout << "save recorded frames as .sens file" << std::endl;
-		std::string file = ".\\data\\captured_data.sens";
-		std::ofstream output_file;
-		output_file.open(file);
-		//_sensor_data_wrapper->_sensor_data.saveToFile(file);
-		//_sensor_data_wrapper->_sensor_data.savePointCloud(file, 0);// .saveToFile(file);
-		//output_file << _sensor_data_wrapper->_sensor_data;
+		_reader->save(".\\data\\captured_data.sens");
 	}
 	else if (key == KEY_L) {
-		std::cout << "load recorded frames from .sens file" << std::endl;
-		std::string file = ".\\data\\captured_data.sens";
-		std::ifstream input_file;
-		input_file.open(file);
-		//input_file >> _sensor_data_wrapper->_sensor_data;
-		//auto frame = _sensor_data_wrapper->_sensor_data.m_frames.size() - 1;
-		//auto points = _sensor_data_wrapper->getPoints(frame);
-		//m_pointCloud.init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(0.002f), points /*_all_points*/));
-
+		_reader->load(".\\data\\captured_data.sens");
 	}
 }
