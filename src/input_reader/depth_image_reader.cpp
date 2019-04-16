@@ -20,16 +20,6 @@ void DepthImageReader::configImageReaderSensor(std::string filepath)
 	_depth_sensor.toggleNearMode();
 }
 
-ml::mat4f DepthImageReader::getWorldTransformation()
-{
-	float scale_factor = 0.004;
-	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
-	ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
-	ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });
-	return transform * rotation * scale;
-}
-
-
 std::vector<ml::vec3f> DepthImageReader::getPoints(unsigned int frame, unsigned int step_size)
 {
 	return _sensor_data_wrapper->getPoints(frame, step_size);
@@ -45,7 +35,6 @@ unsigned int DepthImageReader::frame()
 {
 	return _sensor_data_wrapper->getNumberFrames() -1;
 }
-
 
 void DepthImageReader::load(std::string filename)
 {
@@ -69,12 +58,12 @@ void DepthImageReader::save(std::string filename)
 }
 
 
-DepthImageReader::DepthImageReader(std::string filepath)
+DepthImageReader::DepthImageReader(std::string filepath, ml::mat4f extrinsics)
 {
 	configImageReaderSensor(filepath);
 
-	ml::mat4f depth_extrinsics = ml::mat4f::identity();// getWorldTransformation();
-	ml::mat4f color_extrinsics = ml::mat4f::identity();
+	ml::mat4f depth_extrinsics = extrinsics;
+	ml::mat4f color_extrinsics = extrinsics;
 
 	_sensor_data_wrapper = std::make_unique<CalibrateSensorDataWrapper>(_depth_sensor,
 																		_depth_sensor.getDepthIntrinsics(), depth_extrinsics,

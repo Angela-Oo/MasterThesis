@@ -11,7 +11,6 @@ private:
 	ImageReaderSensor _depth_sensor;
 private:
 	void configImageReaderSensor(std::string filepath);
-	ml::mat4f DepthImageReader::getWorldTransformation();
 public:
 	std::vector<ml::vec3f> getPoints(unsigned int frame, unsigned int step_size = 1) override;
 	void processFrame() override;
@@ -20,5 +19,5 @@ public:
 	void load(std::string filename) override;
 	void save(std::string filename) override;
 public:
-	DepthImageReader(std::string filepath);
+	DepthImageReader(std::string filepath, ml::mat4f extrinsics = ml::mat4f::identity());
 };

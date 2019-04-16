@@ -8,18 +8,14 @@
 class ShowTwoRigideRegisteredFrames : public IShowData
 {
 private:
-	std::vector<ml::vec3f> _points_a;
-	std::vector<ml::vec3f> _points_b;
-
 	std::unique_ptr<IReader> _reader;
 	std::unique_ptr<PointsRenderer> _point_renderer;
 	bool icp_active = false;
 	std::unique_ptr<IRegistration> _registration;
 private:
-	void transform(std::vector<ml::vec3f>& points);
 	void renderPoints();
-	void initICP();
-	void initNonRigidRegistration();
+	void initRegistration();
+	void initReader();
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;
