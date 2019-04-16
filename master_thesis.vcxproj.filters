@@ -530,6 +530,12 @@
     <ClInclude Include="src\visualize\pointsRenderer.h">
       <Filter>visualize</Filter>
     </ClInclude>
+    <ClInclude Include="src\visualize\showMesh.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\meshRenderer.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -613,6 +619,12 @@
       <Filter>input_reader</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\pointsRenderer.cpp">
+      <Filter>visualize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\showMesh.cpp">
+      <Filter>visualize</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\meshRenderer.cpp">
       <Filter>visualize</Filter>
     </ClCompile>
   </ItemGroup>
