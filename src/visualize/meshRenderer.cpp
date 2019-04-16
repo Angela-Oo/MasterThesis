@@ -1,5 +1,20 @@
 #include "meshRenderer.h"
 
+
+ml::vec4f NormalShader::operator()(ml::vec3f normal)
+{
+	return ml::vec4f(normal);
+}
+
+ml::vec4f PhongShader::operator()(ml::vec3f normal)
+{
+	ml::vec3f diffuse = _diffuse * (ml::vec3f::dot(normal, _incomming_light_direction))* _incomming_light_color;
+	ml::vec3f ambient = _ambient * _incomming_light_color;
+	return ml::vec4f(diffuse + ambient);
+}
+
+
+
 void MeshRenderer::render(ml::Cameraf& camera)
 {
 	ConstantBuffer constants;
@@ -14,7 +29,7 @@ void MeshRenderer::render(ml::Cameraf& camera)
 	_buffer.unbindSRV(0); 
 }
 
-void MeshRenderer::insertMesh(std::string id, ml::TriMeshf mesh)
+void MeshRenderer::insertMesh(std::string id, const ml::TriMeshf& mesh)
 {
 	_meshes[id] = mesh;
 
@@ -27,12 +42,13 @@ void MeshRenderer::insertMesh(std::string id, ml::TriMeshf mesh)
 
 	std::vector<ml::vec4f> bufferData(_mesh.getTriMesh().getVertices().size());
 	for (size_t i = 0; i < _mesh.getTriMesh().getVertices().size(); i++) {
-		bufferData[i] =_mesh.getTriMesh().getVertices()[i].color;
+		bufferData[i] = _shader(_mesh.getTriMesh().getVertices()[i].normal);// { 1., 0., 0., 0.5 };// _mesh.getTriMesh().getVertices()[i].color;
 	}
 	_buffer.init(*_graphics, bufferData);
 }
 
-MeshRenderer::MeshRenderer(ml::ApplicationData &app)
+MeshRenderer::MeshRenderer(ml::ApplicationData &app, std::function<ml::vec4f(ml::vec3f)> shader)
+	: _shader(shader)
 {
 	_graphics = &app.graphics;
 	_shaderManager.init(app.graphics);
