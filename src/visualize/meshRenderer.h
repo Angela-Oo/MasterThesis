@@ -11,11 +11,11 @@ public:
 
 
 class PhongShader{
-	float _diffuse = 0.5f;
+	float _diffuse = 0.3f;
 	float _specular = 0.4f;
-	float _ambient = 0.2f;
-	ml::vec3f _incomming_light_direction = { 2., 0., 4. };
-	ml::vec3f _incomming_light_color = { 1., 1., 1. };
+	float _ambient = 0.3f;
+	ml::vec3f _incomming_light_direction = { 3., -1., 5. };
+	ml::vec3f _incomming_light_color = {1., 1., 1. };
 public:
 	ml::vec4f operator()(ml::vec3f normal);
 };
