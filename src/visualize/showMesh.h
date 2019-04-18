@@ -20,7 +20,7 @@ private:
 	bool _solve_non_rigid_registration = false;
 	std::unique_ptr<IRegistration> _registration;
 private:
-	void renderMesh(unsigned int frame);
+	void renderMesh();
 	void renderRegisteredPoints();
 	void nonRigidRegistration(int frame_a, int frame_b);
 public:
