@@ -8,9 +8,9 @@ ml::vec4f NormalShader::operator()(ml::vec3f normal)
 
 ml::vec4f PhongShader::operator()(ml::vec3f normal)
 {
-	ml::vec3f diffuse = _diffuse * (ml::vec3f::dot(normal, _incomming_light_direction.getNormalized())) * _incomming_light_color;
-	ml::vec3f ambient = _ambient * _incomming_light_color;
-	ml::vec3f color = ambient + diffuse;
+	ml::vec4f diffuse = _diffuse * (ml::vec3f::dot(normal, _incomming_light_direction.getNormalized())) * _incomming_light_color;
+	ml::vec4f ambient = _ambient * _incomming_light_color;
+	ml::vec4f color = ambient + diffuse;
 	return ml::vec4f(color);
 }
 
@@ -42,9 +42,19 @@ void MeshRenderer::insertMesh(std::string id, const ml::TriMeshf& mesh)
 
 	std::vector<ml::vec4f> bufferData(_mesh.getTriMesh().getVertices().size());
 	for (size_t i = 0; i < _mesh.getTriMesh().getVertices().size(); i++) {
-		bufferData[i] = _shader(_mesh.getTriMesh().getVertices()[i].normal);// { 1., 0., 0., 0.5 };// _mesh.getTriMesh().getVertices()[i].color;
+		bufferData[i] = _shader(_mesh.getTriMesh().getVertices()[i].normal);
 	}
 	_buffer.init(*_graphics, bufferData);
+}
+
+void MeshRenderer::removeMesh(std::string id)
+{
+	_meshes.erase(id);
+}
+
+void MeshRenderer::clear()
+{
+	_meshes.clear();
 }
 
 MeshRenderer::MeshRenderer(ml::ApplicationData &app, std::function<ml::vec4f(ml::vec3f)> shader)

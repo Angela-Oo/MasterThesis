@@ -15,9 +15,11 @@ class PhongShader{
 	float _specular = 0.4f;
 	float _ambient = 0.3f;
 	ml::vec3f _incomming_light_direction = { 3., -1., 5. };
-	ml::vec3f _incomming_light_color = {1., 1., 1. };
+	ml::vec4f _incomming_light_color = {1., 1., 1., 1. };
 public:
 	ml::vec4f operator()(ml::vec3f normal);
+	PhongShader(ml::vec4f color = { 1., 1., 1., 1. })
+		: _incomming_light_color(color) {}
 };
 
 
@@ -34,6 +36,8 @@ private:
 public:
 	void render(ml::Cameraf& camera);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh);
+	void removeMesh(std::string id);
+	void clear();
 public:
 	MeshRenderer(ml::ApplicationData &app, std::function<ml::vec4f(ml::vec3f)> shader);
 };

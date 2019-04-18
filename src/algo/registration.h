@@ -37,6 +37,7 @@ private:
 	std::vector<ml::vec3f> _points_a;
 	std::vector<ml::vec3f> _points_b;
 	std::vector<ml::vec6d> _transformation;
+	unsigned int _number_of_deformation_nodes;
 	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
 	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
 public:
@@ -46,5 +47,5 @@ public:
 	std::vector<ml::vec3f> getPointsDeformationGraph() override;
 public:
 	NonRigidRegistration();
-	NonRigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b);
+	NonRigidRegistration(const std::vector<ml::vec3f> & points_a, const std::vector<ml::vec3f> & points_b, unsigned int number_of_deformation_nodes = 1000);
 };
