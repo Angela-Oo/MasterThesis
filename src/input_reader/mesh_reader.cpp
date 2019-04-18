@@ -20,7 +20,7 @@ ml::TriMeshf& MeshReader::getMesh(unsigned int frame)
 
 bool MeshReader::processFrame()
 {
-	std::string filename = getFileName(frame() + 1);
+	std::string filename = getFileName(frame() + _start_number);
 
 	std::fstream file_stream;
 	file_stream.open(filename);
@@ -28,10 +28,6 @@ bool MeshReader::processFrame()
 		std::cout << "load mesh " << filename << std::endl;
 		ml::MeshDataf meshData = ml::MeshIOf::loadFromFile(filename);
 		ml::TriMeshf triMesh(meshData);
-
-		auto bounding_box = triMesh.computeBoundingBox();
-		ml::mat4f center = ml::mat4f::translation(-bounding_box.getCenter());
-		triMesh.transform(center);
 
 		triMesh.transform(_transformation);
 
@@ -70,9 +66,10 @@ void MeshReader::save(std::string filename)
 }
 
 
-MeshReader::MeshReader(std::string filepath, std::string filename, ml::mat4f transformation)
+MeshReader::MeshReader(std::string filepath, std::string filename, ml::mat4f transformation, unsigned int start_number)
 	: _file_path(filepath)
 	, _file_name(filename)
 	, _transformation(transformation)
+	, _start_number(start_number)
 {
 }

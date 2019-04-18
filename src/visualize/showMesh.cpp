@@ -51,11 +51,11 @@ void ShowMesh::renderMesh()
 
 	if (!_registration) {
 		_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame));
+		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
 	}
 	if (_selected_frame_for_registration.size() >= 1)
 	{
-		ml::vec4f color = ml::RGBColor::Orange.toVec4f();
-		color.w = 0.3f;
+		ml::vec4f color = { 1.0, 0.7, 0., 0.4 };// ml::RGBColor::Orange.toVec4f();
 		_mesh_renderer->insertMesh("mesh_a", _input_mesh->getMesh(_selected_frame_for_registration[0]), color);
 	}
 	if (_selected_frame_for_registration.size() >= 2)
@@ -63,6 +63,7 @@ void ShowMesh::renderMesh()
 		ml::vec4f color = ml::RGBColor::Green.toVec4f();
 		color.w = 0.3f;
 		_mesh_renderer->insertMesh("mesh_b", _input_mesh->getMesh(_selected_frame_for_registration[1]), color);
+		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
 	}
 }
 
@@ -70,7 +71,7 @@ void ShowMesh::renderMesh()
 void ShowMesh::render(ml::Cameraf& camera)
 {
 	if (_solve_non_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
-		nonRigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
+		nonRigidRegistration(_selected_frame_for_registration[1], _selected_frame_for_registration[0]);
 	}
 	_mesh_renderer->render(camera);
 	_point_renderer->render(camera);
@@ -121,7 +122,8 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
 	ml::mat4f transform = ml::mat4f::translation({ -0.5f, 3.5f, 1.5f });
-	ml::mat4f transformation = transform * rotation * scale;
+	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
+	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
 	// puppet
 	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation);
@@ -136,11 +138,13 @@ void ShowMesh::init(ml::ApplicationData &app)
 	//_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation);
 
 	// hand
-	_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation);
-	_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation);
+	_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
+	_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);
 
 	//_mesh_reader->processAllFrames();
-	for (int i = 0; i < 2; i++)
+	for (int i = 0; i < 20; i++) {
 		_input_mesh->processFrame();
+		_reference_registration_mesh->processFrame();
+	}
 	renderMesh();
 }

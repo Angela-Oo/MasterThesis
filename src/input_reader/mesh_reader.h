@@ -11,6 +11,7 @@ private:
 	std::string _file_name;
 	std::vector<ml::TriMeshf> _meshes;
 	ml::mat4f _transformation;
+	unsigned int _start_number;
 private:
 	std::string getFileName(unsigned int index);
 public:
@@ -22,5 +23,5 @@ public:
 	void load(std::string filename);
 	void save(std::string filename);
 public:
-	MeshReader(std::string filepath, std::string filename, ml::mat4f transformation = ml::mat4f::identity());
+	MeshReader(std::string filepath, std::string filename, ml::mat4f transformation = ml::mat4f::identity(), unsigned int start_number = 0);
 };
