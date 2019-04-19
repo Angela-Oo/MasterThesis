@@ -18,10 +18,13 @@ private:
 	unsigned int _current_frame = 0;
 	std::vector<unsigned int> _selected_frame_for_registration;
 	bool _solve_non_rigid_registration = false;
+	bool _render_mesh = true;
 	std::unique_ptr<IRegistration> _registration;
 private:
 	void renderMesh();
 	void renderRegisteredPoints();
+	void renderError();
+	void renderRegistration();
 	void nonRigidRegistration(int frame_a, int frame_b);
 public:
 	void init(ml::ApplicationData &app) override;

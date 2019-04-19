@@ -1,5 +1,7 @@
 #include "showMesh.h"
-
+#include "algo/evaluate_registration.h"
+#include <algorithm>
+#include <cmath>
 
 void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 {
@@ -14,15 +16,17 @@ void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 		std::vector<ml::vec3f> positions_b;
 		for (auto p : points_b)
 			positions_b.push_back(p.position);
-		
 		_registration = std::make_unique<NonRigidRegistration>(positions_a, positions_b, 300);
-		renderMesh();
-		renderRegisteredPoints();
+		//_registration = std::make_unique<NonRigidRegistrationMesh>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), 300);
+
+		renderRegistration();
+		_render_mesh = false;
 	}
 	else {
 		if (_registration->solve()) {
 			std::cout << "solve non rigid registration" << std::endl;
-			renderRegisteredPoints();
+			renderRegistration();
+
 		}
 		else {
 			_selected_frame_for_registration.clear();
@@ -31,6 +35,18 @@ void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 			std::cout << "finished, select next two frames" << std::endl;
 		}
 	}
+}
+
+void ShowMesh::renderError()
+{
+	auto registered_points_a = _registration->getPointsA();
+	auto nearest_reference_points = evaluate_error(registered_points_a, _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
+
+	auto distance_errors = evaluate_distance_error(registered_points_a, nearest_reference_points);
+	float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
+	float max = *std::max_element(distance_errors.begin(), distance_errors.end());
+	std::cout << "mean distance error: " << average << " max distance error: " << max << std::endl;
+	_point_renderer->insertLine("line", registered_points_a, nearest_reference_points, ml::RGBColor::Cyan, 0.0005);
 }
 
 void ShowMesh::renderRegisteredPoints()
@@ -49,24 +65,32 @@ void ShowMesh::renderMesh()
 {
 	_mesh_renderer->clear();
 
-	if (!_registration) {
-		_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame));
-		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
-	}
-	if (_selected_frame_for_registration.size() >= 1)
-	{
-		ml::vec4f color = { 1.0, 0.7, 0., 0.4 };// ml::RGBColor::Orange.toVec4f();
-		_mesh_renderer->insertMesh("mesh_a", _input_mesh->getMesh(_selected_frame_for_registration[0]), color);
-	}
-	if (_selected_frame_for_registration.size() >= 2)
-	{
-		ml::vec4f color = ml::RGBColor::Green.toVec4f();
-		color.w = 0.3f;
-		_mesh_renderer->insertMesh("mesh_b", _input_mesh->getMesh(_selected_frame_for_registration[1]), color);
-		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
+	if (_render_mesh) {
+		if (!_registration) {
+			_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame));
+			_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
+		}
+		if (_selected_frame_for_registration.size() >= 1)
+		{
+			ml::vec4f color = { 1.0, 0.7, 0., 0.4 };// ml::RGBColor::Orange.toVec4f();
+			_mesh_renderer->insertMesh("mesh_a", _input_mesh->getMesh(_selected_frame_for_registration[0]), color);
+		}
+		if (_selected_frame_for_registration.size() >= 2)
+		{
+			ml::vec4f color = ml::RGBColor::Green.toVec4f();
+			color.w = 0.3f;
+			_mesh_renderer->insertMesh("mesh_b", _input_mesh->getMesh(_selected_frame_for_registration[1]), color);
+			//_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
+		}
 	}
 }
 
+void ShowMesh::renderRegistration()
+{
+	renderMesh();
+	renderRegisteredPoints();
+	renderError();
+}
 
 void ShowMesh::render(ml::Cameraf& camera)
 {
@@ -142,7 +166,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);
 
 	//_mesh_reader->processAllFrames();
-	for (int i = 0; i < 20; i++) {
+	for (int i = 0; i < 2; i++) {
 		_input_mesh->processFrame();
 		_reference_registration_mesh->processFrame();
 	}

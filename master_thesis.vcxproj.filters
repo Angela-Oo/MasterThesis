@@ -536,6 +536,12 @@
     <ClInclude Include="src\input_reader\mesh_reader.h">
       <Filter>input_reader</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\evaluate_registration.h">
+      <Filter>algo</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\mesh_knn.h">
+      <Filter>algo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -626,6 +632,12 @@
     </ClCompile>
     <ClCompile Include="src\input_reader\mesh_reader.cpp">
       <Filter>input_reader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\evaluate_registration.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\mesh_knn.cpp">
+      <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

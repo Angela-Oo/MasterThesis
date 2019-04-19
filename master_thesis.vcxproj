@@ -222,7 +222,9 @@
     <ClInclude Include="mLib\include\mLibZLib.h" />
     <ClInclude Include="src\algo\ceres_iteration_logger.h" />
     <ClInclude Include="src\algo\ceres_math.h" />
+    <ClInclude Include="src\algo\evaluate_registration.h" />
     <ClInclude Include="src\algo\knn.h" />
+    <ClInclude Include="src\algo\mesh_knn.h" />
     <ClInclude Include="src\algo\non_rigid_registration\as_rigid_as_possible.h" />
     <ClInclude Include="src\algo\non_rigid_registration\as_rigid_as_possible_cost_function.h" />
     <ClInclude Include="src\algo\non_rigid_registration\deformation_graph.h" />
@@ -262,7 +264,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\algo\ceres_iteration_logger.cpp" />
+    <ClCompile Include="src\algo\evaluate_registration.cpp" />
     <ClCompile Include="src\algo\knn.cpp" />
+    <ClCompile Include="src\algo\mesh_knn.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\as_rigid_as_possible.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\deformation_graph.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\deformation_graph_knn.cpp" />
