@@ -21,6 +21,8 @@ OpenMesh::Vec3f pointOnPlane(Plane plane, OpenMesh::Vec3f point)
 	auto angle = OpenMesh::dot(normal, direction.normalized());
 	auto h = sin(angle) * direction.length();
 
+	if (isnan(h))
+		std::cout <<"fuu h" << std::endl;
 	auto point_on_plane = point - normal * h;
 	return point_on_plane;
 }
@@ -28,7 +30,9 @@ OpenMesh::Vec3f pointOnPlane(Plane plane, OpenMesh::Vec3f point)
 float area(OpenMesh::Vec3f point_a, OpenMesh::Vec3f point_b, OpenMesh::Vec3f point_c)
 {
 	auto c = point_b - point_a;
-	auto b = point_b - point_a;
+	auto b = point_c - point_a;
+	assert(c.length() != 0.f && b.length() != 0.f);
+
 	auto angle = OpenMesh::dot(c.normalized(), b.normalized());
 	auto hb = sin(angle) * b.length();
 	auto area = (hb * b.length()) / 2.;
@@ -42,6 +46,7 @@ OpenMesh::Vec3f barycentricCoordinates(OpenMesh::Vec3f point_a, OpenMesh::Vec3f 
 	auto area_w = area(point_on_triangle, point_c, point_a);
 	auto area_face = area(point_a, point_b, point_c);
 
+	assert(area_face != 0.);
 	float u = area_u / area_face;
 	float v = area_v / area_face;
 	float w = area_w / area_face;
@@ -62,13 +67,15 @@ OpenMesh::Vec3f barycentricCoordinates(ml::OpenMeshTriMesh::Mesh & mesh, OpenMes
 OpenMesh::Vec3f getNearestPointOnSurface(ml::OpenMeshTriMesh::Mesh & mesh, OpenMeshKNN& knn, OpenMesh::Vec3f point)
 {
 	mesh.request_face_normals();
+	
 	auto v_handle = knn.nearest_index(point);
 	auto vf_begin = mesh.vf_iter(v_handle);
 	auto v_point = mesh.point(v_handle);
 
 	for (auto vfIt = vf_begin; vfIt; ++vfIt)
 	{
-		auto normal = mesh.normal(vfIt.handle()).normalized();
+		auto normal = mesh.calc_face_normal(vfIt.handle());
+		normal = normal.normalized();
 		auto point_on_plane = pointOnPlane(Plane(v_point, normal), point);
 		auto barycentric_coordinates = barycentricCoordinates(mesh, vfIt.handle(), point_on_plane);
 		float relative_area = barycentric_coordinates.l1_norm();
@@ -76,8 +83,6 @@ OpenMesh::Vec3f getNearestPointOnSurface(ml::OpenMeshTriMesh::Mesh & mesh, OpenM
 			return point_on_plane;
 		}
 	}
-	assert("fuu??");
-	std::cout << "wtf" << std::endl;
 	return v_point;
 }
 
@@ -90,6 +95,8 @@ std::vector<ml::vec3f> evaluate_error(std::vector<ml::vec3f> result, const ml::T
 	std::vector<ml::vec3f> nearest_points;
 	for (auto & p : result) {
 		auto nearest_point = getNearestPointOnSurface(mesh, knn, OpenMesh::Vec3f(p[0], p[1], p[2]));
+		if (nearest_point.length() == 0.f || isnan(nearest_point[0]) || isnan(nearest_point[1]))
+			std::cout << "help" << std::endl;
 		nearest_points.push_back(ml::vec3f(nearest_point[0], nearest_point[1], nearest_point[2]));
 	}
 	return nearest_points;
@@ -101,7 +108,10 @@ std::vector<float> evaluate_distance_error(const std::vector<ml::vec3f>& points_
 	assert(points_a.size() == points_b.size());
 	std::vector<float> distances;
 	for (int i = 0; i < points_a.size(); ++i) {
-		auto distance = (points_b[i] - points_a[i]).lengthSq();
+		auto vector = points_b[i] - points_a[i];
+		auto distance = (vector).lengthSq();
+		if (isnan(distance) || isinf(distance))
+			std::cout << "bad" << std::endl;
 		distances.push_back(distance);
 	}
 	return distances;

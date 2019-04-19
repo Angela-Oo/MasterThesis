@@ -20,7 +20,7 @@ void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 		//_registration = std::make_unique<NonRigidRegistrationMesh>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), 300);
 
 		renderRegistration();
-		_render_mesh = false;
+		//_render_mesh = false;
 	}
 	else {
 		if (_registration->solve()) {
@@ -68,8 +68,8 @@ void ShowMesh::renderMesh()
 	if (_render_mesh) {
 		if (!_registration) {
 			_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame));
-			_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
 		}
+		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
 		if (_selected_frame_for_registration.size() >= 1)
 		{
 			ml::vec4f color = { 1.0, 0.7, 0., 0.4 };// ml::RGBColor::Orange.toVec4f();
@@ -102,8 +102,8 @@ void ShowMesh::render(ml::Cameraf& camera)
 }
 
 
-void ShowMesh::key(UINT key) {
-
+void ShowMesh::key(UINT key) 
+{
 	if (key == KEY_2)
 	{
 		_current_frame++;
@@ -134,6 +134,14 @@ void ShowMesh::key(UINT key) {
 		else {
 			_solve_non_rigid_registration = true;
 		}
+	}
+	else if (key == KEY_P)
+	{
+		_render_mesh != _render_mesh;
+		if (_render_mesh)
+			std::cout << "show mesh" << std::endl;
+		else
+			std::cout << "hide mesh" << std::endl;
 	}
 }
 
