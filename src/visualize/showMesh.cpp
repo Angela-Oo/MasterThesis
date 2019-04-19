@@ -39,26 +39,31 @@ void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 
 void ShowMesh::renderError()
 {
-	auto registered_points_a = _registration->getPointsA();
-	auto nearest_reference_points = evaluate_error(registered_points_a, _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
+	if (_registration) {
+		auto registered_points_a = _registration->getPointsA();
+		auto nearest_reference_points = evaluate_error(registered_points_a, _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
 
-	auto distance_errors = evaluate_distance_error(registered_points_a, nearest_reference_points);
-	float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
-	float max = *std::max_element(distance_errors.begin(), distance_errors.end());
-	std::cout << "mean distance error: " << average << " max distance error: " << max << std::endl;
-	_point_renderer->insertLine("line", registered_points_a, nearest_reference_points, ml::RGBColor::Cyan, 0.0005);
+		auto distance_errors = evaluate_distance_error(registered_points_a, nearest_reference_points);
+		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
+		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
+		std::cout << "mean distance error: " << average << " max distance error: " << max << std::endl;
+		_point_renderer->insertLine("line", registered_points_a, nearest_reference_points, ml::RGBColor::Red, 0.0005);
+	}
 }
 
 void ShowMesh::renderRegisteredPoints()
 {
-	std::vector<ml::vec3f> render_points_a = _registration->getPointsA();
-	std::vector<ml::vec3f> render_points_b = _registration->getPointsB();
-	std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
+	if (_registration)
+	{
+		std::vector<ml::vec3f> render_points_a = _registration->getPointsA();
+		std::vector<ml::vec3f> render_points_b = _registration->getPointsB();
+		std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
 
-	// render point clouds
-	_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue, 0.004);
-	_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Orange);
-	_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
+		// render point clouds
+		_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue, 0.004);
+		_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Cyan);
+		_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
+	}
 }
 
 void ShowMesh::renderMesh()
@@ -69,10 +74,9 @@ void ShowMesh::renderMesh()
 		if (!_registration) {
 			_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame));
 		}
-		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
 		if (_selected_frame_for_registration.size() >= 1)
 		{
-			ml::vec4f color = { 1.0, 0.7, 0., 0.4 };// ml::RGBColor::Orange.toVec4f();
+			ml::vec4f color = ml::RGBColor::Cyan.toVec4f();
 			_mesh_renderer->insertMesh("mesh_a", _input_mesh->getMesh(_selected_frame_for_registration[0]), color);
 		}
 		if (_selected_frame_for_registration.size() >= 2)
@@ -82,6 +86,9 @@ void ShowMesh::renderMesh()
 			_mesh_renderer->insertMesh("mesh_b", _input_mesh->getMesh(_selected_frame_for_registration[1]), color);
 			//_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
 		}
+	}
+	if (_render_reference_mesh) {
+		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
 	}
 }
 
@@ -135,13 +142,29 @@ void ShowMesh::key(UINT key)
 			_solve_non_rigid_registration = true;
 		}
 	}
+	else if (key == KEY_O)
+	{
+		_render_mesh = true;
+		std::cout << "show mesh" << std::endl;
+		renderRegistration();
+	}
 	else if (key == KEY_P)
 	{
-		_render_mesh != _render_mesh;
-		if (_render_mesh)
-			std::cout << "show mesh" << std::endl;
-		else
-			std::cout << "hide mesh" << std::endl;
+		_render_mesh = false;
+		std::cout << "hide mesh" << std::endl;
+		renderRegistration();
+	}
+	else if (key == KEY_K)
+	{
+		_render_reference_mesh = true;
+		std::cout << "show reference mesh" << std::endl;
+		renderRegistration();
+	}
+	else if (key == KEY_L)
+	{
+		_render_reference_mesh = false;
+		std::cout << "hide reference mesh" << std::endl;
+		renderRegistration();
 	}
 }
 

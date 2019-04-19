@@ -19,6 +19,7 @@ private:
 	std::vector<unsigned int> _selected_frame_for_registration;
 	bool _solve_non_rigid_registration = false;
 	bool _render_mesh = true;
+	bool _render_reference_mesh = true;
 	std::unique_ptr<IRegistration> _registration;
 private:
 	void renderMesh();
