@@ -1,6 +1,7 @@
 #include "mesh_reader.h"
 #include "core-mesh/meshData.h"
 #include <cassert>
+#include <filesystem>
 
 std::string MeshReader::getFileName(unsigned int index)
 {
@@ -72,4 +73,10 @@ MeshReader::MeshReader(std::string filepath, std::string filename, ml::mat4f tra
 	, _transformation(transformation)
 	, _start_number(start_number)
 {
+	if (!std::experimental::filesystem::exists(_file_path)) {
+		throw std::runtime_error("Directory" + _file_path + " does not exists");
+	}
+	else if (!std::experimental::filesystem::exists(getFileName(_start_number))) {
+		throw std::runtime_error("File" + _file_path + " does not exists");
+	}
 }
