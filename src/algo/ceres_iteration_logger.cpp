@@ -19,18 +19,26 @@ long long CeresIterationLoggerGuard::get_time_in_ms()
 
 CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 {
-	std::cout << "Final report:\n" << _summary.BriefReport() << std::endl;
 	auto elapse = get_time_in_ms();
 	_total_time_in_ms += elapse;
 
 	auto time_to_string = [](long long time_in_ms) {
 		long long s = floor(static_cast<double>(time_in_ms) / 1000.);
 		long long ms = time_in_ms - (s * 1000);
-		return std::to_string(s) + "s " + std::to_string(ms) + "ms";
+		std::stringstream ss;
+		ss << std::setw(4) << s << " s " << std::setw(3) << ms << " ms";
+		return ss.str();
 	};
 
 
-	std::cout << "Ceres Solver Iteration: " << _iteration << " sub iterations: " << _summary.num_inner_iteration_steps << ", Duration " << time_to_string(elapse) << ", Total time: " << time_to_string(_total_time_in_ms)
-		<< ", Initial cost: " << _summary.initial_cost << ", Final cost: " << _summary.final_cost << ", Termination: " << _summary.termination_type << std::endl << std::endl;
+	std::cout << std::setprecision(4);
+	std::cout << std::endl << "Iteration: " << std::setw(3) << _iteration << "  steps: " << std::setw(3) << _summary.iterations.size();	
+	//std::cout << " duration " << time_to_string(elapse);
+	std::cout << "  time: " << std::setw(10) << time_to_string(_total_time_in_ms);
+	//std::cout << "Initial cost: " << _summary.initial_cost;
+	std::cout << "  error: " << std::setw(6) << _summary.final_cost;
+	//if (_summary.termination_type != 1)
+	std::cout << "  term: " << _summary.termination_type;
+	std::cout << "  ";
 }
 
