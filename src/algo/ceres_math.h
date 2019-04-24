@@ -26,15 +26,20 @@ void mat3d_to_T(const ml::mat3d& m, T* matrix)
 }
 
 template<typename T>
-void multiply(const T * const m, const T * const v, T* result)
+void matrix_multiplication(const T * const m, const T * const v, T* result)
 {
-	T res[3];
-	res[0] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2];
-	res[1] = m[3] * v[0] + m[4] * v[1] + m[5] * v[2];
-	res[2] = m[6] * v[0] + m[7] * v[1] + m[8] * v[2];
-	result[0] = res[0];
-	result[1] = res[1];
-	result[2] = res[2];
+	result[0] = m[0] * v[0] + m[1] * v[1] + m[2] * v[2];
+	result[1] = m[3] * v[0] + m[4] * v[1] + m[5] * v[2];
+	result[2] = m[6] * v[0] + m[7] * v[1] + m[8] * v[2];
+}
+
+
+template<typename T>
+void scalar_multiply(const T * const v, const T const scalar, T* result)
+{
+	result[0] = v[0] * scalar;
+	result[1] = v[1] * scalar;
+	result[2] = v[2] * scalar;
 }
 
 template<typename T>

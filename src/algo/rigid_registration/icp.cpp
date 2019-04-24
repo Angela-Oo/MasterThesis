@@ -14,10 +14,11 @@ using namespace Eigen;
 #include "../se3.h"
 #include "../ceres_iteration_logger.h"
 #include "../knn.h"
+#include "../mesh_knn.h"
 
 
-ICP::ICP(const std::vector<ml::vec3f>& src,
-		 const std::vector<ml::vec3f>& dst,
+ICP::ICP(const Mesh& src,
+		 const Mesh& dst,
 		 ceres::Solver::Options option)
 	: _src(src)
 	, _dst(dst)
@@ -33,11 +34,13 @@ ml::mat4f ICP::solveFixNN(ml::vec6d transformation_se3)
 {
 	ceres::Solver::Summary summary;
 	CeresIterationLoggerGuard log_guard(summary);
-	KNN nn_search(_dst);
+	TriMeshKNN nn_search(_dst);
 	ceres::Problem problem;
-	for (int i = 0; i < _src.size(); ++i) {
-		unsigned int index = nn_search.nearest_index(_src[i]);
-		ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(_dst[index], _src[i]);
+
+	auto & src_vertices = _src.getVertices();
+	for (int i = 0; i < src_vertices.size(); ++i) {
+		unsigned int index = nn_search.nearest_index(src_vertices[i].position);
+		ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(_dst.getVertices()[index].position, src_vertices[i].position);
 		problem.AddResidualBlock(cost_function, NULL, transformation_se3.array);
 	}
 	ceres::Solve(_options, &problem, &summary);
@@ -50,11 +53,13 @@ ml::mat4f ICP::solve()
 	ceres::Solver::Summary summary;
 	CeresIterationLoggerGuard log_guard(summary);
 
-	KNN nn_search(_dst);
+	TriMeshKNN nn_search(_dst);
 	ml::vec6d rotation_translation(0., 0., 0., 0., 0., 0.);
 	ceres::Problem problem;
-	for (int i = 0; i < _src.size(); ++i) {
-		ceres::CostFunction* cost_function = PointToPointsErrorSE3NNSearch::Create(_src[i], std::bind(&KNN::nearest_f, &nn_search, std::placeholders::_1));
+
+	auto & src_vertices = _src.getVertices();
+	for (int i = 0; i < src_vertices.size(); ++i) {
+		ceres::CostFunction* cost_function = PointToPointsErrorSE3NNSearch::Create(src_vertices[i].position, std::bind(&TriMeshKNN::nearest, &nn_search, std::placeholders::_1));
 		problem.AddResidualBlock(cost_function, NULL, rotation_translation.array);
 	}
 	ceres::Solve(_options, &problem, &summary);

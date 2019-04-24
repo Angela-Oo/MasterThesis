@@ -10,15 +10,16 @@ ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
+typedef ml::TriMeshf Mesh;
 
 class ICP
 {
-	std::vector<ml::vec3f> _src;
-	std::vector<ml::vec3f> _dst;
+	Mesh _src;
+	Mesh _dst;
 	ceres::Solver::Options _options;	
 public:
-	ICP(const std::vector<ml::vec3f>& src,
-		const std::vector<ml::vec3f>& dst,
+	ICP(const Mesh& src,
+		const Mesh& dst,
 		ceres::Solver::Options option);
 
 	ml::mat4f solveFixNN(ml::vec6d transformation_se3 = ml::vec6d(0., 0., 0., 0., 0., 0.));

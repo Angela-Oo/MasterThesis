@@ -9,8 +9,8 @@
 
 void ShowTwoRigideRegisteredFrames::renderPoints()
 {
-	std::vector<ml::vec3f> render_points_a = _registration->getPointsA();
-	std::vector<ml::vec3f> render_points_b = _registration->getPointsB();
+	auto render_points_a = _registration->getPointsA();
+	auto render_points_b = _registration->getPointsB();
 	std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
 
 	// render point clouds
@@ -35,7 +35,15 @@ void ShowTwoRigideRegisteredFrames::initRegistration()
 	std::for_each(points_b.begin(), points_b.end(), [&](ml::vec3f & p) { p = translation * p; });
 
 	//_registration = std::make_unique<RigidRegistration>(points_a_icp, points_b_icp);
-	_registration = std::make_unique<NonRigidRegistration>(points_a, points_b);
+	ml::TriMeshf mesh_a;
+	for (auto & p : points_a)
+		mesh_a.m_vertices.push_back(p);
+
+	ml::TriMeshf mesh_b;
+	for (auto & p : points_b)
+		mesh_b.m_vertices.push_back(p);
+
+	_registration = std::make_unique<NonRigidRegistration>(mesh_a, mesh_b);
 }
 
 void ShowTwoRigideRegisteredFrames::initReader()

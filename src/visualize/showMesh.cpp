@@ -6,17 +6,10 @@
 void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 {
 	if (!_registration) {
-		auto points_a = _input_mesh->getMesh(frame_a).getVertices();
-		auto points_b = _input_mesh->getMesh(frame_b).getVertices();
-
-		std::vector<ml::vec3f> positions_a;
-		for (auto p : points_a)
-			positions_a.push_back(p.position);
+		auto& points_a = _input_mesh->getMesh(frame_a);
+		auto& points_b = _input_mesh->getMesh(frame_b);
 		
-		std::vector<ml::vec3f> positions_b;
-		for (auto p : points_b)
-			positions_b.push_back(p.position);
-		_registration = std::make_unique<NonRigidRegistration>(positions_a, positions_b, 300);
+		_registration = std::make_unique<NonRigidRegistration>(points_a, points_b, 300);
 		//_registration = std::make_unique<NonRigidRegistrationMesh>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), 300);
 
 		renderRegistration();
@@ -47,7 +40,11 @@ void ShowMesh::renderError()
 		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
 		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
 		std::cout << "mean distance error: " << average << " max distance error: " << max << std::endl;
-		_point_renderer->insertLine("line", registered_points_a, nearest_reference_points, ml::RGBColor::Red, 0.0005);
+
+		std::vector<ml::vec3f> positions_a;
+		for (auto & p : registered_points_a.getVertices())
+			positions_a.push_back(p.position);
+		_point_renderer->insertLine("line", positions_a, nearest_reference_points, ml::RGBColor::Red, 0.0005);
 	}
 }
 
@@ -55,8 +52,8 @@ void ShowMesh::renderRegisteredPoints()
 {
 	if (_registration)
 	{
-		std::vector<ml::vec3f> render_points_a = _registration->getPointsA();
-		std::vector<ml::vec3f> render_points_b = _registration->getPointsB();
+		auto render_points_a = _registration->getPointsA();
+		auto render_points_b = _registration->getPointsB();
 		std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
 
 		// render point clouds

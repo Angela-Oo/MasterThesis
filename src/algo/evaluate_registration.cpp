@@ -86,15 +86,15 @@ OpenMesh::Vec3f getNearestPointOnSurface(ml::OpenMeshTriMesh::Mesh & mesh, OpenM
 	return v_point;
 }
 
-std::vector<ml::vec3f> evaluate_error(std::vector<ml::vec3f> result, const ml::TriMeshf & reference_mesh)
+std::vector<ml::vec3f> evaluate_error(const Mesh & result, const Mesh & reference_mesh)
 {
 	ml::OpenMeshTriMesh::Mesh mesh;
 	ml::OpenMeshTriMesh::convertToOpenMesh(reference_mesh, mesh);
 	OpenMeshKNN knn(mesh);  	
 
 	std::vector<ml::vec3f> nearest_points;
-	for (auto & p : result) {
-		auto nearest_point = getNearestPointOnSurface(mesh, knn, OpenMesh::Vec3f(p[0], p[1], p[2]));
+	for (auto & p : result.m_vertices) {
+		auto nearest_point = getNearestPointOnSurface(mesh, knn, OpenMesh::Vec3f(p.position[0], p.position[1], p.position[2]));
 		if (nearest_point.length() == 0.f || isnan(nearest_point[0]) || isnan(nearest_point[1]))
 			std::cout << "help" << std::endl;
 		nearest_points.push_back(ml::vec3f(nearest_point[0], nearest_point[1], nearest_point[2]));
@@ -103,12 +103,12 @@ std::vector<ml::vec3f> evaluate_error(std::vector<ml::vec3f> result, const ml::T
 }
 
 
-std::vector<float> evaluate_distance_error(const std::vector<ml::vec3f>& points_a, const std::vector<ml::vec3f>& points_b)
+std::vector<float> evaluate_distance_error(const Mesh & points_a, const std::vector<ml::vec3f>& points_b)
 {
-	assert(points_a.size() == points_b.size());
+	assert(points_a.m_vertices.size() == points_b.size());
 	std::vector<float> distances;
-	for (int i = 0; i < points_a.size(); ++i) {
-		auto vector = points_b[i] - points_a[i];
+	for (int i = 0; i < points_a.m_vertices.size(); ++i) {
+		auto vector = points_b[i] - points_a.m_vertices[i].position;
 		auto distance = (vector).lengthSq();
 		if (isnan(distance) || isinf(distance))
 			std::cout << "bad" << std::endl;

@@ -96,7 +96,7 @@
 
 
 
-std::vector<ml::vec3f> AsRigidAsPossible::getDeformedPoints()
+Mesh AsRigidAsPossible::getDeformedPoints()
 {
 	return _deformation_graph.deformPoints(_src);
 }
@@ -128,7 +128,7 @@ void AsRigidAsPossible::solveIteration()
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 			unsigned int i = _nn_search.nearest_index(pos_deformed);
 
-			ceres::CostFunction* cost_function = FitStarWCostFunction::Create(_dst[i], src_i._g, global_node._g);
+			ceres::CostFunction* cost_function = FitStarPointToPointCostFunction::Create(_dst.getVertices()[i].position, src_i._g, global_node._g);
 			double weight = a_fit * std::pow(src_i._w, 2);
 			auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function, loss_function,
@@ -170,7 +170,7 @@ void AsRigidAsPossible::solveIteration()
 	}
 }
 
-std::vector<ml::vec3f> AsRigidAsPossible::solve()
+Mesh AsRigidAsPossible::solve()
 {
 	ml::mat4f transformation = ml::mat4f::identity();
 	while (!finished()) {
@@ -186,8 +186,8 @@ bool AsRigidAsPossible::finished()
 		abs(_last_cost - _current_cost) < (tol * _current_cost);
 }
 
-AsRigidAsPossible::AsRigidAsPossible(const std::vector<ml::vec3f>& src,
-									 const std::vector<ml::vec3f>& dst,
+AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
+									 const Mesh& dst,
 									 ceres::Solver::Options option,
 									 unsigned int number_of_deformation_nodes)
 	: _src(src)

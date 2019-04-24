@@ -73,10 +73,13 @@ MeshReader::MeshReader(std::string filepath, std::string filename, ml::mat4f tra
 	, _transformation(transformation)
 	, _start_number(start_number)
 {
+	auto file_name = getFileName(_start_number);
+	std::fstream file_stream;
+	file_stream.open(file_name);
 	if (!std::experimental::filesystem::exists(_file_path)) {
 		throw std::runtime_error("Directory" + _file_path + " does not exists");
 	}
-	else if (!std::experimental::filesystem::exists(getFileName(_start_number))) {
-		throw std::runtime_error("File" + _file_path + " does not exists");
+	else if (!file_stream) {
+		throw std::runtime_error("File" + file_name + " does not exists");
 	}
 }

@@ -21,8 +21,8 @@ void ShowKinectData::renderPoints(int frame)
 
 void ShowKinectData::renderRegisteredPoints()
 {
-	std::vector<ml::vec3f> render_points_a = _registration->getPointsA();
-	std::vector<ml::vec3f> render_points_b = _registration->getPointsB();
+	auto render_points_a = _registration->getPointsA();
+	auto render_points_b = _registration->getPointsB();
 	std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
 
 	// render point clouds
@@ -85,7 +85,16 @@ void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 		auto translation = ml::mat4f::translation({ 1.f, 0., 0. });
 		std::for_each(points_a_icp.begin(), points_a_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
 		std::for_each(points_b_icp.begin(), points_b_icp.end(), [&](ml::vec3f & p) { p = translation * p; });
-		_registration = std::make_unique<NonRigidRegistration>(points_a_icp, points_b_icp);
+
+		ml::TriMeshf mesh_a;
+		for (auto & p : points_a_icp)
+			mesh_a.m_vertices.push_back(p);
+
+		ml::TriMeshf mesh_b;
+		for (auto & p : points_b_icp)
+			mesh_b.m_vertices.push_back(p);
+
+		_registration = std::make_unique<NonRigidRegistration>(mesh_a, mesh_b);
 		renderRegisteredPoints();
 	}
 	else {		

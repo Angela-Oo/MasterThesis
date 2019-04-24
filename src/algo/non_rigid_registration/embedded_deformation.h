@@ -5,15 +5,16 @@
 #include <ceres/ceres.h>
 #include "deformation_graph.h"
 #include "../knn.h"
+#include "../mesh_knn.h"
 
-
+typedef ml::TriMeshf Mesh;
 class EmbeddedDeformation
 {
-	std::vector<ml::vec3f> _src;
-	std::vector<ml::vec3f> _dst;
+	Mesh _src;
+	Mesh _dst;
 	ceres::Solver::Options _options;
 	DeformationGraph _deformation_graph;
-	KNN _nn_search;
+	TriMeshKNN _nn_search;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
@@ -25,15 +26,15 @@ class EmbeddedDeformation
 	double a_conf = 100.;// 1.;// 100;
 	double a_fit = 0.1;
 public:
-	std::vector<ml::vec3f> getDeformedPoints();
+	Mesh getDeformedPoints();
 	bool finished();
 	void solveIteration();
-	std::vector<ml::vec3f> solve();
+	Mesh solve();
 	std::vector<ml::vec3f> getDeformationGraph();
 public:
 	// expect src and dst points to match at the same array position
-	EmbeddedDeformation(const std::vector<ml::vec3f>& src,
-						const std::vector<ml::vec3f>& dst,
+	EmbeddedDeformation(const Mesh& src,
+						const Mesh& dst,
 						ceres::Solver::Options option,
 						unsigned int number_of_deformation_nodes = 1000);
 };

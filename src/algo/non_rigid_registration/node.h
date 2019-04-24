@@ -14,13 +14,14 @@ public:
 	ml::vec3f _g; // node position
 	ml::mat3d _r; // rotation matrix
 	ml::vec3d _t; // translation vector
+	ml::vec3d _n; // normal vector
 	double _w; // weight
 	//std::vector<vertex_index> _nearestNeighbors;
 public:
 	ml::vec3d deformedPosition();
 	ml::vec3d deformPosition(ml::vec3f pos);
 public:
-	Node(ml::vec3f g);
+	Node(ml::vec3f g, ml::vec3f n);
 	Node();
 };
 

@@ -4,6 +4,8 @@
 #include "node.h"
 #include "deformation_graph_knn.h"
 
+typedef ml::TriMeshf Mesh;
+
 class DeformationGraph
 {
 private:
@@ -17,8 +19,8 @@ private:
 	std::vector<double> weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes);
 	ml::vec3f deformPoint(const ml::vec3f & point, std::vector<Node> & k_plus_1_nearest_nodes);
 public:
-	std::vector<ml::vec3f> deformPoints(const std::vector<ml::vec3f> & points);
+	Mesh deformPoints(const Mesh & points);
 	std::vector<ml::vec3f> getDeformationGraph();
 public:
-	DeformationGraph(const std::vector<ml::vec3f> & nodes, size_t number_of_nodes);
+	DeformationGraph(const Mesh & nodes, size_t number_of_nodes);
 };

@@ -99,13 +99,13 @@ ml::vec3f DeformationGraph::deformPoint(const ml::vec3f & point, std::vector<Nod
 }
 
 
-std::vector<ml::vec3f> DeformationGraph::deformPoints(const std::vector<ml::vec3f> & points)
+Mesh DeformationGraph::deformPoints(const Mesh & points)
 {
-	std::vector<ml::vec3f> deformed_points;
-	for (auto & p : points)
+	Mesh deformed_points = points;
+	for (auto & p : deformed_points.getVertices())
 	{
-		std::vector<Node> knn_nodes = _knn->k_nearest(p, _k + 1);
-		deformed_points.push_back(deformPoint(p, knn_nodes));
+		std::vector<Node> knn_nodes = _knn->k_nearest(p.position, _k + 1);
+		p.position = deformPoint(p.position, knn_nodes);
 	}
 	return deformed_points;
 }
@@ -124,23 +124,24 @@ std::vector<ml::vec3f> DeformationGraph::getDeformationGraph()
 	return points;
 }
 
-DeformationGraph::DeformationGraph(const std::vector<ml::vec3f> & points, size_t number_of_nodes)
+DeformationGraph::DeformationGraph(const Mesh & points, size_t number_of_nodes)
 	: _graph(0)
 {
-	std::vector<int> node_point_indices = uniform_node_indices(points.size(), number_of_nodes);
+	auto & vertices = points.getVertices();
+	std::vector<int> node_point_indices = uniform_node_indices(vertices.size(), number_of_nodes);
 
 	for (int index : node_point_indices)
 	{
 		vertex_index v = boost::add_vertex(_graph);
-		if (points.size() > index) {
-			Node n(points[index]);
+		if (vertices.size() > index) {
+			Node n(vertices[index].position, vertices[index].normal);
 			boost::put(boost::get(node_t(), _graph), v, n);
 		}
 	}
 
 	_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
-	for (auto & p : points) {
-		std::vector<vertex_index> node_indices = _knn->k_nearest_indices(p, _k);
+	for (auto & p : vertices) {
+		std::vector<vertex_index> node_indices = _knn->k_nearest_indices(p.position, _k);
 
 		for (size_t i = 0; i < node_indices.size() - 1; ++i) {
 			auto n1 = node_indices[i];

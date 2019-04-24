@@ -7,7 +7,7 @@
 
 
 
-std::vector<ml::vec3f> EmbeddedDeformation::getDeformedPoints()
+Mesh EmbeddedDeformation::getDeformedPoints()
 {
 	return _deformation_graph.deformPoints(_src);
 }
@@ -39,10 +39,17 @@ void EmbeddedDeformation::solveIteration()
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 			unsigned int i = _nn_search.nearest_index(pos_deformed);
 			
-			ceres::CostFunction* cost_function = FitStarWCostFunction::Create(_dst[i], src_i._g, global_node._g);
 			double weight = a_fit;
-			auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function, loss_function,
+			// point to point cost function
+			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointCostFunction::Create(_dst.getVertices()[i].position, src_i._g, global_node._g);
+			auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
+				(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData(), &src_i._w);
+
+			// point to plane cost function
+			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i._g, src_i._n, global_node._g);
+			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
 				(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData(), &src_i._w);
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
@@ -88,7 +95,7 @@ void EmbeddedDeformation::solveIteration()
 	}
 }
 
-std::vector<ml::vec3f> EmbeddedDeformation::solve()
+Mesh EmbeddedDeformation::solve()
 {
 	ml::mat4f transformation = ml::mat4f::identity();
 	while (!finished()) {
@@ -105,8 +112,8 @@ bool EmbeddedDeformation::finished()
 		(abs(_last_cost - _current_cost) < (tol * _current_cost) && _solve_iteration > 5);
 }
 
-EmbeddedDeformation::EmbeddedDeformation(const std::vector<ml::vec3f>& src,
-										 const std::vector<ml::vec3f>& dst,
+EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
+										 const Mesh& dst,
 										 ceres::Solver::Options option,
 										 unsigned int number_of_deformation_nodes)
 	: _src(src)

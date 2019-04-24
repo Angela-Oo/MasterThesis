@@ -26,7 +26,7 @@ struct EmbeddedDeformationCostFunction {
 	bool operator()(const T* const deformation_matrix, T* residuals) const 
 	{
 		T edge_dst[3] = { T(_edge_dst[0]), T(_edge_dst[1]), T(_edge_dst[2]) };
-		multiply(deformation_matrix, edge_dst, edge_dst);
+		matrix_multiplication(deformation_matrix, edge_dst, edge_dst);
 
 		// The error is the difference between the predicted and observed position.
 		residuals[0] = T(_edge_src[0]) - edge_dst[0];
@@ -60,15 +60,17 @@ struct EmbeddedDeformationPointsCostFunction {
 	bool operator()(const T* const point, T* residuals) const
 	{
 		T dst_j[3];
-		vec3f_to_T<T>(_dst_j, dst_j);
 		T edge_dst[3];
-		edge_dst[0] = point[0] - dst_j[0];
-		edge_dst[1] = point[1] - dst_j[1];
-		edge_dst[2] = point[2] - dst_j[2];
+		vec3f_to_T(_dst_j, dst_j);
+
+		substract(point, dst_j, edge_dst);
+		//edge_dst[0] = point[0] - dst_j[0];
+		//edge_dst[1] = point[1] - dst_j[1];
+		//edge_dst[2] = point[2] - dst_j[2];
 
 		T deformation_matrix[9];
-		mat3d_to_T<T>(_matrix.getData(), deformation_matrix);
-		multiply(deformation_matrix, edge_dst, edge_dst);
+		mat3d_to_T(_matrix.getData(), deformation_matrix);
+		matrix_multiplication(deformation_matrix, edge_dst, edge_dst);
 
 		// The error is the difference between the predicted and observed position.
 		residuals[0] = T(_edge_src[0]) - edge_dst[0];
@@ -134,7 +136,7 @@ struct SmoothCostFunction {
 		T result[3];
 
 		substract(vj, vi, edge);
-		multiply(rotation_matrix, edge, result);
+		matrix_multiplication(rotation_matrix, edge, result);
 		addition(result, vi, result);
 		addition(result, bi, result);
 		substract(result, vj, result);
@@ -187,39 +189,94 @@ struct SmoothCostFunction {
 //};
 
 
-struct FitStarWCostFunction {
-	const ml::vec3f& _v;
-	const ml::vec3f& _n;
-	const ml::vec3f& _g;
+struct FitStarPointToPointCostFunction {
+	const ml::vec3f& _point;
+	const ml::vec3f& _node_g;
+	const ml::vec3f& _global_g;
 
-	FitStarWCostFunction(const ml::vec3f &v, const ml::vec3f &n, const ml::vec3f &g) :
-		_v(v), _n(n), _g(g)
+	FitStarPointToPointCostFunction(const ml::vec3f &point, const ml::vec3f &node_g, const ml::vec3f &global_g) :
+		_point(point), _node_g(node_g), _global_g(global_g)
 	{ }
 
 	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create(const ml::vec3f &v, const ml::vec3f &n, const ml::vec3f &g) {
-		return (new ceres::AutoDiffCostFunction<FitStarWCostFunction, 3, 9, 3, 3, 1>(new FitStarWCostFunction(v, n, g)));
+	static ceres::CostFunction* Create(const ml::vec3f &point, const ml::vec3f &node_g, const ml::vec3f &global_g) {
+		return (new ceres::AutoDiffCostFunction<FitStarPointToPointCostFunction, 3, 9, 3, 3, 1>(new FitStarPointToPointCostFunction(point, node_g, global_g)));
 	}
 
 	template <typename T>
 	bool operator()(const T* const global_rotation, const T* const global_translation, const T* const translation, const T* const w, T* residuals) const
 	{
-		T n[3] = { T(_n[0]), T(_n[1]), T(_n[2]) };
-		T g[3] = { T(_g[0]), T(_g[1]), T(_g[2]) };
+		T n[3];
+		T g[3];
+		T point[3];
+		vec3f_to_T(_node_g, n);
+		vec3f_to_T(_global_g, g);
+		vec3f_to_T(_point, point);
 
 		// local deformation of node position
 		addition(n, translation, n);
 
 		// global deformation of node position
 		substract(n, g, n);
-		multiply(global_rotation, n, n);
+		matrix_multiplication(global_rotation, n, n);
+		addition(n, g, n);
+		addition(n, global_translation, n);
+
+		// The error is the difference between the predicted and observed position multiplied with the weight
+		substract(n, point, residuals);
+		scalar_multiply(residuals, w[0], residuals);
+
+		return true;
+	}
+};
+
+
+struct FitStarPointToPlaneCostFunction {
+	const ml::vec3f& _point;
+	const ml::vec3f& _node_g;
+	const ml::vec3f& _node_normal;
+	const ml::vec3f& _global_g;
+
+	FitStarPointToPlaneCostFunction(const ml::vec3f& point, const ml::vec3f& node_g, const ml::vec3f& node_normal, const ml::vec3f &global_g) :
+		_point(point), _node_g(node_g), _node_normal(node_normal), _global_g(global_g)
+	{
+	}
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(const ml::vec3f& point, const ml::vec3f& node_g, const ml::vec3f& node_normal, const ml::vec3f &global_g)
+	{
+		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneCostFunction, 1, 9, 3, 3, 1>(new FitStarPointToPlaneCostFunction(point, node_g, node_normal, global_g)));
+	}
+
+	template <typename T>
+	bool operator()(const T* const global_rotation, const T* const global_translation, const T* const translation, const T* const w, T* residuals) const 
+	{
+		T n[3];
+		T g[3];
+		T point[3];
+		T normal[3];
+		vec3f_to_T(_node_g, n);
+		vec3f_to_T(_global_g, g);
+		vec3f_to_T(_point, point);
+		vec3f_to_T(_node_normal, normal);
+		
+		// local deformation of node position
+		addition(n, translation, n);
+
+		// global deformation of node position
+		substract(n, g, n);
+		matrix_multiplication(global_rotation, n, n);
 		addition(n, g, n);
 		addition(n, global_translation, n);
 
 		// The error is the difference between the predicted and observed position.
-		residuals[0] = (n[0] - T(_v[0])) * w[0];
-		residuals[1] = (n[1] - T(_v[1])) * w[0];
-		residuals[2] = (n[2] - T(_v[2])) * w[0];
+		T difference[3];
+		substract(n, point, difference);
+		residuals[0] = dot(difference, normal) * w[0];
+
+		//residuals[0] = (n[0] - T(_point[0])) * T(_node_normal[0]) + \
+		//	(n[1] - T(_point[1])) * T(_node_normal[1]) + \
+		//	(n[2] - T(_point[2])) * T(_node_normal[2]);
 
 		return true;
 	}
