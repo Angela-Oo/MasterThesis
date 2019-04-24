@@ -108,7 +108,7 @@ Mesh NonRigidRegistration::getPointsB()
 std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
 {
 	if (_embedded_deformation)
-		return _embedded_deformation->getDeformationGraph();
+		return _embedded_deformation->getDeformationGraph().getDeformationGraph();
 	else if (_as_rigid_as_possible)
 		return _as_rigid_as_possible->getDeformationGraph();
 	else
@@ -143,71 +143,68 @@ NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & p
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-//
-//bool NonRigidRegistrationMesh::solve()
-//{
-//
-//	//AsRigidAsPossible arap(_points_a, _points_b, options);
-//	//_points_b = arap.solve();
-//	if (!_embedded_deformation) {
-//		ceres::Solver::Options options;
-//		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-//		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-//		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-//		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-//		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
-//		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-//		options.max_num_iterations = 50;
-//		options.logging_type = ceres::LoggingType::SILENT;
-//		options.minimizer_progress_to_stdout = false;
-//
-//		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes);
-//		//_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, 1000);
-//	}
-//	if (_embedded_deformation && !_embedded_deformation->finished()) {
-//		_embedded_deformation->solveIteration();
-//		_points_a = _embedded_deformation->getDeformedPoints();
-//		return true;
-//	}
-//	if (_as_rigid_as_possible && !_as_rigid_as_possible->finished()) {
-//		_as_rigid_as_possible->solveIteration();
-//		_points_a = _as_rigid_as_possible->getDeformedPoints();
-//		return true;
-//	}
-//	return false;
-//}
-//
-//
-//std::vector<ml::vec3f> NonRigidRegistrationMesh::getPointsA()
-//{
-//	std::vector<ml::vec3f> positions_a;
-//	for (auto p : _points_a.getVertices())
-//		positions_a.push_back(p.position);
-//		
-//	return positions_a;
-//}
-//
-//std::vector<ml::vec3f> NonRigidRegistrationMesh::getPointsB()
-//{
-//	std::vector<ml::vec3f> positions_b;
-//	for (auto p : _points_b.getVertices())
-//		positions_b.push_back(p.position);
-//	return positions_b;
-//}
-//
-//std::vector<ml::vec3f> NonRigidRegistrationMesh::getPointsDeformationGraph()
-//{
-//	if (_embedded_deformation)
-//		return _embedded_deformation->getDeformationGraph();
-//	else if (_as_rigid_as_possible)
-//		return _as_rigid_as_possible->getDeformationGraph();
-//	else
-//		return std::vector<ml::vec3f>();
-//}
-//
-//
-//NonRigidRegistrationMesh::NonRigidRegistrationMesh(const ml::TriMeshf & mesh_a, const ml::TriMeshf & mesh_b, unsigned int number_of_deformation_nodes)
-//	: _points_a(mesh_a)
-//	, _points_b(mesh_b)
-//	, _number_of_deformation_nodes(number_of_deformation_nodes)
-//{}
+
+bool NonRigidRegistrationFrames::solve() 
+{
+	if (_current >= _meshes.size())
+		throw std::exception("not enouth meshes");
+	if (!_embedded_deformation) {
+		ceres::Solver::Options options;
+		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
+		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+		options.max_num_iterations = 50;
+		options.logging_type = ceres::LoggingType::SILENT;
+		options.minimizer_progress_to_stdout = false;
+
+		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[0], _meshes[_current], /*_deformation_graphs[_current - 1],*/ options, _number_of_deformation_nodes);
+		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[_current], _meshes[0], options, _number_of_deformation_nodes);
+	}
+	if (_embedded_deformation && !_embedded_deformation->finished()) {
+		_embedded_deformation->solveIteration();
+		_meshes[_current] = _embedded_deformation->getDeformedPoints();
+		_deformation_graphs[_current] = _embedded_deformation->getDeformationGraph();
+		return true;
+	}
+	else {
+		if (_current < _meshes.size() - 1) {
+			std::cout << std::endl << "frame " << _current << " solved" << std::endl;
+			_current++;			
+			_embedded_deformation.reset();
+			return true;
+		}
+		return false;
+	}
+}
+
+Mesh NonRigidRegistrationFrames::getMesh(int frame) 
+{
+	return _meshes[frame];
+}
+
+size_t NonRigidRegistrationFrames::getCurrent()
+{
+	return _current;
+}
+
+DeformationGraph NonRigidRegistrationFrames::getDeformationGraph(int frame)
+{
+	return _deformation_graphs[frame];
+}
+
+NonRigidRegistrationFrames::NonRigidRegistrationFrames()
+	: _current(1)
+{
+}
+
+NonRigidRegistrationFrames::NonRigidRegistrationFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes)
+	: _meshes(meshes)
+	, _number_of_deformation_nodes(number_of_deformation_nodes)
+	, _current(1)
+{
+	_deformation_graphs.resize(_meshes.size());
+	_deformation_graphs[0] = DeformationGraph(_meshes[0], _number_of_deformation_nodes);
+}

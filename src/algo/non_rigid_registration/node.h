@@ -23,6 +23,7 @@ public:
 public:
 	Node(ml::vec3f g, ml::vec3f n);
 	Node();
+	Node(const Node& node) = default;
 };
 
 typedef boost::property<node_t, Node> VertexProperty;

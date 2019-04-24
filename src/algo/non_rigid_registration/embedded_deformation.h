@@ -30,11 +30,17 @@ public:
 	bool finished();
 	void solveIteration();
 	Mesh solve();
-	std::vector<ml::vec3f> getDeformationGraph();
+	DeformationGraph & getDeformationGraph();
 public:
 	// expect src and dst points to match at the same array position
 	EmbeddedDeformation(const Mesh& src,
 						const Mesh& dst,
+						ceres::Solver::Options option,
+						unsigned int number_of_deformation_nodes = 1000);
+
+	EmbeddedDeformation(const Mesh& src,
+						const Mesh& dst,
+						const DeformationGraph & deformation_graph,
 						ceres::Solver::Options option,
 						unsigned int number_of_deformation_nodes = 1000);
 };

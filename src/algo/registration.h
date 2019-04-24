@@ -53,6 +53,26 @@ public:
 };
 
 
+
+class NonRigidRegistrationFrames
+{
+private:
+	std::vector<Mesh> _meshes;
+	std::vector<DeformationGraph> _deformation_graphs;
+	std::vector<ml::vec6d> _transformation;
+	size_t _current;
+	unsigned int _number_of_deformation_nodes;
+	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
+public:
+	bool solve();
+	size_t getCurrent();
+	Mesh getMesh(int frame);
+	DeformationGraph getDeformationGraph(int frame);
+public:
+	NonRigidRegistrationFrames();
+	NonRigidRegistrationFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes = 1000);
+};
+
 //class NonRigidRegistrationMesh : public IRegistration
 //{
 //private:

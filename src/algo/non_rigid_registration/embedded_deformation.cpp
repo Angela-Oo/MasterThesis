@@ -12,9 +12,9 @@ Mesh EmbeddedDeformation::getDeformedPoints()
 	return _deformation_graph.deformPoints(_src);
 }
 
-std::vector<ml::vec3f> EmbeddedDeformation::getDeformationGraph()
+DeformationGraph & EmbeddedDeformation::getDeformationGraph()
 {
-	return _deformation_graph.getDeformationGraph();
+	return _deformation_graph;// .getDeformationGraph();
 }
 
 void EmbeddedDeformation::solveIteration()
@@ -122,6 +122,23 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(src, number_of_deformation_nodes)
+	, _nn_search(dst)
+{
+	std::cout << "\nCeres Solver" << std::endl;
+	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
+	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
+	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
+}
+
+EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
+										 const Mesh& dst,
+										 const DeformationGraph & deformation_graph,
+										 ceres::Solver::Options option,
+										 unsigned int number_of_deformation_nodes)
+	: _src(src)
+	, _dst(dst)
+	, _options(option)
+	, _deformation_graph(deformation_graph)
 	, _nn_search(dst)
 {
 	std::cout << "\nCeres Solver" << std::endl;

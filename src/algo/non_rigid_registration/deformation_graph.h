@@ -22,5 +22,8 @@ public:
 	Mesh deformPoints(const Mesh & points);
 	std::vector<ml::vec3f> getDeformationGraph();
 public:
+	DeformationGraph() = default;
 	DeformationGraph(const Mesh & nodes, size_t number_of_nodes);
+	DeformationGraph(const DeformationGraph & deformation_graph);
+	DeformationGraph & operator=(DeformationGraph other);
 };

@@ -132,3 +132,22 @@ DeformationGraph::DeformationGraph(const Mesh & points, size_t number_of_nodes)
 	}
 	_global_rigid_deformation._g /= count;
 }
+
+
+DeformationGraph::DeformationGraph(const DeformationGraph & deformation_graph)
+	: _global_rigid_deformation(deformation_graph._global_rigid_deformation)
+	, _graph(deformation_graph._graph)
+{
+	_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+}
+
+DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
+{
+	if (&other == this)
+		return *this;
+
+	_global_rigid_deformation = other._global_rigid_deformation;
+	_graph = other._graph;
+	_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+	return *this;
+}
