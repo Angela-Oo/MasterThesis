@@ -50,7 +50,9 @@ void EmbeddedDeformation::solveIteration()
 			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i._g, src_i._n, global_node._g);
 			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-				(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData(), &src_i._w);
+									(&global_node._r)->getData(), (&global_node._t)->getData(),
+									(&src_i._r)->getData(), (&src_i._t)->getData(),
+									 &src_i._w);
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];

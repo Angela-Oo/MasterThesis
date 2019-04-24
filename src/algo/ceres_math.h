@@ -33,6 +33,24 @@ void matrix_multiplication(const T * const m, const T * const v, T* result)
 	result[2] = m[6] * v[0] + m[7] * v[1] + m[8] * v[2];
 }
 
+template<typename T>
+void matrix_transpose(const T * const m, T * m_transpose)
+{
+	m_transpose[0] = m[0];
+	m_transpose[4] = m[4];
+	m_transpose[8] = m[8];
+
+	m_transpose[1] = m[3];
+	m_transpose[2] = m[6];
+
+	m_transpose[3] = m[1];	
+	m_transpose[5] = m[7];
+
+	m_transpose[6] = m[2];
+	m_transpose[7] = m[5];	
+}
+
+
 
 template<typename T>
 void scalar_multiply(const T * const v, const T const scalar, T* result)
@@ -63,6 +81,20 @@ T dot(const T * const v1, const T * const v2)
 {
 	T result = v1[0] * v2[0] + v1[1] * v2[1] + v1[2] * v2[2];
 	return result;
+}
+
+template<typename T>
+void normalize(const T * const v, T * normalized_v)
+{
+	T length = T(sqrt(dot(v, v)));
+	T one_divided_by_length = T(1.) / length;
+	if (length > T(0.))
+		scalar_multiply<T>(v, one_divided_by_length, normalized_v);
+	else {
+		normalized_v[0] = T(0.);
+		normalized_v[1] = T(0.);
+		normalized_v[2] = T(0.);
+	}
 }
 
 template<typename T>
