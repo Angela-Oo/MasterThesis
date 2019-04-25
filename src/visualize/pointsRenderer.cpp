@@ -58,6 +58,11 @@ void PointsRenderer::insertLine(std::string id, const TriMeshf & points1, const 
 	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 }
 
+void PointsRenderer::clear()
+{
+	_pointClouds.clear();
+}
+
 PointsRenderer::PointsRenderer(ml::ApplicationData &app)
 {
 	_graphics = &app.graphics;

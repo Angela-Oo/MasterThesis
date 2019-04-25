@@ -63,7 +63,6 @@ RigidRegistration::RigidRegistration(const Mesh & points_a, const Mesh & points_
 
 bool NonRigidRegistration::solve()
 {
-
 	//AsRigidAsPossible arap(_points_a, _points_b, options);
 	//_points_b = arap.solve();
 	if (!_embedded_deformation) {
@@ -74,7 +73,7 @@ bool NonRigidRegistration::solve()
 		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
 		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
 		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-		options.max_num_iterations = 50;
+		options.max_num_iterations = 100;
 		options.logging_type = ceres::LoggingType::SILENT;
 		options.minimizer_progress_to_stdout = false;
 

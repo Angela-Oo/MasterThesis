@@ -23,6 +23,7 @@ private:
 	bool _solve_all_non_rigid_registration = false;
 	bool _render_mesh = true;
 	bool _render_reference_mesh = true;
+	bool _render_error = true;
 	std::unique_ptr<IRegistration> _registration;
 	std::unique_ptr<NonRigidRegistrationFrames> _registration_frames;
 private:

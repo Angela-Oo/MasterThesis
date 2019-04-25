@@ -22,7 +22,7 @@ void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 		else {
 			_selected_frame_for_registration.clear();
 			_solve_non_rigid_registration = false;
-			_registration.reset();
+			//_registration.reset();
 			std::cout << std::endl << "finished, select next two frames" << std::endl;
 		}
 	}
@@ -52,8 +52,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 
 void ShowMesh::renderError()
 {
-	bool render_error = true;
-	if (_registration && render_error) {
+	if (_registration) {
 		auto registered_points_a = _registration->getPointsA();
 		auto nearest_reference_points = evaluate_error(registered_points_a, _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
 
@@ -67,10 +66,12 @@ void ShowMesh::renderError()
 		if(_logger)
 			_logger->write(ss.str());
 
-		std::vector<ml::vec3f> positions_a;
-		for (auto & p : registered_points_a.getVertices())
-			positions_a.push_back(p.position);
-		_point_renderer->insertLine("line", positions_a, nearest_reference_points, ml::RGBColor::Red, 0.0005);
+		if (_render_error) {
+			std::vector<ml::vec3f> positions_a;
+			for (auto & p : registered_points_a.getVertices())
+				positions_a.push_back(p.position);
+			_point_renderer->insertLine("line", positions_a, nearest_reference_points, ml::RGBColor::Red, 0.0005);
+		}
 	}
 }
 
@@ -128,6 +129,7 @@ void ShowMesh::renderMesh()
 
 void ShowMesh::renderRegistration()
 {
+	_point_renderer->clear();
 	renderMesh();
 	renderRegisteredPoints();
 	renderError();
@@ -213,6 +215,18 @@ void ShowMesh::key(UINT key)
 		std::cout << "hide reference mesh" << std::endl;
 		renderRegistration();
 	}
+	else if (key == KEY_N)
+	{
+		_render_error = true;
+		std::cout << "show error to reference mesh" << std::endl;
+		renderRegistration();
+	}
+	else if (key == KEY_M)
+	{
+		_render_error = false;
+		std::cout << "hide error to reference mesh" << std::endl;
+		renderRegistration();
+	}
 }
 
 
@@ -229,16 +243,16 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
 	// puppet
-	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation);
-	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation);	
+	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
+	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);	
 
 	// paperbag
-	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation);
-	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation);
+	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
+	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 0);
 
 	// head
-	_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation);
-	_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation);
+	_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
+	_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
 	_logger = std::make_shared<FileWriter>("head_log.txt");
 
 	// hand
@@ -252,4 +266,16 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_reference_registration_mesh->processFrame();
 	}
 	renderMesh();
+
+	std::cout << "controls:" << std::endl;
+	std::cout << "    show next frame: KEY_2" << std::endl;
+	std::cout << "    show previous frame: KEY_1" << std::endl;
+	std::cout << "    show mesh: KEY_O" << std::endl;
+	std::cout << "    hide mesh: KEY_P" << std::endl;
+	std::cout << "    show reference mesh: KEY_K" << std::endl;
+	std::cout << "    hide reference mesh: KEY_L" << std::endl;
+	std::cout << "    show error to reference mesh: KEY_N" << std::endl;
+	std::cout << "    hide error to reference mesh: KEY_M" << std::endl;
+	std::cout << "    non rigid registration: KEY_I" << std::endl;
+
 }
