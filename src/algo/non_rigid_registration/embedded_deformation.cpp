@@ -23,7 +23,7 @@ void EmbeddedDeformation::solveIteration()
 		_solve_iteration++;
 
 		ceres::Solver::Summary summary;
-		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
+		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration, _logger);
 
 		ceres::Problem problem;
 		auto & g = _deformation_graph._graph;
@@ -117,12 +117,14 @@ bool EmbeddedDeformation::finished()
 EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 										 const Mesh& dst,
 										 ceres::Solver::Options option,
-										 unsigned int number_of_deformation_nodes)
+										 unsigned int number_of_deformation_nodes,
+										 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(src, number_of_deformation_nodes)
 	, _nn_search(dst)
+	, _logger(logger)
 {
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
@@ -134,12 +136,14 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 										 const Mesh& dst,
 										 const DeformationGraph & deformation_graph,
 										 ceres::Solver::Options option,
-										 unsigned int number_of_deformation_nodes)
+										 unsigned int number_of_deformation_nodes,
+										 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
 	, _nn_search(dst)
+	, _logger(logger)
 {
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;

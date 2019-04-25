@@ -6,11 +6,13 @@
 #include "pointsRenderer.h"
 #include "input_reader/mesh_reader.h"
 #include "algo/registration.h"
+#include "algo/file_writer.h"
 
 
 class ShowMesh : public IShowData
 {
 private:
+	std::shared_ptr<FileWriter> _logger;
 	std::unique_ptr<PointsRenderer> _point_renderer;
 	std::unique_ptr<MeshRenderer> _mesh_renderer;
 	std::unique_ptr<MeshReader> _input_mesh;

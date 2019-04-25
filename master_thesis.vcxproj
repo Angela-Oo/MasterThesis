@@ -223,6 +223,7 @@
     <ClInclude Include="src\algo\ceres_iteration_logger.h" />
     <ClInclude Include="src\algo\ceres_math.h" />
     <ClInclude Include="src\algo\evaluate_registration.h" />
+    <ClInclude Include="src\algo\file_writer.h" />
     <ClInclude Include="src\algo\knn.h" />
     <ClInclude Include="src\algo\mesh_knn.h" />
     <ClInclude Include="src\algo\non_rigid_registration\as_rigid_as_possible.h" />
@@ -265,6 +266,7 @@
   <ItemGroup>
     <ClCompile Include="src\algo\ceres_iteration_logger.cpp" />
     <ClCompile Include="src\algo\evaluate_registration.cpp" />
+    <ClCompile Include="src\algo\file_writer.cpp" />
     <ClCompile Include="src\algo\knn.cpp" />
     <ClCompile Include="src\algo\mesh_knn.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\as_rigid_as_possible.cpp" />

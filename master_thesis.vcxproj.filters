@@ -542,6 +542,9 @@
     <ClInclude Include="src\algo\mesh_knn.h">
       <Filter>algo</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\file_writer.h">
+      <Filter>algo</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -637,6 +640,9 @@
       <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\mesh_knn.cpp">
+      <Filter>algo</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\file_writer.cpp">
       <Filter>algo</Filter>
     </ClCompile>
   </ItemGroup>

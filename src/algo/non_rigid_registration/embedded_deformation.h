@@ -6,6 +6,7 @@
 #include "deformation_graph.h"
 #include "../knn.h"
 #include "../mesh_knn.h"
+#include "../file_writer.h"
 
 typedef ml::TriMeshf Mesh;
 class EmbeddedDeformation
@@ -25,6 +26,7 @@ class EmbeddedDeformation
 	double a_smooth = 100.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
 	double a_fit = 0.1;
+	std::shared_ptr<FileWriter> _logger;
 public:
 	Mesh getDeformedPoints();
 	bool finished();
@@ -36,11 +38,13 @@ public:
 	EmbeddedDeformation(const Mesh& src,
 						const Mesh& dst,
 						ceres::Solver::Options option,
-						unsigned int number_of_deformation_nodes = 1000);
+						unsigned int number_of_deformation_nodes = 1000,
+						std::shared_ptr<FileWriter> logger = nullptr);
 
 	EmbeddedDeformation(const Mesh& src,
 						const Mesh& dst,
 						const DeformationGraph & deformation_graph,
 						ceres::Solver::Options option,
-						unsigned int number_of_deformation_nodes = 1000);
+						unsigned int number_of_deformation_nodes = 1000,
+						std::shared_ptr<FileWriter> logger = nullptr);
 };

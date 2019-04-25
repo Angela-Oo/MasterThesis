@@ -2,6 +2,7 @@
 #include "algo/rigid_registration/icp.h"
 #include "algo/non_rigid_registration/embedded_deformation.h"
 #include "algo/non_rigid_registration/as_rigid_as_possible.h"
+#include "algo/file_writer.h"
 
 typedef ml::TriMeshf Mesh;
 
@@ -42,6 +43,7 @@ private:
 	unsigned int _number_of_deformation_nodes;
 	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
 	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
+	std::shared_ptr<FileWriter> _logger;
 public:
 	bool solve() override;
 	Mesh getPointsA() override;
@@ -49,7 +51,7 @@ public:
 	std::vector<ml::vec3f> getPointsDeformationGraph() override;
 public:
 	NonRigidRegistration();
-	NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes = 1000);
+	NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
 };
 
 
