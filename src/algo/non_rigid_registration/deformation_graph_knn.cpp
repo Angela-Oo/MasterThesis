@@ -9,12 +9,12 @@ DeformationGraphKNN::DeformationGraphKNN(const Graph & graph, unsigned int max_k
 
 	auto all_nodes = boost::get(node_t(), _graph);
 	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
-		Node n = all_nodes[*vp.first];
+		auto p = all_nodes[*vp.first].position();
 		_node_graph_indices.push_back(*vp.first);
 		float * point = new float[3];
-		point[0] = n._g[0];
-		point[1] = n._g[1];
-		point[2] = n._g[2];
+		point[0] = p[0];
+		point[1] = p[1];
+		point[2] = p[2];
 		nn_points.push_back(point);
 	}
 	_neares_neighbor_search.init(nn_points, 3, max_k);

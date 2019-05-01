@@ -65,7 +65,7 @@ bool NonRigidRegistration::solve()
 {
 	//AsRigidAsPossible arap(_points_a, _points_b, options);
 	//_points_b = arap.solve();
-	if (!_embedded_deformation) {
+	if (!(_embedded_deformation || _as_rigid_as_possible)) {
 		ceres::Solver::Options options;
 		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
 		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
@@ -77,8 +77,8 @@ bool NonRigidRegistration::solve()
 		options.logging_type = ceres::LoggingType::SILENT;
 		options.minimizer_progress_to_stdout = false;
 
-		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
-		_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
+		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
+		//_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
 	}
 	if (_embedded_deformation && !_embedded_deformation->finished()) {
 		_embedded_deformation->solveIteration();

@@ -47,26 +47,26 @@ void EmbeddedDeformation::solveIteration()
 			
 			double weight = a_fit;
 			// point to point cost function
-			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointCostFunction::Create(_dst.getVertices()[i].position, src_i._g, global_node._g);
+			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
 			auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
-				(&global_node._r)->getData(), (&global_node._t)->getData(), (&src_i._t)->getData(), &src_i._w);
+				global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
 			// point to plane cost function
-			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i._g, src_i._n, global_node._g);
+			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
 			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-									(&global_node._r)->getData(), (&global_node._t)->getData(),
-									(&src_i._r)->getData(), (&src_i._t)->getData(),
-									 &src_i._w);
+									 global_node.r(), global_node.t(),
+									 src_i.r(), src_i.t(),
+									 src_i.w());
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];
 			for (auto avp = boost::adjacent_vertices(*vp.first, g); avp.first != avp.second; ++avp.first) {
 				Node& src_j = nodes[*avp.first];
-				ceres::CostFunction* cost_function = SmoothCostFunction::Create(src_i._g, src_j._g);
+				ceres::CostFunction* cost_function = SmoothCostFunction::Create(src_i.g(), src_j.g());
 				auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
-				problem.AddResidualBlock(cost_function, loss_function, (&src_i._r)->getData(), (&src_i._t)->getData(), (&src_j._t)->getData());
+				problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
 			}
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
@@ -74,17 +74,17 @@ void EmbeddedDeformation::solveIteration()
 			Node& src_i = nodes[*vp.first];
 			ceres::CostFunction* cost_function = RotationCostFunction::Create();
 			auto loss_function = new ceres::ScaledLoss(NULL, a_rigid, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function, loss_function, (&src_i._r)->getData());
+			problem.AddResidualBlock(cost_function, loss_function, src_i.r());
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
 		{
 			Node& src_i = nodes[*vp.first];
 			ceres::CostFunction* cost_function = ConfCostFunction::Create();
 			auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function, loss_function, &src_i._w);
+			problem.AddResidualBlock(cost_function, loss_function, src_i.w());
 		}
 		ceres::CostFunction* cost_function = RotationCostFunction::Create();
-		problem.AddResidualBlock(cost_function, NULL, (&global_node._r)->getData());
+		problem.AddResidualBlock(cost_function, NULL, global_node.r());
 
 		ceres::Solve(_options, &problem, &summary);
 

@@ -33,7 +33,7 @@ std::vector<int> uniform_node_indices(size_t number_of_points, size_t number_of_
 
 double DeformationGraph::weight(const ml::vec3f & point, Node & node, double dmax)
 {
-	double normed_distance = ml::dist(point, node._g);
+	double normed_distance = ml::dist(point, node.position());
 	double weight = std::pow(1. - (normed_distance / dmax), 2);
 	return weight;
 }
@@ -41,7 +41,7 @@ double DeformationGraph::weight(const ml::vec3f & point, Node & node, double dma
 std::vector<double> DeformationGraph::weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes)
 {
 	auto last_node = k_plus_1_nearest_nodes[k_plus_1_nearest_nodes.size() - 1];
-	double d_max = ml::dist(point, last_node._g);
+	double d_max = ml::dist(point, last_node.position());
 
 	std::vector<double> weights;
 	for (size_t i = 0; i < k_plus_1_nearest_nodes.size() - 1; ++i)
@@ -125,12 +125,16 @@ DeformationGraph::DeformationGraph(const Mesh & points, size_t number_of_nodes)
 
 	auto& nodes = boost::get(node_t(), _graph);
 	int count = 0;
+	ml::vec3f global_position = ml::vec3f::origin;
 	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
 		Node& node = nodes[*vp.first];
-		_global_rigid_deformation._g += node._g;
+		global_position += node.position();
+		//_global_rigid_deformation.position() += node.position();
 		count++;
 	}
-	_global_rigid_deformation._g /= count;
+	//_global_rigid_deformation.position() /= count;
+	global_position /= count;
+	_global_rigid_deformation = Node(global_position, ml::vec3d::eZ);
 }
 
 DeformationGraph::DeformationGraph(const Graph & graph, const Node & global_rigid_deformation)
@@ -165,9 +169,7 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 
 Node inverseDeformationNode(const Node & node)
 {
-	Node inverse_deformation_node(node.deformedPosition(), node.deformedNormal());
-	inverse_deformation_node._r = node._r.getInverse();
-	inverse_deformation_node._t = -node._t;
+	Node inverse_deformation_node(node.deformedPosition(), node.deformedNormal(), node.rotation().getInverse(), -node.translation());
 	return inverse_deformation_node;
 }
 
