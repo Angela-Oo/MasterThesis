@@ -68,6 +68,7 @@ private:
 	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
 public:
 	bool solve();
+	bool finished();
 	size_t getCurrent();
 	Mesh getMesh(int frame);
 	Mesh getDeformedMesh(int frame);

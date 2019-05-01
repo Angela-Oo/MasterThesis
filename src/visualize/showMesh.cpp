@@ -92,7 +92,11 @@ void ShowMesh::renderRegisteredPoints()
 	else if (_registration_frames) {
 		_point_renderer->insertPoints("frame_registered_A", _registration_frames->getDeformedMesh(0), ml::RGBColor::Cyan);
 		_point_renderer->insertPoints("frame_registered_B", _registration_frames->getDeformedMesh(_registration_frames->getCurrent()), ml::RGBColor::Green);
-		_point_renderer->insertPoints("frame_B", _registration_frames->getMesh(_registration_frames->getCurrent()), ml::RGBColor::Yellow);
+		if(!_registration_frames->finished())
+			_point_renderer->insertPoints("frame_B", _registration_frames->getMesh(_registration_frames->getCurrent()), ml::RGBColor::Yellow);
+		else {
+			_point_renderer->removePoints("frame_B");
+		}
 	}
 }
 
@@ -127,12 +131,12 @@ void ShowMesh::renderMesh()
 		}
 	}
 	if (_render_reference_mesh) {
-		if (_registration_frames) {
-			_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_registration_frames->getCurrent()));
-		}
-		else {
-			_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
-		}
+		//if (_registration_frames) {
+		//	_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_registration_frames->getCurrent()));
+		//}
+		//else {
+		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
+		//}
 	}
 }
 
@@ -271,7 +275,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_logger = std::make_shared<FileWriter>("hand_log.txt");
 
 	//_mesh_reader->processAllFrames();
-	for (int i = 0; i < 5; i++) {
+	for (int i = 10; i < 20; i++) {
 		_input_mesh->processFrame();
 		_reference_registration_mesh->processFrame();
 	}
@@ -287,5 +291,6 @@ void ShowMesh::init(ml::ApplicationData &app)
 	std::cout << "    show error to reference mesh: KEY_N" << std::endl;
 	std::cout << "    hide error to reference mesh: KEY_M" << std::endl;
 	std::cout << "    non rigid registration: KEY_I" << std::endl;
+	std::cout << "    non rigid registration for all frames: KEY_U" << std::endl;
 
 }

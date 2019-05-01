@@ -77,8 +77,8 @@ bool NonRigidRegistration::solve()
 		options.logging_type = ceres::LoggingType::SILENT;
 		options.minimizer_progress_to_stdout = false;
 
-		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
-		//_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, 1000);
+		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
+		_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
 	}
 	if (_embedded_deformation && !_embedded_deformation->finished()) {
 		_embedded_deformation->solveIteration();
@@ -156,7 +156,7 @@ bool NonRigidRegistrationFrames::solve()
 		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
 		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
 		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-		options.max_num_iterations = 50;
+		options.max_num_iterations = 100;
 		options.logging_type = ceres::LoggingType::SILENT;
 		options.minimizer_progress_to_stdout = false;
 
@@ -179,6 +179,11 @@ bool NonRigidRegistrationFrames::solve()
 		}
 		return false;
 	}
+}
+
+bool NonRigidRegistrationFrames::finished()
+{
+	return (_current >= _meshes.size() - 1);
 }
 
 Mesh NonRigidRegistrationFrames::getMesh(int frame) 
