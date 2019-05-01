@@ -70,6 +70,7 @@ public:
 	bool solve();
 	size_t getCurrent();
 	Mesh getMesh(int frame);
+	Mesh getDeformedMesh(int frame);
 	DeformationGraph getDeformationGraph(int frame);
 public:
 	NonRigidRegistrationFrames();

@@ -183,6 +183,11 @@ bool NonRigidRegistrationFrames::solve()
 
 Mesh NonRigidRegistrationFrames::getMesh(int frame) 
 {
+	return _meshes[frame];
+}
+
+Mesh NonRigidRegistrationFrames::getDeformedMesh(int frame)
+{
 	return _deformed_meshes[frame];
 }
 
