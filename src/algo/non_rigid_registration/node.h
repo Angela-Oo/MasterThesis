@@ -18,8 +18,9 @@ public:
 	double _w; // weight
 	//std::vector<vertex_index> _nearestNeighbors;
 public:
-	ml::vec3d deformedPosition();
-	ml::vec3d deformPosition(ml::vec3f pos);
+	ml::vec3d deformedPosition() const;
+	ml::vec3d deformedNormal() const;
+	ml::vec3d deformPosition(ml::vec3f pos) const;
 public:
 	Node(ml::vec3f g, ml::vec3f n);
 	Node();

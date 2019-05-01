@@ -161,11 +161,12 @@ bool NonRigidRegistrationFrames::solve()
 		options.minimizer_progress_to_stdout = false;
 
 		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[0], _meshes[_current], /*_deformation_graphs[_current - 1],*/ options, _number_of_deformation_nodes);
-		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[_current], _meshes[0], options, _number_of_deformation_nodes);
+		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], options, _number_of_deformation_nodes);
+		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[_current], _meshes[0], options, _number_of_deformation_nodes);
 	}
 	if (_embedded_deformation && !_embedded_deformation->finished()) {
 		_embedded_deformation->solveIteration();
-		_meshes[_current] = _embedded_deformation->getDeformedPoints();
+		_deformed_meshes[_current] = _embedded_deformation->getInverseDeformedPoints();
 		_deformation_graphs[_current] = _embedded_deformation->getDeformationGraph();
 		return true;
 	}
@@ -182,7 +183,7 @@ bool NonRigidRegistrationFrames::solve()
 
 Mesh NonRigidRegistrationFrames::getMesh(int frame) 
 {
-	return _meshes[frame];
+	return _deformed_meshes[frame];
 }
 
 size_t NonRigidRegistrationFrames::getCurrent()
@@ -203,8 +204,10 @@ NonRigidRegistrationFrames::NonRigidRegistrationFrames()
 NonRigidRegistrationFrames::NonRigidRegistrationFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes)
 	: _meshes(meshes)
 	, _number_of_deformation_nodes(number_of_deformation_nodes)
-	, _current(1)
+	, _current(1)	
 {
 	_deformation_graphs.resize(_meshes.size());
+	_deformed_meshes.resize(_meshes.size());
 	_deformation_graphs[0] = DeformationGraph(_meshes[0], _number_of_deformation_nodes);
+	_deformed_meshes[0] = _meshes[0];
 }

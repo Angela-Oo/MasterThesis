@@ -6,6 +6,11 @@
 #include "../ceres_iteration_logger.h"
 
 
+Mesh EmbeddedDeformation::getInverseDeformedPoints()
+{
+	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
+	return inverse_deformation.deformPoints(_dst);
+}
 
 Mesh EmbeddedDeformation::getDeformedPoints()
 {

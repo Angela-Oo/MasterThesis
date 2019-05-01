@@ -28,6 +28,7 @@ class EmbeddedDeformation
 	double a_fit = 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
+	Mesh getInverseDeformedPoints();
 	Mesh getDeformedPoints();
 	bool finished();
 	void solveIteration();

@@ -13,7 +13,7 @@ private:
 public:
 	Node _global_rigid_deformation;
 	Graph _graph;
-	std::unique_ptr<DeformationGraphKNN> _knn;
+	std::unique_ptr<DeformationGraphKNN> _deformation_graph_knn;
 private:
 	double weight(const ml::vec3f & point, Node & node, double dmax);
 	std::vector<double> weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes);
@@ -24,6 +24,11 @@ public:
 public:
 	DeformationGraph() = default;
 	DeformationGraph(const Mesh & nodes, size_t number_of_nodes);
+	DeformationGraph(const Graph & graph, const Node & global_rigid_deformation);
 	DeformationGraph(const DeformationGraph & deformation_graph);
 	DeformationGraph & operator=(DeformationGraph other);
 };
+
+
+
+DeformationGraph inverteDeformationGraph(const DeformationGraph & deformation_graph);

@@ -60,6 +60,7 @@ class NonRigidRegistrationFrames
 {
 private:
 	std::vector<Mesh> _meshes;
+	std::vector<Mesh> _deformed_meshes;
 	std::vector<DeformationGraph> _deformation_graphs;
 	std::vector<ml::vec6d> _transformation;
 	size_t _current;

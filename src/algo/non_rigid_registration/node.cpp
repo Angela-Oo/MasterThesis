@@ -1,14 +1,24 @@
 #include "node.h"
 
-ml::vec3d Node::deformedPosition()
+ml::vec3d Node::deformedPosition() const
 {
 	return _g + _t;
 }
 
-ml::vec3d Node::deformPosition(ml::vec3f pos)
+ml::vec3d Node::deformedNormal() const
+{
+	auto r_t = _r.getTranspose();
+	auto normal = r_t * _n;
+	return normal.getNormalized();
+	//matrix_multiplication(rotation_t, normal, normal);
+	//matrix_multiplication(global_rotation_t, normal, normal);
+}
+
+ml::vec3d Node::deformPosition(ml::vec3f pos) const
 {
 	return (_r*(pos - _g)) + _g + _t;
 }
+
 
 Node::Node(ml::vec3f g, ml::vec3f n)
 	: _g(g)

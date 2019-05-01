@@ -76,7 +76,7 @@ Mesh DeformationGraph::deformPoints(const Mesh & points)
 	Mesh deformed_points = points;
 	for (auto & p : deformed_points.getVertices())
 	{
-		std::vector<Node> knn_nodes = _knn->k_nearest(p.position, _k + 1);
+		std::vector<Node> knn_nodes = _deformation_graph_knn->k_nearest(p.position, _k + 1);
 		p.position = deformPoint(p.position, knn_nodes);
 	}
 	return deformed_points;
@@ -111,9 +111,9 @@ DeformationGraph::DeformationGraph(const Mesh & points, size_t number_of_nodes)
 		}
 	}
 
-	_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+	_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
 	for (auto & p : vertices) {
-		std::vector<vertex_index> node_indices = _knn->k_nearest_indices(p.position, _k);
+		std::vector<vertex_index> node_indices = _deformation_graph_knn->k_nearest_indices(p.position, _k);
 
 		for (size_t i = 0; i < node_indices.size() - 1; ++i) {
 			auto n1 = node_indices[i];
@@ -133,12 +133,19 @@ DeformationGraph::DeformationGraph(const Mesh & points, size_t number_of_nodes)
 	_global_rigid_deformation._g /= count;
 }
 
+DeformationGraph::DeformationGraph(const Graph & graph, const Node & global_rigid_deformation)
+	: _graph(graph)
+	, _global_rigid_deformation(global_rigid_deformation)
+{
+	_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+}
+
 
 DeformationGraph::DeformationGraph(const DeformationGraph & deformation_graph)
 	: _global_rigid_deformation(deformation_graph._global_rigid_deformation)
 	, _graph(deformation_graph._graph)
 {
-	_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+	_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
 }
 
 DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
@@ -148,6 +155,34 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 
 	_global_rigid_deformation = other._global_rigid_deformation;
 	_graph = other._graph;
-	_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+	_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
 	return *this;
+}
+
+
+
+
+
+Node inverseDeformationNode(const Node & node)
+{
+	Node inverse_deformation_node(node.deformedPosition(), node.deformedNormal());
+	inverse_deformation_node._r = node._r.getInverse();
+	inverse_deformation_node._t = -node._t;
+	return inverse_deformation_node;
+}
+
+
+DeformationGraph inverteDeformationGraph(const DeformationGraph & deformation_graph)
+{
+	Graph inverse_deformation_graph = deformation_graph._graph;
+	
+	auto& nodes = boost::get(node_t(), inverse_deformation_graph);
+
+	for (auto vp = boost::vertices(inverse_deformation_graph); vp.first != vp.second; ++vp.first) {
+		Node& node = nodes[*vp.first];
+		node = inverseDeformationNode(node);
+	}
+	Node inverse_global_rigid_deformation = inverseDeformationNode(deformation_graph._global_rigid_deformation);
+
+	return DeformationGraph(inverse_deformation_graph, inverse_global_rigid_deformation);
 }
