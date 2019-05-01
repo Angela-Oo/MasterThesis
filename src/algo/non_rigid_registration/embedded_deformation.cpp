@@ -1,5 +1,6 @@
 #include "embedded_deformation.h"
 #include "embedded_deformation_cost_function.h"
+#include "non_rigid_registration_cost_function.h"
 #include "../se3.h"
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"

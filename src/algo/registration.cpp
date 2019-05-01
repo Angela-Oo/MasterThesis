@@ -109,7 +109,7 @@ std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
 	if (_embedded_deformation)
 		return _embedded_deformation->getDeformationGraph().getDeformationGraph();
 	else if (_as_rigid_as_possible)
-		return _as_rigid_as_possible->getDeformationGraph();
+		return _as_rigid_as_possible->getDeformationGraph().getDeformationGraph();
 	else
 		return std::vector<ml::vec3f>();
 }

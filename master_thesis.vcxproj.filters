@@ -545,6 +545,9 @@
     <ClInclude Include="src\algo\file_writer.h">
       <Filter>algo</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\non_rigid_registration\non_rigid_registration_cost_function.h">
+      <Filter>algo\non rigid registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
