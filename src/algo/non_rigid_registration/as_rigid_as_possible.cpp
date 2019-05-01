@@ -48,12 +48,10 @@ void AsRigidAsPossible::solveIteration()
 				global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
 			// point to plane cost function
-			//ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i._g, src_i._n, global_node._g);
-			//auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-			//problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-			//	(&global_node._r)->getData(), (&global_node._t)->getData(),
-			//						 (&src_i._r)->getData(), (&src_i._t)->getData(),
-			//						 &src_i._w);
+			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
+			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
+				global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];

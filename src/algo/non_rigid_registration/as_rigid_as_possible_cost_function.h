@@ -18,7 +18,7 @@ struct AsRigidAsPossibleCostFunction {
 
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create(const ml::vec3f & v_i, const ml::vec3f & v_j) {
-		return (new ceres::AutoDiffCostFunction<AsRigidAsPossibleCostFunction, 3, 9, 3, 3>(new AsRigidAsPossibleCostFunction(v_i, v_j)));
+		return (new ceres::AutoDiffCostFunction<AsRigidAsPossibleCostFunction, 3, 3, 3, 3>(new AsRigidAsPossibleCostFunction(v_i, v_j)));
 	}
 
 	// E_arap = sum_{i} sum_{j in N} |(vi-vj) - Ri(vi' - vj')|^2
@@ -34,20 +34,20 @@ struct AsRigidAsPossibleCostFunction {
 		T rotated_edge[3];
 		T vi_t[3];
 		T vj_t[3];
-		T tmp[3];
+		T transformed_edge[3];
 
 		substract(vj, vi, edge);
 
-		T rotation_angle_axis[3];//
-		ceres::RotationMatrixToAngleAxis(rotation, rotation_angle_axis);//
-		ceres::AngleAxisRotatePoint(rotation_angle_axis, edge, rotated_edge);//
-		//ceres::AngleAxisRotatePoint(rotation, edge, rotated_edge);
+		//T rotation_angle_axis[3];//
+		//ceres::RotationMatrixToAngleAxis(rotation, rotation_angle_axis);//
+		//ceres::AngleAxisRotatePoint(rotation_angle_axis, edge, rotated_edge);//
+		ceres::AngleAxisRotatePoint(rotation, edge, rotated_edge);
 
 		addition(vi, translation_i, vi_t);
 		addition(vj, translation_j, vj_t);
 
-		substract(vj_t, vi_t, tmp);
-		substract(rotated_edge, tmp, residuals);
+		substract(vj_t, vi_t, transformed_edge);
+		substract(rotated_edge, transformed_edge, residuals);
 
 		//T edge_src[3];		
 		//substract(vi, vj, edge_src);

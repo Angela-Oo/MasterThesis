@@ -128,7 +128,7 @@ struct FitStarPointToPointAngleAxisCostFunction {
 
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create(const ml::vec3f &point, const ml::vec3f &node_g, const ml::vec3f &global_g) {
-		return (new ceres::AutoDiffCostFunction<FitStarPointToPointAngleAxisCostFunction, 3, 9, 3, 3, 1>(new FitStarPointToPointAngleAxisCostFunction(point, node_g, global_g)));
+		return (new ceres::AutoDiffCostFunction<FitStarPointToPointAngleAxisCostFunction, 3, 3, 3, 3, 1>(new FitStarPointToPointAngleAxisCostFunction(point, node_g, global_g)));
 	}
 
 	template <typename T>
@@ -147,10 +147,10 @@ struct FitStarPointToPointAngleAxisCostFunction {
 		// global deformation of node position
 		substract(n, g, n);
 
-		T global_rotation_angle_axis[3];//
-		ceres::RotationMatrixToAngleAxis(global_rotation, global_rotation_angle_axis);//
-		ceres::AngleAxisRotatePoint(global_rotation_angle_axis, n, n);//
-		//ceres::AngleAxisRotatePoint(global_rotation, n, n);
+		//T global_rotation_angle_axis[3];//
+		//ceres::RotationMatrixToAngleAxis(global_rotation, global_rotation_angle_axis);//
+		//ceres::AngleAxisRotatePoint(global_rotation_angle_axis, n, n);//
+		ceres::AngleAxisRotatePoint(global_rotation, n, n);
 		addition(n, g, n);
 		addition(n, global_translation, n);
 
@@ -236,7 +236,7 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create(const ml::vec3f& point, const ml::vec3f& node_g, const ml::vec3f& node_normal, const ml::vec3f &global_g)
 	{
-		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneAngleAxisCostFunction, 1, 9, 3, 9, 3, 1>(new FitStarPointToPlaneAngleAxisCostFunction(point, node_g, node_normal, global_g)));
+		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneAngleAxisCostFunction, 1, 3, 3, 3, 3, 1>(new FitStarPointToPlaneAngleAxisCostFunction(point, node_g, node_normal, global_g)));
 	}
 
 	template <typename T>
@@ -257,22 +257,22 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 		// global deformation of node position
 		substract(node_g, global_g, node_g);
 
-		T global_rotation_angle_axis[3];//
-		ceres::RotationMatrixToAngleAxis(global_rotation, global_rotation_angle_axis);//
-		ceres::AngleAxisRotatePoint(global_rotation_angle_axis, node_g, node_g);//
-		//ceres::AngleAxisRotatePoint(global_rotation, node_g, node_g);
+		//T global_rotation_angle_axis[3];//
+		//ceres::RotationMatrixToAngleAxis(global_rotation, global_rotation_angle_axis);//
+		//ceres::AngleAxisRotatePoint(global_rotation_angle_axis, node_g, node_g);//
+		ceres::AngleAxisRotatePoint(global_rotation, node_g, node_g);
 		addition(node_g, global_g, node_g);
 		addition(node_g, global_translation, node_g);
 
 		// deform the node normal
 		T rotation_t[9];
 		T global_rotation_t[9];
-		T rotation_angle_axis[3];//
-		ceres::RotationMatrixToAngleAxis(rotation, rotation_angle_axis);//
-		ceres::AngleAxisToRotationMatrix(rotation_angle_axis, rotation_t);//
-		ceres::AngleAxisToRotationMatrix(global_rotation_angle_axis, global_rotation_t);//
-		//ceres::AngleAxisToRotationMatrix(rotation, rotation_t);
-		//ceres::AngleAxisToRotationMatrix(global_rotation, global_rotation_t);
+		//T rotation_angle_axis[3];//
+		//ceres::RotationMatrixToAngleAxis(rotation, rotation_angle_axis);//
+		//ceres::AngleAxisToRotationMatrix(rotation_angle_axis, rotation_t);//
+		//ceres::AngleAxisToRotationMatrix(global_rotation_angle_axis, global_rotation_t);//
+		ceres::AngleAxisToRotationMatrix(rotation, rotation_t);
+		ceres::AngleAxisToRotationMatrix(global_rotation, global_rotation_t);
 		matrix_transpose(rotation_t, rotation_t);
 		matrix_transpose(global_rotation_t, global_rotation_t);
 		matrix_multiplication(rotation_t, normal, normal);
