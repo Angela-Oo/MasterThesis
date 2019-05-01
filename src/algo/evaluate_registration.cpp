@@ -1,6 +1,6 @@
 #include "evaluate_registration.h"
-#include "mesh_knn.h"
-#include "ext-openmesh/triMesh.h"
+
+
 
 class Plane
 {
@@ -115,4 +115,29 @@ std::vector<float> evaluate_distance_error(const Mesh & points_a, const std::vec
 		distances.push_back(distance);
 	}
 	return distances;
+}
+
+
+
+
+
+
+
+std::vector<ml::vec3f> ErrorEvaluation::evaluate_error(const Mesh & mesh)
+{
+	std::vector<ml::vec3f> nearest_points;
+	for (auto & p : mesh.m_vertices) {
+		auto nearest_point = getNearestPointOnSurface(_reference_open_mesh, *_knn.get(), OpenMesh::Vec3f(p.position[0], p.position[1], p.position[2]));
+		if (nearest_point.length() == 0.f || isnan(nearest_point[0]) || isnan(nearest_point[1]))
+			std::cout << "help" << std::endl;
+		nearest_points.push_back(ml::vec3f(nearest_point[0], nearest_point[1], nearest_point[2]));
+	}
+	return nearest_points;
+}
+
+ErrorEvaluation::ErrorEvaluation(const Mesh & reference_mesh)
+	: _reference_mesh(reference_mesh)
+{
+	ml::OpenMeshTriMesh::convertToOpenMesh(reference_mesh, _reference_open_mesh);
+	_knn = std::make_unique<OpenMeshKNN>(_reference_open_mesh);
 }

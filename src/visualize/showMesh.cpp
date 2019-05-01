@@ -1,5 +1,4 @@
 #include "showMesh.h"
-#include "algo/evaluate_registration.h"
 #include <algorithm>
 #include <cmath>
 
@@ -22,7 +21,6 @@ void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 		else {
 			_selected_frame_for_registration.clear();
 			_solve_non_rigid_registration = false;
-			//_registration.reset();
 			std::cout << std::endl << "finished, select next two frames" << std::endl;
 		}
 	}
@@ -53,8 +51,12 @@ void ShowMesh::solveAllNonRigidRegistration()
 void ShowMesh::renderError()
 {
 	if (_registration) {
+		if (!_error_evaluation) {
+			_error_evaluation = std::make_unique<ErrorEvaluation>(_reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
+		}
+
 		auto registered_points_a = _registration->getPointsA();
-		auto nearest_reference_points = evaluate_error(registered_points_a, _reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
+		auto nearest_reference_points = _error_evaluation->evaluate_error(registered_points_a);
 
 		auto distance_errors = evaluate_distance_error(registered_points_a, nearest_reference_points);
 		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
@@ -243,17 +245,18 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
 	// puppet
-	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
-	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);	
+	_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
+	_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);
+	_logger = std::make_shared<FileWriter>("puppet_log.txt");
 
 	// paperbag
-	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
-	//_mesh_reader = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 0);
+	//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
+	//_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 0);
 
 	// head
-	_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
-	_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
-	_logger = std::make_shared<FileWriter>("head_log.txt");
+	//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
+	//_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
+	//_logger = std::make_shared<FileWriter>("head_log.txt");
 
 	// hand
 	//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);

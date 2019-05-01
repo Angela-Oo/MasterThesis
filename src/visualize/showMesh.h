@@ -7,6 +7,7 @@
 #include "input_reader/mesh_reader.h"
 #include "algo/registration.h"
 #include "algo/file_writer.h"
+#include "algo/evaluate_registration.h"
 
 
 class ShowMesh : public IShowData
@@ -26,6 +27,7 @@ private:
 	bool _render_error = true;
 	std::unique_ptr<IRegistration> _registration;
 	std::unique_ptr<NonRigidRegistrationFrames> _registration_frames;
+	std::unique_ptr<ErrorEvaluation> _error_evaluation;
 private:
 	void renderMesh();
 	void renderRegisteredPoints();
