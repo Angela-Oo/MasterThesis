@@ -28,7 +28,6 @@ private:
 	std::shared_ptr<FileWriter> _logger;
 public:
 	bool solve() override;
-	//void icp_calc_nn_in_cost_function();
 	Mesh getPointsA() override;
 	Mesh getPointsB() override;
 	std::vector<ml::vec3f> getPointsDeformationGraph() override;
@@ -58,8 +57,6 @@ public:
 class ARAPNonRigidRegistration : public IRegistration
 {
 private:
-	Mesh _points_a;
-	Mesh _points_b;
 	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
 public:
 	bool solve() override;

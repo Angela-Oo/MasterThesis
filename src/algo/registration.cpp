@@ -26,15 +26,6 @@ bool RigidRegistration::solve()
 	return false;
 }
 
-
-//void RigidRegistration::icp_calc_nn_in_cost_function()
-//{
-//	if (!_icp_nn) {
-//		_icp_nn = std::make_unique<ICP>(_points_a, _points_b, ceresOption());
-//		_transformation = _icp_nn->solve();
-//	}
-//}
-
 Mesh RigidRegistration::getPointsA()
 {
 	auto transformed_points = _points_a;
@@ -124,8 +115,6 @@ NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & p
 {}
 
 
-
-
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
@@ -133,7 +122,6 @@ bool ARAPNonRigidRegistration::solve()
 {
 	if (!_as_rigid_as_possible->finished()) {
 		_as_rigid_as_possible->solveIteration();
-		_points_a = _as_rigid_as_possible->getDeformedPoints();
 		return true;
 	}
 	return false;
@@ -141,25 +129,22 @@ bool ARAPNonRigidRegistration::solve()
 
 Mesh ARAPNonRigidRegistration::getPointsA()
 {
-	return _points_a;
+	return _as_rigid_as_possible->getDeformedPoints();
 }
 
 Mesh ARAPNonRigidRegistration::getPointsB()
 {
-	return _points_b;
+	return _as_rigid_as_possible->getTarget();
 }
 
 std::vector<ml::vec3f> ARAPNonRigidRegistration::getPointsDeformationGraph()
 {
-	_as_rigid_as_possible->getDeformationGraph().getDeformationGraph();
+	return _as_rigid_as_possible->getDeformationGraph().getDeformationGraph();
 }
 
-
 ARAPNonRigidRegistration::ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
-	: _points_a(points_a)
-	, _points_b(points_b)
 {
-	_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
+	_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(points_a, points_b, ceresOption(), number_of_deformation_nodes, logger);
 }
 
 

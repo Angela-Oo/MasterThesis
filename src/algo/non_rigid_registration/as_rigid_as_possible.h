@@ -27,11 +27,14 @@ class AsRigidAsPossible
 	double a_fit = 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
+	const Mesh & getSource();
+	const Mesh & getTarget();
+	ARAPDeformationGraph & getDeformationGraph();
 	Mesh getDeformedPoints();
+public:
 	bool finished();
 	void solveIteration();
 	Mesh solve();
-	ARAPDeformationGraph & getDeformationGraph();
 public:
 	AsRigidAsPossible(const Mesh& src,
 					  const Mesh& dst,

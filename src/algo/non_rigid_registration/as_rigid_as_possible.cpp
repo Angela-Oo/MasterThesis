@@ -6,6 +6,17 @@
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"
 
+
+const Mesh & AsRigidAsPossible::getSource()
+{
+	return _src;
+}
+
+const Mesh & AsRigidAsPossible::getTarget()
+{
+	return _dst;
+}
+
 Mesh AsRigidAsPossible::getDeformedPoints()
 {
 	return _deformation_graph.deformPoints(_src);
