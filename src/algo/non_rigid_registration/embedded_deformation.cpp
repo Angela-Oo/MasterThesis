@@ -18,7 +18,7 @@ Mesh EmbeddedDeformation::getDeformedPoints()
 	return _deformation_graph.deformPoints(_src);
 }
 
-DeformationGraph & EmbeddedDeformation::getDeformationGraph()
+EmbeddedDeformationGraph & EmbeddedDeformation::getDeformationGraph()
 {
 	return _deformation_graph;// .getDeformationGraph();
 }
@@ -140,7 +140,7 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 
 EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 										 const Mesh& dst,
-										 const DeformationGraph & deformation_graph,
+										 const EmbeddedDeformationGraph & deformation_graph,
 										 ceres::Solver::Options option,
 										 unsigned int number_of_deformation_nodes,
 										 std::shared_ptr<FileWriter> logger)

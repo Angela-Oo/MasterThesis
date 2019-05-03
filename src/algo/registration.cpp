@@ -201,7 +201,7 @@ size_t NonRigidRegistrationFrames::getCurrent()
 	return _current;
 }
 
-DeformationGraph NonRigidRegistrationFrames::getDeformationGraph(int frame)
+TemplateDeformationGraph<Graph, Node> NonRigidRegistrationFrames::getDeformationGraph(int frame)
 {
 	return _deformation_graphs[frame];
 }
@@ -218,6 +218,6 @@ NonRigidRegistrationFrames::NonRigidRegistrationFrames(const std::vector<Mesh> &
 {
 	_deformation_graphs.resize(_meshes.size());
 	_deformed_meshes.resize(_meshes.size());
-	_deformation_graphs[0] = DeformationGraph(_meshes[0], _number_of_deformation_nodes);
+	_deformation_graphs[0] = TemplateDeformationGraph<Graph, Node>(_meshes[0], _number_of_deformation_nodes);
 	_deformed_meshes[0] = _meshes[0];
 }

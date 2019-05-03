@@ -3,18 +3,23 @@
 #include "mLibInclude.h"
 #include <vector>
 #include <ceres/ceres.h>
-#include "deformation_graph.h"
-#include "../knn.h"
-#include "../mesh_knn.h"
-#include "../file_writer.h"
+//#include "deformation_graph.h"
+#include "template_deformation_graph.h"
+#include "node.h"
+#include "algo/knn.h"
+#include "algo/mesh_knn.h"
+#include "algo/file_writer.h"
 
+typedef TemplateDeformationGraph<Graph, Node> EmbeddedDeformationGraph;
 typedef ml::TriMeshf Mesh;
 class EmbeddedDeformation
 {
+	
 	Mesh _src;
 	Mesh _dst;
 	ceres::Solver::Options _options;
-	DeformationGraph _deformation_graph;
+	//DeformationGraph _deformation_graph;
+	EmbeddedDeformationGraph _deformation_graph;
 	TriMeshKNN _nn_search;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
@@ -33,7 +38,7 @@ public:
 	bool finished();
 	void solveIteration();
 	Mesh solve();
-	DeformationGraph & getDeformationGraph();
+	EmbeddedDeformationGraph & getDeformationGraph();
 public:
 	// expect src and dst points to match at the same array position
 	EmbeddedDeformation(const Mesh& src,
@@ -44,7 +49,7 @@ public:
 
 	EmbeddedDeformation(const Mesh& src,
 						const Mesh& dst,
-						const DeformationGraph & deformation_graph,
+						const EmbeddedDeformationGraph & deformation_graph,
 						ceres::Solver::Options option,
 						unsigned int number_of_deformation_nodes = 1000,
 						std::shared_ptr<FileWriter> logger = nullptr);

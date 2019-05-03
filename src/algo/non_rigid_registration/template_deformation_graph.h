@@ -248,7 +248,8 @@ TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(con
 	: _graph(graph)
 	, _global_rigid_deformation(global_rigid_deformation)
 {
-	_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+	_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
+	//_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
 }
 
 
@@ -257,7 +258,8 @@ TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(con
 	: _global_rigid_deformation(deformation_graph._global_rigid_deformation)
 	, _graph(deformation_graph._graph)
 {
-	_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+	_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
+	//_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
 }
 
 template<typename Graph, typename Node>
@@ -268,7 +270,31 @@ TemplateDeformationGraph<Graph, Node> & TemplateDeformationGraph<Graph, Node>::o
 
 	_global_rigid_deformation = other._global_rigid_deformation;
 	_graph = other._graph;
-	_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
+	_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
+	//_deformation_graph_knn = std::make_unique<DeformationGraphKNN>(_graph, _k + 1);
 	return *this;
 }
 
+
+template<typename Node>
+Node inverseDeformationNode(const Node & node)
+{
+	Node inverse_deformation_node(node.deformedPosition(), node.deformedNormal(), node.rotation().getInverse(), -node.translation());
+	return inverse_deformation_node;
+}
+
+template<typename Graph, typename Node>
+TemplateDeformationGraph<Graph, Node> inverteDeformationGraph(const TemplateDeformationGraph<Graph, Node> & deformation_graph)
+{
+	Graph inverse_deformation_graph = deformation_graph._graph;
+
+	auto& nodes = boost::get(node_t(), inverse_deformation_graph);
+
+	for (auto vp = boost::vertices(inverse_deformation_graph); vp.first != vp.second; ++vp.first) {
+		Node& node = nodes[*vp.first];
+		node = inverseDeformationNode(node);
+	}
+	Node inverse_global_rigid_deformation = inverseDeformationNode(deformation_graph._global_rigid_deformation);
+
+	return TemplateDeformationGraph<Graph, Node>(inverse_deformation_graph, inverse_global_rigid_deformation);
+}
