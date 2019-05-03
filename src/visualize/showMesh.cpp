@@ -3,24 +3,6 @@
 #include <cmath>
 
 
-//void ShowMesh::rigidRegistration(int frame_a, int frame_b)
-//{
-//	if (!_registration) {
-//		_registration = std::make_unique<RigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _logger);
-//		renderRegistration();
-//	}
-//	else {
-//		if (_registration->solve()) {
-//			renderRegistration();
-//		}
-//		else {
-//			_selected_frame_for_registration.clear();
-//			_solve_rigid_registration = false;
-//			std::cout << std::endl << "finished rigid registration, select next two frames" << std::endl;
-//		}
-//	}
-//}
-
 
 void ShowMesh::nonRigidRegistration(int frame_a, int frame_b, RegistrationType type)
 {

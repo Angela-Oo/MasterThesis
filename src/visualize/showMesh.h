@@ -40,7 +40,6 @@ private:
 	void renderRegisteredPoints();
 	void renderError();
 	void renderRegistration();
-	//void rigidRegistration(int frame_a, int frame_b);
 	void nonRigidRegistration(int frame_a, int frame_b, RegistrationType type);
 	void solveAllNonRigidRegistration();
 public:
