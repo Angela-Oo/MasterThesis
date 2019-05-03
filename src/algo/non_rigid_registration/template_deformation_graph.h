@@ -235,10 +235,8 @@ TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(con
 	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
 		Node& node = nodes[*vp.first];
 		global_position += node.position();
-		//_global_rigid_deformation.position() += node.position();
 		count++;
 	}
-	//_global_rigid_deformation.position() /= count;
 	global_position /= count;
 	_global_rigid_deformation = Node(global_position, ml::vec3d::eZ);
 }
