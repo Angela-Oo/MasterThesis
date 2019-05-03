@@ -77,7 +77,7 @@ bool NonRigidRegistration::solve()
 		options.logging_type = ceres::LoggingType::SILENT;
 		options.minimizer_progress_to_stdout = false;
 
-		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
+		_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
 		//_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
 	}
 	if (_embedded_deformation && !_embedded_deformation->finished()) {
@@ -161,7 +161,7 @@ bool NonRigidRegistrationFrames::solve()
 		options.minimizer_progress_to_stdout = false;
 
 		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[0], _meshes[_current], /*_deformation_graphs[_current - 1],*/ options, _number_of_deformation_nodes);
-		_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], options, _number_of_deformation_nodes);
+		_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], options, _number_of_deformation_nodes);
 		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[_current], _meshes[0], options, _number_of_deformation_nodes);
 	}
 	if (_embedded_deformation && !_embedded_deformation->finished()) {
@@ -201,7 +201,7 @@ size_t NonRigidRegistrationFrames::getCurrent()
 	return _current;
 }
 
-TemplateDeformationGraph<Graph, Node> NonRigidRegistrationFrames::getDeformationGraph(int frame)
+DeformationGraph<ED::Graph, ED::Node> NonRigidRegistrationFrames::getDeformationGraph(int frame)
 {
 	return _deformation_graphs[frame];
 }
@@ -218,6 +218,6 @@ NonRigidRegistrationFrames::NonRigidRegistrationFrames(const std::vector<Mesh> &
 {
 	_deformation_graphs.resize(_meshes.size());
 	_deformed_meshes.resize(_meshes.size());
-	_deformation_graphs[0] = TemplateDeformationGraph<Graph, Node>(_meshes[0], _number_of_deformation_nodes);
+	_deformation_graphs[0] = DeformationGraph<ED::Graph, ED::Node>(_meshes[0], _number_of_deformation_nodes);
 	_deformed_meshes[0] = _meshes[0];
 }

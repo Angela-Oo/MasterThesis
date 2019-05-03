@@ -1,6 +1,8 @@
 #include "node.h"
 #include <ceres/rotation.h>
 
+namespace ED
+{
 
 ml::vec3d Node::deformedPosition() const
 {
@@ -34,3 +36,4 @@ Node::Node(const ml::vec3f & g, const ml::vec3d & n, const ml::mat3d & r, const 
 Node::Node()
 	: Node(ml::vec3f::origin, ml::vec3f::eZ)
 {}
+}

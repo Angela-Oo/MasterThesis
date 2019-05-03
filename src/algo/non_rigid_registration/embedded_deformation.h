@@ -9,11 +9,13 @@
 #include <vector>
 #include <ceres/ceres.h>
 
-typedef TemplateDeformationGraph<Graph, Node> EmbeddedDeformationGraph;
+namespace ED {
+
+typedef DeformationGraph<Graph, Node> EmbeddedDeformationGraph;
 typedef ml::TriMeshf Mesh;
 
 class EmbeddedDeformation
-{	
+{
 	Mesh _src;
 	Mesh _dst;
 	ceres::Solver::Options _options;
@@ -50,3 +52,5 @@ public:
 						unsigned int number_of_deformation_nodes = 1000,
 						std::shared_ptr<FileWriter> logger = nullptr);
 };
+
+}

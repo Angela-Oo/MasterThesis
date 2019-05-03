@@ -1,11 +1,12 @@
 #include "embedded_deformation.h"
 #include "embedded_deformation_cost_function.h"
 #include "non_rigid_registration_cost_function.h"
-#include "../se3.h"
+//#include "algo/se3.h"
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"
-#include "../ceres_iteration_logger.h"
+#include "algo/ceres_iteration_logger.h"
 
+namespace ED {
 
 Mesh EmbeddedDeformation::getInverseDeformedPoints()
 {
@@ -44,13 +45,13 @@ void EmbeddedDeformation::solveIteration()
 			ml::vec3f pos = src_i.deformedPosition();
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 			unsigned int i = _nn_search.nearest_index(pos_deformed);
-			
+
 			double weight = a_fit;
 			// point to point cost function
 			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
 			auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
-				global_node.r(), global_node.t(), src_i.t(), src_i.w());
+									 global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
 			// point to plane cost function
 			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
@@ -155,4 +156,6 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
+}
+
 }

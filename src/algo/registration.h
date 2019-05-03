@@ -41,7 +41,7 @@ private:
 	Mesh _points_b;
 	std::vector<ml::vec6d> _transformation;
 	unsigned int _number_of_deformation_nodes;
-	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
+	std::unique_ptr<ED::EmbeddedDeformation> _embedded_deformation;
 	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
 	std::shared_ptr<FileWriter> _logger;
 public:
@@ -61,18 +61,18 @@ class NonRigidRegistrationFrames
 private:
 	std::vector<Mesh> _meshes;
 	std::vector<Mesh> _deformed_meshes;
-	std::vector<TemplateDeformationGraph<Graph, Node>> _deformation_graphs;
+	std::vector<DeformationGraph<ED::Graph, ED::Node>> _deformation_graphs;
 	std::vector<ml::vec6d> _transformation;
 	size_t _current;
 	unsigned int _number_of_deformation_nodes;
-	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
+	std::unique_ptr<ED::EmbeddedDeformation> _embedded_deformation;
 public:
 	bool solve();
 	bool finished();
 	size_t getCurrent();
 	Mesh getMesh(int frame);
 	Mesh getDeformedMesh(int frame);
-	TemplateDeformationGraph<Graph, Node> getDeformationGraph(int frame);
+	DeformationGraph<ED::Graph, ED::Node> getDeformationGraph(int frame);
 public:
 	NonRigidRegistrationFrames();
 	NonRigidRegistrationFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes = 1000);

@@ -8,7 +8,7 @@
 typedef ml::TriMeshf Mesh;
 
 template<typename Graph, typename Node>
-class TemplateDeformationGraph
+class DeformationGraph
 {
 private:
 	const int _k = 4;
@@ -25,21 +25,21 @@ public:
 	Mesh deformPoints(const Mesh & points);
 	std::vector<ml::vec3f> getDeformationGraph();
 public:
-	TemplateDeformationGraph() = default;
-	TemplateDeformationGraph(const Mesh & nodes, size_t number_of_nodes);
-	TemplateDeformationGraph(const Graph & graph, const Node & global_rigid_deformation);
-	TemplateDeformationGraph(const TemplateDeformationGraph<Graph, Node> & deformation_graph);
-	TemplateDeformationGraph & operator=(TemplateDeformationGraph<Graph, Node> other);
+	DeformationGraph() = default;
+	DeformationGraph(const Mesh & nodes, size_t number_of_nodes);
+	DeformationGraph(const Graph & graph, const Node & global_rigid_deformation);
+	DeformationGraph(const DeformationGraph<Graph, Node> & deformation_graph);
+	DeformationGraph & operator=(DeformationGraph<Graph, Node> other);
 };
 
 template<typename Graph, typename Node>
-std::vector<int> TemplateDeformationGraph<Graph, Node>::uniform_node_indices(size_t number_of_points, size_t number_of_nodes)
+std::vector<int> DeformationGraph<Graph, Node>::uniform_node_indices(size_t number_of_points, size_t number_of_nodes)
 {
-	size_t step_size = floor(number_of_points / number_of_nodes);
+	int step_size = static_cast<int>(floor(number_of_points / number_of_nodes));
 
 	std::vector<int> node_indices;
-	for (size_t i = 0; i < number_of_nodes; ++i) {
-		size_t x = step_size * i;
+	for (int i = 0; i < number_of_nodes; ++i) {
+		int x = step_size * i;
 		node_indices.push_back(x);
 	}
 	return node_indices;
@@ -47,7 +47,7 @@ std::vector<int> TemplateDeformationGraph<Graph, Node>::uniform_node_indices(siz
 
 
 template<typename Graph, typename Node>
-double TemplateDeformationGraph<Graph, Node>::weight(const ml::vec3f & point, Node & node, double dmax)
+double DeformationGraph<Graph, Node>::weight(const ml::vec3f & point, Node & node, double dmax)
 {
 	double normed_distance = ml::dist(point, node.position());
 	double weight = std::pow(1. - (normed_distance / dmax), 2);
@@ -55,7 +55,7 @@ double TemplateDeformationGraph<Graph, Node>::weight(const ml::vec3f & point, No
 }
 
 template<typename Graph, typename Node>
-std::vector<double> TemplateDeformationGraph<Graph, Node>::weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes)
+std::vector<double> DeformationGraph<Graph, Node>::weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes)
 {
 	auto last_node = k_plus_1_nearest_nodes[k_plus_1_nearest_nodes.size() - 1];
 	double d_max = ml::dist(point, last_node.position());
@@ -72,7 +72,7 @@ std::vector<double> TemplateDeformationGraph<Graph, Node>::weights(const ml::vec
 }
 
 template<typename Graph, typename Node>
-ml::vec3f TemplateDeformationGraph<Graph, Node>::deformPoint(const ml::vec3f & point, std::vector<Node> & k_plus_1_nearest_nodes)
+ml::vec3f DeformationGraph<Graph, Node>::deformPoint(const ml::vec3f & point, std::vector<Node> & k_plus_1_nearest_nodes)
 {
 	std::vector<double> w = weights(point, k_plus_1_nearest_nodes);
 
@@ -89,7 +89,7 @@ ml::vec3f TemplateDeformationGraph<Graph, Node>::deformPoint(const ml::vec3f & p
 }
 
 template<typename Graph, typename Node>
-Mesh TemplateDeformationGraph<Graph, Node>::deformPoints(const Mesh & points)
+Mesh DeformationGraph<Graph, Node>::deformPoints(const Mesh & points)
 {
 	Mesh deformed_points = points;
 	for (auto & p : deformed_points.getVertices())
@@ -101,7 +101,7 @@ Mesh TemplateDeformationGraph<Graph, Node>::deformPoints(const Mesh & points)
 }
 
 template<typename Graph, typename Node>
-std::vector<ml::vec3f> TemplateDeformationGraph<Graph, Node>::getDeformationGraph()
+std::vector<ml::vec3f> DeformationGraph<Graph, Node>::getDeformationGraph()
 {
 	std::vector<ml::vec3f> points;
 	auto & nodes = boost::get(node_t(), _graph);
@@ -116,7 +116,7 @@ std::vector<ml::vec3f> TemplateDeformationGraph<Graph, Node>::getDeformationGrap
 }
 
 template<typename Graph, typename Node>
-TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(const Mesh & points, size_t number_of_nodes)
+DeformationGraph<Graph, Node>::DeformationGraph(const Mesh & points, size_t number_of_nodes)
 	: _graph(0)
 {
 	auto & vertices = points.getVertices();
@@ -151,14 +151,14 @@ TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(con
 		global_position += node.position();
 		count++;
 	}
-	global_position /= count;
+	global_position /= static_cast<float>(count);
 	_global_rigid_deformation = Node(global_position, ml::vec3d::eZ);
 }
 
 
 
 template<typename Graph, typename Node>
-TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(const Graph & graph, const Node & global_rigid_deformation)
+DeformationGraph<Graph, Node>::DeformationGraph(const Graph & graph, const Node & global_rigid_deformation)
 	: _graph(graph)
 	, _global_rigid_deformation(global_rigid_deformation)
 {
@@ -167,7 +167,7 @@ TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(con
 
 
 template<typename Graph, typename Node>
-TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(const TemplateDeformationGraph<Graph, Node> & deformation_graph)
+DeformationGraph<Graph, Node>::DeformationGraph(const DeformationGraph<Graph, Node> & deformation_graph)
 	: _global_rigid_deformation(deformation_graph._global_rigid_deformation)
 	, _graph(deformation_graph._graph)
 {
@@ -175,7 +175,7 @@ TemplateDeformationGraph<Graph, Node>::TemplateDeformationGraph<Graph, Node>(con
 }
 
 template<typename Graph, typename Node>
-TemplateDeformationGraph<Graph, Node> & TemplateDeformationGraph<Graph, Node>::operator=(TemplateDeformationGraph<Graph, Node> other)
+DeformationGraph<Graph, Node> & DeformationGraph<Graph, Node>::operator=(DeformationGraph<Graph, Node> other)
 {
 	if (&other == this)
 		return *this;
@@ -195,7 +195,7 @@ Node inverseDeformationNode(const Node & node)
 }
 
 template<typename Graph, typename Node>
-TemplateDeformationGraph<Graph, Node> inverteDeformationGraph(const TemplateDeformationGraph<Graph, Node> & deformation_graph)
+DeformationGraph<Graph, Node> inverteDeformationGraph(const DeformationGraph<Graph, Node> & deformation_graph)
 {
 	Graph inverse_deformation_graph = deformation_graph._graph;
 
@@ -207,5 +207,5 @@ TemplateDeformationGraph<Graph, Node> inverteDeformationGraph(const TemplateDefo
 	}
 	Node inverse_global_rigid_deformation = inverseDeformationNode(deformation_graph._global_rigid_deformation);
 
-	return TemplateDeformationGraph<Graph, Node>(inverse_deformation_graph, inverse_global_rigid_deformation);
+	return DeformationGraph<Graph, Node>(inverse_deformation_graph, inverse_global_rigid_deformation);
 }

@@ -2,7 +2,7 @@
 #include "mLibInclude.h"
 #include "graph_node_type.h"
 
-
+namespace ED {
 class Node
 {
 private:
@@ -19,10 +19,10 @@ public:
 	double * w() { return &_w; }
 public:
 	ml::vec3f Node::position() const { return _g; }
-	ml::vec3d Node::normal() const { return _n;	}
+	ml::vec3d Node::normal() const { return _n; }
 	const ml::mat3d & Node::rotation() const { return _r; }
 	const ml::vec3d & Node::translation() const { return _t; }
-	double Node::weight() const	{ return _w; }
+	double Node::weight() const { return _w; }
 public:
 	ml::vec3d deformedPosition() const;
 	ml::vec3d deformedNormal() const;
@@ -36,3 +36,5 @@ public:
 
 typedef boost::property<node_t, Node> VertexProperty;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, VertexProperty> Graph;
+
+}

@@ -11,7 +11,7 @@ Mesh AsRigidAsPossible::getDeformedPoints()
 	return _deformation_graph.deformPoints(_src);
 }
 
-TemplateDeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossible::getDeformationGraph()
+DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossible::getDeformationGraph()
 {
 	return _deformation_graph;
 }

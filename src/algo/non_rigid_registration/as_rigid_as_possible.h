@@ -8,7 +8,7 @@
 #include <ceres/ceres.h>
 
 typedef ml::TriMeshf Mesh;
-typedef TemplateDeformationGraph<ARAPGraph, ARAPNode> ARAPDeformationGraph;
+typedef DeformationGraph<ARAPGraph, ARAPNode> ARAPDeformationGraph;
 
 class AsRigidAsPossible
 {
