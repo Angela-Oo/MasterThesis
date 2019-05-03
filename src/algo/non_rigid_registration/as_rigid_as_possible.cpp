@@ -59,7 +59,6 @@ Mesh AsRigidAsPossible::getDeformedPoints()
 	return _deformation_graph.deformPoints(_src);
 }
 
-//DeformationGraph & AsRigidAsPossible::getDeformationGraph()
 TemplateDeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossible::getDeformationGraph()
 {
 	return _deformation_graph;
@@ -123,9 +122,8 @@ void AsRigidAsPossible::solveIteration()
 		_current_cost = summary.final_cost;
 
 		if (abs(_current_cost - _last_cost) < 0.00001 *(1 + _current_cost) &&
-			(a_rigid > 1 || a_smooth > 0.1 || a_conf > 1.))
+			(a_smooth > 0.1 || a_conf > 1.))
 		{
-			a_rigid /= 2.;
 			a_smooth /= 2.;
 			a_conf /= 2.;
 		}

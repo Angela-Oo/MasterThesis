@@ -188,3 +188,19 @@ DeformationGraph inverteDeformationGraph(const DeformationGraph & deformation_gr
 
 	return DeformationGraph(inverse_deformation_graph, inverse_global_rigid_deformation);
 }
+
+
+//DeformationGraph addDeformationGraphToDeformationGraph(DeformationGraph to_deformation_graph, const DeformationGraph & append_deformation_graph)
+//{
+//	Graph deformation_graph = to_deformation_graph._graph;
+//
+//	auto& nodes = boost::get(node_t(), deformation_graph);
+//
+//	for (auto vp = boost::vertices(inverse_deformation_graph); vp.first != vp.second; ++vp.first) {
+//		Node& node = nodes[*vp.first];
+//		node = inverseDeformationNode(node);
+//	}
+//	Node inverse_global_rigid_deformation = inverseDeformationNode(deformation_graph._global_rigid_deformation);
+//
+//	return DeformationGraph(inverse_deformation_graph, inverse_global_rigid_deformation);
+//}
