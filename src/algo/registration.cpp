@@ -95,7 +95,11 @@ NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & p
 	//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
 	//options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
 
-	_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
+	//_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
+	std::vector<int> fixed_index;
+	fixed_index.push_back(0);
+	fixed_index.push_back(points_a.m_vertices.size() - 1);
+	_embedded_deformation = std::make_unique<ED::EmbeddedDeformationWithoutICP>(_points_a, _points_b, fixed_index, ceresOption(), logger);
 }
 
 

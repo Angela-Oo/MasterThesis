@@ -85,7 +85,6 @@ public:
 								  const Mesh& dst,
 								  std::vector<int> fixed_positions,
 								  ceres::Solver::Options option,
-								  unsigned int number_of_deformation_nodes = 1000,
 								  std::shared_ptr<FileWriter> logger = nullptr);
 };
 

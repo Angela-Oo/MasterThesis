@@ -307,7 +307,6 @@ EmbeddedDeformationWithoutICP::EmbeddedDeformationWithoutICP(const Mesh& src,
 															 const Mesh& dst,
 															 std::vector<int> fixed_positions,
 															 ceres::Solver::Options option,
-															 unsigned int number_of_deformation_nodes,
 															 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
