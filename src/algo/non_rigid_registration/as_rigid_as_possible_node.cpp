@@ -26,12 +26,13 @@ ml::vec3d ARAPNode::deformPosition(const ml::vec3f & pos) const
 	return (rotation()*(pos - _g)) + _g + _t;
 }
 
-ARAPNode::ARAPNode(const ml::vec3f & g, const ml::vec3d & n)
-	: ARAPNode(g, n, ml::vec3d::origin, ml::vec3d::origin)
+ARAPNode::ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n)
+	: ARAPNode(index, g, n, ml::vec3d::origin, ml::vec3d::origin)
 {}
 
-ARAPNode::ARAPNode(const ml::vec3f & g, const ml::vec3d & n, const ml::vec3d & r, const ml::vec3d & t)
-	: _g(g)
+ARAPNode::ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n, const ml::vec3d & r, const ml::vec3d & t)
+	: _index(index)
+	, _g(g)
 	, _n(n)
 	, _r(r)
 	, _t(t)
@@ -39,5 +40,5 @@ ARAPNode::ARAPNode(const ml::vec3f & g, const ml::vec3d & n, const ml::vec3d & r
 {}
 
 ARAPNode::ARAPNode()
-	: ARAPNode(ml::vec3f::origin, ml::vec3f::eZ)
+	: ARAPNode(0, ml::vec3f::origin, ml::vec3f::eZ)
 {}

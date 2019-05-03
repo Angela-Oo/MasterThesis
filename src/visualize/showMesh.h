@@ -23,8 +23,8 @@ private:
 	std::shared_ptr<FileWriter> _logger;
 	std::unique_ptr<PointsRenderer> _point_renderer;
 	std::unique_ptr<MeshRenderer> _mesh_renderer;
-	std::unique_ptr<MeshReader> _input_mesh;
-	std::unique_ptr<MeshReader> _reference_registration_mesh;
+	std::unique_ptr<IMeshReader> _input_mesh;
+	std::unique_ptr<IMeshReader> _reference_registration_mesh;
 	unsigned int _current_frame = 0;
 	std::vector<unsigned int> _selected_frame_for_registration;
 	bool _solve_registration = false;

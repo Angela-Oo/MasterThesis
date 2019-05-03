@@ -64,27 +64,13 @@ RigidRegistration::RigidRegistration(const Mesh & points_a, const Mesh & points_
 
 bool NonRigidRegistration::solve()
 {
-	if (!(_embedded_deformation || _as_rigid_as_possible)) {
-		ceres::Solver::Options options = ceresOption();
-		//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
-		//options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-
-		_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
-		//_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
-	}
-	if (_embedded_deformation && !_embedded_deformation->finished()) {
+	if (!_embedded_deformation->finished()) {
 		_embedded_deformation->solveIteration();
 		_points_a = _embedded_deformation->getDeformedPoints();
 		return true;
 	}
-	if (_as_rigid_as_possible && !_as_rigid_as_possible->finished()) {
-		_as_rigid_as_possible->solveIteration();
-		_points_a = _as_rigid_as_possible->getDeformedPoints();
-		return true;
-	}
 	return false;
 }
-
 
 Mesh NonRigidRegistration::getPointsA()
 {
@@ -98,21 +84,19 @@ Mesh NonRigidRegistration::getPointsB()
 
 std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
 {
-	if (_embedded_deformation)
-		return _embedded_deformation->getDeformationGraph().getDeformationGraph();
-	else if (_as_rigid_as_possible)
-		return _as_rigid_as_possible->getDeformationGraph().getDeformationGraph();
-	else
-		return std::vector<ml::vec3f>();
+	return _embedded_deformation->getDeformationGraph().getDeformationGraph();
 }
 
 
 NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
 	: _points_a(points_a)
 	, _points_b(points_b)
-	, _number_of_deformation_nodes(number_of_deformation_nodes)
-	, _logger(logger)
-{}
+{
+	//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
+	//options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+
+	_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
+}
 
 
 //-----------------------------------------------------------------------------

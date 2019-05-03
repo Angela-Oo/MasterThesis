@@ -4,7 +4,15 @@
 #include "kinect/ImageReaderSensor.h"
 #include "kinect/SensorDataWrapper.h"
 
-class MeshReader
+class IMeshReader
+{
+public:
+	virtual ml::TriMeshf& getMesh(unsigned int frame) = 0;
+	virtual unsigned int frame() = 0;
+};
+
+
+class MeshReader : public IMeshReader
 {
 private:
 	std::string _file_path;
@@ -15,13 +23,24 @@ private:
 private:
 	std::string getFileName(unsigned int index);
 public:
-	ml::TriMeshf& getMesh(unsigned int frame);
+	ml::TriMeshf& getMesh(unsigned int frame) override;
 	bool processFrame();
-	unsigned int frame();
+	unsigned int frame() override;
 	bool processAllFrames();
 public:
 	void load(std::string filename);
 	void save(std::string filename);
 public:
 	MeshReader(std::string filepath, std::string filename, ml::mat4f transformation = ml::mat4f::identity(), unsigned int start_number = 0);
+};
+
+
+class DeformationMesh : public IMeshReader
+{
+	std::vector<ml::TriMeshf> _meshes;
+public:
+	ml::TriMeshf& getMesh(unsigned int frame) override;
+	unsigned int frame() override;
+public:
+	DeformationMesh();
 };

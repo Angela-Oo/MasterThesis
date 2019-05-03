@@ -2,6 +2,7 @@
 #include "core-mesh/meshData.h"
 #include <cassert>
 #include <filesystem>
+#include "core-mesh/meshShapes.h"
 
 std::string MeshReader::getFileName(unsigned int index)
 {
@@ -82,4 +83,28 @@ MeshReader::MeshReader(std::string filepath, std::string filename, ml::mat4f tra
 	else if (!file_stream) {
 		throw std::runtime_error("File" + file_name + " does not exists");
 	}
+}
+
+
+
+
+
+ml::TriMeshf& DeformationMesh::getMesh(unsigned int frame)
+{
+	return _meshes[frame];
+}
+
+unsigned int DeformationMesh::frame()
+{
+	return _meshes.size();
+}
+
+DeformationMesh::DeformationMesh()
+{
+	auto mesh_1 = ml::Shapes<float>::cylinder(0.1, 1., 3, 5);
+	_meshes.push_back(mesh_1);
+
+	auto mesh_2 = mesh_1;
+	mesh_2.m_vertices[mesh_2.m_vertices.size() - 1].position.x += 0.2;
+	_meshes.push_back(mesh_2);
 }

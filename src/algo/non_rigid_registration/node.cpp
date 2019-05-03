@@ -21,12 +21,13 @@ ml::vec3d Node::deformPosition(const ml::vec3f & pos) const
 	return (rotation()*(pos - _g)) + _g + _t;
 }
 
-Node::Node(const ml::vec3f & g, const ml::vec3d & n)
-	: Node(g, n, ml::mat3d::identity(), ml::vec3d::origin)
+Node::Node(int index, const ml::vec3f & g, const ml::vec3d & n)
+	: Node(index, g, n, ml::mat3d::identity(), ml::vec3d::origin)
 {}
 
-Node::Node(const ml::vec3f & g, const ml::vec3d & n, const ml::mat3d & r, const ml::vec3d & t)
-	: _g(g)
+Node::Node(int index, const ml::vec3f & g, const ml::vec3d & n, const ml::mat3d & r, const ml::vec3d & t)
+	: _index(index)
+	, _g(g)
 	, _n(n)
 	, _r(r)
 	, _t(t)
@@ -34,6 +35,6 @@ Node::Node(const ml::vec3f & g, const ml::vec3d & n, const ml::mat3d & r, const 
 {}
 
 Node::Node()
-	: Node(ml::vec3f::origin, ml::vec3f::eZ)
+	: Node(-1, ml::vec3f::origin, ml::vec3f::eZ)
 {}
 }

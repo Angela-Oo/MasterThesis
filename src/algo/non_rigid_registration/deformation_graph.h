@@ -26,6 +26,8 @@ public:
 	std::vector<ml::vec3f> getDeformationGraph();
 public:
 	DeformationGraph() = default;
+	// all mesh vertices will be deformation nodes
+	DeformationGraph(const Mesh & nodes);
 	DeformationGraph(const Mesh & nodes, size_t number_of_nodes);
 	DeformationGraph(const Graph & graph, const Node & global_rigid_deformation);
 	DeformationGraph(const DeformationGraph<Graph, Node> & deformation_graph);
@@ -115,6 +117,46 @@ std::vector<ml::vec3f> DeformationGraph<Graph, Node>::getDeformationGraph()
 	return points;
 }
 
+
+
+template<typename Graph, typename Node>
+DeformationGraph<Graph, Node>::DeformationGraph(const Mesh & mesh)
+	: _graph(0)
+{
+	auto & vertices = mesh.getVertices();
+	for (int index = 0; index < vertices.size(); ++index)
+	{
+		vertex_index v = boost::add_vertex(_graph);
+		Node n(index, vertices[index].position, vertices[index].normal.getNormalized());
+		boost::put(boost::get(node_t(), _graph), v, n);
+	}
+
+	_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
+	for (auto & p : vertices) {
+		std::vector<vertex_index> node_indices = _deformation_graph_knn->k_nearest_indices(p.position, _k);
+
+		for (size_t i = 0; i < node_indices.size() - 1; ++i) {
+			auto n1 = node_indices[i];
+			auto n2 = node_indices[i + 1];
+			if (boost::edge(n1, n2, _graph).second == false)
+				boost::add_edge(n1, n2, _graph);
+		}
+	}
+
+	auto& nodes = boost::get(node_t(), _graph);
+	int count = 0;
+	ml::vec3f global_position = ml::vec3f::origin;
+	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
+		Node& node = nodes[*vp.first];
+		global_position += node.position();
+		count++;
+	}
+	global_position /= static_cast<float>(count);
+	_global_rigid_deformation = Node(-1, global_position, ml::vec3d::eZ);
+}
+
+
+
 template<typename Graph, typename Node>
 DeformationGraph<Graph, Node>::DeformationGraph(const Mesh & points, size_t number_of_nodes)
 	: _graph(0)
@@ -126,7 +168,7 @@ DeformationGraph<Graph, Node>::DeformationGraph(const Mesh & points, size_t numb
 	{
 		vertex_index v = boost::add_vertex(_graph);
 		if (vertices.size() > index) {
-			Node n(vertices[index].position, vertices[index].normal.getNormalized());
+			Node n(index, vertices[index].position, vertices[index].normal.getNormalized());
 			boost::put(boost::get(node_t(), _graph), v, n);
 		}
 	}
@@ -152,7 +194,7 @@ DeformationGraph<Graph, Node>::DeformationGraph(const Mesh & points, size_t numb
 		count++;
 	}
 	global_position /= static_cast<float>(count);
-	_global_rigid_deformation = Node(global_position, ml::vec3d::eZ);
+	_global_rigid_deformation = Node(-1, global_position, ml::vec3d::eZ);
 }
 
 
@@ -190,7 +232,7 @@ DeformationGraph<Graph, Node> & DeformationGraph<Graph, Node>::operator=(Deforma
 template<typename Node>
 Node inverseDeformationNode(const Node & node)
 {
-	Node inverse_deformation_node(node.deformedPosition(), node.deformedNormal(), node.rotation().getInverse(), -node.translation());
+	Node inverse_deformation_node(node.index(), node.deformedPosition(), node.deformedNormal(), node.rotation().getInverse(), -node.translation());
 	return inverse_deformation_node;
 }
 

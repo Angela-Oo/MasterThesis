@@ -40,10 +40,7 @@ class NonRigidRegistration : public IRegistration
 private:
 	Mesh _points_a;
 	Mesh _points_b;
-	unsigned int _number_of_deformation_nodes;
 	std::unique_ptr<ED::EmbeddedDeformation> _embedded_deformation;
-	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
-	std::shared_ptr<FileWriter> _logger;
 public:
 	bool solve() override;
 	Mesh getPointsA() override;
