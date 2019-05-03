@@ -20,6 +20,7 @@ private:
 	std::unique_ptr<MeshReader> _reference_registration_mesh;
 	unsigned int _current_frame = 0;
 	std::vector<unsigned int> _selected_frame_for_registration;
+	bool _solve_rigid_registration = false;
 	bool _solve_non_rigid_registration = false;
 	bool _solve_all_non_rigid_registration = false;
 	bool _render_mesh = true;
@@ -33,6 +34,7 @@ private:
 	void renderRegisteredPoints();
 	void renderError();
 	void renderRegistration();
+	void rigidRegistration(int frame_a, int frame_b);
 	void nonRigidRegistration(int frame_a, int frame_b);
 	void solveAllNonRigidRegistration();
 public:

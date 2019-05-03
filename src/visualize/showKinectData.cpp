@@ -3,6 +3,7 @@
 #include "algo/rigid_registration/icp.h"
 #include "algo/non_rigid_registration/embedded_deformation.h"
 #include "input_reader/kinect_reader.h"
+#include <ceres/ceres.h>
 
 using namespace ml;
 

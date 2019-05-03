@@ -6,6 +6,8 @@
 
 typedef ml::TriMeshf Mesh;
 
+ceres::Solver::Options ceresOption();
+
 class IRegistration
 {
 public:
@@ -19,27 +21,26 @@ public:
 class RigidRegistration : public IRegistration
 {
 private:
-	std::unique_ptr<ICP> _icp_nn;
+	std::unique_ptr<ICPNN> _icp_nn;
 	Mesh _points_a;
 	Mesh _points_b;
 	ml::mat4f _transformation;
+	std::shared_ptr<FileWriter> _logger;
 public:
 	bool solve() override;
-	void icp_calc_nn_in_cost_function();
+	//void icp_calc_nn_in_cost_function();
 	Mesh getPointsA() override;
 	Mesh getPointsB() override;
 	std::vector<ml::vec3f> getPointsDeformationGraph() override;
 public:
-	RigidRegistration(const Mesh & points_a, const Mesh & points_b);
+	RigidRegistration(const Mesh & points_a, const Mesh & points_b, std::shared_ptr<FileWriter> logger = nullptr);
 };
 
 class NonRigidRegistration : public IRegistration
 {
 private:
-	std::unique_ptr<ICP> _icp_nn;
 	Mesh _points_a;
 	Mesh _points_b;
-	std::vector<ml::vec6d> _transformation;
 	unsigned int _number_of_deformation_nodes;
 	std::unique_ptr<ED::EmbeddedDeformation> _embedded_deformation;
 	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
@@ -50,8 +51,23 @@ public:
 	Mesh getPointsB() override;
 	std::vector<ml::vec3f> getPointsDeformationGraph() override;
 public:
-	NonRigidRegistration();
 	NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
+};
+
+
+class ARAPNonRigidRegistration : public IRegistration
+{
+private:
+	Mesh _points_a;
+	Mesh _points_b;
+	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
+public:
+	bool solve() override;
+	Mesh getPointsA() override;
+	Mesh getPointsB() override;
+	std::vector<ml::vec3f> getPointsDeformationGraph() override;
+public:
+	ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
 };
 
 
@@ -78,21 +94,3 @@ public:
 	NonRigidRegistrationFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes = 1000);
 };
 
-//class NonRigidRegistrationMesh : public IRegistration
-//{
-//private:
-//	std::unique_ptr<ICP> _icp_nn;
-//	ml::TriMeshf _points_a;
-//	ml::TriMeshf _points_b;
-//	std::vector<ml::vec6d> _transformation;
-//	unsigned int _number_of_deformation_nodes;
-//	std::unique_ptr<EmbeddedDeformation> _embedded_deformation;
-//	std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
-//public:
-//	bool solve() override;
-//	std::vector<ml::vec3f> getPointsA() override;
-//	std::vector<ml::vec3f> getPointsB() override;
-//	std::vector<ml::vec3f> getPointsDeformationGraph() override;
-//public:
-//	NonRigidRegistrationMesh(const ml::TriMeshf & mesh_a, const ml::TriMeshf & mesh_b, unsigned int number_of_deformation_nodes = 1000);
-//};

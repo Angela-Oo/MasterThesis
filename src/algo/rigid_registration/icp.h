@@ -4,7 +4,8 @@
 #include <vector>
 #include <ceres/ceres.h>
 #include <functional>
-#include "../knn.h"
+#include "algo/knn.h"
+#include "algo/file_writer.h"
 
 ml::mat4f iterative_closest_points(std::vector<ml::vec3f> &src, std::vector<ml::vec3f> &dst);
 
@@ -42,18 +43,16 @@ class ICPNN
 	long long _total_time_in_ms = 0;
 	size_t _max_iterations = 20;
 	KNN _nn_search;
+	std::shared_ptr<FileWriter> _logger;
+public:
+	ml::mat4f solve();
+	ml::mat4f solveIteration();
+	bool finished();
 public:
 	ICPNN(const std::vector<ml::vec3f>& src,
 		  const std::vector<ml::vec3f>& dst,
-		  ceres::Solver::Options option);
-public:
-	ml::mat4f solve();
-	ml::mat4f solveTransformDataset();
-public:
-	ml::mat4f solveIteration();
-	// 12 iterations 157s 929ms (last episode 9s 561ms 
-	ml::mat4f solveIterationTransformDataset();
-	bool finished();
+		  ceres::Solver::Options option,
+		  std::shared_ptr<FileWriter> logger = nullptr);
 };
 
 //-----------------------------------------------------------------------------

@@ -1,39 +1,39 @@
 #include "registration.h"
 
+ceres::Solver::Options ceresOption() {
+	ceres::Solver::Options options;
+	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
+	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+	options.max_num_iterations = 50;
+	options.logging_type = ceres::LoggingType::SILENT;
+	options.minimizer_progress_to_stdout = false;
+	return options;
+}
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
 bool RigidRegistration::solve()
 {
-	std::vector<ml::vec3f> positions_a;
-	for (auto & p : _points_a.getVertices())
-		positions_a.push_back(p.position);
-	
-	std::vector<ml::vec3f> positions_b;
-	for (auto & p : _points_b.getVertices())
-		positions_b.push_back(p.position);
-	_transformation = iterative_closest_points(positions_a, positions_b);
-	return true;
-}
-
-
-void RigidRegistration::icp_calc_nn_in_cost_function()
-{
-	if (!_icp_nn) {
-		ceres::Solver::Options options;
-		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
-		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-		options.max_num_iterations = 50;
-		options.logging_type = ceres::LoggingType::SILENT;
-		options.minimizer_progress_to_stdout = false;
-		_icp_nn = std::make_unique<ICP>(_points_a, _points_b, options);
-
-		//if (!_icp_nn->finished())
-			//_transformation = _icp_nn->solveIteration();
-		_transformation = _icp_nn->solve();
+	if (!_icp_nn->finished()) {
+		_transformation = _icp_nn->solveIteration();
+		return true;
 	}
+	return false;
 }
+
+
+//void RigidRegistration::icp_calc_nn_in_cost_function()
+//{
+//	if (!_icp_nn) {
+//		_icp_nn = std::make_unique<ICP>(_points_a, _points_b, ceresOption());
+//		_transformation = _icp_nn->solve();
+//	}
+//}
 
 Mesh RigidRegistration::getPointsA()
 {
@@ -52,30 +52,31 @@ std::vector<ml::vec3f> RigidRegistration::getPointsDeformationGraph()
 	return std::vector<ml::vec3f>();
 }
 
-RigidRegistration::RigidRegistration(const Mesh & points_a, const Mesh & points_b)
+RigidRegistration::RigidRegistration(const Mesh & points_a, const Mesh & points_b, std::shared_ptr<FileWriter> logger)
 	: _points_a(points_a)
 	, _points_b(points_b)
 	, _transformation(ml::mat4f::identity())
-{}
+	, _logger(logger)
+{
+	std::vector<ml::vec3f> positions_a;
+	for (auto & p : _points_a.getVertices())
+		positions_a.push_back(p.position);
+	
+	std::vector<ml::vec3f> positions_b;
+	for (auto & p : _points_b.getVertices())
+		positions_b.push_back(p.position);
+	_icp_nn = std::make_unique<ICPNN>(positions_a, positions_b, ceresOption(), logger);
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
 bool NonRigidRegistration::solve()
 {
-	//AsRigidAsPossible arap(_points_a, _points_b, options);
-	//_points_b = arap.solve();
 	if (!(_embedded_deformation || _as_rigid_as_possible)) {
-		ceres::Solver::Options options;
-		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
-		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-		options.max_num_iterations = 100;
-		options.logging_type = ceres::LoggingType::SILENT;
-		options.minimizer_progress_to_stdout = false;
+		ceres::Solver::Options options = ceresOption();
+		//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
+		//options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
 
 		_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
 		//_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, options, _number_of_deformation_nodes, _logger);
@@ -114,22 +115,6 @@ std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
 		return std::vector<ml::vec3f>();
 }
 
-NonRigidRegistration::NonRigidRegistration()
-	: _transformation()
-{
-	for (int i = 0; i < 50; i++) {
-		float x = 0.01 *static_cast<float>(i);
-		ml::TriMeshf::Vertex vertex;
-		vertex.position = { x,0.,0. };
-		_points_a.m_vertices.push_back(vertex);
-	}
-
-	_points_b = _points_a;
-	for (int i = 25; i < 50; i++) {
-		float z = 0.005 *static_cast<double>(i - 24);
-		_points_b.m_vertices[i].position.y = z;
-	}
-}
 
 NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
 	: _points_a(points_a)
@@ -144,25 +129,50 @@ NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & p
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
+bool ARAPNonRigidRegistration::solve()
+{
+	if (!_as_rigid_as_possible->finished()) {
+		_as_rigid_as_possible->solveIteration();
+		_points_a = _as_rigid_as_possible->getDeformedPoints();
+		return true;
+	}
+	return false;
+}
+
+Mesh ARAPNonRigidRegistration::getPointsA()
+{
+	return _points_a;
+}
+
+Mesh ARAPNonRigidRegistration::getPointsB()
+{
+	return _points_b;
+}
+
+std::vector<ml::vec3f> ARAPNonRigidRegistration::getPointsDeformationGraph()
+{
+	_as_rigid_as_possible->getDeformationGraph().getDeformationGraph();
+}
+
+
+ARAPNonRigidRegistration::ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
+	: _points_a(points_a)
+	, _points_b(points_b)
+{
+	_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
+}
+
+
+//-----------------------------------------------------------------------------
+//-----------------------------------------------------------------------------
+
 bool NonRigidRegistrationFrames::solve() 
 {
 	if (_current >= _meshes.size())
 		throw std::exception("not enouth meshes");
 	if (!_embedded_deformation) {
-		ceres::Solver::Options options;
-		options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-		options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-		options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-		options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-		options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
-		options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-		options.max_num_iterations = 100;
-		options.logging_type = ceres::LoggingType::SILENT;
-		options.minimizer_progress_to_stdout = false;
-
 		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[0], _meshes[_current], /*_deformation_graphs[_current - 1],*/ options, _number_of_deformation_nodes);
-		_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], options, _number_of_deformation_nodes);
-		//_embedded_deformation = std::make_unique<EmbeddedDeformation>(_meshes[_current], _meshes[0], options, _number_of_deformation_nodes);
+		_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], ceresOption(), _number_of_deformation_nodes);
 	}
 	if (_embedded_deformation && !_embedded_deformation->finished()) {
 		_embedded_deformation->solveIteration();

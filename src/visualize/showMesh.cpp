@@ -2,6 +2,26 @@
 #include <algorithm>
 #include <cmath>
 
+
+void ShowMesh::rigidRegistration(int frame_a, int frame_b)
+{
+	if (!_registration) {
+		_registration = std::make_unique<RigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _logger);
+		renderRegistration();
+	}
+	else {
+		if (_registration->solve()) {
+			renderRegistration();
+		}
+		else {
+			_selected_frame_for_registration.clear();
+			_solve_rigid_registration = false;
+			std::cout << std::endl << "finished rigid registration, select next two frames" << std::endl;
+		}
+	}
+}
+
+
 void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
 {
 	if (!_registration) {
@@ -131,12 +151,7 @@ void ShowMesh::renderMesh()
 		}
 	}
 	if (_render_reference_mesh) {
-		//if (_registration_frames) {
-		//	_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_registration_frames->getCurrent()));
-		//}
-		//else {
 		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
-		//}
 	}
 }
 
@@ -152,6 +167,9 @@ void ShowMesh::render(ml::Cameraf& camera)
 {
 	if (_solve_non_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
 		nonRigidRegistration(_selected_frame_for_registration[1], _selected_frame_for_registration[0]);
+	}
+	if (_solve_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
+		rigidRegistration(_selected_frame_for_registration[1], _selected_frame_for_registration[0]);
 	}
 	else if (_solve_all_non_rigid_registration && _registration_frames) {
 		solveAllNonRigidRegistration();
@@ -193,6 +211,22 @@ void ShowMesh::key(UINT key)
 		}
 		else {
 			_solve_non_rigid_registration = true;
+		}
+	}
+	else if (key == KEY_J)
+	{
+		if (_selected_frame_for_registration.size() < 2) {
+			if (_selected_frame_for_registration.empty() || (_selected_frame_for_registration.size() == 1 && _selected_frame_for_registration[0] != _current_frame)) {
+				std::cout << "select frame " << _current_frame << " for rigid registration" << std::endl;
+				_selected_frame_for_registration.push_back(_current_frame);
+			}
+		}
+		else if (!_registration) {
+			std::cout << "init rigid registration between the two selected frames" << std::endl;
+			rigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
+		}
+		else {
+			_solve_rigid_registration = true;
 		}
 	}
 	else if (key == KEY_U)
@@ -239,6 +273,11 @@ void ShowMesh::key(UINT key)
 		_render_error = false;
 		std::cout << "hide error to reference mesh" << std::endl;
 		renderRegistration();
+	}
+	else if (key == KEY_B)
+	{
+		_error_evaluation = false;
+		std::cout << "disabled error evaluation" << std::endl;
 	}
 }
 

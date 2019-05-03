@@ -71,21 +71,6 @@ ml::mat4f ICP::solve()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-
-ICPNN::ICPNN(const std::vector<ml::vec3f>& src,
-			 const std::vector<ml::vec3f>& dst,
-			 ceres::Solver::Options options)
-	: _src(src)
-	, _dst(dst)
-	, _options(options)
-	, _nn_search(dst)
-{
-	std::cout << "\nCeres Solver" << std::endl;
-	std::cout << "Ceres preconditioner type: " << options.preconditioner_type << std::endl;
-	std::cout << "Ceres linear algebra type: " << options.sparse_linear_algebra_library_type << std::endl;
-	std::cout << "Ceres linear solver type: " << options.linear_solver_type << std::endl;
-}
-
 ml::mat4f ICPNN::solve()
 {
 	ml::mat4f transformation = ml::mat4f::identity();
@@ -95,16 +80,7 @@ ml::mat4f ICPNN::solve()
 	return transformation;
 }
 
-ml::mat4f ICPNN::solveTransformDataset()
-{
-	ml::mat4f transformation = ml::mat4f::identity();
-	while (!finished()) {
-		transformation = solveIterationTransformDataset();
-	}
-	return transformation;
-}
-
-ml::mat4f ICPNN::solveIteration() // working
+ml::mat4f ICPNN::solveIteration()
 {
 	if (!finished()) {
 		ceres::Solver::Summary summary;
@@ -130,43 +106,27 @@ ml::mat4f ICPNN::solveIteration() // working
 	return rigid_transformation_from_se3(_transformation_se3);
 }
 
-ml::mat4f ICPNN::solveIterationTransformDataset()
-{
-	if (!finished()) {
-		ceres::Solver::Summary summary;
-		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration);
-
-		_solve_iteration++;
-
-		// icp
-		ml::vec6d transformation(0., 0., 0., 0., 0., 0.);
-		ceres::Problem problem;
-		for (int i = 0; i < _src.size(); i++) {
-			unsigned int index = _nn_search.nearest_index(_src[i]);
-			ceres::CostFunction* cost_function = PointToPointErrorSE3::Create(_dst[index], _src[i]);
-			problem.AddResidualBlock(cost_function, NULL, transformation.array);
-		}
-		ceres::Solve(_options, &problem, &summary);
-
-
-		ml::mat4f transform_matrix = rigid_transformation_from_se3(transformation);
-		std::for_each(_src.begin(), _src.end(), [&](ml::vec3f & p) { p = transform_matrix * p; });
-		_transformation_se3 += transformation;
-
-		_current_tol = abs(_current_cost - summary.final_cost);
-		_current_cost = summary.final_cost;
-
-		_total_time_in_ms += logger.get_time_in_ms();
-	}
-	return rigid_transformation_from_se3(_transformation_se3);
-}
-
 bool ICPNN::finished()
 {
 	double tol = 0.001;
 	return (_solve_iteration >= _max_iterations || _current_tol < tol);
 }
 
+ICPNN::ICPNN(const std::vector<ml::vec3f>& src,
+			 const std::vector<ml::vec3f>& dst,
+			 ceres::Solver::Options option,
+			 std::shared_ptr<FileWriter> logger)
+	: _src(src)
+	, _dst(dst)
+	, _options(option)
+	, _nn_search(dst)
+	, _logger(logger)
+{
+	std::cout << "\nCeres Solver" << std::endl;
+	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
+	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
+	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
+}
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
