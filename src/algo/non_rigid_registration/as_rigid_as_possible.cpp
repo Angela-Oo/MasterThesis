@@ -8,12 +8,59 @@
 
 
 
+
+const ml::mat3d & ARAPNode::rotation() const
+{
+	ml::mat3d r;
+	ceres::AngleAxisToRotationMatrix(_r.array, r.getData());
+	return r;
+}
+
+ml::vec3d ARAPNode::deformedPosition() const
+{
+	return _g + _t;
+}
+
+ml::vec3d ARAPNode::deformedNormal() const
+{
+	auto r_t = rotation().getTranspose();
+	auto normal = r_t * _n;
+	return normal.getNormalized();
+}
+
+ml::vec3d ARAPNode::deformPosition(const ml::vec3f & pos) const
+{
+	return (rotation()*(pos - _g)) + _g + _t;
+}
+
+ARAPNode::ARAPNode(const ml::vec3f & g, const ml::vec3d & n)
+	: ARAPNode(g, n, ml::vec3d::origin, ml::vec3d::origin)
+{}
+
+ARAPNode::ARAPNode(const ml::vec3f & g, const ml::vec3d & n, const ml::vec3d & r, const ml::vec3d & t)
+	: _g(g)
+	, _n(n)
+	, _r(r)
+	, _t(t)
+	, _w(1.)
+{}
+
+ARAPNode::ARAPNode()
+	: ARAPNode(ml::vec3f::origin, ml::vec3f::eZ)
+{}
+
+
+
+
+
+
 Mesh AsRigidAsPossible::getDeformedPoints()
 {
 	return _deformation_graph.deformPoints(_src);
 }
 
-DeformationGraph & AsRigidAsPossible::getDeformationGraph()
+//DeformationGraph & AsRigidAsPossible::getDeformationGraph()
+TemplateDeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossible::getDeformationGraph()
 {
 	return _deformation_graph;
 }
@@ -34,7 +81,7 @@ void AsRigidAsPossible::solveIteration()
 		auto & nodes = boost::get(node_t(), g);
 
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-			Node& src_i = nodes[*vp.first];
+			auto& src_i = nodes[*vp.first];
 
 			ml::vec3f pos = src_i.deformedPosition();
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
@@ -54,9 +101,9 @@ void AsRigidAsPossible::solveIteration()
 				global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-			Node& src_i = nodes[*vp.first];
+			auto& src_i = nodes[*vp.first];
 			for (auto avp = boost::adjacent_vertices(*vp.first, g); avp.first != avp.second; ++avp.first) {
-				Node& src_j = nodes[*avp.first];
+				auto& src_j = nodes[*avp.first];
 				ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(src_i.g(), src_j.g());
 				auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 				problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
@@ -64,7 +111,7 @@ void AsRigidAsPossible::solveIteration()
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
 		{
-			Node& src_i = nodes[*vp.first];
+			auto& src_i = nodes[*vp.first];
 			ceres::CostFunction* cost_function = ConfCostFunction::Create();
 			auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function, loss_function, src_i.w());
