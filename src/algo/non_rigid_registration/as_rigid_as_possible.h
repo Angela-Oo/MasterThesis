@@ -2,19 +2,20 @@
 
 #include "mLibInclude.h"
 #include "as_rigid_as_possible_node.h"
-#include "template_deformation_graph.h"
+#include "deformation_graph.h"
 #include "algo/file_writer.h"
 #include "algo/mesh_knn.h"
 #include <ceres/ceres.h>
 
 typedef ml::TriMeshf Mesh;
+typedef TemplateDeformationGraph<ARAPGraph, ARAPNode> ARAPDeformationGraph;
 
 class AsRigidAsPossible
 {
 	Mesh _src;
 	Mesh _dst;
 	ceres::Solver::Options _options;
-	TemplateDeformationGraph<ARAPGraph, ARAPNode> _deformation_graph;
+	ARAPDeformationGraph _deformation_graph;
 	TriMeshKNN _nn_search;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
@@ -30,7 +31,7 @@ public:
 	bool finished();
 	void solveIteration();
 	Mesh solve();
-	TemplateDeformationGraph<ARAPGraph, ARAPNode> & getDeformationGraph();
+	ARAPDeformationGraph & getDeformationGraph();
 public:
 	AsRigidAsPossible(const Mesh& src,
 					  const Mesh& dst,

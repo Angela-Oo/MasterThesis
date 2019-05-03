@@ -1,24 +1,22 @@
 #pragma once
 
 #include "mLibInclude.h"
-#include <vector>
-#include <ceres/ceres.h>
-//#include "deformation_graph.h"
-#include "template_deformation_graph.h"
+#include "deformation_graph.h"
 #include "node.h"
 #include "algo/knn.h"
 #include "algo/mesh_knn.h"
 #include "algo/file_writer.h"
+#include <vector>
+#include <ceres/ceres.h>
 
 typedef TemplateDeformationGraph<Graph, Node> EmbeddedDeformationGraph;
 typedef ml::TriMeshf Mesh;
+
 class EmbeddedDeformation
-{
-	
+{	
 	Mesh _src;
 	Mesh _dst;
 	ceres::Solver::Options _options;
-	//DeformationGraph _deformation_graph;
 	EmbeddedDeformationGraph _deformation_graph;
 	TriMeshKNN _nn_search;
 	double _current_cost = 1.;
@@ -26,7 +24,6 @@ class EmbeddedDeformation
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
-
 	double a_rigid = 1000.;// 1.;// 1000;
 	double a_smooth = 100.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
@@ -40,7 +37,6 @@ public:
 	Mesh solve();
 	EmbeddedDeformationGraph & getDeformationGraph();
 public:
-	// expect src and dst points to match at the same array position
 	EmbeddedDeformation(const Mesh& src,
 						const Mesh& dst,
 						ceres::Solver::Options option,

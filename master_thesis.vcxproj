@@ -237,7 +237,6 @@
     <ClInclude Include="src\algo\non_rigid_registration\node.h" />
     <ClInclude Include="src\algo\non_rigid_registration\non_rigid_deformation.h" />
     <ClInclude Include="src\algo\non_rigid_registration\non_rigid_registration_cost_function.h" />
-    <ClInclude Include="src\algo\non_rigid_registration\template_deformation_graph.h" />
     <ClInclude Include="src\algo\registration.h" />
     <ClInclude Include="src\algo\rigid_registration\icp.h" />
     <ClInclude Include="src\algo\rigid_registration\icp_cost_function.h" />
@@ -275,8 +274,6 @@
     <ClCompile Include="src\algo\mesh_knn.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\as_rigid_as_possible.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\as_rigid_as_possible_node.cpp" />
-    <ClCompile Include="src\algo\non_rigid_registration\deformation_graph.cpp" />
-    <ClCompile Include="src\algo\non_rigid_registration\deformation_graph_knn.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\embedded_deformation.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\node.cpp" />
     <ClCompile Include="src\algo\non_rigid_registration\non_rigid_deformation.cpp" />
