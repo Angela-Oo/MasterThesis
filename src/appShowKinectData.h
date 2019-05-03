@@ -1,6 +1,7 @@
 #pragma once
 #include "mLibInclude.h"
 #include "visualize/i_showData.h"
+#include <chrono>
 
 class AppShowKinectData : public ml::ApplicationCallback
 {
@@ -21,4 +22,7 @@ private:
 
 	ml::D3D11Canvas2D m_canvas;
 	ml::Cameraf m_camera;
+
+	std::chrono::system_clock::time_point last_time_key_was_pressed;
+	UINT last_pressed_key = 0;
 };

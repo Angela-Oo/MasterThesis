@@ -12,6 +12,7 @@ using namespace ml;
 
 void AppShowKinectData::init(ml::ApplicationData &app)
 {
+	last_time_key_was_pressed = std::chrono::system_clock::now();
 	m_render_data = std::make_unique<ShowMesh>();
 	//m_render_data = std::make_unique<ShowRGBDImageData>();
 	//m_render_data = std::make_unique<ShowTwoRigideRegisteredFrames>();
@@ -133,7 +134,12 @@ void AppShowKinectData::keyPressed(ml::ApplicationData& app, UINT key)
 		FreeImageWrapper::saveImage("depth.png", ml::ColorImageR32G32B32A32(depth));
 	}
 
-	m_render_data->key(key);
+	auto time_passed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last_time_key_was_pressed).count();
+	if (last_pressed_key != key || time_passed > 200) {
+		m_render_data->key(key);
+		last_pressed_key = key;
+		last_time_key_was_pressed = std::chrono::system_clock::now();
+	}
 }
 
 void AppShowKinectData::mouseDown(ml::ApplicationData &app, ml::MouseButtonType button)

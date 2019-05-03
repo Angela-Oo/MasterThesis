@@ -3,10 +3,34 @@
 #include <cmath>
 
 
-void ShowMesh::rigidRegistration(int frame_a, int frame_b)
+//void ShowMesh::rigidRegistration(int frame_a, int frame_b)
+//{
+//	if (!_registration) {
+//		_registration = std::make_unique<RigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _logger);
+//		renderRegistration();
+//	}
+//	else {
+//		if (_registration->solve()) {
+//			renderRegistration();
+//		}
+//		else {
+//			_selected_frame_for_registration.clear();
+//			_solve_rigid_registration = false;
+//			std::cout << std::endl << "finished rigid registration, select next two frames" << std::endl;
+//		}
+//	}
+//}
+
+
+void ShowMesh::nonRigidRegistration(int frame_a, int frame_b, RegistrationType type)
 {
-	if (!_registration) {
-		_registration = std::make_unique<RigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _logger);
+	if (!_registration) {		
+		if(type == RegistrationType::ED)
+			_registration = std::make_unique<NonRigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), 300, _logger);
+		else if(type == RegistrationType::ASAP)
+			_registration = std::make_unique<ARAPNonRigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), 300);
+		else
+			_registration = std::make_unique<RigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _logger);
 		renderRegistration();
 	}
 	else {
@@ -15,32 +39,7 @@ void ShowMesh::rigidRegistration(int frame_a, int frame_b)
 		}
 		else {
 			_selected_frame_for_registration.clear();
-			_solve_rigid_registration = false;
-			std::cout << std::endl << "finished rigid registration, select next two frames" << std::endl;
-		}
-	}
-}
-
-
-void ShowMesh::nonRigidRegistration(int frame_a, int frame_b)
-{
-	if (!_registration) {
-		auto& points_a = _input_mesh->getMesh(frame_a);
-		auto& points_b = _input_mesh->getMesh(frame_b);
-		
-		_registration = std::make_unique<NonRigidRegistration>(points_a, points_b, 300, _logger);
-		//_registration = std::make_unique<NonRigidRegistrationMesh>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), 300);
-
-		renderRegistration();
-		//_render_mesh = false;
-	}
-	else {
-		if (_registration->solve()) {
-			renderRegistration();
-		}
-		else {
-			_selected_frame_for_registration.clear();
-			_solve_non_rigid_registration = false;
+			_solve_registration = false;
 			std::cout << std::endl << "finished, select next two frames" << std::endl;
 		}
 	}
@@ -62,7 +61,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 		}
 		else {
 			std::cout << std::endl << "finished registration" << std::endl;
-			_solve_all_non_rigid_registration = false;
+			_solve_registration = false;
 		}
 	}
 }
@@ -165,15 +164,15 @@ void ShowMesh::renderRegistration()
 
 void ShowMesh::render(ml::Cameraf& camera)
 {
-	if (_solve_non_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
-		nonRigidRegistration(_selected_frame_for_registration[1], _selected_frame_for_registration[0]);
-	}
-	if (_solve_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
-		rigidRegistration(_selected_frame_for_registration[1], _selected_frame_for_registration[0]);
-	}
-	else if (_solve_all_non_rigid_registration && _registration_frames) {
+	if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2 && _registration_type == RegistrationType::AllFrames) {
 		solveAllNonRigidRegistration();
 	}
+	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
+		nonRigidRegistration(_selected_frame_for_registration[1], _selected_frame_for_registration[0], _registration_type);
+	}
+	//else if (_solve_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
+	//	rigidRegistration(_selected_frame_for_registration[1], _selected_frame_for_registration[0]);
+	//}
 
 	_mesh_renderer->render(camera);
 	_point_renderer->render(camera);
@@ -200,33 +199,51 @@ void ShowMesh::key(UINT key)
 	else if (key == KEY_I)
 	{
 		if (_selected_frame_for_registration.size() < 2) {
+			if (_selected_frame_for_registration.empty())
+				_registration.reset();
 			if (_selected_frame_for_registration.empty() || (_selected_frame_for_registration.size() == 1 && _selected_frame_for_registration[0] != _current_frame)) {
-				std::cout << "select frame " << _current_frame << " for non rigid registration" << std::endl;
+				std::cout << "select frame " << _current_frame << " for registration" << std::endl;
 				_selected_frame_for_registration.push_back(_current_frame);
 			}
-		}
-		else if (!_registration) {
-			std::cout << "init non rigid registration between the two selected frames" << std::endl;
-			nonRigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
-		}
-		else {
-			_solve_non_rigid_registration = true;
 		}
 	}
-	else if (key == KEY_J)
+	else if (key == KEY_O)
 	{
-		if (_selected_frame_for_registration.size() < 2) {
-			if (_selected_frame_for_registration.empty() || (_selected_frame_for_registration.size() == 1 && _selected_frame_for_registration[0] != _current_frame)) {
-				std::cout << "select frame " << _current_frame << " for rigid registration" << std::endl;
-				_selected_frame_for_registration.push_back(_current_frame);
+		if (_selected_frame_for_registration.size() == 2) {
+			if (!_registration) {
+				std::cout << "init rigid registration between the two selected frames" << std::endl;
+				_registration_type = RegistrationType::Rigid;
+				nonRigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1], _registration_type);
+			}
+			else {				
+				_solve_registration = true;
 			}
 		}
-		else if (!_registration) {
-			std::cout << "init rigid registration between the two selected frames" << std::endl;
-			rigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1]);
+	}
+	else if(key == KEY_P)
+	{
+		if (_selected_frame_for_registration.size() == 2) {
+			if (!_registration) {
+				std::cout << "init embedded deformation non rigid registration between the two selected frames" << std::endl;
+				_registration_type = RegistrationType::ED;
+				nonRigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1], _registration_type);
+			}
+			else {				
+				_solve_registration = true;
+			}
 		}
-		else {
-			_solve_rigid_registration = true;
+	}	
+	else if (key == KEY_M)
+	{
+		if (_selected_frame_for_registration.size() == 2) {
+			if (!_registration) {
+				std::cout << "init as rigid as possible non rigid registration between the two selected frames" << std::endl;
+				_registration_type = RegistrationType::ASAP;
+				nonRigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1], _registration_type);
+			}
+			else {				
+				_solve_registration = true;
+			}
 		}
 	}
 	else if (key == KEY_U)
@@ -234,50 +251,37 @@ void ShowMesh::key(UINT key)
 		std::cout << "register all frames " << std::endl;
 		if (!_registration_frames) {
 			_current_frame = 0;
-			solveAllNonRigidRegistration();
-			_solve_all_non_rigid_registration = true;
+			_registration_type = RegistrationType::AllFrames;
+			solveAllNonRigidRegistration();			
+			_solve_registration = true;
 		}
 	}
-	else if (key == KEY_O)
+	else if (key == KEY_H)
 	{
-		_render_mesh = true;
-		std::cout << "show mesh" << std::endl;
+		_render_mesh = !_render_mesh;
+		std::string visible = (_render_mesh) ? "show" : "hide";
+		std::cout << visible << " mesh" << std::endl;
 		renderRegistration();
 	}
-	else if (key == KEY_P)
+	else if (key == KEY_J)
 	{
-		_render_mesh = false;
-		std::cout << "hide mesh" << std::endl;
+		_render_reference_mesh = !_render_reference_mesh;
+		std::string visible = (_render_reference_mesh) ? "show" : "hide";
+		std::cout << visible << " reference mesh" << std::endl;
 		renderRegistration();
 	}
 	else if (key == KEY_K)
 	{
-		_render_reference_mesh = true;
-		std::cout << "show reference mesh" << std::endl;
+		_render_error = !_render_error;
+		std::string visible = (_render_error) ? "show" : "hide";
+		std::cout << visible << " error to reference mesh" << std::endl;
 		renderRegistration();
 	}
 	else if (key == KEY_L)
 	{
-		_render_reference_mesh = false;
-		std::cout << "hide reference mesh" << std::endl;
-		renderRegistration();
-	}
-	else if (key == KEY_N)
-	{
-		_render_error = true;
-		std::cout << "show error to reference mesh" << std::endl;
-		renderRegistration();
-	}
-	else if (key == KEY_M)
-	{
-		_render_error = false;
-		std::cout << "hide error to reference mesh" << std::endl;
-		renderRegistration();
-	}
-	else if (key == KEY_B)
-	{
 		_error_evaluation = false;
-		std::cout << "disabled error evaluation" << std::endl;
+		std::string enabled = (_error_evaluation) ? "enable" : "disable";
+		std::cout << enabled << " error evaluation" << std::endl;
 	}
 }
 
@@ -314,22 +318,23 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_logger = std::make_shared<FileWriter>("hand_log.txt");
 
 	//_mesh_reader->processAllFrames();
-	for (int i = 10; i < 20; i++) {
+	for (int i = 0; i < 10; i++) {
 		_input_mesh->processFrame();
 		_reference_registration_mesh->processFrame();
 	}
 	renderMesh();
 
 	std::cout << "controls:" << std::endl;
-	std::cout << "    show next frame: KEY_2" << std::endl;
-	std::cout << "    show previous frame: KEY_1" << std::endl;
-	std::cout << "    show mesh: KEY_O" << std::endl;
-	std::cout << "    hide mesh: KEY_P" << std::endl;
-	std::cout << "    show reference mesh: KEY_K" << std::endl;
-	std::cout << "    hide reference mesh: KEY_L" << std::endl;
-	std::cout << "    show error to reference mesh: KEY_N" << std::endl;
-	std::cout << "    hide error to reference mesh: KEY_M" << std::endl;
-	std::cout << "    non rigid registration: KEY_I" << std::endl;
+	std::cout << "    show / hide mesh:                      KEY_H" << std::endl;
+	std::cout << "    show / hide reference mesh:            KEY_J" << std::endl;
+	std::cout << "    show / hide error to reference mesh:   KEY_K" << std::endl;
+	std::cout << "    enable / disable error evalutation:    KEY_L" << std::endl;
+	std::cout << "    show next frame:                       KEY_2" << std::endl;
+	std::cout << "    show previous frame:                   KEY_1" << std::endl;
+	std::cout << "    select frame for registration:         KEY_I" << std::endl;
+	std::cout << "    rigid registration:                    KEY_O" << std::endl;
+	std::cout << "    non rigid registration (ed):           KEY_P" << std::endl;
+	std::cout << "    non rigid registration (arap):         KEY_M" << std::endl;
 	std::cout << "    non rigid registration for all frames: KEY_U" << std::endl;
 
 }
