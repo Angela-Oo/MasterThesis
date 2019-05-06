@@ -10,7 +10,7 @@ void ShowMesh::nonRigidRegistration(int frame_a, int frame_b, RegistrationType t
 		if(type == RegistrationType::ED)
 			_registration = std::make_unique<NonRigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _input_mesh->getFixedPositions(frame_b), 300, _logger);
 		else if(type == RegistrationType::ASAP)
-			_registration = std::make_unique<ARAPNonRigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _input_mesh->getFixedPositions(frame_b), 300);
+			_registration = std::make_unique<ARAPNonRigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _input_mesh->getFixedPositions(frame_b), 300, _logger);
 		else
 			_registration = std::make_unique<RigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _logger);
 		renderRegistration();
@@ -257,8 +257,8 @@ void ShowMesh::key(UINT key)
 			_selected_frame_for_registration.push_back(0);
 			_selected_frame_for_registration.push_back(1);
 
-			//_registration_type = RegistrationType::ED;
-			_registration_type = RegistrationType::ASAP;
+			_registration_type = RegistrationType::ED;
+			//_registration_type = RegistrationType::ASAP;
 			nonRigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1], _registration_type);
 			_solve_registration = true;
 		}

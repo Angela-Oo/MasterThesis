@@ -266,7 +266,7 @@ bool AsRigidAsPossibleWithoutICP::finished()
 	double tol = 0.0000001;
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
-	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 5);
+	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
 AsRigidAsPossibleWithoutICP::AsRigidAsPossibleWithoutICP(const Mesh& src,
