@@ -84,11 +84,14 @@ void ShowMesh::renderRegisteredPoints()
 		auto render_points_a = _registration->getPointsA();
 		auto render_points_b = _registration->getPointsB();
 		std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
+		auto render_dg = _registration->getDeformationGraph();
 		std::vector<ml::vec3f> render_fixed_positions = _registration->getFixedPositions();
 
 
 		// render point clouds
 		_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue, 0.004);
+		_point_renderer->insertLine("line", render_dg.first, render_dg.second, ml::RGBColor::Purple, 0.002);
+
 		_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Cyan);
 		_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
 		_point_renderer->insertPoints("frame_fixed_positions", render_fixed_positions, ml::RGBColor::Red, 0.005);
@@ -126,7 +129,8 @@ void ShowMesh::renderMesh()
 			}
 			if (_registration) {
 				_mesh_renderer->insertMesh("mesh_a", _registration->getPointsA(), ml::RGBColor::Cyan.toVec4f());
-				_mesh_renderer->insertMesh("mesh_b", _registration->getPointsB(), ml::RGBColor::Green.toVec4f());
+				_registration->getPointsDeformationGraph();
+				//_mesh_renderer->insertMesh("mesh_b", _registration->getPointsB(), ml::RGBColor::Green.toVec4f());
 			}
 			else if (_selected_frame_for_registration.size() >= 1)
 			{

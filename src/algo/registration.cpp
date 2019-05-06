@@ -87,6 +87,11 @@ std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
 	return _embedded_deformation->getDeformationGraph().getDeformationGraph();
 }
 
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> NonRigidRegistration::getDeformationGraph()
+{
+	return _embedded_deformation->getDeformationGraph().getDeformationGraphEdges();
+}
+
 std::vector<ml::vec3f> NonRigidRegistration::getFixedPositions()
 {
 	return _embedded_deformation->getFixedPostions();

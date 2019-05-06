@@ -24,6 +24,7 @@ private:
 public:
 	Mesh deformPoints(const Mesh & points);
 	std::vector<ml::vec3f> getDeformationGraph();
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraphEdges();
 public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
@@ -117,6 +118,28 @@ std::vector<ml::vec3f> DeformationGraph<Graph, Node>::getDeformationGraph()
 	return points;
 }
 
+
+template<typename Graph, typename Node>
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> DeformationGraph<Graph, Node>::getDeformationGraphEdges()
+{
+	std::vector<ml::vec3f> source_points;
+	std::vector<ml::vec3f> target_points;
+	auto & nodes = boost::get(node_t(), _graph);
+	boost::graph_traits<ED::Graph>::edge_iterator ei, ei_end;
+	for (boost::tie(ei, ei_end) = boost::edges(_graph); ei != ei_end; ++ei) 
+	{
+		Node & n_i = nodes[boost::source(*ei, _graph)];
+		ml::vec3f pos_i = n_i.deformedPosition();
+		pos_i = _global_rigid_deformation.deformPosition(pos_i);
+		source_points.push_back(pos_i);
+
+		Node & n_j = nodes[boost::target(*ei, _graph)];
+		ml::vec3f pos_j = n_j.deformedPosition();
+		pos_j = _global_rigid_deformation.deformPosition(pos_j);
+		target_points.push_back(pos_j);
+	}
+	return std::make_pair(source_points, target_points);
+}
 
 
 template<typename Graph, typename Node>

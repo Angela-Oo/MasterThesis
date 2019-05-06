@@ -15,6 +15,7 @@ public:
 	virtual Mesh getPointsA() = 0;
 	virtual Mesh getPointsB() = 0;
 	virtual std::vector<ml::vec3f> getPointsDeformationGraph() = 0;
+	virtual std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() = 0;
 	virtual std::vector<ml::vec3f> getFixedPositions() = 0;
 	virtual ~IRegistration() = default;
 };
@@ -32,6 +33,7 @@ public:
 	Mesh getPointsA() override;
 	Mesh getPointsB() override;
 	std::vector<ml::vec3f> getPointsDeformationGraph() override;
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override { return std::make_pair(std::vector<ml::vec3f>(), std::vector<ml::vec3f>());  };
 	std::vector<ml::vec3f> getFixedPositions() override { return std::vector<ml::vec3f>(); }
 public:
 	RigidRegistration(const Mesh & points_a, const Mesh & points_b, std::shared_ptr<FileWriter> logger = nullptr);
@@ -47,6 +49,7 @@ public:
 	Mesh getPointsA() override;
 	Mesh getPointsB() override;
 	std::vector<ml::vec3f> getPointsDeformationGraph() override;
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
 	std::vector<ml::vec3f> getFixedPositions() override;
 public:
 	NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions = std::vector<int>(), unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
@@ -62,6 +65,7 @@ public:
 	Mesh getPointsA() override;
 	Mesh getPointsB() override;
 	std::vector<ml::vec3f> getPointsDeformationGraph() override;
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override { return std::make_pair(std::vector<ml::vec3f>(), std::vector<ml::vec3f>()); };
 	std::vector<ml::vec3f> getFixedPositions() override { return std::vector<ml::vec3f>(); }
 public:
 	ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
