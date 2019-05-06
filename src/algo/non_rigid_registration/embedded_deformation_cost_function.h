@@ -19,14 +19,33 @@ struct RotationCostFunction {
 	template <typename T>
 	bool operator()(const T* const rotation_matrix, T* residuals) const
 	{
-		const T *c1 = rotation_matrix;
-		const T *c2 = rotation_matrix + 3;
-		const T *c3 = rotation_matrix + 6;
+		//const T *c1 = rotation_matrix;
+		//const T *c2 = rotation_matrix + 3;
+		//const T *c3 = rotation_matrix + 6;
+		T c1[3];
+		T c2[3];
+		T c3[3];
+		c1[0] = rotation_matrix[0];
+		c1[1] = rotation_matrix[3];
+		c1[2] = rotation_matrix[6];
+
+		c2[0] = rotation_matrix[1];
+		c2[1] = rotation_matrix[4];
+		c2[2] = rotation_matrix[7];
+
+		c3[0] = rotation_matrix[2];
+		c3[1] = rotation_matrix[5];
+		c3[2] = rotation_matrix[8];
 		T one = T(1.);
 		T dot_c1_c2 = dot(c1, c2);
+		T dot_c1_c3 = dot(c1, c3);
+		T dot_c2_c3 = dot(c2, c3);
+		T dot_c1_c1 = dot(c1, c1);
+		T dot_c2_c2 = dot(c2, c2);
+		T dot_c3_c3 = dot(c3, c3);
 
-		residuals[0] = pow2(dot(c1, c2)) + pow2(dot(c1, c3)) + pow2(dot(c1, c3))
-			+ pow2(dot(c1, c1) - one) + pow2(dot(c2, c2) - one) + pow2(dot(c3, c3) - one);		
+		residuals[0] = pow2(dot_c1_c2) + pow2(dot_c1_c3) + pow2(dot_c2_c3)
+			+ pow2(dot_c1_c1 - one) + pow2(dot_c2_c2 - one) + pow2(dot_c3_c3 - one);
 		return true;
 	}
 };
