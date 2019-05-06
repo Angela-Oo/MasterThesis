@@ -103,8 +103,6 @@ std::vector<int> DeformationMesh::getFixedPositions(unsigned int frame)
 	for (int i = 0; i < _cylinder_width_points; ++i) {
 		fixed_index.push_back(_meshes[0].m_vertices.size() - 1 - i);
 	}
-	//fixed_index.push_back(_meshes[0].m_vertices.size() - 3);
-	//fixed_index.push_back(_meshes[0].m_vertices.size() - 1);
 	return fixed_index;
 }
 
@@ -121,7 +119,7 @@ DeformationMesh::DeformationMesh()
 	auto mesh_2 = mesh_1;
 
 	auto rotation = ml::mat4f::rotationZ(ml::math::degreesToRadians(0.));
-	auto translation = ml::mat4f::translation({ 0.5, 0., -0.7 });
+	auto translation = ml::mat4f::translation({ 0.4, 0., -0.4 });
 
 	size_t num_vertices = mesh_2.m_vertices.size();
 	for (int i = num_vertices - 1; i > num_vertices - _cylinder_width_points - 1; --i) {

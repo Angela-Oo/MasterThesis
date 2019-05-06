@@ -147,24 +147,30 @@ DeformationGraph<Graph, Node>::DeformationGraph(const Mesh & mesh)
 	: _graph(0)
 {
 	auto & vertices = mesh.getVertices();
+
+	std::map<int, vertex_index> index_to_vertex_index;
 	for (int index = 0; index < vertices.size(); ++index)
 	{
 		vertex_index v = boost::add_vertex(_graph);
 		Node n(index, vertices[index].position, vertices[index].normal.getNormalized());
 		boost::put(boost::get(node_t(), _graph), v, n);
+		index_to_vertex_index[index] = v;
 	}
 
+	auto & indices = mesh.getIndices();
+	for (int index = 0; index < indices.size(); ++index)
+	{
+		auto n1 = index_to_vertex_index[indices[index][0]];
+		auto n2 = index_to_vertex_index[indices[index][1]];
+		auto n3 = index_to_vertex_index[indices[index][2]];
+		if (boost::edge(n1, n2, _graph).second == false)
+			boost::add_edge(n1, n2, _graph);
+		if (boost::edge(n2, n3, _graph).second == false)
+			boost::add_edge(n2, n3, _graph);
+		if (boost::edge(n3, n1, _graph).second == false)
+			boost::add_edge(n3, n1, _graph);
+	}
 	_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
-	for (auto & p : vertices) {
-		std::vector<vertex_index> node_indices = _deformation_graph_knn->k_nearest_indices(p.position, _k);
-
-		for (size_t i = 0; i < node_indices.size() - 1; ++i) {
-			auto n1 = node_indices[i];
-			auto n2 = node_indices[i + 1];
-			if (boost::edge(n1, n2, _graph).second == false)
-				boost::add_edge(n1, n2, _graph);
-		}
-	}
 
 	auto& nodes = boost::get(node_t(), _graph);
 	int count = 0;

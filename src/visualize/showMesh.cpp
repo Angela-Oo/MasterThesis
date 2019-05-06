@@ -250,9 +250,9 @@ void ShowMesh::key(UINT key)
 		}
 	}
 	else if (key == KEY_T)
-	{
-		std::cout << "test registration " << std::endl;
+	{		
 		if (!_registration) {
+			std::cout << "test registration " << std::endl;
 			_current_frame = 1;
 			_selected_frame_for_registration.push_back(0);
 			_selected_frame_for_registration.push_back(1);

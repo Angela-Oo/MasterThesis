@@ -108,8 +108,9 @@ bool AsRigidAsPossible::finished()
 {
 	//double tol = 0.000001;
 	double tol = 0.0000001;
-	return (_solve_iteration >= _max_iterations) ||
-		abs(_last_cost - _current_cost) < (tol * _current_cost);
+	double error = abs(_last_cost - _current_cost);
+	bool solved = error < (tol * _current_cost);
+	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
@@ -193,52 +194,38 @@ void AsRigidAsPossibleWithoutICP::solveIteration()
 			auto& src_i = nodes[*vp.first];
 			if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), src_i.index()) != _fixed_positions.end()))
 			{
-				ml::vec3f pos = src_i.deformedPosition();
-				ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 				unsigned int i = src_i.index();
-				auto & position_j = _dst.getVertices()[i].position;
-
 				double weight = a_fit;
 				// point to point cost function
-				ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(position_j, src_i.g(), global_node.g());
+				ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
 				auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 				problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
 										 global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
+
+
 				// point to plane cost function
-				//ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(position_j, src_i.g(), src_i.n(), global_node.g());
-				//auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-				//problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-				//						 global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
+				ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
+				auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
+				problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
+										 global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 			}
 		}
 		// as rigid as possible cost
-		//for (auto ep = boost::edges(g); ep.first != ep.second; ++ep.first) {
-		//	auto vi = boost::source(*ep.first, g);
-		//	auto vj = boost::target(*ep.first, g);
+		for (auto ep = boost::edges(g); ep.first != ep.second; ++ep.first) {
+			auto vi = boost::source(*ep.first, g);
+			auto vj = boost::target(*ep.first, g);
 
-		//	auto& src_i = nodes[vi];
-		//	auto& src_j = nodes[vj];
-		//	ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(src_i.g(), src_j.g());
-		//	auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
-		//	problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
-		//}
-		//for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-		//	auto& src_i = nodes[*vp.first];
-		//	for (auto avp = boost::adjacent_vertices(*vp.first, g); avp.first != avp.second; ++avp.first) {
-		//		auto& src_j = nodes[*avp.first];
-		//		ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(src_i.g(), src_j.g());
-		//		auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
-		//		problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
-		//	}
-		//}
-		//for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
-		//{
-		//	auto& src_i = nodes[*vp.first];
-		//	ceres::CostFunction* cost_function = ConfCostFunction::Create();
-		//	auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
-		//	problem.AddResidualBlock(cost_function, loss_function, src_i.w());
-		//}
+			auto& src_i = nodes[vi];
+			auto& src_j = nodes[vj];
+			ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(src_i.g(), src_j.g());
+			auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
+
+			ceres::CostFunction* cost_function_j = AsRigidAsPossibleCostFunction::Create(src_j.g(), src_i.g());
+			auto loss_function_j = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function_j, loss_function_j, src_j.r(), src_j.t(), src_i.t());
+		}
 
 		ceres::Solve(_options, &problem, &summary);
 
@@ -269,8 +256,9 @@ bool AsRigidAsPossibleWithoutICP::finished()
 {
 	//double tol = 0.000001;
 	double tol = 0.0000001;
-	return (_solve_iteration >= _max_iterations) ||
-		abs(_last_cost - _current_cost) < (tol * _current_cost);
+	double error = abs(_last_cost - _current_cost);
+	bool solved = error < (tol * _current_cost);
+	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 5);
 }
 
 AsRigidAsPossibleWithoutICP::AsRigidAsPossibleWithoutICP(const Mesh& src,

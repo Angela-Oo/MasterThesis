@@ -59,9 +59,9 @@ class AsRigidAsPossibleWithoutICP
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
-	double a_smooth = 10.;// 0.1;// 100;
+	double a_smooth = 100.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 100.;
+	double a_fit = 10.;
 	std::shared_ptr<FileWriter> _logger;
 public:
 	const Mesh & getSource();
