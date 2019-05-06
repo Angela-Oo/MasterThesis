@@ -71,10 +71,10 @@ class EmbeddedDeformationWithoutICP
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
-	double a_rigid = 10.;// 1000;
-	double a_smooth = 10.;// 100;
+	double a_rigid = 1000.;// 1000;
+	double a_smooth = 0.5;// 100;
 	double a_conf = 1.;// 100;
-	double a_fit = 100.0; // 0.1;
+	double a_fit = 1.0; // 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
 	const Mesh & getSource();

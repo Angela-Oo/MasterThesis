@@ -50,6 +50,7 @@ struct RotationCostFunction {
 	}
 };
 
+
 struct SmoothCostFunction {
 	const ml::vec3f& _vi;
 	const ml::vec3f& _vj;
@@ -64,7 +65,7 @@ struct SmoothCostFunction {
 		return (new ceres::AutoDiffCostFunction<SmoothCostFunction, 3, 9, 3, 3>(new SmoothCostFunction(vi, vj)));
 	}
 
-	// Esmooth = sum_i sum_j || Ai(xj-xi) + xi + bi - (xj + bj) ||^2
+	// Esmooth = sum_i sum_j || Ai(xj-xi) + xi + ti - (xj + tj) ||^2
 	template <typename T>
 	bool operator()(const T* const rotation_matrix, const T* const translation_i, const T* const translation_j, T* residuals) const
 	{
@@ -72,28 +73,21 @@ struct SmoothCostFunction {
 		T vj[3];
 		vec3f_to_T(_vi, vi);
 		vec3f_to_T(_vj, vj);
-		T edge[3];
-		T vi_t[3];
-		T vj_t[3];
-		T tmp[3];
+		T edge_rotated[3];
+		T edge_translated[3];
 
-		substract(vj, vi, edge);
-		matrix_multiplication(rotation_matrix, edge, tmp);
+		//substract(vj, vi, edge);
+		substract(vi, vj, edge_rotated);
+		matrix_multiplication(rotation_matrix, edge_rotated, edge_rotated);
 
-		addition(vi, translation_i, vi_t);
-		addition(vj, translation_j, vj_t);
+		addition(vi, translation_i, vi);
+		addition(vj, translation_j, vj);
 
-		addition(tmp, vi_t, tmp);
-		substract(tmp, vj_t, residuals);
+		substract(vi, vj, edge_translated);
 
-		//addition(result, vi, result);
-		//addition(result, translation_i, result);
-		//substract(result, vj, result);
-		//substract(result, translation_j, result);
+		substract(edge_rotated, edge_translated, residuals);	
 
-		//residuals[0] = result[0];
-		//residuals[1] = result[1];
-		//residuals[2] = result[2];
 		return true;
 	}
 };
+

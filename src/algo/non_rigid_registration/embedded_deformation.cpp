@@ -69,9 +69,7 @@ void EmbeddedDeformation::solveIteration()
 			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
 			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-									 global_node.r(), global_node.t(),
-									 src_i.r(), src_i.t(),
-									 src_i.w());
+									 global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 		}
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];
@@ -264,39 +262,44 @@ void EmbeddedDeformationWithoutICP::solveIteration()
 				ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
 				auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 				problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-										 global_node.r(), global_node.t(),
-										 src_i.r(), src_i.t(),
-										 src_i.w());
+										 global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 			}
 		}
 		// smooth cost
-		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-			Node& src_i = nodes[*vp.first];
-			for (auto avp = boost::adjacent_vertices(*vp.first, g); avp.first != avp.second; ++avp.first) {
-				Node& src_j = nodes[*avp.first];
-				ceres::CostFunction* cost_function = SmoothCostFunction::Create(src_i.g(), src_j.g());
-				auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
-				problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
-			}
+		for (auto ep = boost::edges(g); ep.first != ep.second; ++ep.first) {
+			auto vi = boost::source(*ep.first, g);
+			auto vj = boost::target(*ep.first, g);
+
+			Node& src_i = nodes[vi];
+			Node& src_j = nodes[vj];
+
+			ceres::CostFunction* cost_function = SmoothCostFunction::Create(src_i.g(), src_j.g());
+			auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());		
+
+			ceres::CostFunction* cost_function_j = SmoothCostFunction::Create(src_j.g(), src_i.g());
+			auto loss_function_j = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function_j, loss_function_j, src_j.r(), src_j.t(), src_i.t());
 		}
 		// rotation cost
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
 		{
 			Node& src_i = nodes[*vp.first];
 			ceres::CostFunction* cost_function = RotationCostFunction::Create();
-			auto loss_function = new ceres::ScaledLoss(NULL, a_rigid, ceres::TAKE_OWNERSHIP);
+			
+			auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), a_rigid, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function, loss_function, src_i.r());
 		}
 		// confident cost
-		//for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
-		//{
-		//	Node& src_i = nodes[*vp.first];
-		//	ceres::CostFunction* cost_function = ConfCostFunction::Create();
-		//	auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
-		//	problem.AddResidualBlock(cost_function, loss_function, src_i.w());
-		//}
+		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
+		{
+			Node& src_i = nodes[*vp.first];
+			ceres::CostFunction* cost_function = ConfCostFunction::Create();
+			auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function, loss_function, src_i.w());
+		}
 		ceres::CostFunction* cost_function = RotationCostFunction::Create();
-		problem.AddResidualBlock(cost_function, NULL, global_node.r());
+		problem.AddResidualBlock(cost_function, new ceres::SoftLOneLoss(0.001), global_node.r());
 
 		ceres::Solve(_options, &problem, &summary);
 
@@ -330,7 +333,7 @@ bool EmbeddedDeformationWithoutICP::finished()
 	double tol = 0.000001;
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
-	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 5);
+	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
 EmbeddedDeformationWithoutICP::EmbeddedDeformationWithoutICP(const Mesh& src,
