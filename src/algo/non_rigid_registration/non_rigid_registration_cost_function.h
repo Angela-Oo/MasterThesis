@@ -67,25 +67,25 @@ struct FitStarPointToPointAngleAxisCostFunction {
 	template <typename T>
 	bool operator()(const T* const global_rotation, const T* const global_translation, const T* const translation, const T* const w, T* residuals) const
 	{
-		T n[3];
-		T g[3];
+		T node_g[3];
+		T global_g[3];
 		T point[3];
-		vec3f_to_T(_node_g, n);
-		vec3f_to_T(_global_g, g);
+		vec3f_to_T(_node_g, node_g);
+		vec3f_to_T(_global_g, global_g);
 		vec3f_to_T(_point, point);
 
 		// local deformation of node position
-		addition(n, translation, n);
+		addition(node_g, translation, node_g);
 
 		// global deformation of node position
-		substract(n, g, n);
-
-		ceres::AngleAxisRotatePoint(global_rotation, n, n);
-		addition(n, g, n);
-		addition(n, global_translation, n);
+		substract(node_g, global_g, node_g);
+		T tmp[3];
+		ceres::AngleAxisRotatePoint(global_rotation, node_g, tmp);
+		addition(tmp, global_g, node_g);
+		addition(node_g, global_translation, node_g);
 
 		// The error is the difference between the predicted and observed position multiplied with the weight
-		substract(n, point, residuals);
+		substract(node_g, point, residuals);
 		scalar_multiply(residuals, w[0], residuals);
 
 		return true;
@@ -225,7 +225,7 @@ struct ConfCostFunction {
 	bool operator()(const T* const weight, T* residuals) const {
 
 		T one{ 1. };
-		residuals[0] = one - weight[0] * weight[0];
+		residuals[0] = one - (weight[0] * weight[0]);
 		return true;
 	}
 };

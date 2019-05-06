@@ -226,6 +226,14 @@ void AsRigidAsPossibleWithoutICP::solveIteration()
 			auto loss_function_j = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_j, loss_function_j, src_j.r(), src_j.t(), src_i.t());
 		}
+		// conf cost
+		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
+		{
+			auto& src_i = nodes[*vp.first];
+			ceres::CostFunction* cost_function = ConfCostFunction::Create();
+			auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
+			problem.AddResidualBlock(cost_function, loss_function, src_i.w());
+		}
 
 		ceres::Solve(_options, &problem, &summary);
 
