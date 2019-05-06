@@ -32,6 +32,7 @@ private:
 	bool _render_mesh = true;
 	bool _render_reference_mesh = true;
 	bool _render_error = true;	
+	bool _calculate_error = true;
 	std::unique_ptr<IRegistration> _registration;
 	std::unique_ptr<NonRigidRegistrationFrames> _registration_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;

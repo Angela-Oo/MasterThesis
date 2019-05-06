@@ -8,6 +8,7 @@ class IMeshReader
 {
 public:
 	virtual ml::TriMeshf& getMesh(unsigned int frame) = 0;
+	virtual std::vector<int> getFixedPositions(unsigned int frame) = 0;
 	virtual unsigned int frame() = 0;
 };
 
@@ -24,6 +25,9 @@ private:
 	std::string getFileName(unsigned int index);
 public:
 	ml::TriMeshf& getMesh(unsigned int frame) override;
+	std::vector<int> getFixedPositions(unsigned int frame) override {
+		return std::vector<int>();
+	};
 	bool processFrame();
 	unsigned int frame() override;
 	bool processAllFrames();
@@ -40,6 +44,7 @@ class DeformationMesh : public IMeshReader
 	std::vector<ml::TriMeshf> _meshes;
 public:
 	ml::TriMeshf& getMesh(unsigned int frame) override;
+	std::vector<int> getFixedPositions(unsigned int frame) override;
 	unsigned int frame() override;
 public:
 	DeformationMesh();

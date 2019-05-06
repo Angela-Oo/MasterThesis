@@ -8,7 +8,7 @@ void ShowMesh::nonRigidRegistration(int frame_a, int frame_b, RegistrationType t
 {
 	if (!_registration) {		
 		if(type == RegistrationType::ED)
-			_registration = std::make_unique<NonRigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), 300, _logger);
+			_registration = std::make_unique<NonRigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), _input_mesh->getFixedPositions(frame_b), 300, _logger);
 		else if(type == RegistrationType::ASAP)
 			_registration = std::make_unique<ARAPNonRigidRegistration>(_input_mesh->getMesh(frame_a), _input_mesh->getMesh(frame_b), 300);
 		else
@@ -50,7 +50,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 
 void ShowMesh::renderError()
 {
-	if (_registration) {
+	if (_registration && _calculate_error) {
 		if (!_error_evaluation) {
 			_error_evaluation = std::make_unique<ErrorEvaluation>(_reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
 		}
@@ -84,11 +84,14 @@ void ShowMesh::renderRegisteredPoints()
 		auto render_points_a = _registration->getPointsA();
 		auto render_points_b = _registration->getPointsB();
 		std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
+		std::vector<ml::vec3f> render_fixed_positions = _registration->getFixedPositions();
+
 
 		// render point clouds
 		_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue, 0.004);
 		_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Cyan);
 		_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
+		_point_renderer->insertPoints("frame_fixed_positions", render_fixed_positions, ml::RGBColor::Red, 0.005);
 	}
 	else if (_registration_frames) {
 		_point_renderer->insertPoints("frame_registered_A", _registration_frames->getDeformedMesh(0), ml::RGBColor::Cyan);
@@ -242,6 +245,19 @@ void ShowMesh::key(UINT key)
 			_solve_registration = true;
 		}
 	}
+	else if (key == KEY_T)
+	{
+		std::cout << "test registration " << std::endl;
+		if (!_registration) {
+			_current_frame = 1;
+			_selected_frame_for_registration.push_back(0);
+			_selected_frame_for_registration.push_back(1);
+
+			_registration_type = RegistrationType::ED;
+			nonRigidRegistration(_selected_frame_for_registration[0], _selected_frame_for_registration[1], _registration_type);
+			_solve_registration = true;
+		}
+	}
 	else if (key == KEY_H)
 	{
 		_render_mesh = !_render_mesh;
@@ -265,7 +281,7 @@ void ShowMesh::key(UINT key)
 	}
 	else if (key == KEY_L)
 	{
-		_error_evaluation = false;
+		_calculate_error = !_calculate_error;
 		std::string enabled = (_error_evaluation) ? "enable" : "disable";
 		std::cout << enabled << " error evaluation" << std::endl;
 	}
@@ -313,7 +329,9 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 	_input_mesh = std::make_unique<DeformationMesh>();
 	_reference_registration_mesh = std::make_unique<DeformationMesh>();
+	_logger = std::make_shared<FileWriter>("test.txt");
 	_render_reference_mesh = false;
+	_calculate_error = false;
 	renderMesh();
 
 	std::cout << "controls:" << std::endl;

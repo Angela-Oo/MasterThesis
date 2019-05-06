@@ -8,6 +8,18 @@
 
 namespace ED {
 
+const Mesh & EmbeddedDeformation::getSource()
+{
+	return _src;
+}
+
+const Mesh & EmbeddedDeformation::getTarget()
+{
+	return _dst;
+}
+
+
+
 Mesh EmbeddedDeformation::getInverseDeformedPoints()
 {
 	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
@@ -183,7 +195,24 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 
 
 
+const Mesh & EmbeddedDeformationWithoutICP::getSource()
+{
+	return _src;
+}
 
+const Mesh & EmbeddedDeformationWithoutICP::getTarget()
+{
+	return _dst;
+}
+
+std::vector<ml::vec3f> EmbeddedDeformationWithoutICP::getFixedPostions()
+{
+	std::vector<ml::vec3f> positions;
+	for (auto & i : _fixed_positions) {
+		positions.push_back(_dst.getVertices()[i].position);
+	}
+	return positions;
+}
 
 Mesh EmbeddedDeformationWithoutICP::getInverseDeformedPoints()
 {
@@ -218,7 +247,7 @@ void EmbeddedDeformationWithoutICP::solveIteration()
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 			Node& src_i = nodes[*vp.first];
 
-			if (std::find(_fixed_positions.begin(), _fixed_positions.end(), src_i.index()) != _fixed_positions.end())
+			if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), src_i.index()) != _fixed_positions.end()))
 			{
 				ml::vec3f pos = src_i.deformedPosition();
 				ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
@@ -259,13 +288,13 @@ void EmbeddedDeformationWithoutICP::solveIteration()
 			problem.AddResidualBlock(cost_function, loss_function, src_i.r());
 		}
 		// confident cost
-		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
-		{
-			Node& src_i = nodes[*vp.first];
-			ceres::CostFunction* cost_function = ConfCostFunction::Create();
-			auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function, loss_function, src_i.w());
-		}
+		//for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
+		//{
+		//	Node& src_i = nodes[*vp.first];
+		//	ceres::CostFunction* cost_function = ConfCostFunction::Create();
+		//	auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
+		//	problem.AddResidualBlock(cost_function, loss_function, src_i.w());
+		//}
 		ceres::CostFunction* cost_function = RotationCostFunction::Create();
 		problem.AddResidualBlock(cost_function, NULL, global_node.r());
 
@@ -298,9 +327,10 @@ Mesh EmbeddedDeformationWithoutICP::solve()
 bool EmbeddedDeformationWithoutICP::finished()
 {
 	//double tol = 0.000001;
-	double tol = 0.0000001;
-	return (_solve_iteration >= _max_iterations) ||
-		(abs(_last_cost - _current_cost) < (tol * _current_cost) && _solve_iteration > 5);
+	double tol = 0.000001;
+	double error = abs(_last_cost - _current_cost);
+	bool solved = error < (tol * _current_cost);
+	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 5);
 }
 
 EmbeddedDeformationWithoutICP::EmbeddedDeformationWithoutICP(const Mesh& src,

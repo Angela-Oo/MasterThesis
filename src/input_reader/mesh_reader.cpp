@@ -94,6 +94,18 @@ ml::TriMeshf& DeformationMesh::getMesh(unsigned int frame)
 	return _meshes[frame];
 }
 
+std::vector<int> DeformationMesh::getFixedPositions(unsigned int frame)
+{
+	std::vector<int> fixed_index;
+	fixed_index.push_back(0);
+	fixed_index.push_back(1);
+	fixed_index.push_back(2);
+	fixed_index.push_back(3);
+	fixed_index.push_back(4);
+	fixed_index.push_back(_meshes[0].m_vertices.size() - 1);
+	return fixed_index;
+}
+
 unsigned int DeformationMesh::frame()
 {
 	return _meshes.size();
@@ -105,6 +117,8 @@ DeformationMesh::DeformationMesh()
 	_meshes.push_back(mesh_1);
 
 	auto mesh_2 = mesh_1;
-	mesh_2.m_vertices[mesh_2.m_vertices.size() - 1].position.x += 0.2;
+	mesh_2.m_vertices[mesh_2.m_vertices.size() - 1].position.z -= 0.4;
+	mesh_2.m_vertices[mesh_2.m_vertices.size() - 1].position.x += 0.4;
+	mesh_2.m_vertices[mesh_2.m_vertices.size() - 1].position.y += 0.2;
 	_meshes.push_back(mesh_2);
 }

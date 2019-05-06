@@ -32,8 +32,11 @@ class EmbeddedDeformation
 	double a_fit = 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
+	const Mesh & getSource();
+	const Mesh & getTarget();
 	Mesh getInverseDeformedPoints();
 	Mesh getDeformedPoints();
+public:
 	bool finished();
 	void solveIteration();
 	Mesh solve();
@@ -68,14 +71,18 @@ class EmbeddedDeformationWithoutICP
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
-	double a_rigid = 1000.;// 1.;// 1000;
-	double a_smooth = 100.;// 0.1;// 100;
-	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 0.1;
+	double a_rigid = 10.;// 1000;
+	double a_smooth = 10.;// 100;
+	double a_conf = 1.;// 100;
+	double a_fit = 100.0; // 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
+	const Mesh & getSource();
+	const Mesh & getTarget();
+	std::vector<ml::vec3f> getFixedPostions();
 	Mesh getInverseDeformedPoints();
 	Mesh getDeformedPoints();
+public:
 	bool finished();
 	void solveIteration();
 	Mesh solve();

@@ -66,7 +66,7 @@ bool NonRigidRegistration::solve()
 {
 	if (!_embedded_deformation->finished()) {
 		_embedded_deformation->solveIteration();
-		_points_a = _embedded_deformation->getDeformedPoints();
+		
 		return true;
 	}
 	return false;
@@ -74,12 +74,12 @@ bool NonRigidRegistration::solve()
 
 Mesh NonRigidRegistration::getPointsA()
 {
-	return _points_a;
+	return _embedded_deformation->getDeformedPoints();
 }
 
 Mesh NonRigidRegistration::getPointsB()
 {
-	return _points_b;
+	return _embedded_deformation->getTarget();
 }
 
 std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
@@ -87,19 +87,18 @@ std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
 	return _embedded_deformation->getDeformationGraph().getDeformationGraph();
 }
 
+std::vector<ml::vec3f> NonRigidRegistration::getFixedPositions()
+{
+	return _embedded_deformation->getFixedPostions();
+}
 
-NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
-	: _points_a(points_a)
-	, _points_b(points_b)
+NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
 {
 	//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
 	//options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
 
 	//_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
-	std::vector<int> fixed_index;
-	fixed_index.push_back(0);
-	fixed_index.push_back(points_a.m_vertices.size() - 1);
-	_embedded_deformation = std::make_unique<ED::EmbeddedDeformationWithoutICP>(_points_a, _points_b, fixed_index, ceresOption(), logger);
+	_embedded_deformation = std::make_unique<ED::EmbeddedDeformationWithoutICP>(points_a, points_b, fixed_positions, ceresOption(), logger);
 }
 
 
