@@ -4,9 +4,9 @@
 
 const ml::mat3d & ARAPNode::rotation() const
 {
-	ml::mat3d r;
+	ml::mat3d r;	
 	ceres::AngleAxisToRotationMatrix(_r.array, r.getData());
-	return r;
+	return r.getTranspose(); // why??
 }
 
 ml::vec3d ARAPNode::deformedPosition() const
@@ -23,7 +23,8 @@ ml::vec3d ARAPNode::deformedNormal() const
 
 ml::vec3d ARAPNode::deformPosition(const ml::vec3f & pos) const
 {
-	return (rotation()*(pos - _g)) + _g + _t;
+	auto r = rotation();
+	return (r*(pos - _g)) + _g + _t;
 }
 
 ARAPNode::ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n)
