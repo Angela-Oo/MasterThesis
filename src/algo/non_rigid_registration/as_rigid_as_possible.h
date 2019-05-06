@@ -42,3 +42,41 @@ public:
 					  unsigned int number_of_deformation_nodes = 1000,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 };
+
+
+
+
+
+class AsRigidAsPossibleWithoutICP
+{
+	Mesh _src;
+	Mesh _dst;
+	ceres::Solver::Options _options;
+	ARAPDeformationGraph _deformation_graph;
+	std::vector<int> _fixed_positions;
+	double _current_cost = 1.;
+	double _last_cost = 2.;
+	size_t _solve_iteration = 0;
+	size_t _max_iterations = 200;
+	long long _total_time_in_ms = 0;
+	double a_smooth = 10.;// 0.1;// 100;
+	double a_conf = 100.;// 1.;// 100;
+	double a_fit = 100.;
+	std::shared_ptr<FileWriter> _logger;
+public:
+	const Mesh & getSource();
+	const Mesh & getTarget();
+	std::vector<ml::vec3f> getFixedPostions();
+	ARAPDeformationGraph & getDeformationGraph();
+	Mesh getDeformedPoints();
+public:
+	bool finished();
+	void solveIteration();
+	Mesh solve();
+public:
+	AsRigidAsPossibleWithoutICP(const Mesh& src,
+								const Mesh& dst,
+								std::vector<int> fixed_positions,
+								ceres::Solver::Options option,
+								std::shared_ptr<FileWriter> logger = nullptr);
+};

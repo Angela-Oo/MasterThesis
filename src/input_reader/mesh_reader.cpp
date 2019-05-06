@@ -97,12 +97,14 @@ ml::TriMeshf& DeformationMesh::getMesh(unsigned int frame)
 std::vector<int> DeformationMesh::getFixedPositions(unsigned int frame)
 {
 	std::vector<int> fixed_index;
-	fixed_index.push_back(0);
-	fixed_index.push_back(1);
-	fixed_index.push_back(2);
-	fixed_index.push_back(3);
-	fixed_index.push_back(4);
-	fixed_index.push_back(_meshes[0].m_vertices.size() - 1);
+	for (int i = 0; i < _cylinder_width_points; ++i) {
+		fixed_index.push_back(i);
+	}
+	for (int i = 0; i < _cylinder_width_points; ++i) {
+		fixed_index.push_back(_meshes[0].m_vertices.size() - 1 - i);
+	}
+	//fixed_index.push_back(_meshes[0].m_vertices.size() - 3);
+	//fixed_index.push_back(_meshes[0].m_vertices.size() - 1);
 	return fixed_index;
 }
 
@@ -113,12 +115,17 @@ unsigned int DeformationMesh::frame()
 
 DeformationMesh::DeformationMesh()
 {
-	auto mesh_1 = ml::Shapes<float>::cylinder(0.1, 1., 3, 5);
+	auto mesh_1 = ml::Shapes<float>::cylinder(0.1, 1., _cylinder_height_points, _cylinder_width_points);
 	_meshes.push_back(mesh_1);
 
 	auto mesh_2 = mesh_1;
-	mesh_2.m_vertices[mesh_2.m_vertices.size() - 1].position.z -= 0.4;
-	mesh_2.m_vertices[mesh_2.m_vertices.size() - 1].position.x += 0.4;
-	mesh_2.m_vertices[mesh_2.m_vertices.size() - 1].position.y += 0.2;
+
+	auto rotation = ml::mat4f::rotationZ(ml::math::degreesToRadians(0.));
+	auto translation = ml::mat4f::translation({ 0.5, 0., -0.7 });
+
+	size_t num_vertices = mesh_2.m_vertices.size();
+	for (int i = num_vertices - 1; i > num_vertices - _cylinder_width_points - 1; --i) {
+		mesh_2.m_vertices[i].position = rotation * translation * mesh_2.m_vertices[i].position;
+	}
 	_meshes.push_back(mesh_2);
 }

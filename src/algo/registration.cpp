@@ -134,9 +134,19 @@ std::vector<ml::vec3f> ARAPNonRigidRegistration::getPointsDeformationGraph()
 	return _as_rigid_as_possible->getDeformationGraph().getDeformationGraph();
 }
 
-ARAPNonRigidRegistration::ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> ARAPNonRigidRegistration::getDeformationGraph()
 {
-	_as_rigid_as_possible = std::make_unique<AsRigidAsPossible>(points_a, points_b, ceresOption(), number_of_deformation_nodes, logger);
+	return _as_rigid_as_possible->getDeformationGraph().getDeformationGraphEdges();
+}
+
+std::vector<ml::vec3f> ARAPNonRigidRegistration::getFixedPositions()
+{
+	return _as_rigid_as_possible->getFixedPostions();
+}
+
+ARAPNonRigidRegistration::ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
+{
+	_as_rigid_as_possible = std::make_unique<AsRigidAsPossibleWithoutICP>(points_a, points_b, fixed_positions, ceresOption(), logger);
 }
 
 
