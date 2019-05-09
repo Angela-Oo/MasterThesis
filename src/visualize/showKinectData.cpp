@@ -22,12 +22,12 @@ void ShowKinectData::renderPoints(int frame)
 
 void ShowKinectData::renderRegisteredPoints()
 {
-	auto render_points_a = _registration->getPointsA();
-	auto render_points_b = _registration->getPointsB();
-	std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
+	auto render_points_a = _registration->getDeformedPoints();
+	auto render_points_b = _registration->getTarget();
+	//std::vector<ml::vec3f> render_points_dg = _registration->getPointsDeformationGraph();
 
 	// render point clouds
-	_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue);
+	//_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue);
 	_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Orange);
 	_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
 }
@@ -95,7 +95,7 @@ void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 		for (auto & p : points_b_icp)
 			mesh_b.m_vertices.push_back(p);
 
-		_registration = std::make_unique<NonRigidRegistration>(mesh_a, mesh_b);
+		_registration = std::make_unique<ED::EmbeddedDeformation>(mesh_a, mesh_b, ceresOption());
 		renderRegisteredPoints();
 	}
 	else {		

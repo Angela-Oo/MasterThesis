@@ -19,29 +19,51 @@ ceres::Solver::Options ceresOption() {
 
 bool RigidRegistration::solve()
 {
-	if (!_icp_nn->finished()) {
+	while (!_icp_nn->finished()) {
 		_transformation = _icp_nn->solveIteration();
-		return true;
 	}
-	return false;
+	return true;
 }
 
-Mesh RigidRegistration::getPointsA()
+bool RigidRegistration::finished()
+{
+	return _icp_nn->finished();
+}
+
+
+bool RigidRegistration::solveIteration()
+{
+	if (!_icp_nn->finished()) {
+		_transformation = _icp_nn->solveIteration();
+	}
+	return finished();
+}
+
+const Mesh & RigidRegistration::getSource()
+{
+	return _points_a;
+}
+
+const Mesh & RigidRegistration::getTarget()
+{
+	return _points_b;
+}
+
+Mesh RigidRegistration::getDeformedPoints()
 {
 	auto transformed_points = _points_a;
 	std::for_each(transformed_points.m_vertices.begin(), transformed_points.m_vertices.end(), [&](Mesh::Vertex & p) { p.position = _transformation * p.position; });
 	return transformed_points;
 }
 
-Mesh RigidRegistration::getPointsB()
+Mesh RigidRegistration::getInverseDeformedPoints()
 {
-	return _points_b;
+	auto transformed_points = _points_a;
+	auto inverse_transformation = _transformation.getInverse();
+	std::for_each(transformed_points.m_vertices.begin(), transformed_points.m_vertices.end(), [&](Mesh::Vertex & p) { p.position = inverse_transformation * p.position; });
+	return transformed_points;
 }
 
-std::vector<ml::vec3f> RigidRegistration::getPointsDeformationGraph()
-{
-	return std::vector<ml::vec3f>();
-}
 
 RigidRegistration::RigidRegistration(const Mesh & points_a, const Mesh & points_b, std::shared_ptr<FileWriter> logger)
 	: _points_a(points_a)
@@ -61,93 +83,93 @@ RigidRegistration::RigidRegistration(const Mesh & points_a, const Mesh & points_
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-
-bool NonRigidRegistration::solve()
-{
-	if (!_embedded_deformation->finished()) {
-		_embedded_deformation->solveIteration();
-		
-		return true;
-	}
-	return false;
-}
-
-Mesh NonRigidRegistration::getPointsA()
-{
-	return _embedded_deformation->getDeformedPoints();
-}
-
-Mesh NonRigidRegistration::getPointsB()
-{
-	return _embedded_deformation->getTarget();
-}
-
-std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
-{
-	return _embedded_deformation->getEmeddedDeformationGraph().getDeformationGraph();
-}
-
-std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> NonRigidRegistration::getDeformationGraph()
-{
-	return _embedded_deformation->getDeformationGraph();
-}
-
-std::vector<ml::vec3f> NonRigidRegistration::getFixedPositions()
-{
-	return _embedded_deformation->getFixedPostions();
-}
-
-NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
-{
-	//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
-	//options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-
-	//_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
-	_embedded_deformation = std::make_unique<ED::EmbeddedDeformationWithoutICP>(points_a, points_b, fixed_positions, ceresOption(), logger);
-}
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-
-bool ARAPNonRigidRegistration::solve()
-{
-	if (!_as_rigid_as_possible->finished()) {
-		_as_rigid_as_possible->solveIteration();
-		return true;
-	}
-	return false;
-}
-
-Mesh ARAPNonRigidRegistration::getPointsA()
-{
-	return _as_rigid_as_possible->getDeformedPoints();
-}
-
-Mesh ARAPNonRigidRegistration::getPointsB()
-{
-	return _as_rigid_as_possible->getTarget();
-}
-
-std::vector<ml::vec3f> ARAPNonRigidRegistration::getPointsDeformationGraph()
-{
-	return _as_rigid_as_possible->getARAPDeformationGraph().getDeformationGraph();
-}
-
-std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> ARAPNonRigidRegistration::getDeformationGraph()
-{
-	return _as_rigid_as_possible->getDeformationGraph();
-}
-
-std::vector<ml::vec3f> ARAPNonRigidRegistration::getFixedPositions()
-{
-	return _as_rigid_as_possible->getFixedPostions();
-}
-
-ARAPNonRigidRegistration::ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
-{
-	_as_rigid_as_possible = std::make_unique<AsRigidAsPossibleWithoutICP>(points_a, points_b, fixed_positions, ceresOption(), logger);
-}
+//
+//bool NonRigidRegistration::solve()
+//{
+//	if (!_embedded_deformation->finished()) {
+//		_embedded_deformation->solveIteration();
+//		
+//		return true;
+//	}
+//	return false;
+//}
+//
+//Mesh NonRigidRegistration::getPointsA()
+//{
+//	return _embedded_deformation->getDeformedPoints();
+//}
+//
+//Mesh NonRigidRegistration::getPointsB()
+//{
+//	return _embedded_deformation->getTarget();
+//}
+//
+//std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
+//{
+//	return _embedded_deformation->getEmeddedDeformationGraph().getDeformationGraph();
+//}
+//
+//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> NonRigidRegistration::getDeformationGraph()
+//{
+//	return _embedded_deformation->getDeformationGraph();
+//}
+//
+//std::vector<ml::vec3f> NonRigidRegistration::getFixedPositions()
+//{
+//	return _embedded_deformation->getFixedPostions();
+//}
+//
+//NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
+//{
+//	//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
+//	//options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
+//
+//	//_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
+//	_embedded_deformation = std::make_unique<ED::EmbeddedDeformationWithoutICP>(points_a, points_b, fixed_positions, ceresOption(), logger);
+//}
+//
+//
+////-----------------------------------------------------------------------------
+////-----------------------------------------------------------------------------
+//
+//bool ARAPNonRigidRegistration::solve()
+//{
+//	if (!_as_rigid_as_possible->finished()) {
+//		_as_rigid_as_possible->solveIteration();
+//		return true;
+//	}
+//	return false;
+//}
+//
+//Mesh ARAPNonRigidRegistration::getPointsA()
+//{
+//	return _as_rigid_as_possible->getDeformedPoints();
+//}
+//
+//Mesh ARAPNonRigidRegistration::getPointsB()
+//{
+//	return _as_rigid_as_possible->getTarget();
+//}
+//
+//std::vector<ml::vec3f> ARAPNonRigidRegistration::getPointsDeformationGraph()
+//{
+//	return _as_rigid_as_possible->getARAPDeformationGraph().getDeformationGraph();
+//}
+//
+//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> ARAPNonRigidRegistration::getDeformationGraph()
+//{
+//	return _as_rigid_as_possible->getDeformationGraph();
+//}
+//
+//std::vector<ml::vec3f> ARAPNonRigidRegistration::getFixedPositions()
+//{
+//	return _as_rigid_as_possible->getFixedPostions();
+//}
+//
+//ARAPNonRigidRegistration::ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
+//{
+//	_as_rigid_as_possible = std::make_unique<AsRigidAsPossibleWithoutICP>(points_a, points_b, fixed_positions, ceresOption(), logger);
+//}
 
 
 //-----------------------------------------------------------------------------

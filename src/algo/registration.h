@@ -3,6 +3,7 @@
 #include "algo/non_rigid_registration/embedded_deformation.h"
 #include "algo/non_rigid_registration/as_rigid_as_possible.h"
 #include "algo/file_writer.h"
+#include "algo/non_rigid_registration/non_rigid_deformation.h"
 
 typedef ml::TriMeshf Mesh;
 
@@ -21,7 +22,7 @@ public:
 	virtual ~IRegistration() = default;
 };
 
-class RigidRegistration : public IRegistration
+class RigidRegistration : public INonRigidRegistration
 {
 private:
 	std::unique_ptr<ICPNN> _icp_nn;
@@ -30,49 +31,51 @@ private:
 	ml::mat4f _transformation;
 	std::shared_ptr<FileWriter> _logger;
 public:
+	bool finished() override;
+	bool solveIteration() override;
 	bool solve() override;
-	Mesh getPointsA() override;
-	Mesh getPointsB() override;
-	std::vector<ml::vec3f> getPointsDeformationGraph() override;
-	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override { return std::make_pair(std::vector<ml::vec3f>(), std::vector<ml::vec3f>());  };
-	std::vector<ml::vec3f> getFixedPositions() override { return std::vector<ml::vec3f>(); }
+public:
+	const Mesh & getSource() override;
+	const Mesh & getTarget() override;
+	Mesh getDeformedPoints() override;
+	Mesh getInverseDeformedPoints() override;
 public:
 	RigidRegistration(const Mesh & points_a, const Mesh & points_b, std::shared_ptr<FileWriter> logger = nullptr);
 };
 
-class NonRigidRegistration : public IRegistration
-{
-private:
-	//std::unique_ptr<ED::EmbeddedDeformation> _embedded_deformation;
-	std::unique_ptr<ED::EmbeddedDeformationWithoutICP> _embedded_deformation;
-public:
-	bool solve() override;
-	Mesh getPointsA() override;
-	Mesh getPointsB() override;
-	std::vector<ml::vec3f> getPointsDeformationGraph() override;
-	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
-	std::vector<ml::vec3f> getFixedPositions() override;
-public:
-	NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions = std::vector<int>(), unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
-};
+//class NonRigidRegistration : public IRegistration
+//{
+//private:
+//	//std::unique_ptr<ED::EmbeddedDeformation> _embedded_deformation;
+//	std::unique_ptr<ED::EmbeddedDeformationWithoutICP> _embedded_deformation;
+//public:
+//	bool solve() override;
+//	Mesh getPointsA() override;
+//	Mesh getPointsB() override;
+//	std::vector<ml::vec3f> getPointsDeformationGraph() override;
+//	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+//	std::vector<ml::vec3f> getFixedPositions() override;
+//public:
+//	NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions = std::vector<int>(), unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
+//};
 
 
-class ARAPNonRigidRegistration : public IRegistration
-{
-private:
-	//std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
-	std::unique_ptr<AsRigidAsPossibleWithoutICP> _as_rigid_as_possible;
-public:
-	bool solve() override;
-	Mesh getPointsA() override;
-	Mesh getPointsB() override;
-	std::vector<ml::vec3f> getPointsDeformationGraph() override;
-	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
-	std::vector<ml::vec3f> getFixedPositions() override;
-public:
-	ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions = std::vector<int>(), unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
-};
-
+//class ARAPNonRigidRegistration : public IRegistration
+//{
+//private:
+//	//std::unique_ptr<AsRigidAsPossible> _as_rigid_as_possible;
+//	std::unique_ptr<AsRigidAsPossibleWithoutICP> _as_rigid_as_possible;
+//public:
+//	bool solve() override;
+//	Mesh getPointsA() override;
+//	Mesh getPointsB() override;
+//	std::vector<ml::vec3f> getPointsDeformationGraph() override;
+//	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+//	std::vector<ml::vec3f> getFixedPositions() override;
+//public:
+//	ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions = std::vector<int>(), unsigned int number_of_deformation_nodes = 1000, std::shared_ptr<FileWriter> logger = nullptr);
+//};
+//
 
 
 class NonRigidRegistrationFrames

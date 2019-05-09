@@ -18,7 +18,7 @@ public:
 	virtual Mesh getInverseDeformedPoints() = 0;
 public:
 	virtual std::vector<ml::vec3f> getFixedPostions() { return std::vector<ml::vec3f>(); }
-	virtual std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() = 0;
+	virtual std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() { return std::make_pair(std::vector<ml::vec3f>(), std::vector<ml::vec3f>()); }
 public:
 	virtual ~INonRigidRegistration() = default;
 };
