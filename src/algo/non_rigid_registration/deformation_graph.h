@@ -125,7 +125,7 @@ std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> DeformationGraph<Graph
 	std::vector<ml::vec3f> source_points;
 	std::vector<ml::vec3f> target_points;
 	auto & nodes = boost::get(node_t(), _graph);
-	boost::graph_traits<ED::Graph>::edge_iterator ei, ei_end;
+	boost::graph_traits<Graph>::edge_iterator ei, ei_end;
 	for (boost::tie(ei, ei_end) = boost::edges(_graph); ei != ei_end; ++ei) 
 	{
 		Node & n_i = nodes[boost::source(*ei, _graph)];
@@ -261,7 +261,7 @@ DeformationGraph<Graph, Node> & DeformationGraph<Graph, Node>::operator=(Deforma
 template<typename Node>
 Node inverseDeformationNode(const Node & node)
 {
-	Node inverse_deformation_node(node.index(), node.deformedPosition(), node.deformedNormal(), node.rotation().getInverse(), -node.translation());
+	Node inverse_deformation_node(node, true);
 	return inverse_deformation_node;
 }
 

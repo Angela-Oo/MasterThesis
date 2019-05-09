@@ -6,11 +6,12 @@
 #include "algo/file_writer.h"
 #include "algo/mesh_knn.h"
 #include <ceres/ceres.h>
+#include "algo/non_rigid_registration/non_rigid_deformation.h"
 
 typedef ml::TriMeshf Mesh;
 typedef DeformationGraph<ARAPGraph, ARAPNode> ARAPDeformationGraph;
 
-class AsRigidAsPossible
+class AsRigidAsPossible : public INonRigidRegistration
 {
 	Mesh _src;
 	Mesh _dst;
@@ -27,14 +28,18 @@ class AsRigidAsPossible
 	double a_fit = 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
-	const Mesh & getSource();
-	const Mesh & getTarget();
-	ARAPDeformationGraph & getDeformationGraph();
-	Mesh getDeformedPoints();
+	bool finished() override;
+	bool solveIteration() override;
+	bool solve() override;
 public:
-	bool finished();
-	void solveIteration();
-	Mesh solve();
+	const Mesh & getSource() override;
+	const Mesh & getTarget() override;
+	Mesh getDeformedPoints() override;
+	Mesh getInverseDeformedPoints() override;
+public:
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+public:
+	ARAPDeformationGraph & getARAPDeformationGraph();
 public:
 	AsRigidAsPossible(const Mesh& src,
 					  const Mesh& dst,
@@ -47,7 +52,7 @@ public:
 
 
 
-class AsRigidAsPossibleWithoutICP
+class AsRigidAsPossibleWithoutICP : public INonRigidRegistration
 {
 	Mesh _src;
 	Mesh _dst;
@@ -64,15 +69,19 @@ class AsRigidAsPossibleWithoutICP
 	double a_fit = 10.;
 	std::shared_ptr<FileWriter> _logger;
 public:
-	const Mesh & getSource();
-	const Mesh & getTarget();
-	std::vector<ml::vec3f> getFixedPostions();
-	ARAPDeformationGraph & getDeformationGraph();
-	Mesh getDeformedPoints();
+	bool finished() override;
+	bool solveIteration() override;
+	bool solve() override;
 public:
-	bool finished();
-	void solveIteration();
-	Mesh solve();
+	const Mesh & getSource() override;
+	const Mesh & getTarget() override;
+	Mesh getDeformedPoints() override;
+	Mesh getInverseDeformedPoints() override;
+public:
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+	std::vector<ml::vec3f> getFixedPostions() override;
+public:
+	ARAPDeformationGraph & getARAPDeformationGraph();
 public:
 	AsRigidAsPossibleWithoutICP(const Mesh& src,
 								const Mesh& dst,

@@ -8,6 +8,7 @@ typedef ml::TriMeshf Mesh;
 
 ceres::Solver::Options ceresOption();
 
+
 class IRegistration
 {
 public:

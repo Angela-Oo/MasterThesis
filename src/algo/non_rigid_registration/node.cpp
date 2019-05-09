@@ -37,4 +37,22 @@ Node::Node(int index, const ml::vec3f & g, const ml::vec3d & n, const ml::mat3d 
 Node::Node()
 	: Node(-1, ml::vec3f::origin, ml::vec3f::eZ)
 {}
+
+Node::Node(const Node & node, bool inverse)
+	: _index(node._index)
+	, _g(node._g)
+	, _n(node._n)
+	, _r(node._r)
+	, _t(node._t)
+	, _w(node._w)
+{
+	if (inverse) {
+		_g = node.deformedPosition();
+		_n = node.deformedNormal();
+		_r = node._r.getInverse();
+		_t = -node._t;
+	}
+}
+
+
 }

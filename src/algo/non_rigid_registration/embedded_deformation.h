@@ -9,12 +9,14 @@
 #include <vector>
 #include <ceres/ceres.h>
 
+#include "algo/non_rigid_registration/non_rigid_deformation.h"
+
 namespace ED {
 
 typedef DeformationGraph<Graph, Node> EmbeddedDeformationGraph;
-typedef ml::TriMeshf Mesh;
+//typedef ml::TriMeshf Mesh;
 
-class EmbeddedDeformation
+class EmbeddedDeformation : public INonRigidRegistration
 {
 	Mesh _src;
 	Mesh _dst;
@@ -32,15 +34,18 @@ class EmbeddedDeformation
 	double a_fit = 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
-	const Mesh & getSource();
-	const Mesh & getTarget();
-	Mesh getInverseDeformedPoints();
-	Mesh getDeformedPoints();
-public:
 	bool finished();
-	void solveIteration();
-	Mesh solve();
-	EmbeddedDeformationGraph & getDeformationGraph();
+	bool solveIteration() override;
+	bool solve() override;
+public:
+	const Mesh & getSource() override;
+	const Mesh & getTarget() override;
+	Mesh getDeformedPoints() override;
+	Mesh getInverseDeformedPoints() override;
+public:
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+public:
+	EmbeddedDeformationGraph & getEmbeddedDeformationGraph();
 public:
 	EmbeddedDeformation(const Mesh& src,
 						const Mesh& dst,
@@ -59,7 +64,7 @@ public:
 
 
 
-class EmbeddedDeformationWithoutICP
+class EmbeddedDeformationWithoutICP : public INonRigidRegistration
 {
 	Mesh _src;
 	Mesh _dst;
@@ -77,16 +82,19 @@ class EmbeddedDeformationWithoutICP
 	double a_fit = 1.0; // 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
-	const Mesh & getSource();
-	const Mesh & getTarget();
-	std::vector<ml::vec3f> getFixedPostions();
-	Mesh getInverseDeformedPoints();
-	Mesh getDeformedPoints();
+	bool finished() override;
+	bool solveIteration() override;
+	bool solve() override;
 public:
-	bool finished();
-	void solveIteration();
-	Mesh solve();
-	EmbeddedDeformationGraph & getDeformationGraph();
+	const Mesh & getSource() override;
+	const Mesh & getTarget() override;
+	Mesh getDeformedPoints() override;
+	Mesh getInverseDeformedPoints() override;
+public:
+	std::vector<ml::vec3f> getFixedPostions() override;
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+public:
+	EmbeddedDeformationGraph & getEmeddedDeformationGraph();
 public:
 	EmbeddedDeformationWithoutICP(const Mesh& src,
 								  const Mesh& dst,

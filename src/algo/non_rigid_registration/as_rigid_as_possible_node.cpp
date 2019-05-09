@@ -43,3 +43,19 @@ ARAPNode::ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n, const ml
 ARAPNode::ARAPNode()
 	: ARAPNode(0, ml::vec3f::origin, ml::vec3f::eZ)
 {}
+
+ARAPNode::ARAPNode(const ARAPNode & node, bool inverse)
+	: _index(node._index)
+	, _g(node._g)
+	, _n(node._n)
+	, _r(node._r)
+	, _t(node._t)
+	, _w(node._w)
+{
+	if (inverse) {
+		_g = node.deformedPosition();
+		_n = node.deformedNormal();
+		_r = -node._r;
+		_t = -node._t;
+	}
+}

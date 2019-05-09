@@ -18,7 +18,10 @@ const Mesh & EmbeddedDeformation::getTarget()
 	return _dst;
 }
 
-
+Mesh EmbeddedDeformation::getDeformedPoints()
+{
+	return _deformation_graph.deformPoints(_src);
+}
 
 Mesh EmbeddedDeformation::getInverseDeformedPoints()
 {
@@ -26,17 +29,17 @@ Mesh EmbeddedDeformation::getInverseDeformedPoints()
 	return inverse_deformation.deformPoints(_dst);
 }
 
-Mesh EmbeddedDeformation::getDeformedPoints()
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> EmbeddedDeformation::getDeformationGraph()
 {
-	return _deformation_graph.deformPoints(_src);
+	return _deformation_graph.getDeformationGraphEdges();
 }
 
-EmbeddedDeformationGraph & EmbeddedDeformation::getDeformationGraph()
+EmbeddedDeformationGraph & EmbeddedDeformation::getEmbeddedDeformationGraph()
 {
-	return _deformation_graph;// .getDeformationGraph();
+	return _deformation_graph;
 }
 
-void EmbeddedDeformation::solveIteration()
+bool EmbeddedDeformation::solveIteration()
 {
 	if (!finished()) {
 		_solve_iteration++;
@@ -112,15 +115,15 @@ void EmbeddedDeformation::solveIteration()
 
 		_total_time_in_ms += logger.get_time_in_ms();
 	}
+	return finished();
 }
 
-Mesh EmbeddedDeformation::solve()
+bool EmbeddedDeformation::solve()
 {
-	ml::mat4f transformation = ml::mat4f::identity();
 	while (!finished()) {
 		solveIteration();
 	}
-	return getDeformedPoints();
+	return true;
 }
 
 bool EmbeddedDeformation::finished()
@@ -223,12 +226,18 @@ Mesh EmbeddedDeformationWithoutICP::getDeformedPoints()
 	return _deformation_graph.deformPoints(_src);
 }
 
-EmbeddedDeformationGraph & EmbeddedDeformationWithoutICP::getDeformationGraph()
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> EmbeddedDeformationWithoutICP::getDeformationGraph()
+{
+	return _deformation_graph.getDeformationGraphEdges();
+}
+
+
+EmbeddedDeformationGraph & EmbeddedDeformationWithoutICP::getEmeddedDeformationGraph()
 {
 	return _deformation_graph;
 }
 
-void EmbeddedDeformationWithoutICP::solveIteration()
+bool EmbeddedDeformationWithoutICP::solveIteration()
 {
 	if (!finished()) {
 		_solve_iteration++;
@@ -316,15 +325,15 @@ void EmbeddedDeformationWithoutICP::solveIteration()
 
 		_total_time_in_ms += logger.get_time_in_ms();
 	}
+	return finished();
 }
 
-Mesh EmbeddedDeformationWithoutICP::solve()
+bool EmbeddedDeformationWithoutICP::solve()
 {
-	ml::mat4f transformation = ml::mat4f::identity();
 	while (!finished()) {
 		solveIteration();
 	}
-	return getDeformedPoints();
+	return finished();
 }
 
 bool EmbeddedDeformationWithoutICP::finished()

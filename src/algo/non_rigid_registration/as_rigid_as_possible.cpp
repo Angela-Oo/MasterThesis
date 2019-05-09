@@ -22,12 +22,23 @@ Mesh AsRigidAsPossible::getDeformedPoints()
 	return _deformation_graph.deformPoints(_src);
 }
 
-DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossible::getDeformationGraph()
+Mesh AsRigidAsPossible::getInverseDeformedPoints()
+{
+	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
+	return inverse_deformation.deformPoints(_dst);
+}
+
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> AsRigidAsPossible::getDeformationGraph()
+{
+	return _deformation_graph.getDeformationGraphEdges();
+}
+
+DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossible::getARAPDeformationGraph()
 {
 	return _deformation_graph;
 }
 
-void AsRigidAsPossible::solveIteration()
+bool AsRigidAsPossible::solveIteration()
 {
 	if (!finished()) {
 		_solve_iteration++;
@@ -93,15 +104,15 @@ void AsRigidAsPossible::solveIteration()
 
 		_total_time_in_ms += logger.get_time_in_ms();
 	}
+	return finished();
 }
 
-Mesh AsRigidAsPossible::solve()
+bool AsRigidAsPossible::solve()
 {
-	ml::mat4f transformation = ml::mat4f::identity();
 	while (!finished()) {
 		solveIteration();
 	}
-	return getDeformedPoints();
+	return true;
 }
 
 bool AsRigidAsPossible::finished()
@@ -157,6 +168,28 @@ const Mesh & AsRigidAsPossibleWithoutICP::getTarget()
 	return _dst;
 }
 
+
+Mesh AsRigidAsPossibleWithoutICP::getDeformedPoints()
+{
+	return _deformation_graph.deformPoints(_src);
+}
+
+Mesh AsRigidAsPossibleWithoutICP::getInverseDeformedPoints()
+{
+	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
+	return inverse_deformation.deformPoints(_dst);
+}
+
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> AsRigidAsPossibleWithoutICP::getDeformationGraph()
+{
+	return _deformation_graph.getDeformationGraphEdges();
+}
+
+DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossibleWithoutICP::getARAPDeformationGraph()
+{
+	return _deformation_graph;
+}
+
 std::vector<ml::vec3f> AsRigidAsPossibleWithoutICP::getFixedPostions()
 {
 	std::vector<ml::vec3f> positions;
@@ -166,17 +199,8 @@ std::vector<ml::vec3f> AsRigidAsPossibleWithoutICP::getFixedPostions()
 	return positions;
 }
 
-Mesh AsRigidAsPossibleWithoutICP::getDeformedPoints()
-{
-	return _deformation_graph.deformPoints(_src);
-}
 
-DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossibleWithoutICP::getDeformationGraph()
-{
-	return _deformation_graph;
-}
-
-void AsRigidAsPossibleWithoutICP::solveIteration()
+bool AsRigidAsPossibleWithoutICP::solveIteration()
 {
 	if (!finished()) {
 		_solve_iteration++;
@@ -249,15 +273,15 @@ void AsRigidAsPossibleWithoutICP::solveIteration()
 
 		_total_time_in_ms += logger.get_time_in_ms();
 	}
+	return finished();
 }
 
-Mesh AsRigidAsPossibleWithoutICP::solve()
+bool AsRigidAsPossibleWithoutICP::solve()
 {
-	ml::mat4f transformation = ml::mat4f::identity();
 	while (!finished()) {
 		solveIteration();
 	}
-	return getDeformedPoints();
+	return true;
 }
 
 bool AsRigidAsPossibleWithoutICP::finished()

@@ -33,6 +33,7 @@ public:
 	Node(int index, const ml::vec3f & g, const ml::vec3d & n);
 	Node(int index, const ml::vec3f & g, const ml::vec3d & n, const ml::mat3d & r, const ml::vec3d & t);
 	Node();
+	Node(const Node& node, bool inverse);
 	Node(const Node& node) = default;
 };
 

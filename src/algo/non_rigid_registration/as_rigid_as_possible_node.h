@@ -29,8 +29,9 @@ public:
 	ml::vec3d deformPosition(const ml::vec3f & pos) const;
 public:
 	ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n);
-	ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n, const ml::vec3d & r, const ml::vec3d & t);
+	ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n, const ml::vec3d & r, const ml::vec3d & t);	
 	ARAPNode();
+	ARAPNode(const ARAPNode& node, bool inverse);
 	ARAPNode(const ARAPNode& node) = default;
 };
 

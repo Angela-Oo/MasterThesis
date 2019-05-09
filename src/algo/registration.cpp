@@ -84,12 +84,12 @@ Mesh NonRigidRegistration::getPointsB()
 
 std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
 {
-	return _embedded_deformation->getDeformationGraph().getDeformationGraph();
+	return _embedded_deformation->getEmeddedDeformationGraph().getDeformationGraph();
 }
 
 std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> NonRigidRegistration::getDeformationGraph()
 {
-	return _embedded_deformation->getDeformationGraph().getDeformationGraphEdges();
+	return _embedded_deformation->getDeformationGraph();
 }
 
 std::vector<ml::vec3f> NonRigidRegistration::getFixedPositions()
@@ -131,12 +131,12 @@ Mesh ARAPNonRigidRegistration::getPointsB()
 
 std::vector<ml::vec3f> ARAPNonRigidRegistration::getPointsDeformationGraph()
 {
-	return _as_rigid_as_possible->getDeformationGraph().getDeformationGraph();
+	return _as_rigid_as_possible->getARAPDeformationGraph().getDeformationGraph();
 }
 
 std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> ARAPNonRigidRegistration::getDeformationGraph()
 {
-	return _as_rigid_as_possible->getDeformationGraph().getDeformationGraphEdges();
+	return _as_rigid_as_possible->getDeformationGraph();
 }
 
 std::vector<ml::vec3f> ARAPNonRigidRegistration::getFixedPositions()
@@ -164,7 +164,7 @@ bool NonRigidRegistrationFrames::solve()
 	if (_embedded_deformation && !_embedded_deformation->finished()) {
 		_embedded_deformation->solveIteration();
 		_deformed_meshes[_current] = _embedded_deformation->getInverseDeformedPoints();
-		_deformation_graphs[_current] = _embedded_deformation->getDeformationGraph();
+		_deformation_graphs[_current] = _embedded_deformation->getEmbeddedDeformationGraph();
 		return true;
 	}
 	else {
