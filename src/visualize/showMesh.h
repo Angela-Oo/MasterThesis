@@ -43,7 +43,7 @@ private:
 	void renderRegisteredPoints();
 	void renderError();
 	void renderRegistration();
-	void nonRigidRegistration(int frame_a, int frame_b, RegistrationType type);
+	void nonRigidRegistration();
 	void solveAllNonRigidRegistration();
 public:
 	void init(ml::ApplicationData &app) override;

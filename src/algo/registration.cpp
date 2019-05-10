@@ -8,7 +8,7 @@ ceres::Solver::Options ceresOption() {
 	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
 	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
 	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-	options.max_num_iterations = 50;
+	options.max_num_iterations = 100;
 	options.logging_type = ceres::LoggingType::SILENT;
 	options.minimizer_progress_to_stdout = false;
 	return options;
@@ -80,97 +80,6 @@ RigidRegistration::RigidRegistration(const Mesh & points_a, const Mesh & points_
 		positions_b.push_back(p.position);
 	_icp_nn = std::make_unique<ICPNN>(positions_a, positions_b, ceresOption(), logger);
 }
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-//
-//bool NonRigidRegistration::solve()
-//{
-//	if (!_embedded_deformation->finished()) {
-//		_embedded_deformation->solveIteration();
-//		
-//		return true;
-//	}
-//	return false;
-//}
-//
-//Mesh NonRigidRegistration::getPointsA()
-//{
-//	return _embedded_deformation->getDeformedPoints();
-//}
-//
-//Mesh NonRigidRegistration::getPointsB()
-//{
-//	return _embedded_deformation->getTarget();
-//}
-//
-//std::vector<ml::vec3f> NonRigidRegistration::getPointsDeformationGraph()
-//{
-//	return _embedded_deformation->getEmeddedDeformationGraph().getDeformationGraph();
-//}
-//
-//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> NonRigidRegistration::getDeformationGraph()
-//{
-//	return _embedded_deformation->getDeformationGraph();
-//}
-//
-//std::vector<ml::vec3f> NonRigidRegistration::getFixedPositions()
-//{
-//	return _embedded_deformation->getFixedPostions();
-//}
-//
-//NonRigidRegistration::NonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
-//{
-//	//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY; //ceres::LinearSolverType::CGNR
-//	//options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
-//
-//	//_embedded_deformation = std::make_unique<ED::EmbeddedDeformation>(_points_a, _points_b, ceresOption(), number_of_deformation_nodes, logger);
-//	_embedded_deformation = std::make_unique<ED::EmbeddedDeformationWithoutICP>(points_a, points_b, fixed_positions, ceresOption(), logger);
-//}
-//
-//
-////-----------------------------------------------------------------------------
-////-----------------------------------------------------------------------------
-//
-//bool ARAPNonRigidRegistration::solve()
-//{
-//	if (!_as_rigid_as_possible->finished()) {
-//		_as_rigid_as_possible->solveIteration();
-//		return true;
-//	}
-//	return false;
-//}
-//
-//Mesh ARAPNonRigidRegistration::getPointsA()
-//{
-//	return _as_rigid_as_possible->getDeformedPoints();
-//}
-//
-//Mesh ARAPNonRigidRegistration::getPointsB()
-//{
-//	return _as_rigid_as_possible->getTarget();
-//}
-//
-//std::vector<ml::vec3f> ARAPNonRigidRegistration::getPointsDeformationGraph()
-//{
-//	return _as_rigid_as_possible->getARAPDeformationGraph().getDeformationGraph();
-//}
-//
-//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> ARAPNonRigidRegistration::getDeformationGraph()
-//{
-//	return _as_rigid_as_possible->getDeformationGraph();
-//}
-//
-//std::vector<ml::vec3f> ARAPNonRigidRegistration::getFixedPositions()
-//{
-//	return _as_rigid_as_possible->getFixedPostions();
-//}
-//
-//ARAPNonRigidRegistration::ARAPNonRigidRegistration(const Mesh & points_a, const Mesh & points_b, std::vector<int> fixed_positions, unsigned int number_of_deformation_nodes, std::shared_ptr<FileWriter> logger)
-//{
-//	_as_rigid_as_possible = std::make_unique<AsRigidAsPossibleWithoutICP>(points_a, points_b, fixed_positions, ceresOption(), logger);
-//}
-
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
