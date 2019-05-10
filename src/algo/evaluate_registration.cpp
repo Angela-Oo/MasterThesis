@@ -74,10 +74,10 @@ OpenMesh::Vec3f getNearestPointOnSurface(ml::OpenMeshTriMesh::Mesh & mesh, OpenM
 
 	for (auto vfIt = vf_begin; vfIt; ++vfIt)
 	{
-		auto normal = mesh.calc_face_normal(vfIt.handle());
+		auto normal = mesh.calc_face_normal(*vfIt);
 		normal = normal.normalized();
 		auto point_on_plane = pointOnPlane(Plane(v_point, normal), point);
-		auto barycentric_coordinates = barycentricCoordinates(mesh, vfIt.handle(), point_on_plane);
+		auto barycentric_coordinates = barycentricCoordinates(mesh, *vfIt, point_on_plane);
 		float relative_area = barycentric_coordinates.l1_norm();
 		if (relative_area <= 1) {
 			return point_on_plane;

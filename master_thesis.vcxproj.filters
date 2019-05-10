@@ -61,6 +61,12 @@
     <Filter Include="algo\non rigid registration\embedded deformation">
       <UniqueIdentifier>{3ef78849-9f16-4976-90ef-ea33cb87994c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="mLibHeader\ext-cgal">
+      <UniqueIdentifier>{a4c38909-b948-45db-909d-280e38bf0245}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\mesh simplification">
+      <UniqueIdentifier>{5e66546d-06c8-463d-83c2-c372bdcaab7a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -560,6 +566,15 @@
     <ClInclude Include="src\algo\non_rigid_registration\as_rigid_as_possible_node.h">
       <Filter>algo\non rigid registration\as rigid as possible</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\non_rigid_registration\deformation_graph_mesh.h">
+      <Filter>algo\non rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="mLib\include\ext-cgal\cgalWrapper.h">
+      <Filter>mLibHeader\ext-cgal</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h">
+      <Filter>algo\mesh simplification</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -656,6 +671,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\non_rigid_registration\as_rigid_as_possible_node.cpp">
       <Filter>algo\non rigid registration\as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
+      <Filter>algo\mesh simplification</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

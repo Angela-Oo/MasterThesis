@@ -23,5 +23,6 @@
 #include "mLibOpenMesh.h"
 #include "mLibFreeImage.h"
 #include "mLibFLANN.h"
+#include "mLibCGAL.h"
 
 //using namespace ml;
