@@ -12,13 +12,14 @@ void ShowMesh::nonRigidRegistration()
 		auto frame_b = _selected_frame_for_registration[1];
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
+		int number_of_nodes = 1000;
 		auto option = ceresOption();
 		if(_registration_type == RegistrationType::ED)
-			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, 300, _logger);
+			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, number_of_nodes, _logger);
 		else if(_registration_type == RegistrationType::ED_WithoutICP)
 			_registration = std::make_unique<ED::EmbeddedDeformationWithoutICP>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
 		else if(_registration_type == RegistrationType::ASAP)
-			_registration = std::make_unique<AsRigidAsPossible>(source, target, option, 300, _logger);
+			_registration = std::make_unique<AsRigidAsPossible>(source, target, option, number_of_nodes, _logger);
 		else if(_registration_type == RegistrationType::ASAP_WithoutICP)
 			_registration = std::make_unique<AsRigidAsPossibleWithoutICP>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
 		else
@@ -322,23 +323,23 @@ void ShowMesh::init(ml::ApplicationData &app)
 	//_logger = std::make_shared<FileWriter>("head_log.txt");
 
 	// hand
-	//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
-	//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);
-	//_logger = std::make_shared<FileWriter>("hand_log.txt");	
+	auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
+	auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);
+	_logger = std::make_shared<FileWriter>("hand_log.txt");	
 
 	////_mesh_reader->processAllFrames();
-	//for (int i = 0; i < 10; i++) {
-	//	input_mesh->processFrame();
-	//	reference_registration_mesh->processFrame();
-	//}
-	//_input_mesh = std::move(input_mesh);
-	//_reference_registration_mesh = std::move(reference_registration_mesh);
+	for (int i = 0; i < 10; i++) {
+		input_mesh->processFrame();
+		reference_registration_mesh->processFrame();
+	}
+	_input_mesh = std::move(input_mesh);
+	_reference_registration_mesh = std::move(reference_registration_mesh);
 
-	_input_mesh = std::make_unique<DeformationMesh>();
-	_reference_registration_mesh = std::make_unique<DeformationMesh>();
-	_logger = std::make_shared<FileWriter>("test.txt");
-	_render_reference_mesh = false;
-	_calculate_error = false;
+	//_input_mesh = std::make_unique<DeformationMesh>();
+	//_reference_registration_mesh = std::make_unique<DeformationMesh>();
+	//_logger = std::make_shared<FileWriter>("test.txt");
+	//_render_reference_mesh = false;
+	//_calculate_error = false;
 	renderMesh();
 
 	std::cout << "controls:" << std::endl;

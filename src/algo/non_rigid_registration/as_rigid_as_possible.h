@@ -25,7 +25,7 @@ class AsRigidAsPossible : public INonRigidRegistration
 	long long _total_time_in_ms = 0;
 	double a_smooth = 100.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 0.1;
+	double a_fit = 1.;// 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
 	bool finished() override;
@@ -65,7 +65,7 @@ class AsRigidAsPossibleWithoutICP : public INonRigidRegistration
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
 	double a_smooth = 100.;// 0.1;// 100;
-	double a_conf = 100.;// 1.;// 100;
+	double a_conf = 10.;// 1.;// 100;
 	double a_fit = 10.;
 	std::shared_ptr<FileWriter> _logger;
 public:
