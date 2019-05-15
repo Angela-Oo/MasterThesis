@@ -8,6 +8,8 @@
 #include "algo/registration.h"
 #include "algo/file_writer.h"
 #include "algo/evaluate_registration.h"
+#include "algo/non_rigid_registration/as_rigid_as_possible.h"
+#include "algo/non_rigid_registration/embedded_deformation.h"
 
 enum class RegistrationType
 {
@@ -34,9 +36,11 @@ private:
 	bool _render_mesh = true;
 	bool _render_reference_mesh = true;
 	bool _render_error = true;	
+	bool _render_deformation_graph = false;
 	bool _calculate_error = true;
 	std::unique_ptr<INonRigidRegistration> _registration;
-	std::unique_ptr<NonRigidRegistrationFrames> _registration_frames;
+	std::unique_ptr<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>> _registration_frames;
+	//std::unique_ptr < NonRigidRegistrationAllFrames < ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Node>>> _registration_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;
 private:
 	void renderMesh();

@@ -202,19 +202,22 @@ DeformationGraph<Graph, Node>::DeformationGraph(const Mesh & points, size_t numb
 		}
 	}
 
+	auto& nodes = boost::get(node_t(), _graph);
 	_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
-	for (auto & p : vertices) {
-		std::vector<vertex_index> node_indices = _deformation_graph_knn->k_nearest_indices(p.position, _k);
+	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
+		auto node_index = *vp.first;
+		Node& node = nodes[node_index];
+		std::vector<vertex_index> node_indices = _deformation_graph_knn->k_nearest_indices(node.g(), _k);
 
-		for (size_t i = 0; i < node_indices.size() - 1; ++i) {
-			auto n1 = node_indices[i];
-			auto n2 = node_indices[i + 1];
+		for (size_t i = 0; i < node_indices.size(); ++i) {
+			auto n1 = node_index;
+			auto n2 = node_indices[i];
 			if (boost::edge(n1, n2, _graph).second == false)
 				boost::add_edge(n1, n2, _graph);
 		}
 	}
 
-	auto& nodes = boost::get(node_t(), _graph);
+
 	int count = 0;
 	ml::vec3f global_position = ml::vec3f::origin;
 	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {

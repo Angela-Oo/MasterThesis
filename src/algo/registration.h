@@ -44,25 +44,98 @@ public:
 };
 
 
-class NonRigidRegistrationFrames
+template <typename Registration, typename DeformationGraph>
+class NonRigidRegistrationAllFrames
 {
 private:
 	std::vector<Mesh> _meshes;
 	std::vector<Mesh> _deformed_meshes;
-	std::vector<DeformationGraph<ED::Graph, ED::Node>> _deformation_graphs;
-	std::vector<ml::vec6d> _transformation;
+	std::vector<DeformationGraph> _deformation_graphs;
 	size_t _current;
 	unsigned int _number_of_deformation_nodes;
-	std::unique_ptr<ED::EmbeddedDeformation> _embedded_deformation;
+	std::unique_ptr<Registration> _registration;
 public:
 	bool solve();
 	bool finished();
 	size_t getCurrent();
 	Mesh getMesh(int frame);
 	Mesh getDeformedMesh(int frame);
-	DeformationGraph<ED::Graph, ED::Node> getDeformationGraph(int frame);
+	DeformationGraph getDeformationGraph(int frame);
 public:
-	NonRigidRegistrationFrames();
-	NonRigidRegistrationFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes = 1000);
+	NonRigidRegistrationAllFrames();
+	NonRigidRegistrationAllFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes = 1000);
 };
 
+
+template <typename Registration, typename DeformationGraph>
+bool NonRigidRegistrationAllFrames<Registration, DeformationGraph>::solve()
+{
+	if (_current >= _meshes.size())
+		throw std::exception("not enouth meshes");
+	if (!_registration) {
+		_registration = std::make_unique<Registration>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], ceresOption(), _number_of_deformation_nodes);
+	}
+	if (_registration && !_registration->finished()) {
+		_registration->solveIteration();
+		_deformed_meshes[_current] = _registration->getInverseDeformedPoints();
+		_deformation_graphs[_current] = _registration->getARAPDeformationGraph();
+		return true;
+	}
+	else {
+		if (_current < _meshes.size() - 1) {
+			std::cout << std::endl << "frame " << _current << " solved" << std::endl;
+			_current++;
+			_registration.reset();
+			return true;
+		}
+		return false;
+	}
+}
+
+template <typename Registration, typename DeformationGraph>
+bool NonRigidRegistrationAllFrames<Registration, DeformationGraph>::finished()
+{
+	return (_current >= _meshes.size() - 1);
+}
+
+template <typename Registration, typename DeformationGraph>
+Mesh NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getMesh(int frame)
+{
+	return _meshes[frame];
+}
+
+template <typename Registration, typename DeformationGraph>
+Mesh NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getDeformedMesh(int frame)
+{
+	return _deformed_meshes[frame];
+}
+
+template <typename Registration, typename DeformationGraph>
+size_t NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getCurrent()
+{
+	return _current;
+}
+
+template <typename Registration, typename DeformationGraph>
+DeformationGraph NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getDeformationGraph(int frame)
+{
+	return _deformation_graphs[frame];
+}
+
+template <typename Registration, typename DeformationGraph>
+NonRigidRegistrationAllFrames<Registration, DeformationGraph>::NonRigidRegistrationAllFrames()
+	: _current(1)
+{
+}
+
+template <typename Registration, typename DeformationGraph>
+NonRigidRegistrationAllFrames<Registration, DeformationGraph>::NonRigidRegistrationAllFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes)
+	: _meshes(meshes)
+	, _number_of_deformation_nodes(number_of_deformation_nodes)
+	, _current(1)
+{
+	_deformation_graphs.resize(_meshes.size());
+	_deformed_meshes.resize(_meshes.size());
+	_deformation_graphs[0] = DeformationGraph(_meshes[0], _number_of_deformation_nodes);
+	_deformed_meshes[0] = _meshes[0];
+}

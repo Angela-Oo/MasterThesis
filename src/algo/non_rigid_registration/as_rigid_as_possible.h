@@ -46,6 +46,12 @@ public:
 					  ceres::Solver::Options option,
 					  unsigned int number_of_deformation_nodes = 1000,
 					  std::shared_ptr<FileWriter> logger = nullptr);
+	AsRigidAsPossible(const Mesh& src,
+					  const Mesh& dst,
+					  const ARAPDeformationGraph & deformation_graph,
+					  ceres::Solver::Options option,
+					  unsigned int number_of_deformation_nodes = 1000,
+					  std::shared_ptr<FileWriter> logger = nullptr);
 };
 
 

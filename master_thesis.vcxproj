@@ -202,7 +202,6 @@
     <ClInclude Include="mLib\include\core-util\uniformAccelerator.h" />
     <ClInclude Include="mLib\include\core-util\utility.h" />
     <ClInclude Include="mLib\include\core-util\windowsUtil.h" />
-    <ClInclude Include="mLib\include\ext-cgal\cgalWrapper.h" />
     <ClInclude Include="mLib\include\ext-d3d11font\D3D11Font.h" />
     <ClInclude Include="mLib\include\ext-depthcamera\calibratedSensorData.h" />
     <ClInclude Include="mLib\include\ext-depthcamera\sensorData.h" />
