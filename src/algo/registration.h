@@ -60,7 +60,7 @@ public:
 	size_t getCurrent();
 	Mesh getMesh(int frame);
 	Mesh getDeformedMesh(int frame);
-	DeformationGraph getDeformationGraph(int frame);
+	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph(int frame);
 public:
 	NonRigidRegistrationAllFrames();
 	NonRigidRegistrationAllFrames(const std::vector<Mesh> & meshes, unsigned int number_of_deformation_nodes = 1000);
@@ -117,9 +117,9 @@ size_t NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getCurrent
 }
 
 template <typename Registration, typename DeformationGraph>
-DeformationGraph NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getDeformationGraph(int frame)
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>>  NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getDeformationGraph(int frame)
 {
-	return _deformation_graphs[frame];
+	return _deformation_graphs[frame].getDeformationGraphEdges();
 }
 
 template <typename Registration, typename DeformationGraph>

@@ -119,6 +119,14 @@ void ShowMesh::renderRegisteredPoints()
 		else {
 			_point_renderer->removePoints("frame_B");
 		}
+
+		if (_render_deformation_graph) {
+			auto render_dg = _registration_frames->getDeformationGraph(_registration_frames->getCurrent());
+			_point_renderer->insertLine("deformation_graph", render_dg.first, render_dg.second, ml::RGBColor::Purple);
+		}
+		else {
+			_point_renderer->removePoints("deformation_graph");
+		}
 	}
 	else
 	{
