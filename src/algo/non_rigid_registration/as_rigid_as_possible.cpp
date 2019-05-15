@@ -5,6 +5,7 @@
 #include "algo/ceres_iteration_logger.h"
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"
+#include "algo/mesh_simplification/mesh_simplification.h"
 
 
 const Mesh & AsRigidAsPossible::getSource()
@@ -132,10 +133,12 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, number_of_deformation_nodes)
 	, _nn_search(dst)
 	, _logger(logger)
 {
+	auto reduced_mesh = createReducedMesh(dst, number_of_deformation_nodes);
+
+	_deformation_graph = ARAPDeformationGraph(reduced_mesh);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;

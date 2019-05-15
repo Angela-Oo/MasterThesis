@@ -39,4 +39,4 @@ private:
 typedef ml::TriMeshf Mesh;
 
 
-Mesh createReducedMesh(const Mesh & mesh);
+Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices);

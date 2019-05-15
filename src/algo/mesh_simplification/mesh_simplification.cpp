@@ -63,11 +63,11 @@ Mesh convertToTriMesh(SurfaceMesh& mesh) {
 	return Mesh(mData);
 }
 
-Mesh createReducedMesh(const Mesh & mesh)
+Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices)
 {
 	auto surface_mesh = convertToCGALMesh(mesh);
 
-	CGAL::Surface_mesh_simplification::Count_stop_predicate_vertices<SurfaceMesh> stop(1000);
+	CGAL::Surface_mesh_simplification::Count_stop_predicate_vertices<SurfaceMesh> stop(number_of_vertices);
 
 
 	// This is a stop predicate (defines when the algorithm terminates).
