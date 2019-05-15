@@ -4,6 +4,7 @@
 #include "algo/non_rigid_registration/as_rigid_as_possible.h"
 #include "algo/file_writer.h"
 #include "algo/non_rigid_registration/non_rigid_deformation.h"
+#include "algo/mesh_simplification/mesh_simplification.h"
 
 typedef ml::TriMeshf Mesh;
 
@@ -136,6 +137,8 @@ NonRigidRegistrationAllFrames<Registration, DeformationGraph>::NonRigidRegistrat
 {
 	_deformation_graphs.resize(_meshes.size());
 	_deformed_meshes.resize(_meshes.size());
-	_deformation_graphs[0] = DeformationGraph(_meshes[0], _number_of_deformation_nodes);
+
+	auto reduced_mesh = createReducedMesh(_meshes[0], _number_of_deformation_nodes);
+	_deformation_graphs[0] = DeformationGraph(reduced_mesh);
 	_deformed_meshes[0] = _meshes[0];
 }

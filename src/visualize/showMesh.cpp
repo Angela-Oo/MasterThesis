@@ -12,7 +12,7 @@ void ShowMesh::nonRigidRegistration()
 		auto frame_b = _selected_frame_for_registration[1];
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
-		int number_of_nodes = 1000;
+		int number_of_nodes = 2000;
 		auto option = ceresOption();
 		if(_registration_type == RegistrationType::ED)
 			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, number_of_nodes, _logger);
@@ -46,7 +46,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 			meshes.push_back(_input_mesh->getMesh(i));
 		}
 		//_registration_frames = std::make_unique<NonRigidRegistrationFrames>(meshes, 300);
-		_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>>(meshes, 300);
+		_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>>(meshes, 1000);
 		renderRegistration();
 	}
 	else {
