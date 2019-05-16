@@ -73,24 +73,20 @@ bool NonRigidRegistrationAllFrames<Registration, DeformationGraph>::solve()
 {
 	if (_current >= _meshes.size())
 		throw std::exception("not enouth meshes");
-	if (!_registration) {
+	if (!_registration && _current < _meshes.size()) {
 		_registration = std::make_unique<Registration>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], ceresOption(), _number_of_deformation_nodes);
-	}
-	if (_registration && !_registration->finished()) {
-		_registration->solveIteration();
+		_registration->solve();
 		_deformed_meshes[_current] = _registration->getInverseDeformedPoints();
 		_deformation_graphs[_current] = _registration->getARAPDeformationGraph();
+		std::cout << std::endl << "frame " << _current << " solved" << std::endl;
+	}
+	if (_current < _meshes.size() - 1) {
+		
+		_current++;
+		_registration.reset();
 		return true;
 	}
-	else {
-		if (_current < _meshes.size() - 1) {
-			std::cout << std::endl << "frame " << _current << " solved" << std::endl;
-			_current++;
-			_registration.reset();
-			return true;
-		}
-		return false;
-	}
+	return false;
 }
 
 template <typename Registration, typename DeformationGraph>
@@ -120,6 +116,8 @@ size_t NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getCurrent
 template <typename Registration, typename DeformationGraph>
 std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>>  NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getDeformationGraph(int frame)
 {
+	//auto inverse_deformation = inverteDeformationGraph(_deformation_graphs[frame]);
+	//return inverse_deformation.getDeformationGraphEdges();	
 	return _deformation_graphs[frame].getDeformationGraphEdges();
 }
 
