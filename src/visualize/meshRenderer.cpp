@@ -29,6 +29,11 @@ void MeshRenderer::insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4
 	_meshes[id].buffer.init(*_graphics, bufferData);
 }
 
+bool MeshRenderer::keyExists(std::string id)
+{
+	return (_meshes.find(id) != _meshes.end());
+}
+
 void MeshRenderer::removeMesh(std::string id)
 {
 	_meshes.erase(id);

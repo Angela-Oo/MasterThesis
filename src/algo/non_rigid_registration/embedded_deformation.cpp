@@ -5,6 +5,7 @@
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"
 #include "algo/ceres_iteration_logger.h"
+#include "algo/mesh_simplification/mesh_simplification.h"
 
 namespace ED {
 
@@ -146,10 +147,13 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, number_of_deformation_nodes)
+	//, _deformation_graph(src, number_of_deformation_nodes)
 	, _nn_search(dst)
 	, _logger(logger)
 {
+	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
+	_deformation_graph = EmbeddedDeformationGraph(reduced_mesh);
+	_deformed_mesh = std::make_unique<EmbeddedDeformedMesh>(src, _deformation_graph);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
@@ -169,6 +173,7 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 	, _nn_search(dst)
 	, _logger(logger)
 {
+	_deformed_mesh = std::make_unique<EmbeddedDeformedMesh>(src, _deformation_graph);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;

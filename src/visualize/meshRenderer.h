@@ -19,6 +19,7 @@ private:
 public:
 	void render(ml::Cameraf& camera);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color = { 1., 1., 1., 1. });
+	bool keyExists(std::string id);
 	void removeMesh(std::string id);
 	void clear();
 public:

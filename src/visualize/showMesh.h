@@ -34,6 +34,7 @@ private:
 	std::vector<unsigned int> _selected_frame_for_registration;
 	bool _solve_registration = false;
 	RegistrationType _registration_type;
+	bool _render_points = true;
 	bool _render_mesh = true;
 	bool _render_reference_mesh = true;
 	bool _render_error = false;	
@@ -44,9 +45,11 @@ private:
 	//std::unique_ptr < NonRigidRegistrationAllFrames < ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Node>>> _registration_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;
 private:
-	void renderMesh();
-	void renderRegisteredPoints();
+	void renderRegistrationTwoFrames();
+	void renderRegistrationAllFrames();
+	void renderCurrentMesh();
 	void renderError();
+private:
 	void renderRegistration();
 	void nonRigidRegistration();
 	void solveAllNonRigidRegistration();

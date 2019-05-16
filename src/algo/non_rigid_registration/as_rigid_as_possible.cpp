@@ -163,6 +163,7 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _nn_search(dst)
 	, _logger(logger)
 {
+	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
