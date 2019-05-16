@@ -20,13 +20,17 @@ const Mesh & EmbeddedDeformation::getTarget()
 
 Mesh EmbeddedDeformation::getDeformedPoints()
 {
-	return _deformation_graph.deformPoints(_src);
+	return _deformed_mesh->deformPoints();
+	//return _deformation_graph.deformPoints(_src);
 }
 
 Mesh EmbeddedDeformation::getInverseDeformedPoints()
 {
 	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
-	return inverse_deformation.deformPoints(_dst);
+
+	EmbeddedDeformedMesh deformed(_dst, inverse_deformation);
+	return deformed.deformPoints();
+	//return inverse_deformation.deformPoints(_dst);
 }
 
 std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> EmbeddedDeformation::getDeformationGraph()
@@ -218,12 +222,15 @@ std::vector<ml::vec3f> EmbeddedDeformationWithoutICP::getFixedPostions()
 Mesh EmbeddedDeformationWithoutICP::getInverseDeformedPoints()
 {
 	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
-	return inverse_deformation.deformPoints(_dst);
+	EmbeddedDeformedMesh deformed(_dst, inverse_deformation);
+	return deformed.deformPoints();
+	//return inverse_deformation.deformPoints(_dst);
 }
 
 Mesh EmbeddedDeformationWithoutICP::getDeformedPoints()
 {
-	return _deformation_graph.deformPoints(_src);
+	return _deformed_mesh->deformPoints();
+	//return _deformation_graph.deformPoints(_src);
 }
 
 std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> EmbeddedDeformationWithoutICP::getDeformationGraph()

@@ -36,9 +36,9 @@ private:
 	RegistrationType _registration_type;
 	bool _render_mesh = true;
 	bool _render_reference_mesh = true;
-	bool _render_error = true;	
-	bool _render_deformation_graph = false;
-	bool _calculate_error = true;
+	bool _render_error = false;	
+	bool _render_deformation_graph = true;
+	bool _calculate_error = false;
 	std::unique_ptr<INonRigidRegistration> _registration;
 	std::unique_ptr<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>> _registration_frames;
 	//std::unique_ptr < NonRigidRegistrationAllFrames < ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Node>>> _registration_frames;

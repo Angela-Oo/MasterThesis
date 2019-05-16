@@ -308,7 +308,7 @@ void ShowMesh::key(UINT key)
 	else if (key == KEY_L)
 	{
 		_calculate_error = !_calculate_error;
-		std::string enabled = (_error_evaluation) ? "enable" : "disable";
+		std::string enabled = (_calculate_error) ? "enable" : "disable";
 		std::cout << enabled << " error evaluation" << std::endl;
 	}
 }

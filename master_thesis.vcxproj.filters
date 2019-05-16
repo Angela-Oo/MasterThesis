@@ -575,6 +575,9 @@
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\non_rigid_registration\deformed_mesh.h">
+      <Filter>algo\non rigid registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />

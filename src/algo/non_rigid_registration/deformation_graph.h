@@ -2,27 +2,43 @@
 
 #include "mLibInclude.h"
 #include "deformation_graph_knn.h"
+
 #include <vector>
 
 
 typedef ml::TriMeshf Mesh;
 
+class NearestNodes
+{
+public:
+	ml::vec3f point;
+	std::vector<vertex_index> nodes;
+	std::vector<double> weights;
+public:
+	NearestNodes() {}
+	NearestNodes(ml::vec3f p, const std::vector<vertex_index> & n, const std::vector<double> & w)
+		: point(p)
+		, nodes(n)
+		, weights(w)
+	{}
+};
+
 template<typename Graph, typename Node>
 class DeformationGraph
 {
-private:
-	const int _k = 4;
 public:
+	const int _k = 4;
 	Node _global_rigid_deformation;
 	Graph _graph;
 	std::unique_ptr<GraphKNN<Graph, Node>> _deformation_graph_knn;
 private:
-	double weight(const ml::vec3f & point, Node & node, double dmax);
-	std::vector<double> weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes);
-	ml::vec3f deformPoint(const ml::vec3f & point, std::vector<Node> & k_plus_1_nearest_nodes);
+	//double weight(const ml::vec3f & point, Node & node, double dmax);
+	//std::vector<double> weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes);
+	//ml::vec3f deformPoint(const ml::vec3f & point, std::vector<Node> & k_plus_1_nearest_nodes);
 	std::vector<int> uniform_node_indices(size_t number_of_points, size_t number_of_nodes);
 public:
-	Mesh deformPoints(const Mesh & points);
+	//DeformedMesh deformPoints(const Mesh & points);
+	ml::vec3f deformPoint(const ml::vec3f & point, const NearestNodes & nearest_nodes);
 	std::vector<ml::vec3f> getDeformationGraph();
 	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraphEdges();
 public:
@@ -48,60 +64,78 @@ std::vector<int> DeformationGraph<Graph, Node>::uniform_node_indices(size_t numb
 	return node_indices;
 }
 
-
 template<typename Graph, typename Node>
-double DeformationGraph<Graph, Node>::weight(const ml::vec3f & point, Node & node, double dmax)
+ml::vec3f deformPoint(const ml::vec3f & point, const NearestNodes & nearest_nodes)
 {
-	double normed_distance = ml::dist(point, node.position());
-	double weight = std::pow(1. - (normed_distance / dmax), 2);
-	return weight;
-}
-
-template<typename Graph, typename Node>
-std::vector<double> DeformationGraph<Graph, Node>::weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes)
-{
-	auto last_node = k_plus_1_nearest_nodes[k_plus_1_nearest_nodes.size() - 1];
-	double d_max = ml::dist(point, last_node.position());
-
-	std::vector<double> weights;
-	for (size_t i = 0; i < k_plus_1_nearest_nodes.size() - 1; ++i)
-	{
-		weights.push_back(weight(point, k_plus_1_nearest_nodes[i], d_max));
-	}
-
-	double sum = std::accumulate(weights.begin(), weights.end(), 0.0);
-	std::for_each(weights.begin(), weights.end(), [sum](double & w) { w = w / sum; });
-	return weights;
-}
-
-template<typename Graph, typename Node>
-ml::vec3f DeformationGraph<Graph, Node>::deformPoint(const ml::vec3f & point, std::vector<Node> & k_plus_1_nearest_nodes)
-{
-	std::vector<double> w = weights(point, k_plus_1_nearest_nodes);
-
 	ml::vec3f deformed_point = ml::vec3f::origin;
-	for (size_t i = 0; i < k_plus_1_nearest_nodes.size() - 1; ++i)
+
+	auto & nodes = boost::get(node_t(), _graph);
+
+	for (size_t i = 0; i < nearest_nodes.nodes.size() - 1; ++i)
 	{
-		auto & node = k_plus_1_nearest_nodes[i];
-		ml::vec3f transformed_point = node.deformPosition(point) * w[i];
+		auto & node = nodes[nearest_nodes.nodes[i]];
+		double w = nearest_nodes.weights[i];
+		ml::vec3f transformed_point = node.deformPosition(point) * w;
 		deformed_point += transformed_point;
 	}
 
 	ml::vec3f global_deformed_point = _global_rigid_deformation.deformPosition(deformed_point);
 	return global_deformed_point;
 }
-
-template<typename Graph, typename Node>
-Mesh DeformationGraph<Graph, Node>::deformPoints(const Mesh & points)
-{
-	Mesh deformed_points = points;
-	for (auto & p : deformed_points.getVertices())
-	{
-		std::vector<Node> knn_nodes = _deformation_graph_knn->k_nearest(p.position, _k + 1);
-		p.position = deformPoint(p.position, knn_nodes);
-	}
-	return deformed_points;
-}
+//
+//template<typename Graph, typename Node>
+//double DeformationGraph<Graph, Node>::weight(const ml::vec3f & point, Node & node, double dmax)
+//{
+//	double normed_distance = ml::dist(point, node.position());
+//	double weight = std::pow(1. - (normed_distance / dmax), 2);
+//	return weight;
+//}
+//
+//template<typename Graph, typename Node>
+//std::vector<double> DeformationGraph<Graph, Node>::weights(const ml::vec3f & point, std::vector<Node>& k_plus_1_nearest_nodes)
+//{
+//	auto last_node = k_plus_1_nearest_nodes[k_plus_1_nearest_nodes.size() - 1];
+//	double d_max = ml::dist(point, last_node.position());
+//
+//	std::vector<double> weights;
+//	for (size_t i = 0; i < k_plus_1_nearest_nodes.size() - 1; ++i)
+//	{
+//		weights.push_back(weight(point, k_plus_1_nearest_nodes[i], d_max));
+//	}
+//
+//	double sum = std::accumulate(weights.begin(), weights.end(), 0.0);
+//	std::for_each(weights.begin(), weights.end(), [sum](double & w) { w = w / sum; });
+//	return weights;
+//}
+//
+//template<typename Graph, typename Node>
+//ml::vec3f DeformationGraph<Graph, Node>::deformPoint(const ml::vec3f & point, std::vector<Node> & k_plus_1_nearest_nodes)
+//{
+//	std::vector<double> w = weights(point, k_plus_1_nearest_nodes);
+//
+//	ml::vec3f deformed_point = ml::vec3f::origin;
+//	for (size_t i = 0; i < k_plus_1_nearest_nodes.size() - 1; ++i)
+//	{
+//		auto & node = k_plus_1_nearest_nodes[i];
+//		ml::vec3f transformed_point = node.deformPosition(point) * w[i];
+//		deformed_point += transformed_point;
+//	}
+//
+//	ml::vec3f global_deformed_point = _global_rigid_deformation.deformPosition(deformed_point);
+//	return global_deformed_point;
+//}
+//
+//template<typename Graph, typename Node>
+//Mesh DeformationGraph<Graph, Node>::deformPoints(const Mesh & points)
+//{
+//	Mesh deformed_points = points;
+//	for (auto & p : deformed_points.getVertices())
+//	{
+//		std::vector<Node> knn_nodes = _deformation_graph_knn->k_nearest(p.position, _k + 1);
+//		p.position = deformPoint(p.position, knn_nodes);
+//	}
+//	return deformed_points;
+//}
 
 template<typename Graph, typename Node>
 std::vector<ml::vec3f> DeformationGraph<Graph, Node>::getDeformationGraph()

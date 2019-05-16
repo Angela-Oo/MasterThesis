@@ -20,13 +20,17 @@ const Mesh & AsRigidAsPossible::getTarget()
 
 Mesh AsRigidAsPossible::getDeformedPoints()
 {
-	return _deformation_graph.deformPoints(_src);
+	return _deformed_mesh->deformPoints();
+	//return _deformation_graph.deformPoints(_src);
 }
 
 Mesh AsRigidAsPossible::getInverseDeformedPoints()
 {
 	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
-	return inverse_deformation.deformPoints(_dst);
+
+	ARAPDeformedMesh deformed(_dst, inverse_deformation);
+	return deformed.deformPoints();
+	//return inverse_deformation.deformPoints(_dst);
 }
 
 std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> AsRigidAsPossible::getDeformationGraph()
@@ -139,6 +143,7 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
 
 	_deformation_graph = ARAPDeformationGraph(reduced_mesh);
+	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
@@ -193,13 +198,16 @@ const Mesh & AsRigidAsPossibleWithoutICP::getTarget()
 
 Mesh AsRigidAsPossibleWithoutICP::getDeformedPoints()
 {
-	return _deformation_graph.deformPoints(_src);
+	return _deformed_mesh->deformPoints();
+	//return _deformation_graph.deformPoints(_src);
 }
 
 Mesh AsRigidAsPossibleWithoutICP::getInverseDeformedPoints()
 {
 	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
-	return inverse_deformation.deformPoints(_dst);
+	ARAPDeformedMesh deformed(_dst, inverse_deformation);
+	return deformed.deformPoints();
+	//return inverse_deformation.deformPoints(_dst);
 }
 
 std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> AsRigidAsPossibleWithoutICP::getDeformationGraph()
@@ -327,6 +335,7 @@ AsRigidAsPossibleWithoutICP::AsRigidAsPossibleWithoutICP(const Mesh& src,
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
 {
+	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;

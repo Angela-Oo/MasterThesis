@@ -2,6 +2,7 @@
 
 #include "mLibInclude.h"
 #include "deformation_graph.h"
+#include "deformed_mesh.h"
 #include "node.h"
 #include "algo/knn.h"
 #include "algo/mesh_knn.h"
@@ -14,6 +15,7 @@
 namespace ED {
 
 typedef DeformationGraph<Graph, Node> EmbeddedDeformationGraph;
+typedef DeformedMesh<Graph, Node> EmbeddedDeformedMesh;
 //typedef ml::TriMeshf Mesh;
 
 class EmbeddedDeformation : public INonRigidRegistration
@@ -22,6 +24,7 @@ class EmbeddedDeformation : public INonRigidRegistration
 	Mesh _dst;
 	ceres::Solver::Options _options;
 	EmbeddedDeformationGraph _deformation_graph;
+	std::unique_ptr<EmbeddedDeformedMesh> _deformed_mesh;
 	TriMeshKNN _nn_search;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
@@ -70,6 +73,7 @@ class EmbeddedDeformationWithoutICP : public INonRigidRegistration
 	Mesh _dst;
 	ceres::Solver::Options _options;
 	EmbeddedDeformationGraph _deformation_graph;
+	std::unique_ptr<EmbeddedDeformedMesh> _deformed_mesh;
 	std::vector<int> _fixed_positions;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
