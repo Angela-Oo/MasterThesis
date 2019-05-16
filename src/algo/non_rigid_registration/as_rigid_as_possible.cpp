@@ -95,12 +95,13 @@ bool AsRigidAsPossible::solveIteration()
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
-
+		
 		if (abs(_current_cost - _last_cost) < 0.00001 *(1 + _current_cost) &&
 			(a_smooth > 0.1 || a_conf > 1.))
 		{
 			a_smooth /= 2.;
 			a_conf /= 2.;
+			std::cout << "scale factor: smooth " << a_smooth << std::endl;
 		}
 
 		_total_time_in_ms += logger.get_time_in_ms();
@@ -118,8 +119,7 @@ bool AsRigidAsPossible::solve()
 
 bool AsRigidAsPossible::finished()
 {
-	//double tol = 0.000001;
-	double tol = 0.0000001;
+	auto tol = _options.function_tolerance;
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
 	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);

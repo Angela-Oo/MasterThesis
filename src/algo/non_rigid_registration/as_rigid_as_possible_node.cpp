@@ -2,7 +2,7 @@
 #include <ceres/rotation.h>
 
 
-const ml::mat3d & ARAPNode::rotation() const
+ml::mat3d ARAPNode::rotation() const
 {
 	ml::mat3d r;	
 	ceres::AngleAxisToRotationMatrix(_r.array, r.getData());

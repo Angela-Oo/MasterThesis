@@ -19,7 +19,7 @@ public:
 	double * w() { return &_w; }	
 public:
 	const ml::vec3f & position() const { return _g; };
-	const ml::mat3d & rotation() const;
+	ml::mat3d rotation() const;
 	const ml::vec3d & translation() const { return _t; }
 	double weight() const { return _w; };
 	int index() { return _index; }

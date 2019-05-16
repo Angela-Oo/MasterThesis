@@ -150,7 +150,7 @@ void ShowMesh::renderMesh()
 				_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame));
 			}
 			if (_registration) {
-				_mesh_renderer->insertMesh("mesh_a", _registration->getSource(), ml::RGBColor::Cyan.toVec4f());
+				_mesh_renderer->insertMesh("mesh_a", _registration->getDeformedPoints(), ml::RGBColor::Cyan.toVec4f());
 				//_registration->getPointsDeformationGraph();
 				_mesh_renderer->insertMesh("mesh_b", _registration->getTarget(), ml::RGBColor::Green.toVec4f());
 			}
@@ -317,7 +317,7 @@ void ShowMesh::key(UINT key)
 void ShowMesh::init(ml::ApplicationData &app)
 {
 	
-	_mesh_renderer = std::make_unique<MeshRenderer>(app, PhongShader());
+	_mesh_renderer = std::make_unique<MeshRenderer>(app);
 	_point_renderer = std::make_unique<PointsRenderer>(app);
 
 	ml::mat4f scale = ml::mat4f::scale(0.01);
@@ -346,7 +346,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	//_logger = std::make_shared<FileWriter>("hand_log.txt");	
 
 	////_mesh_reader->processAllFrames();
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 2; i++) {
 		input_mesh->processFrame();
 		reference_registration_mesh->processFrame();
 	}
