@@ -259,6 +259,7 @@
     <ClInclude Include="src\main.h" />
     <ClInclude Include="src\mLibInclude.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\visualize\constantBuffer.h" />
     <ClInclude Include="src\visualize\i_showData.h" />
     <ClInclude Include="src\visualize\meshRenderer.h" />
     <ClInclude Include="src\visualize\pointsRenderer.h" />

@@ -1,6 +1,7 @@
 #pragma once
 #include "../mLibInclude.h"
 #include "i_showData.h"
+#include "visualize/constantBuffer.h"
 #include "ext-depthcamera/sensorData.h"
 #include <chrono>
 

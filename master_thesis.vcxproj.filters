@@ -572,6 +572,9 @@
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h">
       <Filter>algo\mesh simplification</Filter>
     </ClInclude>
+    <ClInclude Include="src\visualize\constantBuffer.h">
+      <Filter>visualize</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />

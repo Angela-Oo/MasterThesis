@@ -1,6 +1,6 @@
 #pragma once
 #include "../mLibInclude.h"
-#include "i_showData.h"
+#include "visualize/constantBuffer.h"
 
 class PointsRenderer
 {

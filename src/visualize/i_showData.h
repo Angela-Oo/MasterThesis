@@ -9,10 +9,3 @@ public:
 	virtual void key(UINT key) = 0;
 	virtual ~IShowData() = default;
 };
-
-
-struct ConstantBuffer
-{
-	ml::mat4f worldViewProj;
-	ml::vec4f modelColor;
-};

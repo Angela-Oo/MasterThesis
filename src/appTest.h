@@ -1,11 +1,6 @@
 #pragma once
 #include "mLibInclude.h"
-
-struct ConstantBuffer
-{
-	ml::mat4f worldViewProj;
-	ml::vec4f modelColor;
-};
+#include "visualize/constantBuffer.h"
 
 class AppTest : public ml::ApplicationCallback
 {
