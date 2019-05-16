@@ -85,6 +85,9 @@ void ShowMesh::renderError()
 				positions_a.push_back(p.position);
 			_point_renderer->insertLine("error", positions_a, nearest_reference_points, ml::RGBColor::Red, 0.0005);
 		}
+		else {
+			_point_renderer->removePoints("error");
+		}
 	}
 	else {
 		_point_renderer->removePoints("error");
