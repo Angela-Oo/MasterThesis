@@ -578,6 +578,9 @@
     <ClInclude Include="src\algo\non_rigid_registration\deformed_mesh.h">
       <Filter>algo\non rigid registration</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\non_rigid_registration\node_weighting.h">
+      <Filter>algo\non rigid registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -677,6 +680,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
       <Filter>algo\mesh simplification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\non_rigid_registration\node_weighting.cpp">
+      <Filter>algo\non rigid registration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
