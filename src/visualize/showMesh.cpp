@@ -101,7 +101,7 @@ void ShowMesh::renderRegistrationTwoFrames()
 			auto deformed_points = _registration->getDeformedPoints();
 			
 			// render point clouds
-			if (_render_points) {
+			if (!_render_mesh) {
 				_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Cyan);
 				if(!_point_renderer->keyExists("frame_registered_B"))
 					_point_renderer->insertPoints("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green);
@@ -147,7 +147,7 @@ void ShowMesh::renderRegistrationAllFrames()
 		}
 
 		// points
-		if (_render_points) {
+		if (!_render_mesh) {
 			_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Cyan);
 			_point_renderer->insertPoints("frame_registered_B", target_points, ml::RGBColor::Green);
 			if (!_registration_frames->finished())
@@ -315,6 +315,7 @@ void ShowMesh::key(UINT key)
 		_render_mesh = !_render_mesh;
 		std::string visible = (_render_mesh) ? "show" : "hide";
 		std::cout << visible << " mesh" << std::endl;
+		_mesh_renderer->clear();
 		renderRegistration();
 	}
 	else if (key == KEY_J)

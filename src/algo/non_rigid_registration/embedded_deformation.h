@@ -34,7 +34,7 @@ class EmbeddedDeformation : public INonRigidRegistration
 	double a_rigid = 1000.;// 1.;// 1000;
 	double a_smooth = 100.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 0.1;
+	double a_fit = 1.;
 	std::shared_ptr<FileWriter> _logger;
 public:
 	bool finished();

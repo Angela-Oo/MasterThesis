@@ -116,6 +116,7 @@ bool EmbeddedDeformation::solveIteration()
 			a_rigid /= 2.;
 			a_smooth /= 2.;
 			a_conf /= 2.;
+			std::cout << "scale factor: smooth " << a_smooth << " rigid: " << a_rigid << std::endl;
 		}
 
 		_total_time_in_ms += logger.get_time_in_ms();
@@ -133,10 +134,11 @@ bool EmbeddedDeformation::solve()
 
 bool EmbeddedDeformation::finished()
 {
-	//double tol = 0.000001;
-	double tol = 0.0000001;
-	return (_solve_iteration >= _max_iterations) ||
-		(abs(_last_cost - _current_cost) < (tol * _current_cost) && _solve_iteration > 2);
+	//double tol = 0.0000001;
+	double tol = _options.function_tolerance;
+	double error = abs(_last_cost - _current_cost);
+	bool solved = error < (tol * _current_cost);
+	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
@@ -147,7 +149,6 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	//, _deformation_graph(src, number_of_deformation_nodes)
 	, _nn_search(dst)
 	, _logger(logger)
 {
