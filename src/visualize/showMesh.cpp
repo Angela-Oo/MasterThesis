@@ -12,14 +12,13 @@ void ShowMesh::nonRigidRegistration()
 		auto frame_b = _selected_frame_for_registration[1];
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
-		int number_of_nodes = 2000;
 		auto option = ceresOption();
 		if(_registration_type == RegistrationType::ED)
-			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, number_of_nodes, _logger);
+			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, _number_of_deformation_graph_nodes, _logger);
 		else if(_registration_type == RegistrationType::ED_WithoutICP)
 			_registration = std::make_unique<ED::EmbeddedDeformationWithoutICP>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
 		else if(_registration_type == RegistrationType::ASAP)
-			_registration = std::make_unique<AsRigidAsPossible>(source, target, option, number_of_nodes, _logger);
+			_registration = std::make_unique<AsRigidAsPossible>(source, target, option, _number_of_deformation_graph_nodes, _logger);
 		else if(_registration_type == RegistrationType::ASAP_WithoutICP)
 			_registration = std::make_unique<AsRigidAsPossibleWithoutICP>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
 		else
@@ -46,7 +45,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 			meshes.push_back(_input_mesh->getMesh(i));
 		}
 		//_registration_frames = std::make_unique<NonRigidRegistrationFrames>(meshes, 300);
-		_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>>(meshes, 1000);
+		_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>>(meshes, _number_of_deformation_graph_nodes);
 		renderRegistration();
 	}
 	else {

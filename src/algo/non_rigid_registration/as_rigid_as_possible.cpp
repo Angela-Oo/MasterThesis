@@ -136,7 +136,7 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _nn_search(dst)
 	, _logger(logger)
 {
-	auto reduced_mesh = createReducedMesh(dst, number_of_deformation_nodes);
+	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
 
 	_deformation_graph = ARAPDeformationGraph(reduced_mesh);
 	std::cout << "\nCeres Solver" << std::endl;
