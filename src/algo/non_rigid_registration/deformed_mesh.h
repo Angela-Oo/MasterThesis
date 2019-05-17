@@ -50,7 +50,8 @@ DeformedMesh<Graph, Node>::DeformedMesh(const Mesh & mesh, const DeformationGrap
 	for (size_t i = 0; i < _mesh.m_vertices.size(); ++i)
 	{		
 		auto & point = _mesh.m_vertices[i].position;
-		std::vector<vertex_index> knn_nodes_indices = _deformation_graph._deformation_graph_knn->k_nearest_indices(point, _deformation_graph._k + 1);
+		//std::vector<vertex_index> knn_nodes_indices = _deformation_graph._deformation_graph_knn->k_nearest_indices(point, _deformation_graph._k + 1);
+		std::vector<vertex_index> knn_nodes_indices = _deformation_graph.nearestNodes(point);
 		std::vector<double> weights = _deformation_graph.weights(point, knn_nodes_indices);
 		_deformable_points[i] = NearestNodes(point, knn_nodes_indices, weights);
 	}

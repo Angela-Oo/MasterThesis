@@ -38,6 +38,7 @@ private:
 	std::vector<int> uniform_node_indices(size_t number_of_points, size_t number_of_nodes);
 public:
 	std::vector<double> weights(const ml::vec3f & point, std::vector<vertex_index>& nearest_nodes_indices) const;
+	std::vector<vertex_index> nearestNodes(const ml::vec3f & point) const;
 	ml::vec3f deformPoint(const ml::vec3f & point, const NearestNodes & nearest_nodes) const;
 public:
 	std::vector<ml::vec3f> getDeformationGraph();
@@ -74,6 +75,38 @@ std::vector<double> DeformationGraph<Graph, Node>::weights(const ml::vec3f & poi
 		knn_nodes.push_back(nodes[i].position());
 	}
 	return nodeDistanceWeighting(point, knn_nodes);	
+}
+
+template<typename Graph, typename Node>
+std::vector<vertex_index> DeformationGraph<Graph, Node>::nearestNodes(const ml::vec3f & point) const
+{
+	vertex_index nearest_node_index = _deformation_graph_knn->nearest_index(point);
+	auto & nodes = boost::get(node_t(), _graph);
+	auto & nearest_node = nodes[nearest_node_index];
+
+	std::vector<std::pair<vertex_index, double>> node_distance;
+
+	for (auto avp = boost::adjacent_vertices(nearest_node_index, _graph); avp.first != avp.second; ++avp.first) {
+		vertex_index node_index = *avp.first;
+		auto& node = nodes[*avp.first];
+		double distance = dist(node.position(), nearest_node.position());
+		node_distance.push_back(std::make_pair(node_index, distance));
+	}
+	std::sort(node_distance.begin(), node_distance.end(),
+			  [](const std::pair<vertex_index, double> & rhs, const std::pair<vertex_index, double> & lhs) 
+	{
+		return rhs.second < lhs.second;
+	});
+
+	if (node_distance.size() < 2) {
+		std::cout << "should not happen" << std::endl;
+	}
+
+	std::vector<vertex_index> indices;
+	indices.push_back(nearest_node_index);
+	for (int i = 0; i < _k && i < node_distance.size(); ++i)
+		indices.push_back(node_distance[i].first);
+	return indices;
 }
 
 template<typename Graph, typename Node>
