@@ -77,6 +77,7 @@ std::vector<double> DeformationGraph<Graph, Node>::weights(const ml::vec3f & poi
 	return nodeDistanceWeighting(point, knn_nodes);	
 }
 
+
 template<typename Graph, typename Node>
 std::vector<vertex_index> DeformationGraph<Graph, Node>::nearestNodes(const ml::vec3f & point) const
 {
@@ -84,28 +85,47 @@ std::vector<vertex_index> DeformationGraph<Graph, Node>::nearestNodes(const ml::
 	auto & nodes = boost::get(node_t(), _graph);
 	auto & nearest_node = nodes[nearest_node_index];
 
-	std::vector<std::pair<vertex_index, double>> node_distance;
+	auto getNodeDistances = [&](vertex_index node_index) {
+		std::map<vertex_index, double> node_distance;
+		for (auto avp = boost::adjacent_vertices(nearest_node_index, _graph); avp.first != avp.second; ++avp.first) {
+			vertex_index node_index = *avp.first;
+			auto& node = nodes[*avp.first];
+			double distance = dist(node.position(), nearest_node.position());
+			node_distance[node_index] = distance;
+		}
+		return node_distance;
+	};
 
-	for (auto avp = boost::adjacent_vertices(nearest_node_index, _graph); avp.first != avp.second; ++avp.first) {
-		vertex_index node_index = *avp.first;
-		auto& node = nodes[*avp.first];
-		double distance = dist(node.position(), nearest_node.position());
-		node_distance.push_back(std::make_pair(node_index, distance));
+	std::map<vertex_index, double> node_distance = getNodeDistances(nearest_node_index);
+	if (node_distance.size() < _k) {
+		//if(node_distance.size() < 3)
+		//	std::cout << "search more vertices " << node_distance.size() << std::endl;
+		for (auto & n : node_distance) {
+			auto more_distance = getNodeDistances(n.first);
+			node_distance.insert(more_distance.begin(), more_distance.end());
+		}
 	}
-	std::sort(node_distance.begin(), node_distance.end(),
+
+	std::vector<std::pair<vertex_index, double>> sorted_node_distance;
+	for (auto & d : node_distance) {
+		sorted_node_distance.push_back(d);
+	}
+	//for (auto avp = boost::adjacent_vertices(nearest_node_index, _graph); avp.first != avp.second; ++avp.first) {
+	//	vertex_index node_index = *avp.first;
+	//	auto& node = nodes[*avp.first];
+	//	double distance = dist(node.position(), nearest_node.position());
+	//	node_distance.push_back(std::make_pair(node_index, distance));
+	//}
+	std::sort(sorted_node_distance.begin(), sorted_node_distance.end(),
 			  [](const std::pair<vertex_index, double> & rhs, const std::pair<vertex_index, double> & lhs) 
 	{
 		return rhs.second < lhs.second;
 	});
 
-	if (node_distance.size() < 2) {
-		std::cout << "should not happen" << std::endl;
-	}
-
 	std::vector<vertex_index> indices;
 	indices.push_back(nearest_node_index);
-	for (int i = 0; i < _k && i < node_distance.size(); ++i)
-		indices.push_back(node_distance[i].first);
+	for (int i = 0; i < _k && i < sorted_node_distance.size(); ++i)
+		indices.push_back(sorted_node_distance[i].first);
 	return indices;
 }
 
