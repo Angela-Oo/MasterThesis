@@ -61,21 +61,25 @@ bool AsRigidAsPossible::solveIteration()
 			auto& src_i = nodes[*vp.first];
 
 			ml::vec3f pos = src_i.deformedPosition();
+			ml::vec3f normal = src_i.deformedNormal();
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
-			unsigned int i = _nn_search.nearest_index(pos_deformed);
+			ml::vec3f normal_deformed = _deformation_graph._global_rigid_deformation.deformPosition(normal);
+			auto correspondent_point = _find_correspondence_point.correspondingPoint(pos_deformed, normal_deformed);
 
-			double weight = a_fit;
-			// point to point cost function
-			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
-			auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
-				global_node.r(), global_node.t(), src_i.t(), src_i.w());
+			if (correspondent_point.first) {
+				double weight = a_fit;
+				// point to point cost function
+				ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(correspondent_point.second, src_i.g(), global_node.g());
+				auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, 0.1 *weight, ceres::TAKE_OWNERSHIP);
+				problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
+										 global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
-			// point to plane cost function
-			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
-			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-				global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
+				// point to plane cost function
+				ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(correspondent_point.second, src_i.g(), src_i.n(), global_node.g());
+				auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, 0.9 *weight, ceres::TAKE_OWNERSHIP);
+				problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
+										 global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
+			}
 		}
 		// as rigid as possible cost
 		for (auto ep = boost::edges(g); ep.first != ep.second; ++ep.first) {
@@ -106,7 +110,8 @@ bool AsRigidAsPossible::solveIteration()
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 		
-		if (abs(_current_cost - _last_cost) < 0.00001 *(1 + _current_cost) &&
+		auto scale_factor_tol = 0.00005;// 0.00001;
+		if (abs(_current_cost - _last_cost) < scale_factor_tol * (1 + _current_cost) &&
 			(a_smooth > 0.01 || a_conf > 1.))
 		{
 			a_smooth /= 2.;
@@ -143,7 +148,7 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _nn_search(dst)
+	, _find_correspondence_point(dst)
 	, _logger(logger)
 {
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
@@ -166,7 +171,7 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
-	, _nn_search(dst)
+	, _find_correspondence_point(dst)
 	, _logger(logger)
 {
 	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);

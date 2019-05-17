@@ -8,6 +8,7 @@
 #include "algo/mesh_knn.h"
 #include <ceres/ceres.h>
 #include "i_registration.h"
+#include "find_correspondece_point.h"
 
 typedef ml::TriMeshf Mesh;
 typedef DeformationGraph<ARAPGraph, ARAPNode> ARAPDeformationGraph;
@@ -20,15 +21,15 @@ class AsRigidAsPossible : public IRegistration
 	ceres::Solver::Options _options;
 	ARAPDeformationGraph _deformation_graph;
 	std::unique_ptr<ARAPDeformedMesh> _deformed_mesh;
-	TriMeshKNN _nn_search;
+	FindCorrespondecePoint _find_correspondence_point;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
-	size_t _max_iterations = 200;
+	size_t _max_iterations = 50;
 	long long _total_time_in_ms = 0;
-	double a_smooth = 10.;// 0.1;// 100;
-	double a_conf = 10.;// 1.;// 100;
-	double a_fit = 100.;// 0.1;
+	double a_smooth = 100.;// 100.;
+	double a_conf = 100.;// 100;
+	double a_fit = 5.;
 	std::shared_ptr<FileWriter> _logger;
 public:
 	bool finished() override;

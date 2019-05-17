@@ -70,6 +70,9 @@
     <Filter Include="algo\registration\deformation graph">
       <UniqueIdentifier>{d971d056-c787-4641-b23b-e59871068af5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algo\registration\find correspondences">
+      <UniqueIdentifier>{e3268d0a-d09b-4b4c-8441-a59f423826a3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -593,6 +596,9 @@
     <ClInclude Include="src\algo\registration\ceres_option.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\find_correspondece_point.h">
+      <Filter>algo\registration\find correspondences</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -698,6 +704,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\ceres_option.cpp">
       <Filter>algo\registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\find_correspondece_point.cpp">
+      <Filter>algo\registration\find correspondences</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
