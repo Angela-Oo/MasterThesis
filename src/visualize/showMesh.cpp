@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "showMesh.h"
 #include <algorithm>
 #include <cmath>
@@ -103,20 +104,29 @@ void ShowMesh::renderRegistrationTwoFrames()
 {
 	if (_registration)
 	{
-		if (_render_points || _render_mesh) {
+		if (_render_points || _render_mesh != Render::NONE) {
 			auto deformed_points = _registration->getDeformedPoints();
 			
 			// render point clouds
-			if (!_render_mesh) {
+			if (_render_mesh == Render::NONE) {
 				_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Cyan);
 				if(!_point_renderer->keyExists("frame_registered_B"))
 					_point_renderer->insertPoints("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green);
 			}
 			// render mesh
-			if (_render_mesh) {
+			if (_render_mesh == Render::DEFORMATION) {
+				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
+				_mesh_renderer->removeMesh("mesh_b");
+			}
+			else if (_render_mesh == Render::ALL) {
 				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
 				if (!_mesh_renderer->keyExists("mesh_b"))
 					_mesh_renderer->insertMesh("mesh_b", _registration->getTarget(), ml::RGBColor::Green.toVec4f());
+			}
+			else if(_render_mesh == Render::TARGET)	{
+				if (!_mesh_renderer->keyExists("mesh_b"))
+					_mesh_renderer->insertMesh("mesh_b", _registration->getTarget(), ml::RGBColor::Green.toVec4f());
+				_mesh_renderer->removeMesh("mesh_a");
 			}
 		}
 
@@ -139,28 +149,33 @@ void ShowMesh::renderRegistrationTwoFrames()
 void ShowMesh::renderRegistrationAllFrames()
 {
 	if (_registration_frames) {
-		auto current = _registration_frames->getCurrent();
-		auto deformed_points = _registration_frames->getDeformedMesh(0);
-		auto target_points = _registration_frames->getDeformedMesh(current);
+		auto current = _registration_frames->getCurrent();		
 
 		// mesh
-		if (_render_mesh) 
+		if (_render_mesh == Render::DEFORMATION || _render_mesh == Render::ALL)
 		{
 			for (int i = 0; i < _registration_frames->getCurrent(); ++i) {
 				_mesh_renderer->insertMesh("mesh_" + i, _registration_frames->getDeformedMesh(i), ml::RGBColor::Cyan.toVec4f());
-			}			
+			}
+		}
+		if (_render_mesh == Render::TARGET || _render_mesh == Render::ALL) {
+			auto target_points = _registration_frames->getDeformedMesh(current);
 			_mesh_renderer->insertMesh("mesh_" + current, target_points, ml::RGBColor::Green.toVec4f());
 		}
 
 		// points
-		if (!_render_mesh) {
+		if (_render_mesh == Render::NONE) {
+			auto deformed_points = _registration_frames->getDeformedMesh(0);
+			auto target_points = _registration_frames->getDeformedMesh(current);
 			_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Cyan);
 			_point_renderer->insertPoints("frame_registered_B", target_points, ml::RGBColor::Green);
-			if (!_registration_frames->finished())
-				_point_renderer->insertPoints("frame_B", _registration_frames->getMesh(_registration_frames->getCurrent()), ml::RGBColor::Yellow);
-			else {
-				_point_renderer->removePoints("frame_B");
-			}
+		}
+
+		// target mesh 
+		if (!_registration_frames->finished())
+			_point_renderer->insertPoints("frame_B", _registration_frames->getMesh(_registration_frames->getCurrent()), ml::RGBColor::Yellow);
+		else {
+			_point_renderer->removePoints("frame_B");
 		}
 
 		// deformation graph
@@ -318,8 +333,15 @@ void ShowMesh::key(UINT key)
 	}
 	else if (key == KEY_H)
 	{
-		_render_mesh = !_render_mesh;
-		std::string visible = (_render_mesh) ? "show" : "hide";
+		if (_render_mesh == Render::NONE)
+			_render_mesh = Render::DEFORMATION;
+		else if(_render_mesh == Render::DEFORMATION)
+			_render_mesh = Render::TARGET;
+		else if (_render_mesh == Render::TARGET)
+			_render_mesh = Render::ALL;
+		else
+			_render_mesh = Render::NONE;
+		std::string visible = (_render_mesh != Render::NONE) ? "show" : "hide";
 		std::cout << visible << " mesh" << std::endl;
 		_mesh_renderer->clear();
 		renderRegistration();
