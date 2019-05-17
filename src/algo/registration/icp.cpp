@@ -11,10 +11,10 @@ using namespace Eigen;
 #include "ext-flann/nearestNeighborSearchFLANN.h"
 #include "core-util/nearestNeighborSearch.h"
 #include "icp_cost_function.h"
-#include "../se3.h"
 #include "../ceres_iteration_logger.h"
 #include "../knn.h"
 #include "../mesh_knn.h"
+#include "../se3.h"
 
 
 ICP::ICP(const Mesh& src,

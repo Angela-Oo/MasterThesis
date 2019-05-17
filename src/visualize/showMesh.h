@@ -8,8 +8,7 @@
 #include "algo/registration.h"
 #include "algo/file_writer.h"
 #include "algo/evaluate_registration.h"
-#include "algo/non_rigid_registration/as_rigid_as_possible.h"
-#include "algo/non_rigid_registration/embedded_deformation.h"
+
 
 enum class RegistrationType
 {

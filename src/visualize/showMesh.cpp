@@ -1,7 +1,9 @@
 #include "showMesh.h"
 #include <algorithm>
 #include <cmath>
-
+#include "algo/registration/as_rigid_as_possible.h"
+#include "algo/registration/embedded_deformation.h"
+#include "algo/registration/rigid_registration.h"
 
 
 void ShowMesh::nonRigidRegistration()
@@ -22,7 +24,7 @@ void ShowMesh::nonRigidRegistration()
 		else if(_registration_type == RegistrationType::ASAP_WithoutICP)
 			_registration = std::make_unique<AsRigidAsPossibleWithoutICP>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
 		else
-			_registration = std::make_unique<RigidRegistration>(source, target, _logger);
+			_registration = std::make_unique<RigidRegistration>(source, target, option, _logger);
 		renderRegistration();
 	}
 	else {
@@ -46,6 +48,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 		}
 		//_registration_frames = std::make_unique<NonRigidRegistrationFrames>(meshes, 300);
 		_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>>(meshes, _number_of_deformation_graph_nodes);
+		//_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Node>>>(meshes, _number_of_deformation_graph_nodes);
 		renderRegistration();
 	}
 	else {

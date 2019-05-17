@@ -46,26 +46,29 @@
     <Filter Include="algo">
       <UniqueIdentifier>{5c07260c-18ae-4619-959d-c9ef841fe4a7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="algo\non rigid registration">
-      <UniqueIdentifier>{81ca46bf-dc3c-4097-ba7b-9ce561fcf050}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\rigid registration">
-      <UniqueIdentifier>{b9a48aea-592a-4152-bb5e-3beb74e50087}</UniqueIdentifier>
-    </Filter>
     <Filter Include="input_reader">
       <UniqueIdentifier>{22720d91-d5bc-49a1-b65d-8948508484d7}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\non rigid registration\as rigid as possible">
-      <UniqueIdentifier>{e1b8d276-8a25-43e7-a286-224acf654f63}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\non rigid registration\embedded deformation">
-      <UniqueIdentifier>{3ef78849-9f16-4976-90ef-ea33cb87994c}</UniqueIdentifier>
     </Filter>
     <Filter Include="mLibHeader\ext-cgal">
       <UniqueIdentifier>{a4c38909-b948-45db-909d-280e38bf0245}</UniqueIdentifier>
     </Filter>
     <Filter Include="algo\mesh simplification">
       <UniqueIdentifier>{5e66546d-06c8-463d-83c2-c372bdcaab7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\registration">
+      <UniqueIdentifier>{81ca46bf-dc3c-4097-ba7b-9ce561fcf050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\registration\as rigid as possible">
+      <UniqueIdentifier>{e1b8d276-8a25-43e7-a286-224acf654f63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\registration\embedded deformation">
+      <UniqueIdentifier>{3ef78849-9f16-4976-90ef-ea33cb87994c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\registration\rigid registration">
+      <UniqueIdentifier>{b9a48aea-592a-4152-bb5e-3beb74e50087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\registration\deformation graph">
+      <UniqueIdentifier>{d971d056-c787-4641-b23b-e59871068af5}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -482,21 +485,6 @@
     <ClInclude Include="src\kinect\SensorDataWrapper.h">
       <Filter>kinect</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\rigid_registration\icp.h">
-      <Filter>algo\rigid registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\rigid_registration\icp_cost_function.h">
-      <Filter>algo\rigid registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\deformation_graph.h">
-      <Filter>algo\non rigid registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\deformation_graph_knn.h">
-      <Filter>algo\non rigid registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\non_rigid_deformation.h">
-      <Filter>algo\non rigid registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\ceres_iteration_logger.h">
       <Filter>algo</Filter>
     </ClInclude>
@@ -542,44 +530,62 @@
     <ClInclude Include="src\algo\file_writer.h">
       <Filter>algo</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\non_rigid_registration_cost_function.h">
-      <Filter>algo\non rigid registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\graph_node_type.h">
-      <Filter>algo\non rigid registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\as_rigid_as_possible.h">
-      <Filter>algo\non rigid registration\as rigid as possible</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\as_rigid_as_possible_cost_function.h">
-      <Filter>algo\non rigid registration\as rigid as possible</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\embedded_deformation_cost_function.h">
-      <Filter>algo\non rigid registration\embedded deformation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\embedded_deformation.h">
-      <Filter>algo\non rigid registration\embedded deformation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\node.h">
-      <Filter>algo\non rigid registration\embedded deformation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\as_rigid_as_possible_node.h">
-      <Filter>algo\non rigid registration\as rigid as possible</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\deformation_graph_mesh.h">
-      <Filter>algo\non rigid registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h">
       <Filter>algo\mesh simplification</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\deformed_mesh.h">
-      <Filter>algo\non rigid registration</Filter>
+    <ClInclude Include="src\algo\non_rigid_registration\i_rigid_registration.h">
+      <Filter>algo\registration</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\node_weighting.h">
-      <Filter>algo\non rigid registration</Filter>
+    <ClInclude Include="src\algo\registration\as_rigid_as_possible.h">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\as_rigid_as_possible_cost_function.h">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\as_rigid_as_possible_node.h">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_knn.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_mesh.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformed_mesh.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation.h">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation_cost_function.h">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\graph_node_type.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\icp.h">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\icp_cost_function.h">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\node.h">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_registration.h">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\node_weighting.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\non_rigid_registration_cost_function.h">
+      <Filter>algo\registration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -621,12 +627,6 @@
     <ClCompile Include="src\kinect\SensorDataWrapper.cpp">
       <Filter>kinect</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\rigid_registration\icp.cpp">
-      <Filter>algo\rigid registration</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\non_rigid_registration\non_rigid_deformation.cpp">
-      <Filter>algo\non rigid registration</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\ceres_iteration_logger.cpp">
       <Filter>algo</Filter>
     </ClCompile>
@@ -666,23 +666,29 @@
     <ClCompile Include="src\algo\file_writer.cpp">
       <Filter>algo</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\non_rigid_registration\as_rigid_as_possible.cpp">
-      <Filter>algo\non rigid registration\as rigid as possible</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\non_rigid_registration\embedded_deformation.cpp">
-      <Filter>algo\non rigid registration\embedded deformation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\non_rigid_registration\node.cpp">
-      <Filter>algo\non rigid registration\embedded deformation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\non_rigid_registration\as_rigid_as_possible_node.cpp">
-      <Filter>algo\non rigid registration\as rigid as possible</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
       <Filter>algo\mesh simplification</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\non_rigid_registration\node_weighting.cpp">
-      <Filter>algo\non rigid registration</Filter>
+    <ClCompile Include="src\algo\registration\as_rigid_as_possible.cpp">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\as_rigid_as_possible_node.cpp">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation.cpp">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\icp.cpp">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\node.cpp">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\rigid_registration.cpp">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\node_weighting.cpp">
+      <Filter>algo\registration\deformation graph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

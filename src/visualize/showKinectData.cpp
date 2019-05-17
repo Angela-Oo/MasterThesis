@@ -1,7 +1,7 @@
 #include "showKinectData.h"
 #include <numeric>
-#include "algo/rigid_registration/icp.h"
-#include "algo/non_rigid_registration/embedded_deformation.h"
+#include "algo/registration/icp.h"
+#include "algo/registration/embedded_deformation.h"
 #include "input_reader/kinect_reader.h"
 #include <ceres/ceres.h>
 

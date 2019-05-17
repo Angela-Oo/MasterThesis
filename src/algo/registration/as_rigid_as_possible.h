@@ -7,7 +7,7 @@
 #include "algo/file_writer.h"
 #include "algo/mesh_knn.h"
 #include <ceres/ceres.h>
-#include "algo/non_rigid_registration/non_rigid_deformation.h"
+#include "i_rigid_registration.h"
 
 typedef ml::TriMeshf Mesh;
 typedef DeformationGraph<ARAPGraph, ARAPNode> ARAPDeformationGraph;
@@ -26,9 +26,9 @@ class AsRigidAsPossible : public INonRigidRegistration
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
-	double a_smooth = 100.;// 0.1;// 100;
+	double a_smooth = 10.;// 0.1;// 100;
 	double a_conf = 10.;// 1.;// 100;
-	double a_fit = 10.;// 0.1;
+	double a_fit = 100.;// 0.1;
 	std::shared_ptr<FileWriter> _logger;
 public:
 	bool finished() override;

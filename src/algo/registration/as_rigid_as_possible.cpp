@@ -1,50 +1,46 @@
-#include "embedded_deformation.h"
-#include "embedded_deformation_cost_function.h"
+#include "as_rigid_as_possible.h"
+#include "as_rigid_as_possible_cost_function.h"
 #include "non_rigid_registration_cost_function.h"
-//#include "algo/se3.h"
+#include "algo/ceres_iteration_logger.h"
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"
-#include "algo/ceres_iteration_logger.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
 
-namespace ED {
 
-const Mesh & EmbeddedDeformation::getSource()
+const Mesh & AsRigidAsPossible::getSource()
 {
 	return _src;
 }
 
-const Mesh & EmbeddedDeformation::getTarget()
+const Mesh & AsRigidAsPossible::getTarget()
 {
 	return _dst;
 }
 
-Mesh EmbeddedDeformation::getDeformedPoints()
+Mesh AsRigidAsPossible::getDeformedPoints()
 {
 	return _deformed_mesh->deformPoints();
-	//return _deformation_graph.deformPoints(_src);
 }
 
-Mesh EmbeddedDeformation::getInverseDeformedPoints()
+Mesh AsRigidAsPossible::getInverseDeformedPoints()
 {
 	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
 
-	EmbeddedDeformedMesh deformed(_dst, inverse_deformation);
+	ARAPDeformedMesh deformed(_dst, inverse_deformation);
 	return deformed.deformPoints();
-	//return inverse_deformation.deformPoints(_dst);
 }
 
-std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> EmbeddedDeformation::getDeformationGraph()
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> AsRigidAsPossible::getDeformationGraph()
 {
 	return _deformation_graph.getDeformationGraphEdges();
 }
 
-EmbeddedDeformationGraph & EmbeddedDeformation::getEmbeddedDeformationGraph()
+DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossible::getARAPDeformationGraph()
 {
 	return _deformation_graph;
 }
 
-bool EmbeddedDeformation::solveIteration()
+bool AsRigidAsPossible::solveIteration()
 {
 	if (!finished()) {
 		_solve_iteration++;
@@ -60,7 +56,7 @@ bool EmbeddedDeformation::solveIteration()
 		auto & nodes = boost::get(node_t(), g);
 
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-			Node& src_i = nodes[*vp.first];
+			auto& src_i = nodes[*vp.first];
 
 			ml::vec3f pos = src_i.deformedPosition();
 			ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
@@ -68,65 +64,52 @@ bool EmbeddedDeformation::solveIteration()
 
 			double weight = a_fit;
 			// point to point cost function
-			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
+			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
 			auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
-									 global_node.r(), global_node.t(), src_i.t(), src_i.w());
+				global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
 			// point to plane cost function
-			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
+			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
 			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-									 global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
+				global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 		}
-		// smooth cost
+		// as rigid as possible cost
 		for (auto ep = boost::edges(g); ep.first != ep.second; ++ep.first) {
 			auto vi = boost::source(*ep.first, g);
 			auto vj = boost::target(*ep.first, g);
 
-			Node& src_i = nodes[vi];
-			Node& src_j = nodes[vj];
-
-			ceres::CostFunction* cost_function = SmoothCostFunction::Create(src_i.g(), src_j.g());
+			auto& src_i = nodes[vi];
+			auto& src_j = nodes[vj];
+			ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(src_i.g(), src_j.g());
 			auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
 
-			ceres::CostFunction* cost_function_j = SmoothCostFunction::Create(src_j.g(), src_i.g());
+			ceres::CostFunction* cost_function_j = AsRigidAsPossibleCostFunction::Create(src_j.g(), src_i.g());
 			auto loss_function_j = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_j, loss_function_j, src_j.r(), src_j.t(), src_i.t());
 		}
-		// rotation cost
+		// conf cost
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
 		{
-			Node& src_i = nodes[*vp.first];
-			ceres::CostFunction* cost_function = RotationCostFunction::Create();
-
-			auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), a_rigid, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function, loss_function, src_i.r());
-		}
-		// confident cost
-		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
-		{
-			Node& src_i = nodes[*vp.first];
+			auto& src_i = nodes[*vp.first];
 			ceres::CostFunction* cost_function = ConfCostFunction::Create();
 			auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function, loss_function, src_i.w());
 		}
-		ceres::CostFunction* cost_function = RotationCostFunction::Create();
-		problem.AddResidualBlock(cost_function, NULL, global_node.r());
 
 		ceres::Solve(_options, &problem, &summary);
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
-
+		
 		if (abs(_current_cost - _last_cost) < 0.00001 *(1 + _current_cost) &&
-			(a_rigid > 1 || a_smooth > 0.1 || a_conf > 1.))
+			(a_smooth > 0.1 || a_conf > 1.))
 		{
-			a_rigid /= 2.;
 			a_smooth /= 2.;
 			a_conf /= 2.;
-			std::cout << "scale factor: smooth " << a_smooth << " rigid: " << a_rigid << std::endl;
+			std::cout << "scale factor: smooth " << a_smooth << std::endl;
 		}
 
 		_total_time_in_ms += logger.get_time_in_ms();
@@ -134,7 +117,7 @@ bool EmbeddedDeformation::solveIteration()
 	return finished();
 }
 
-bool EmbeddedDeformation::solve()
+bool AsRigidAsPossible::solve()
 {
 	while (!finished()) {
 		solveIteration();
@@ -142,20 +125,19 @@ bool EmbeddedDeformation::solve()
 	return true;
 }
 
-bool EmbeddedDeformation::finished()
+bool AsRigidAsPossible::finished()
 {
-	//double tol = 0.0000001;
-	double tol = _options.function_tolerance;
+	auto tol = _options.function_tolerance;
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
 	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
-EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
-										 const Mesh& dst,
-										 ceres::Solver::Options option,
-										 unsigned int number_of_deformation_nodes,
-										 std::shared_ptr<FileWriter> logger)
+AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
+									 const Mesh& dst,
+									 ceres::Solver::Options option,
+									 unsigned int number_of_deformation_nodes,
+									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
@@ -163,20 +145,21 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 	, _logger(logger)
 {
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
-	_deformation_graph = EmbeddedDeformationGraph(reduced_mesh);
-	_deformed_mesh = std::make_unique<EmbeddedDeformedMesh>(src, _deformation_graph);
+
+	_deformation_graph = ARAPDeformationGraph(reduced_mesh);
+	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
 }
 
-EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
-										 const Mesh& dst,
-										 const EmbeddedDeformationGraph & deformation_graph,
-										 ceres::Solver::Options option,
-										 unsigned int number_of_deformation_nodes,
-										 std::shared_ptr<FileWriter> logger)
+AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
+									 const Mesh& dst,
+									 const ARAPDeformationGraph & deformation_graph,
+									 ceres::Solver::Options option,
+									 unsigned int number_of_deformation_nodes,
+									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
@@ -184,7 +167,7 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 	, _nn_search(dst)
 	, _logger(logger)
 {
-	_deformed_mesh = std::make_unique<EmbeddedDeformedMesh>(src, _deformation_graph);
+	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
@@ -207,26 +190,42 @@ EmbeddedDeformation::EmbeddedDeformation(const Mesh& src,
 
 
 
-
-
-
-
-
-
-
-
-
-const Mesh & EmbeddedDeformationWithoutICP::getSource()
+const Mesh & AsRigidAsPossibleWithoutICP::getSource()
 {
 	return _src;
 }
 
-const Mesh & EmbeddedDeformationWithoutICP::getTarget()
+const Mesh & AsRigidAsPossibleWithoutICP::getTarget()
 {
 	return _dst;
 }
 
-std::vector<ml::vec3f> EmbeddedDeformationWithoutICP::getFixedPostions()
+
+Mesh AsRigidAsPossibleWithoutICP::getDeformedPoints()
+{
+	return _deformed_mesh->deformPoints();
+	//return _deformation_graph.deformPoints(_src);
+}
+
+Mesh AsRigidAsPossibleWithoutICP::getInverseDeformedPoints()
+{
+	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
+	ARAPDeformedMesh deformed(_dst, inverse_deformation);
+	return deformed.deformPoints();
+	//return inverse_deformation.deformPoints(_dst);
+}
+
+std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> AsRigidAsPossibleWithoutICP::getDeformationGraph()
+{
+	return _deformation_graph.getDeformationGraphEdges();
+}
+
+DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossibleWithoutICP::getARAPDeformationGraph()
+{
+	return _deformation_graph;
+}
+
+std::vector<ml::vec3f> AsRigidAsPossibleWithoutICP::getFixedPostions()
 {
 	std::vector<ml::vec3f> positions;
 	for (auto & i : _fixed_positions) {
@@ -235,32 +234,8 @@ std::vector<ml::vec3f> EmbeddedDeformationWithoutICP::getFixedPostions()
 	return positions;
 }
 
-Mesh EmbeddedDeformationWithoutICP::getInverseDeformedPoints()
-{
-	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
-	EmbeddedDeformedMesh deformed(_dst, inverse_deformation);
-	return deformed.deformPoints();
-	//return inverse_deformation.deformPoints(_dst);
-}
 
-Mesh EmbeddedDeformationWithoutICP::getDeformedPoints()
-{
-	return _deformed_mesh->deformPoints();
-	//return _deformation_graph.deformPoints(_src);
-}
-
-std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> EmbeddedDeformationWithoutICP::getDeformationGraph()
-{
-	return _deformation_graph.getDeformationGraphEdges();
-}
-
-
-EmbeddedDeformationGraph & EmbeddedDeformationWithoutICP::getEmeddedDeformationGraph()
-{
-	return _deformation_graph;
-}
-
-bool EmbeddedDeformationWithoutICP::solveIteration()
+bool AsRigidAsPossibleWithoutICP::solveIteration()
 {
 	if (!finished()) {
 		_solve_iteration++;
@@ -273,65 +248,51 @@ bool EmbeddedDeformationWithoutICP::solveIteration()
 		auto & global_node = _deformation_graph._global_rigid_deformation;
 		auto & nodes = boost::get(node_t(), g);
 
-		// fit cost		
+		// fit cost
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-			Node& src_i = nodes[*vp.first];
-
+			auto& src_i = nodes[*vp.first];
 			if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), src_i.index()) != _fixed_positions.end()))
 			{
-				ml::vec3f pos = src_i.deformedPosition();
-				ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 				unsigned int i = src_i.index();
-
 				double weight = a_fit;
 				// point to point cost function
-				ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
+				ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
 				auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 				problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
 										 global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
+
+
 				// point to plane cost function
-				ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
+				ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
 				auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 				problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
 										 global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 			}
 		}
-		// smooth cost
+		// as rigid as possible cost
 		for (auto ep = boost::edges(g); ep.first != ep.second; ++ep.first) {
 			auto vi = boost::source(*ep.first, g);
 			auto vj = boost::target(*ep.first, g);
 
-			Node& src_i = nodes[vi];
-			Node& src_j = nodes[vj];
-
-			ceres::CostFunction* cost_function = SmoothCostFunction::Create(src_i.g(), src_j.g());
+			auto& src_i = nodes[vi];
+			auto& src_j = nodes[vj];
+			ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(src_i.g(), src_j.g());
 			auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());		
+			problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
 
-			ceres::CostFunction* cost_function_j = SmoothCostFunction::Create(src_j.g(), src_i.g());
+			ceres::CostFunction* cost_function_j = AsRigidAsPossibleCostFunction::Create(src_j.g(), src_i.g());
 			auto loss_function_j = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function_j, loss_function_j, src_j.r(), src_j.t(), src_i.t());
 		}
-		// rotation cost
+		// conf cost
 		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
 		{
-			Node& src_i = nodes[*vp.first];
-			ceres::CostFunction* cost_function = RotationCostFunction::Create();
-			
-			auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), a_rigid, ceres::TAKE_OWNERSHIP);
-			problem.AddResidualBlock(cost_function, loss_function, src_i.r());
-		}
-		// confident cost
-		for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
-		{
-			Node& src_i = nodes[*vp.first];
+			auto& src_i = nodes[*vp.first];
 			ceres::CostFunction* cost_function = ConfCostFunction::Create();
 			auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
 			problem.AddResidualBlock(cost_function, loss_function, src_i.w());
 		}
-		ceres::CostFunction* cost_function = RotationCostFunction::Create();
-		problem.AddResidualBlock(cost_function, new ceres::SoftLOneLoss(0.001), global_node.r());
 
 		ceres::Solve(_options, &problem, &summary);
 
@@ -339,9 +300,8 @@ bool EmbeddedDeformationWithoutICP::solveIteration()
 		_current_cost = summary.final_cost;
 
 		if (abs(_current_cost - _last_cost) < 0.00001 *(1 + _current_cost) &&
-			(a_rigid > 1 || a_smooth > 0.1 || a_conf > 1.))
+			(a_smooth > 0.1 || a_conf > 1.))
 		{
-			a_rigid /= 2.;
 			a_smooth /= 2.;
 			a_conf /= 2.;
 		}
@@ -351,28 +311,28 @@ bool EmbeddedDeformationWithoutICP::solveIteration()
 	return finished();
 }
 
-bool EmbeddedDeformationWithoutICP::solve()
+bool AsRigidAsPossibleWithoutICP::solve()
 {
 	while (!finished()) {
 		solveIteration();
 	}
-	return finished();
+	return true;
 }
 
-bool EmbeddedDeformationWithoutICP::finished()
+bool AsRigidAsPossibleWithoutICP::finished()
 {
 	//double tol = 0.000001;
-	double tol = 0.000001;
+	double tol = 0.0000001;
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
 	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
-EmbeddedDeformationWithoutICP::EmbeddedDeformationWithoutICP(const Mesh& src,
-															 const Mesh& dst,
-															 std::vector<int> fixed_positions,
-															 ceres::Solver::Options option,
-															 std::shared_ptr<FileWriter> logger)
+AsRigidAsPossibleWithoutICP::AsRigidAsPossibleWithoutICP(const Mesh& src,
+														 const Mesh& dst,
+														 std::vector<int> fixed_positions,
+														 ceres::Solver::Options option,
+														 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
@@ -380,12 +340,9 @@ EmbeddedDeformationWithoutICP::EmbeddedDeformationWithoutICP(const Mesh& src,
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
 {
+	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	std::cout << "\nCeres Solver" << std::endl;
 	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
 	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
-}
-
-
-
 }

@@ -10,7 +10,7 @@
 #include <vector>
 #include <ceres/ceres.h>
 
-#include "algo/non_rigid_registration/non_rigid_deformation.h"
+#include "algo/registration/i_rigid_registration.h"
 
 namespace ED {
 
