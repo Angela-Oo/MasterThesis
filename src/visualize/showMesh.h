@@ -9,6 +9,9 @@
 #include "algo/file_writer.h"
 #include "algo/evaluate_registration.h"
 
+#include "algo/registration/as_rigid_as_possible.h"
+#include "algo/registration/embedded_deformation.h"
+
 
 enum class RegistrationType
 {
@@ -39,7 +42,7 @@ private:
 	bool _render_error = false;	
 	bool _render_deformation_graph = true;
 	bool _calculate_error = false;
-	std::unique_ptr<INonRigidRegistration> _registration;
+	std::unique_ptr<IRegistration> _registration;
 	std::unique_ptr<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>> _registration_frames;
 	//std::unique_ptr < NonRigidRegistrationAllFrames < ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Node>>> _registration_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;

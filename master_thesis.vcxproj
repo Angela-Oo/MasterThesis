@@ -227,7 +227,6 @@
     <ClInclude Include="src\algo\knn.h" />
     <ClInclude Include="src\algo\mesh_knn.h" />
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h" />
-    <ClInclude Include="src\algo\non_rigid_registration\i_rigid_registration.h" />
     <ClInclude Include="src\algo\registration.h" />
     <ClInclude Include="src\algo\registration\as_rigid_as_possible.h" />
     <ClInclude Include="src\algo\registration\as_rigid_as_possible_cost_function.h" />
@@ -241,6 +240,7 @@
     <ClInclude Include="src\algo\registration\graph_node_type.h" />
     <ClInclude Include="src\algo\registration\icp.h" />
     <ClInclude Include="src\algo\registration\icp_cost_function.h" />
+    <ClInclude Include="src\algo\registration\i_registration.h" />
     <ClInclude Include="src\algo\registration\node.h" />
     <ClInclude Include="src\algo\registration\node_weighting.h" />
     <ClInclude Include="src\algo\registration\non_rigid_registration_cost_function.h" />

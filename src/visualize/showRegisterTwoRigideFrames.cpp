@@ -3,6 +3,7 @@
 #include <numeric>
 #include "ext-depthcamera/calibratedSensorData.h"
 #include "algo/registration.h"
+#include "algo/registration/embedded_deformation.h"
 #include "input_reader/depth_image_reader.h"
 
 

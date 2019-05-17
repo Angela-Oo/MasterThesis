@@ -1,11 +1,11 @@
 #pragma once
-#include "i_rigid_registration.h"
+#include "i_registration.h"
 #include "icp.h"
 #include "algo/file_writer.h"
 
 typedef ml::TriMeshf Mesh;
 
-class RigidRegistration : public INonRigidRegistration
+class RigidRegistration : public IRegistration
 {
 private:
 	std::unique_ptr<ICPNN> _icp_nn;

@@ -7,13 +7,13 @@
 #include "algo/file_writer.h"
 #include "algo/mesh_knn.h"
 #include <ceres/ceres.h>
-#include "i_rigid_registration.h"
+#include "i_registration.h"
 
 typedef ml::TriMeshf Mesh;
 typedef DeformationGraph<ARAPGraph, ARAPNode> ARAPDeformationGraph;
 typedef DeformedMesh<ARAPGraph, ARAPNode> ARAPDeformedMesh;
 
-class AsRigidAsPossible : public INonRigidRegistration
+class AsRigidAsPossible : public IRegistration
 {
 	Mesh _src;
 	Mesh _dst;
@@ -61,7 +61,7 @@ public:
 
 
 
-class AsRigidAsPossibleWithoutICP : public INonRigidRegistration
+class AsRigidAsPossibleWithoutICP : public IRegistration
 {
 	Mesh _src;
 	Mesh _dst;

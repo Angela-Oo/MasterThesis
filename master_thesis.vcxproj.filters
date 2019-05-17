@@ -536,9 +536,6 @@
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\non_rigid_registration\i_rigid_registration.h">
-      <Filter>algo\registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\as_rigid_as_possible.h">
       <Filter>algo\registration\as rigid as possible</Filter>
     </ClInclude>
@@ -585,6 +582,9 @@
       <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\non_rigid_registration_cost_function.h">
+      <Filter>algo\registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\i_registration.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
   </ItemGroup>

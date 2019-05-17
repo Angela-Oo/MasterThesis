@@ -10,7 +10,7 @@
 #include <vector>
 #include <ceres/ceres.h>
 
-#include "algo/registration/i_rigid_registration.h"
+#include "algo/registration/i_registration.h"
 
 namespace ED {
 
@@ -18,7 +18,7 @@ typedef DeformationGraph<Graph, Node> EmbeddedDeformationGraph;
 typedef DeformedMesh<Graph, Node> EmbeddedDeformedMesh;
 //typedef ml::TriMeshf Mesh;
 
-class EmbeddedDeformation : public INonRigidRegistration
+class EmbeddedDeformation : public IRegistration
 {
 	Mesh _src;
 	Mesh _dst;
@@ -67,7 +67,7 @@ public:
 
 
 
-class EmbeddedDeformationWithoutICP : public INonRigidRegistration
+class EmbeddedDeformationWithoutICP : public IRegistration
 {
 	Mesh _src;
 	Mesh _dst;
