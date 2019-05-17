@@ -497,9 +497,6 @@
     <ClInclude Include="src\algo\se3.h">
       <Filter>algo</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration.h">
-      <Filter>algo</Filter>
-    </ClInclude>
     <ClInclude Include="src\input_reader\depth_image_reader.h">
       <Filter>input_reader</Filter>
     </ClInclude>
@@ -587,6 +584,9 @@
     <ClInclude Include="src\algo\registration\i_registration.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\registration.h">
+      <Filter>algo\registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -634,9 +634,6 @@
       <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\se3.cpp">
-      <Filter>algo</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration.cpp">
       <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\input_reader\depth_image_reader.cpp">
@@ -689,6 +686,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\node_weighting.cpp">
       <Filter>algo\registration\deformation graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\registration.cpp">
+      <Filter>algo\registration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

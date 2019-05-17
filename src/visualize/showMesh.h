@@ -5,10 +5,10 @@
 #include "meshRenderer.h"
 #include "pointsRenderer.h"
 #include "input_reader/mesh_reader.h"
-#include "algo/registration.h"
+
 #include "algo/file_writer.h"
 #include "algo/evaluate_registration.h"
-
+#include "algo/registration/registration.h"
 #include "algo/registration/as_rigid_as_possible.h"
 #include "algo/registration/embedded_deformation.h"
 

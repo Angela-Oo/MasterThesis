@@ -1,7 +1,7 @@
 #pragma once
 #include "../mLibInclude.h"
 #include "i_showData.h"
-#include "algo/registration.h"
+#include "algo/registration/registration.h"
 #include "algo/registration/i_registration.h"
 #include "input_reader/depth_image_reader.h"
 #include "pointsRenderer.h"
