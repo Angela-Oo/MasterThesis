@@ -5,7 +5,7 @@
 #include "algo/registration/registration.h"
 #include "algo/registration/embedded_deformation.h"
 #include "input_reader/depth_image_reader.h"
-
+#include "algo/registration/ceres_option.h"
 
 void ShowTwoRigideRegisteredFrames::renderPoints()
 {

@@ -587,6 +587,12 @@
     <ClInclude Include="src\algo\registration\registration.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\non_rigid_registration_all_frames.h">
+      <Filter>algo\registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\ceres_option.h">
+      <Filter>algo\registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -688,6 +694,9 @@
       <Filter>algo\registration\deformation graph</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\registration.cpp">
+      <Filter>algo\registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\ceres_option.cpp">
       <Filter>algo\registration</Filter>
     </ClCompile>
   </ItemGroup>

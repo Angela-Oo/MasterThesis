@@ -230,6 +230,7 @@
     <ClInclude Include="src\algo\registration\as_rigid_as_possible.h" />
     <ClInclude Include="src\algo\registration\as_rigid_as_possible_cost_function.h" />
     <ClInclude Include="src\algo\registration\as_rigid_as_possible_node.h" />
+    <ClInclude Include="src\algo\registration\ceres_option.h" />
     <ClInclude Include="src\algo\registration\deformation_graph.h" />
     <ClInclude Include="src\algo\registration\deformation_graph_knn.h" />
     <ClInclude Include="src\algo\registration\deformation_graph_mesh.h" />
@@ -242,6 +243,7 @@
     <ClInclude Include="src\algo\registration\i_registration.h" />
     <ClInclude Include="src\algo\registration\node.h" />
     <ClInclude Include="src\algo\registration\node_weighting.h" />
+    <ClInclude Include="src\algo\registration\non_rigid_registration_all_frames.h" />
     <ClInclude Include="src\algo\registration\non_rigid_registration_cost_function.h" />
     <ClInclude Include="src\algo\registration\registration.h" />
     <ClInclude Include="src\algo\registration\rigid_registration.h" />
@@ -281,6 +283,7 @@
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp" />
     <ClCompile Include="src\algo\registration\as_rigid_as_possible.cpp" />
     <ClCompile Include="src\algo\registration\as_rigid_as_possible_node.cpp" />
+    <ClCompile Include="src\algo\registration\ceres_option.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation.cpp" />
     <ClCompile Include="src\algo\registration\icp.cpp" />
     <ClCompile Include="src\algo\registration\node.cpp" />

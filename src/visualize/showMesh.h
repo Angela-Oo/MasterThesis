@@ -11,17 +11,8 @@
 #include "algo/registration/registration.h"
 #include "algo/registration/as_rigid_as_possible.h"
 #include "algo/registration/embedded_deformation.h"
+#include "algo/registration/non_rigid_registration_all_frames.h"
 
-
-enum class RegistrationType
-{
-	ASAP,
-	ASAP_WithoutICP,
-	ED,
-	ED_WithoutICP,
-	Rigid,
-	AllFrames
-};
 
 class ShowMesh : public IShowData
 {

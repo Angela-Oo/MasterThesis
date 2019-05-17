@@ -4,7 +4,7 @@
 #include "algo/registration/as_rigid_as_possible.h"
 #include "algo/registration/embedded_deformation.h"
 #include "algo/registration/rigid_registration.h"
-
+#include "algo/registration/ceres_option.h"
 
 void ShowMesh::nonRigidRegistration()
 {
