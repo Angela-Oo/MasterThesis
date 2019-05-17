@@ -154,8 +154,14 @@ void ShowMesh::renderRegistrationAllFrames()
 		// mesh
 		if (_render_mesh == Render::DEFORMATION || _render_mesh == Render::ALL)
 		{
-			for (int i = 0; i < _registration_frames->getCurrent(); ++i) {
-				_mesh_renderer->insertMesh("mesh_" + i, _registration_frames->getDeformedMesh(i), ml::RGBColor::Cyan.toVec4f());
+			if (_registration_frames->finished()) {
+				for (int i = 0; i <= _registration_frames->getCurrent(); ++i) {
+					_mesh_renderer->insertMesh("mesh_" + i, _registration_frames->getDeformedMesh(i), ml::RGBColor::Cyan.toVec4f());
+				}
+			}
+			else {
+				auto deformed_points = _registration_frames->getDeformedMesh(0);
+				_mesh_renderer->insertMesh("mesh_" + 0, deformed_points, ml::RGBColor::Cyan.toVec4f());
 			}
 		}
 		if (_render_mesh == Render::TARGET || _render_mesh == Render::ALL) {
@@ -182,6 +188,9 @@ void ShowMesh::renderRegistrationAllFrames()
 		if (_render_deformation_graph) {
 			auto render_dg = _registration_frames->getDeformationGraph(_registration_frames->getCurrent());
 			_point_renderer->insertLine("deformation_graph", render_dg.first, render_dg.second, ml::RGBColor::Purple);
+		}
+		else {
+			_point_renderer->removePoints("deformation_graph");
 		}
 	}
 }
