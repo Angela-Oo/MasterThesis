@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "evaluate_registration.h"
 
 

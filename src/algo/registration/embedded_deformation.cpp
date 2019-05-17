@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "embedded_deformation.h"
 #include "embedded_deformation_cost_function.h"
 #include "non_rigid_registration_cost_function.h"

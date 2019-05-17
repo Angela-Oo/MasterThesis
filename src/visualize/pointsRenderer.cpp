@@ -1,6 +1,6 @@
+#include "stdafx.h"
 #include "pointsRenderer.h"
 using namespace ml;
-
 
 
 void PointsRenderer::render(ml::Cameraf& camera)

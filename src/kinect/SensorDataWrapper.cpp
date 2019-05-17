@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "SensorDataWrapper.h"
 
 using namespace ml;

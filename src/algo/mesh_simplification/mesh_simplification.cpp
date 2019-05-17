@@ -1,8 +1,8 @@
+#include "stdafx.h"
+
 #include "mesh_simplification.h"
 #include "mLibCGAL.h"
 
-#include <CGAL/Simple_cartesian.h>
-#include <CGAL/Surface_mesh.h>
 #include <CGAL/Surface_mesh_simplification/edge_collapse.h>
 #include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/Count_ratio_stop_predicate.h>
 // Stop-condition policy

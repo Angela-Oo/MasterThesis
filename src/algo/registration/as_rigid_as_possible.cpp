@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "as_rigid_as_possible.h"
 #include "as_rigid_as_possible_cost_function.h"
 #include "non_rigid_registration_cost_function.h"
@@ -105,7 +107,7 @@ bool AsRigidAsPossible::solveIteration()
 		_current_cost = summary.final_cost;
 		
 		if (abs(_current_cost - _last_cost) < 0.00001 *(1 + _current_cost) &&
-			(a_smooth > 0.1 || a_conf > 1.))
+			(a_smooth > 0.01 || a_conf > 1.))
 		{
 			a_smooth /= 2.;
 			a_conf /= 2.;

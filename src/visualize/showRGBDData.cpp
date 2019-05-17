@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "showRGBDData.h"
 #include <numeric>
 #include "input_reader/depth_image_reader.h"

@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "as_rigid_as_possible_node.h"
 #include <ceres/rotation.h>
 

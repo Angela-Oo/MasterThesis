@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "mesh_reader.h"
 #include "core-mesh/meshData.h"
 #include <cassert>

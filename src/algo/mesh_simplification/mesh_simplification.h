@@ -2,6 +2,13 @@
 #include "mLibInclude.h"
 #include "boost/graph/adjacency_list.hpp"
 
+#include <CGAL/Simple_cartesian.h>
+#include <CGAL/Surface_mesh.h>
+
+typedef CGAL::Simple_cartesian<double> Kernel;
+typedef CGAL::Surface_mesh<Kernel::Point_3> SurfaceMesh;
+typedef boost::graph_traits<SurfaceMesh>::vertex_descriptor vertex_descriptor;
+typedef SurfaceMesh::Face_index face_descriptor;
 
 namespace CGAL
 {
@@ -38,5 +45,10 @@ private:
 
 typedef ml::TriMeshf Mesh;
 
+
+SurfaceMesh convertToCGALMesh(const Mesh& triMesh);
+
+
+Mesh convertToTriMesh(SurfaceMesh& mesh);
 
 Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices);

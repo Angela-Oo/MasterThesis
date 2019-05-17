@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "depth_image_reader.h"
 
 

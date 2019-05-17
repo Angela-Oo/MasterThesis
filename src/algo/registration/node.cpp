@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "node.h"
 #include <ceres/rotation.h>
 

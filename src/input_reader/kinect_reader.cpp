@@ -1,3 +1,5 @@
+#include "stdafx.h"
+
 #include "kinect_reader.h"
 #include "kinect/KinectSensor.h"
 #include "ext-depthcamera/sensorData.h"

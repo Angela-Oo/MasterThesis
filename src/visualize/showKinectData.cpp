@@ -1,9 +1,11 @@
+#include "stdafx.h"
 #include "showKinectData.h"
 #include <numeric>
 #include "algo/registration/icp.h"
 #include "algo/registration/embedded_deformation.h"
 #include "input_reader/kinect_reader.h"
 #include <ceres/ceres.h>
+#include "algo/registration/ceres_option.h"
 
 using namespace ml;
 
