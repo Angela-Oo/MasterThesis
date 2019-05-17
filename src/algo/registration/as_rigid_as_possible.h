@@ -21,7 +21,8 @@ class AsRigidAsPossible : public IRegistration
 	ceres::Solver::Options _options;
 	ARAPDeformationGraph _deformation_graph;
 	std::unique_ptr<ARAPDeformedMesh> _deformed_mesh;
-	FindCorrespondecePoint _find_correspondence_point;
+	TriMeshKNN _nn_search;
+	//FindCorrespondecePoint _find_correspondence_point;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
