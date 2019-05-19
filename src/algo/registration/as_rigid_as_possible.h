@@ -32,6 +32,11 @@ class AsRigidAsPossible : public IRegistration
 	double a_conf = 100.;// 100;
 	double a_fit = 5.;
 	std::shared_ptr<FileWriter> _logger;
+
+private:
+	std::vector<ceres::ResidualBlockId> addFitCost(ceres::Problem &problem);
+	std::vector<ceres::ResidualBlockId> addConfCost(ceres::Problem &problem);
+	std::vector<ceres::ResidualBlockId> addAsRigidAsPossibleCost(ceres::Problem &problem);
 public:
 	bool finished() override;
 	bool solveIteration() override;
@@ -65,12 +70,18 @@ public:
 
 class AsRigidAsPossibleWithoutICP : public IRegistration
 {
+private:
 	Mesh _src;
 	Mesh _dst;
 	ceres::Solver::Options _options;
 	ARAPDeformationGraph _deformation_graph;
 	std::unique_ptr<ARAPDeformedMesh> _deformed_mesh;
 	std::vector<int> _fixed_positions;
+	TriMeshKNN _nn_search;
+	bool _with_icp = true;
+
+	std::vector<double> _gradient;
+private:
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
@@ -80,10 +91,19 @@ class AsRigidAsPossibleWithoutICP : public IRegistration
 	double a_conf = 10.;// 1.;// 100;
 	double a_fit = 10.;
 	std::shared_ptr<FileWriter> _logger;
+private:
+	void printCeresOptions();
+private:
+	std::vector<ceres::ResidualBlockId> addConfCost(ceres::Problem &problem);
+	std::vector<ceres::ResidualBlockId> addFitCost(ceres::Problem &problem);
+	std::vector<ceres::ResidualBlockId> addFitCostWithoutICP(ceres::Problem &problem);
+	std::vector<ceres::ResidualBlockId> addAsRigidAsPossibleCost(ceres::Problem &problem);
 public:
 	bool finished() override;
-	bool solveIteration() override;
+	bool solveIteration() override;	
 	bool solve() override;
+
+	std::vector<double> gradient() override;
 public:
 	const Mesh & getSource() override;
 	const Mesh & getTarget() override;
@@ -95,9 +115,22 @@ public:
 public:
 	ARAPDeformationGraph & getARAPDeformationGraph();
 public:
+	// without icp
 	AsRigidAsPossibleWithoutICP(const Mesh& src,
 								const Mesh& dst,
 								std::vector<int> fixed_positions,
+								ceres::Solver::Options option,
+								std::shared_ptr<FileWriter> logger = nullptr);
+	// with icp
+	AsRigidAsPossibleWithoutICP(const Mesh& src,
+								const Mesh& dst,
+								ceres::Solver::Options option,
+								unsigned int number_of_deformation_nodes = 1000,
+								std::shared_ptr<FileWriter> logger = nullptr);
+	// with icp but init with passed deformation graph
+	AsRigidAsPossibleWithoutICP(const Mesh& src,
+								const Mesh& dst,
+								const ARAPDeformationGraph & deformation_graph,
 								ceres::Solver::Options option,
 								std::shared_ptr<FileWriter> logger = nullptr);
 };

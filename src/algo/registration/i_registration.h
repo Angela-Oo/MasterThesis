@@ -11,6 +11,8 @@ public:
 	virtual bool finished() = 0;
 	virtual bool solveIteration() = 0;
 	virtual bool solve() = 0;
+
+	virtual std::vector<double> gradient() { return std::vector<double>(); };
 public:
 	virtual const Mesh & getSource() = 0;
 	virtual const Mesh & getTarget() = 0;

@@ -28,7 +28,7 @@ Mesh Registration::getInverseDeformedPoints()
 
 bool Registration::solve()
 {
-	_registration->solveIteration();
+	return _registration->solveIteration();
 }
 
 Registration::Registration(RegistrationType _registration_type, 
