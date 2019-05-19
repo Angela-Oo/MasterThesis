@@ -67,7 +67,6 @@ public:
 
 
 
-
 class AsRigidAsPossibleWithoutICP : public IRegistration
 {
 private:
@@ -80,7 +79,12 @@ private:
 	TriMeshKNN _nn_search;
 	bool _with_icp = true;
 
-	std::vector<double> _gradient;
+private:
+	std::vector<ceres::ResidualBlockId> _fit_point_to_point_residuals_ids;
+	std::vector<ceres::ResidualBlockId> _fit_point_to_plane_residuals_ids;
+	std::vector<ceres::ResidualBlockId> _smooth_residuals_ids;
+	std::vector<ceres::ResidualBlockId> _conf_residuals_ids;
+	ARAPGradient _gradient;
 private:
 	double _current_cost = 1.;
 	double _last_cost = 2.;
@@ -93,17 +97,18 @@ private:
 	std::shared_ptr<FileWriter> _logger;
 private:
 	void printCeresOptions();
+	std::vector<NodeGradient> gradientOfResidualBlock(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_block_ids);
 private:
-	std::vector<ceres::ResidualBlockId> addConfCost(ceres::Problem &problem);
-	std::vector<ceres::ResidualBlockId> addFitCost(ceres::Problem &problem);
-	std::vector<ceres::ResidualBlockId> addFitCostWithoutICP(ceres::Problem &problem);
-	std::vector<ceres::ResidualBlockId> addAsRigidAsPossibleCost(ceres::Problem &problem);
+	void addConfCost(ceres::Problem &problem);
+	void addFitCost(ceres::Problem &problem);
+	void addFitCostWithoutICP(ceres::Problem &problem);
+	void addAsRigidAsPossibleCost(ceres::Problem &problem);
 public:
 	bool finished() override;
 	bool solveIteration() override;	
 	bool solve() override;
 
-	std::vector<double> gradient() override;
+	ARAPGradient gradient() override;
 public:
 	const Mesh & getSource() override;
 	const Mesh & getTarget() override;

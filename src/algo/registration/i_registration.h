@@ -5,6 +5,22 @@
 
 typedef ml::TriMeshf Mesh;
 
+struct NodeGradient
+{
+	ml::vec3d translation;
+	ml::vec3d rotation;
+	double w;
+};
+
+struct ARAPGradient
+{
+	std::vector<ml::vec3f> point;
+	std::vector<NodeGradient> fit_point_to_point_gradient;
+	std::vector<NodeGradient> fit_point_to_plane_gradient;
+	std::vector<NodeGradient> smooth_gradient;
+};
+
+
 class IRegistration
 {
 public:
@@ -12,7 +28,7 @@ public:
 	virtual bool solveIteration() = 0;
 	virtual bool solve() = 0;
 
-	virtual std::vector<double> gradient() { return std::vector<double>(); };
+	virtual ARAPGradient gradient() { return ARAPGradient(); };
 public:
 	virtual const Mesh & getSource() = 0;
 	virtual const Mesh & getTarget() = 0;
