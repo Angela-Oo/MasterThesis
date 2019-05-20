@@ -18,6 +18,7 @@ struct ARAPGradient
 	std::vector<NodeGradient> fit_point_to_point_gradient;
 	std::vector<NodeGradient> fit_point_to_plane_gradient;
 	std::vector<NodeGradient> smooth_gradient;
+	std::vector<NodeGradient> all;
 };
 
 

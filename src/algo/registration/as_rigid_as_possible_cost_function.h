@@ -7,8 +7,8 @@
 
 
 struct AsRigidAsPossibleCostFunction {
-	const ml::vec3f & _v_i; // vi
-	const ml::vec3f & _v_j; // vj
+	const ml::vec3f _v_i; // vi
+	const ml::vec3f _v_j; // vj
 
 	AsRigidAsPossibleCostFunction(const ml::vec3f & v_i, const ml::vec3f & v_j)
 		: _v_i(v_i)

@@ -425,9 +425,14 @@ bool AsRigidAsPossibleWithoutICP::solveIteration()
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate
-		_gradient.fit_point_to_point_gradient = gradientOfResidualBlock(problem, _fit_point_to_point_residuals_ids);
-		_gradient.fit_point_to_plane_gradient = gradientOfResidualBlock(problem, _fit_point_to_plane_residuals_ids);
-		_gradient.smooth_gradient = gradientOfResidualBlock(problem, _smooth_residuals_ids);
+		//_gradient.fit_point_to_point_gradient = gradientOfResidualBlock(problem, _fit_point_to_point_residuals_ids);
+		//_gradient.fit_point_to_plane_gradient = gradientOfResidualBlock(problem, _fit_point_to_plane_residuals_ids);
+		//_gradient.smooth_gradient = gradientOfResidualBlock(problem, _smooth_residuals_ids);
+		std::vector<ceres::ResidualBlockId> _ids;
+		_ids.insert(_ids.end(), _fit_point_to_point_residuals_ids.begin(), _fit_point_to_point_residuals_ids.end());
+		_ids.insert(_ids.end(), _fit_point_to_plane_residuals_ids.begin(), _fit_point_to_plane_residuals_ids.end());
+		_ids.insert(_ids.end(), _smooth_residuals_ids.begin(), _smooth_residuals_ids.end());
+		_gradient.all = gradientOfResidualBlock(problem, _ids);
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;

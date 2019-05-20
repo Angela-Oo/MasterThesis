@@ -51,9 +51,9 @@ struct FitStarPointToPointCostFunction {
 
 
 struct FitStarPointToPointAngleAxisCostFunction {
-	const ml::vec3f& _point;
-	const ml::vec3f& _node_g;
-	const ml::vec3f& _global_g;
+	const ml::vec3f _point;
+	const ml::vec3f _node_g;
+	const ml::vec3f _global_g;
 
 	FitStarPointToPointAngleAxisCostFunction(const ml::vec3f &point, const ml::vec3f &node_g, const ml::vec3f &global_g) :
 		_point(point), _node_g(node_g), _global_g(global_g)
@@ -94,10 +94,10 @@ struct FitStarPointToPointAngleAxisCostFunction {
 
 
 struct FitStarPointToPlaneCostFunction {
-	const ml::vec3f& _point;
-	const ml::vec3f& _node_g;
-	const ml::vec3f& _node_normal;
-	const ml::vec3f& _global_g;
+	const ml::vec3f _point;
+	const ml::vec3f _node_g;
+	const ml::vec3f _node_normal;
+	const ml::vec3f _global_g;
 
 	FitStarPointToPlaneCostFunction(const ml::vec3f& point, const ml::vec3f& node_g, const ml::vec3f& node_normal, const ml::vec3f &global_g) :
 		_point(point), _node_g(node_g), _node_normal(node_normal), _global_g(global_g)
@@ -152,10 +152,10 @@ struct FitStarPointToPlaneCostFunction {
 
 
 struct FitStarPointToPlaneAngleAxisCostFunction {
-	const ml::vec3f& _point;
-	const ml::vec3f& _node_g;
-	const ml::vec3f& _node_normal;
-	const ml::vec3f& _global_g;
+	const ml::vec3f _point;
+	const ml::vec3f _node_g;
+	const ml::vec3f _node_normal;
+	const ml::vec3f _global_g;
 
 	FitStarPointToPlaneAngleAxisCostFunction(const ml::vec3f& point, const ml::vec3f& node_g, const ml::vec3f& node_normal, const ml::vec3f &global_g) :
 		_point(point), _node_g(node_g), _node_normal(node_normal), _global_g(global_g)

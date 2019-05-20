@@ -70,19 +70,22 @@ void ShowMesh::renderError()
 	{
 		auto gradient = _registration->gradient();
 		
-		if (gradient.fit_point_to_plane_gradient.size() == gradient.point.size()) {
-			std::vector<ml::vec3f> point_to_plane;
-			std::vector<ml::vec3f> point_to_point;
-			std::vector<ml::vec3f> smooth;
+		if (gradient.all.size() == gradient.point.size()) {
+			//std::vector<ml::vec3f> point_to_plane;
+			//std::vector<ml::vec3f> point_to_point;
+			//std::vector<ml::vec3f> smooth;
+			std::vector<ml::vec3f> all;
 			for (int i = 0; i < gradient.point.size(); ++i)
 			{
-				point_to_plane.emplace_back(ml::vec3f(gradient.point[i] + gradient.fit_point_to_plane_gradient[i].translation));
-				point_to_point.emplace_back(ml::vec3f(gradient.point[i] + gradient.fit_point_to_point_gradient[i].translation));
-				smooth.emplace_back(ml::vec3f(gradient.point[i] + gradient.smooth_gradient[i].translation));
+				//point_to_plane.emplace_back(ml::vec3f(gradient.point[i] + gradient.fit_point_to_plane_gradient[i].translation));
+				//point_to_point.emplace_back(ml::vec3f(gradient.point[i] + gradient.fit_point_to_point_gradient[i].translation));
+				//smooth.emplace_back(ml::vec3f(gradient.point[i] + gradient.smooth_gradient[i].translation));
+				all.emplace_back(ml::vec3f(gradient.point[i] + gradient.all[i].translation * 1000.));
 			}
-			_point_renderer->insertLine("gradient", gradient.point, point_to_plane, ml::RGBColor::Red);
-			_point_renderer->insertLine("gradient_point", gradient.point, point_to_point, ml::RGBColor::Orange);
-			_point_renderer->insertLine("gradient_smooth", gradient.point, smooth, ml::RGBColor::Yellow);
+			//_point_renderer->insertLine("gradient", gradient.point, point_to_plane, ml::RGBColor::Red);
+			//_point_renderer->insertLine("gradient_point", gradient.point, point_to_point, ml::RGBColor::Orange);
+			//_point_renderer->insertLine("gradient_smooth", gradient.point, smooth, ml::RGBColor::Yellow);
+			_point_renderer->insertLine("gradient", gradient.point, all, ml::RGBColor::Orange);
 		}
 	}
 	if (_registration && _calculate_error) {
@@ -164,8 +167,8 @@ void ShowMesh::renderRegistrationTwoFrames()
 			auto render_dg = _registration->getDeformationGraph();
 			_point_renderer->insertLine("deformation_graph", render_dg.first, render_dg.second, ml::RGBColor::Purple);
 
-			auto render_dg_points = _registration->getDeformationGraphMesh();
-			_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, ml::RGBColor::Blue);
+			//auto render_dg_points = _registration->getDeformationGraphMesh();
+			//_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, ml::RGBColor::Blue);
 		}
 		else {
 			_point_renderer->removePoints("deformation_graph");
