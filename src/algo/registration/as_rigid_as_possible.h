@@ -116,6 +116,7 @@ public:
 	Mesh getInverseDeformedPoints() override;
 public:
 	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+	Mesh getDeformationGraphMesh() override;
 	std::vector<ml::vec3f> getFixedPostions() override;
 public:
 	ARAPDeformationGraph & getARAPDeformationGraph();

@@ -45,7 +45,17 @@ void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, ml::R
 	std::vector<ml::vec3f> vertices;
 	for (auto & p : points.getVertices())
 		vertices.push_back(p.position);
-	_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame));
+
+	auto mesh = ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame);
+	//_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame));
+
+	std::vector<TriMeshf> meshes;
+	meshes.push_back(mesh);
+	std::vector<ml::vec3f> normals;
+	for (auto & p : points.getVertices()) {
+		meshes.push_back(ml::Shapesf::line(p.position, p.position + p.normal * 0.01, ml::RGBColor::Orange, point_size * 0.2));
+	}
+	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 }
 
 void PointsRenderer::insertLine(std::string id, const TriMeshf & points1, const TriMeshf & points2, ml::RGBColor color, float point_size)

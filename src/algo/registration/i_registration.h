@@ -37,6 +37,7 @@ public:
 public:
 	virtual std::vector<ml::vec3f> getFixedPostions() { return std::vector<ml::vec3f>(); }
 	virtual std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() { return std::make_pair(std::vector<ml::vec3f>(), std::vector<ml::vec3f>()); }
+	virtual Mesh getDeformationGraphMesh() { return Mesh(); };
 public:
 	virtual ~IRegistration() = default;
 };

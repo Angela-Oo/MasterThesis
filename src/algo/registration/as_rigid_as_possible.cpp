@@ -263,6 +263,11 @@ std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> AsRigidAsPossibleWitho
 	return _deformation_graph.getDeformationGraphEdges();
 }
 
+Mesh AsRigidAsPossibleWithoutICP::getDeformationGraphMesh()
+{
+	return _deformation_graph.getDeformationGraph();
+}
+
 DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossibleWithoutICP::getARAPDeformationGraph()
 {
 	return _deformation_graph;

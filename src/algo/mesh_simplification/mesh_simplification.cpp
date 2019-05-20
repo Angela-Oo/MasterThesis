@@ -43,7 +43,6 @@ Mesh convertToTriMesh(SurfaceMesh& mesh) {
 	for (auto vertex_it = mesh.vertices_begin(); vertex_it != mesh.vertices_end(); ++vertex_it, ++i) {
 		const auto & point = mesh.point(*vertex_it);
 		mData.m_Vertices[i] = ml::vec3f(point.x(), point.y(), point.z());
-
 		cgal_vertex_handle_to_mesh_vertex_handle[*vertex_it] = i;
 	}
 
@@ -60,7 +59,9 @@ Mesh convertToTriMesh(SurfaceMesh& mesh) {
 		vertex_it++;
 		mData.m_FaceIndicesVertices[i][2] = cgal_vertex_handle_to_mesh_vertex_handle[*vertex_it];
 	}
-	return Mesh(mData);
+	auto trimesh = Mesh(mData);
+	trimesh.computeNormals();
+	return trimesh;
 }
 
 Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices)
@@ -68,7 +69,6 @@ Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices)
 	auto surface_mesh = convertToCGALMesh(mesh);
 
 	CGAL::Surface_mesh_simplification::Count_stop_predicate_vertices<SurfaceMesh> stop(number_of_vertices);
-
 
 	// This is a stop predicate (defines when the algorithm terminates).
 	// In this example, the simplification stops when the number of undirected edges

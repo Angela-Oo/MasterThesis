@@ -41,7 +41,7 @@ public:
 	std::vector<vertex_index> nearestNodes(const ml::vec3f & point) const;
 	ml::vec3f deformPoint(const ml::vec3f & point, const NearestNodes & nearest_nodes) const;
 public:
-	std::vector<ml::vec3f> getDeformationGraph();
+	Mesh getDeformationGraph();
 	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraphEdges();
 public:
 	DeformationGraph() = default;
@@ -149,18 +149,27 @@ ml::vec3f DeformationGraph<Graph, Node>::deformPoint(const ml::vec3f & point, co
 }
 
 template<typename Graph, typename Node>
-std::vector<ml::vec3f> DeformationGraph<Graph, Node>::getDeformationGraph()
+Mesh DeformationGraph<Graph, Node>::getDeformationGraph()
 {
-	std::vector<ml::vec3f> points;
+	Mesh mesh;
+
+	//std::vector<ml::vec3f> points;
 	auto & nodes = boost::get(node_t(), _graph);
 
 	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
 		Node& src_i = nodes[*vp.first];
 		ml::vec3f pos = src_i.deformedPosition();
+		ml::vec3f normal = src_i.deformedNormal();
 		ml::vec3f global_pos = _global_rigid_deformation.deformPosition(pos);
-		points.push_back(global_pos);
+		ml::vec3f global_normal = _global_rigid_deformation.deformPosition(normal);
+		Mesh::Vertex vertex;
+		vertex.position = global_pos;
+		vertex.normal = global_normal;
+		mesh.m_vertices.push_back(vertex);
+		//points.push_back(global_pos);
 	}
-	return points;
+	return mesh;
+	//return points;
 }
 
 

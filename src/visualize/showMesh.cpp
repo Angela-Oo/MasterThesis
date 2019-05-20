@@ -133,6 +133,10 @@ void ShowMesh::renderRegistrationTwoFrames()
 				if(!_point_renderer->keyExists("frame_registered_B"))
 					_point_renderer->insertPoints("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green);
 			}
+			else {
+				_point_renderer->removePoints("frame_registered_A");
+				_point_renderer->removePoints("frame_registered_B");
+			}
 			// render mesh
 			if (_render_mesh == Render::DEFORMATION) {
 				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
@@ -159,6 +163,9 @@ void ShowMesh::renderRegistrationTwoFrames()
 		if (_render_deformation_graph) {
 			auto render_dg = _registration->getDeformationGraph();
 			_point_renderer->insertLine("deformation_graph", render_dg.first, render_dg.second, ml::RGBColor::Purple);
+
+			auto render_dg_points = _registration->getDeformationGraphMesh();
+			_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, ml::RGBColor::Blue);
 		}
 		else {
 			_point_renderer->removePoints("deformation_graph");
