@@ -106,20 +106,20 @@ void AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 		ml::vec3f normal = src_i.deformedNormal();
 		ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
 		ml::vec3f normal_deformed = _deformation_graph._global_rigid_deformation.deformPosition(normal);
-		//auto correspondent_point = _find_correspondence_point.correspondingPoint(pos_deformed, normal_deformed);
-		unsigned int i = _nn_search.nearest_index(pos_deformed);
-		auto & correspondent_point = _dst.getVertices()[i].position;
+		auto correspondent_point = _find_correspondence_point.correspondingPoint(pos_deformed, normal_deformed);
+		//unsigned int i = _nn_search.nearest_index(pos_deformed);
+		//auto & correspondent_point = _dst.getVertices()[i].position;
 
-		if (true) {//correspondent_point.first) {
+		if (correspondent_point.first) {
 			double weight = a_fit;
 			// point to point cost function
-			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(correspondent_point, src_i.g(), global_node.g());
+			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(correspondent_point.second, src_i.g(), global_node.g());
 			auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, 0.1 *weight, ceres::TAKE_OWNERSHIP);
 			auto residual_id_point_to_point = problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
 																	   global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
 			// point to plane cost function
-			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(correspondent_point, src_i.g(), src_i.n(), global_node.g());
+			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(correspondent_point.second, src_i.g(), src_i.n(), global_node.g());
 			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, 0.9 *weight, ceres::TAKE_OWNERSHIP);
 			auto residual_id_point_to_plane = problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
 																	   global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
@@ -303,7 +303,8 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _deformation_graph(src)
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
-	, _nn_search(dst)
+	//, _nn_search(dst)
+	, _find_correspondence_point(dst)
 	, _with_icp(false)
 	, a_smooth(10.)
 	, a_fit(100.)
@@ -314,15 +315,15 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 
 
 AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
-														 const Mesh& dst,
-														 ceres::Solver::Options option,
-														 unsigned int number_of_deformation_nodes,
-														 std::shared_ptr<FileWriter> logger)
+									 const Mesh& dst,
+									 ceres::Solver::Options option,
+									 unsigned int number_of_deformation_nodes,
+									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	//, _find_correspondence_point(dst)
-	, _nn_search(dst)
+	, _find_correspondence_point(dst)
+	//, _nn_search(dst)
 	, _logger(logger)
 {
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
@@ -333,15 +334,16 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
-														 const Mesh& dst,
-														 const ARAPDeformationGraph & deformation_graph,
-														 ceres::Solver::Options option,
-														 std::shared_ptr<FileWriter> logger)
+									 const Mesh& dst,
+									 const ARAPDeformationGraph & deformation_graph,
+									 ceres::Solver::Options option,
+									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
-	, _nn_search(dst)
+	//, _nn_search(dst)
+	, _find_correspondence_point(dst)
 	, _logger(logger)
 {
 	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);

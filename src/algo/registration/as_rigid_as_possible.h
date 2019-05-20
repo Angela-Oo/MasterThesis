@@ -24,9 +24,9 @@ private:
 	ARAPDeformationGraph _deformation_graph;
 	std::unique_ptr<ARAPDeformedMesh> _deformed_mesh;
 	std::vector<int> _fixed_positions;
-	TriMeshKNN _nn_search;
+	//TriMeshKNN _nn_search;
+	FindCorrespondecePoint _find_correspondence_point;
 	bool _with_icp = true;
-
 private:
 	std::vector<ceres::ResidualBlockId> _fit_point_to_point_residuals_ids;
 	std::vector<ceres::ResidualBlockId> _fit_point_to_plane_residuals_ids;
@@ -40,8 +40,8 @@ private:
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
 	double a_smooth = 100.;// 0.1;// 100;
-	double a_conf = 10.;// 1.;// 100;
-	double a_fit = 10.;
+	double a_conf = 100.;// 1.;// 100;
+	double a_fit = 0.1;
 	std::shared_ptr<FileWriter> _logger;
 private:
 	void printCeresOptions();
