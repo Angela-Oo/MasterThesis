@@ -39,13 +39,13 @@ private:
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
-	double a_smooth = 10.;// 0.1;// 100;
+	double a_smooth = 100.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
 	double a_fit = 1.0;
 	std::shared_ptr<FileWriter> _logger;
 private:
 	void printCeresOptions();
-	std::vector<NodeGradient> gradientOfResidualBlock(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_block_ids);
+	std::vector<NodeGradient> gradientOfResidualBlock(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_block_ids, int number_residuals);
 private:
 	void addConfCost(ceres::Problem &problem);
 	void addFitCost(ceres::Problem &problem);

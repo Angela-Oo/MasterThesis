@@ -203,19 +203,19 @@ bool AsRigidAsPossible::solveIteration()
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate
-		//_gradient.fit_point_to_point_gradient = gradientOfResidualBlock(problem, _fit_point_to_point_residuals_ids);
-		//_gradient.fit_point_to_plane_gradient = gradientOfResidualBlock(problem, _fit_point_to_plane_residuals_ids);
-		//_gradient.smooth_gradient = gradientOfResidualBlock(problem, _smooth_residuals_ids);
+		_gradient.fit_point_to_point_gradient = gradientOfResidualBlock(problem, _fit_point_to_point_residuals_ids, _gradient.point.size());
+		_gradient.fit_point_to_plane_gradient = gradientOfResidualBlock(problem, _fit_point_to_plane_residuals_ids, _gradient.point.size());
+		_gradient.smooth_gradient = gradientOfResidualBlock(problem, _smooth_residuals_ids, _gradient.point.size());
 		std::vector<ceres::ResidualBlockId> _ids;
 		_ids.insert(_ids.end(), _fit_point_to_point_residuals_ids.begin(), _fit_point_to_point_residuals_ids.end());
 		_ids.insert(_ids.end(), _fit_point_to_plane_residuals_ids.begin(), _fit_point_to_plane_residuals_ids.end());
 		_ids.insert(_ids.end(), _smooth_residuals_ids.begin(), _smooth_residuals_ids.end());
-		_gradient.all = gradientOfResidualBlock(problem, _ids);
+		_gradient.all = gradientOfResidualBlock(problem, _ids, _gradient.point.size());
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 
-		auto scale_factor_tol = 0.00001;// 0.00001;
+		auto scale_factor_tol = 0.00002;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
 			(a_smooth > 0.1 && a_conf > 1.))
 		{
@@ -247,35 +247,37 @@ bool AsRigidAsPossible::finished()
 	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
-std::vector<NodeGradient> AsRigidAsPossible::gradientOfResidualBlock(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_block_ids)
+std::vector<NodeGradient> AsRigidAsPossible::gradientOfResidualBlock(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_block_ids, int number_points)
 {
 	ceres::Problem::EvaluateOptions evaluate_options;
 	evaluate_options.residual_blocks = residual_block_ids;
 
-	auto & g = _deformation_graph._graph;
+	//auto & g = _deformation_graph._graph;
 
-	auto & nodes = boost::get(node_t(), g);
-	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-		auto& src_i = nodes[*vp.first];
-		evaluate_options.parameter_blocks.push_back(src_i.r());
-		evaluate_options.parameter_blocks.push_back(src_i.t());
-		evaluate_options.parameter_blocks.push_back(src_i.w());
-	}
-
+	//auto & nodes = boost::get(node_t(), g);
+	//for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
+	//	auto& src_i = nodes[*vp.first];
+	//	evaluate_options.parameter_blocks.push_back(src_i.r());
+	//	evaluate_options.parameter_blocks.push_back(src_i.t());
+	//	evaluate_options.parameter_blocks.push_back(src_i.w());
+	//}
 	double total_cost = 0.0;
 	std::vector<double> residuals;
-	std::vector<double> gradients;
 
-	problem.Evaluate(evaluate_options, &total_cost, &residuals, &gradients, nullptr);
+	problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
 
 	std::vector<NodeGradient> node_gradients;
-	for (int i = 0; i < gradients.size(); i += 7)
-	{
-		NodeGradient n;
-		n.rotation = { gradients[i], gradients[i + 1], gradients[i + 2] };
-		n.translation = { gradients[i + 3], gradients[i + 4], gradients[i + 5] };
-		n.w = gradients[i + 6];
-		node_gradients.push_back(n);
+	int number_residuals = floor(residuals.size() / number_points);
+	if (number_residuals > 0) {
+		for (int i = 0; i < residuals.size(); i += number_residuals)
+		{
+			NodeGradient n;
+			if (number_residuals == 3)
+				n.translation = { residuals[i], residuals[i + 1], residuals[i + 2] };
+			else if (number_residuals == 1)
+				n.w = residuals[i];
+			node_gradients.push_back(n);
+		}
 	}
 	return node_gradients;
 }
@@ -296,10 +298,10 @@ void AsRigidAsPossible::printCeresOptions()
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
-														 const Mesh& dst,
-														 std::vector<int> fixed_positions,
-														 ceres::Solver::Options option,
-														 std::shared_ptr<FileWriter> logger)
+									 const Mesh& dst,
+									 std::vector<int> fixed_positions,
+									 ceres::Solver::Options option,
+									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
@@ -311,6 +313,7 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _with_icp(false)
 	, a_smooth(10.)
 	, a_fit(100.)
+	, a_conf(100.)
 {
 	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	printCeresOptions();

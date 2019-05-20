@@ -13,7 +13,7 @@ public:
 	void render(ml::Cameraf& camera);
 	void insertPoints(std::string id, std::vector<ml::vec3f> points, ml::RGBColor color, float point_size = 0.001f);
 	void insertLine(std::string id, std::vector<ml::vec3f> points1, std::vector<ml::vec3f> points2, ml::RGBColor color, float point_size = 0.001f);
-	void insertPoints(std::string id, const ml::TriMeshf & points, ml::RGBColor color, float point_size = 0.001f);
+	void insertPoints(std::string id, const ml::TriMeshf & points, ml::RGBColor color, float point_size = 0.001f, bool draw_normals = false);
 	void insertLine(std::string id, const ml::TriMeshf & points1, const ml::TriMeshf & points2, ml::RGBColor color, float point_size = 0.001f);
 	bool keyExists(std::string id);
 	void removePoints(std::string id);
