@@ -99,18 +99,20 @@ void AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 	auto & global_node = _deformation_graph._global_rigid_deformation;
 	auto & nodes = boost::get(node_t(), g);
 
+	int i = 0;
 	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 		auto& src_i = nodes[*vp.first];
 
 		ml::vec3f pos = src_i.deformedPosition();
 		ml::vec3f normal = src_i.deformedNormal();
 		ml::vec3f pos_deformed = _deformation_graph._global_rigid_deformation.deformPosition(pos);
-		ml::vec3f normal_deformed = _deformation_graph._global_rigid_deformation.deformPosition(normal);
+		ml::vec3f normal_deformed = _deformation_graph._global_rigid_deformation.deformNormal(normal);
 		auto correspondent_point = _find_correspondence_point.correspondingPoint(pos_deformed, normal_deformed);
 		//unsigned int i = _nn_search.nearest_index(pos_deformed);
 		//auto & correspondent_point = _dst.getVertices()[i].position;
 
 		if (correspondent_point.first) {
+			i++;
 			double weight = a_fit;
 			// point to point cost function
 			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(correspondent_point.second, src_i.g(), global_node.g());
@@ -128,6 +130,7 @@ void AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 			_fit_point_to_plane_residuals_ids.push_back(residual_id_point_to_plane);
 		}
 	}
+	std::cout << "used " << i << " of " << g.m_vertices.size() << " deformation graph nodes" << std::endl;
 }
 
 void AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &problem)
@@ -212,9 +215,9 @@ bool AsRigidAsPossible::solveIteration()
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 
-		auto scale_factor_tol = 0.00005;// 0.00001;
+		auto scale_factor_tol = 0.00001;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-			(a_smooth > 0.1 || a_conf > 1.))
+			(a_smooth > 0.1 && a_conf > 1.))
 		{
 			a_smooth /= 2.;
 			a_conf /= 2.;

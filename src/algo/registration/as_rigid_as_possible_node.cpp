@@ -18,9 +18,15 @@ ml::vec3d ARAPNode::deformedPosition() const
 
 ml::vec3d ARAPNode::deformedNormal() const
 {
-	auto r_t = rotation().getTranspose();
-	auto normal = r_t * _n;
+	//auto r_t = rotation().getTranspose();
+	auto normal = rotation() * _n;
 	return normal.getNormalized();
+}
+
+ml::vec3d ARAPNode::deformNormal(const ml::vec3f & normal) const
+{
+	auto n = rotation() * normal;
+	return n.getNormalized();
 }
 
 ml::vec3d ARAPNode::deformPosition(const ml::vec3f & pos) const

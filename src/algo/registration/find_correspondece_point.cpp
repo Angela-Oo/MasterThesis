@@ -7,10 +7,11 @@ std::pair<bool, ml::vec3f> FindCorrespondecePoint::correspondingPoint(ml::vec3f 
 	unsigned int i = _nn_search.nearest_index(point);
 	auto vertex = _mesh.getVertices()[i];
 	bool valid = true;
-	auto angle = acos(ml::vec3f::dot(normal.getNormalized(), vertex.normal.getNormalized()));
-	if (angle > ml::math::degreesToRadians(45.))
+	auto dot_product = ml::vec3f::dot(normal.getNormalized(), vertex.normal.getNormalized());
+	auto angle = acos(dot_product);
+	if (dot_product < 0) //abs(angle) < ml::math::degreesToRadians(45.))
 		valid = false;
-	if (dist(point, vertex.position) > 0.05)
+	if (dist(point, vertex.position) > 0.1)
 		valid = false;
 	return std::make_pair(valid, vertex.position);
 }

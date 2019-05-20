@@ -85,7 +85,11 @@ void ShowMesh::renderError()
 			//_point_renderer->insertLine("gradient", gradient.point, point_to_plane, ml::RGBColor::Red);
 			//_point_renderer->insertLine("gradient_point", gradient.point, point_to_point, ml::RGBColor::Orange);
 			//_point_renderer->insertLine("gradient_smooth", gradient.point, smooth, ml::RGBColor::Yellow);
-			_point_renderer->insertLine("gradient", gradient.point, all, ml::RGBColor::Orange);
+			//_point_renderer->insertLine("gradient", gradient.point, all, ml::RGBColor::Orange);
+		}
+		else
+		{
+			std::cout << "no gradient " << std::endl;
 		}
 	}
 	if (_registration && _calculate_error) {
@@ -144,6 +148,8 @@ void ShowMesh::renderRegistrationTwoFrames()
 			if (_render_mesh == Render::DEFORMATION) {
 				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
 				_mesh_renderer->removeMesh("mesh_b");
+				if (!_point_renderer->keyExists("frame_registered_B"))
+					_point_renderer->insertPoints("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green);
 			}
 			else if (_render_mesh == Render::ALL) {
 				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
@@ -167,8 +173,8 @@ void ShowMesh::renderRegistrationTwoFrames()
 			auto render_dg = _registration->getDeformationGraph();
 			_point_renderer->insertLine("deformation_graph", render_dg.first, render_dg.second, ml::RGBColor::Purple);
 
-			//auto render_dg_points = _registration->getDeformationGraphMesh();
-			//_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, ml::RGBColor::Blue);
+			auto render_dg_points = _registration->getDeformationGraphMesh();
+			_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, ml::RGBColor::Blue);
 		}
 		else {
 			_point_renderer->removePoints("deformation_graph");
