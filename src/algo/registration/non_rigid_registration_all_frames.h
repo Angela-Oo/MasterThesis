@@ -36,7 +36,7 @@ bool NonRigidRegistrationAllFrames<Registration, DeformationGraph>::solve()
 	if (_current >= _meshes.size())
 		throw std::exception("not enouth meshes");
 	if (!_registration && _current < _meshes.size()) {
-		_registration = std::make_unique<Registration>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], ceresOption(), _number_of_deformation_nodes);
+		_registration = std::make_unique<Registration>(_meshes[0], _meshes[_current], _deformation_graphs[_current - 1], ceresOption());
 	}
 	if(_registration) {
 		if (_registration->solveIteration())
