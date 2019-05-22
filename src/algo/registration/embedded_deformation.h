@@ -46,7 +46,8 @@ public:
 	Mesh getDeformedPoints() override;
 	Mesh getInverseDeformedPoints() override;
 public:
-	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+	// todo
+	//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
 public:
 	EmbeddedDeformationGraph & getEmbeddedDeformationGraph();
 public:
@@ -96,7 +97,8 @@ public:
 	Mesh getInverseDeformedPoints() override;
 public:
 	std::vector<ml::vec3f> getFixedPostions() override;
-	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+	// todo
+	//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
 public:
 	EmbeddedDeformationGraph & getEmeddedDeformationGraph();
 public:

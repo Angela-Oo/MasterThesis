@@ -33,9 +33,26 @@ Mesh AsRigidAsPossible::getInverseDeformedPoints()
 	return deformed.deformPoints();
 }
 
-std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> AsRigidAsPossible::getDeformationGraph()
+std::vector<Edge> AsRigidAsPossible::getDeformationGraph()
 {
-	return _deformation_graph.getDeformationGraphEdges();
+	std::vector<Edge> edges;
+	auto & g = _deformation_graph._graph;
+	auto & graph_edges = boost::get(edge_t(), g);
+	boost::graph_traits<ARAPGraph>::edge_iterator ei, ei_end;
+	for (boost::tie(ei, ei_end) = boost::edges(g); ei != ei_end; ++ei)
+	{
+		Edge e;
+		auto & edge = graph_edges[*ei];
+
+		auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
+		e.source_point = vertex_i.position;
+
+		auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
+		e.target_point = vertex_j.position;
+		e.cost = (edge.residual().empty()) ? 0. : edge.residual()[0];
+		edges.push_back(e);
+	}
+	return edges;
 }
 
 Mesh AsRigidAsPossible::getDeformationGraphMesh()
@@ -206,9 +223,11 @@ bool AsRigidAsPossible::solveIteration()
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate
+		/*
 		evaluateResidual(problem, fit_residual_ids, "fit");
 		evaluateResidual(problem, arap_residual_ids, "arap");
 		evaluateResidual(problem, conf_residual_ids, "conf");
+		*/
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;

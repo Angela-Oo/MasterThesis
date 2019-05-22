@@ -11,12 +11,7 @@
 typedef ml::TriMeshf Mesh;
 
 
-//struct Edge
-//{
-//	ml::vec3f point_a;
-//	ml::vec3f point_b;
-//	ml::vec4f color;
-//};
+
 
 class NearestNodes
 {
@@ -167,7 +162,7 @@ Mesh::Vertex DeformationGraph<Graph, Node>::deformNode(vertex_index node_index)
 	ml::vec3f global_normal = _global_rigid_deformation.deformNormal(normal);
 
 	Mesh::Vertex v;
-	v.point = global_pos;
+	v.position = global_pos;
 	v.normal = global_normal;
 	return v;
 }
@@ -196,15 +191,11 @@ Mesh DeformationGraph<Graph, Node>::getDeformationGraph()
 	}
 	std::cout << "max error " << max_error << std::endl;
 	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
-		Node& src_i = nodes[*vp.first];
-		ml::vec3f pos = src_i.deformedPosition();
-		ml::vec3f normal = src_i.deformedNormal();
-		ml::vec3f global_pos = _global_rigid_deformation.deformPosition(pos);
-		ml::vec3f global_normal = _global_rigid_deformation.deformNormal(normal);
-		Mesh::Vertex vertex;
-		vertex.position = global_pos;
-		vertex.normal = global_normal.getNormalized();
+		
+		Mesh::Vertex vertex = deformNode(*vp.first);
+
 		double error = 0.;
+		Node& src_i = nodes[*vp.first];
 		auto & residuals = src_i.residual();
 		auto found = residuals.find("fit");
 		if (found != residuals.end() && found->second.size() == 4) {
@@ -231,22 +222,16 @@ std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> DeformationGraph<Graph
 	std::vector<ml::vec3f> target_points;
 
 	//std::vector<Edge> edges;
-	auto & nodes = boost::get(node_t(), _graph);
 	auto & edges = boost::get(edge_t(), _graph);
 	boost::graph_traits<Graph>::edge_iterator ei, ei_end;
 	for (boost::tie(ei, ei_end) = boost::edges(_graph); ei != ei_end; ++ei) 
 	{
 		auto & edge = edges[*ei];
-		Node & n_i = nodes[boost::source(*ei, _graph)];
-		ml::vec3f pos_i = n_i.deformedPosition();
-		pos_i = _global_rigid_deformation.deformPosition(pos_i);
-		source_points.push_back(pos_i);
+		auto vertex_i = deformNode(boost::source(*ei, _graph));
+		source_points.push_back(vertex_i.position);
 
-		Node & n_j = nodes[boost::target(*ei, _graph)];
-		ml::vec3f pos_j = n_j.deformedPosition();
-		pos_j = _global_rigid_deformation.deformPosition(pos_j);
-		target_points.push_back(pos_j);
-
+		auto vertex_j = deformNode(boost::target(*ei, _graph));
+		target_points.push_back(vertex_j.position);
 		//Edge e;
 		//e.point_a = pos_i;
 		//e.point_b = pos_j;

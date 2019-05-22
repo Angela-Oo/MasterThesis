@@ -23,6 +23,13 @@ struct ARAPGradient
 };
 
 
+struct Edge
+{
+	ml::vec3f source_point;
+	ml::vec3f target_point;
+	double cost = 0.;
+};
+
 class IRegistration
 {
 public:
@@ -39,7 +46,7 @@ public:
 	virtual Mesh getInverseDeformedPoints() = 0;
 public:
 	virtual std::vector<ml::vec3f> getFixedPostions() { return std::vector<ml::vec3f>(); }
-	virtual std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() { return std::make_pair(std::vector<ml::vec3f>(), std::vector<ml::vec3f>()); }
+	virtual std::vector<Edge> getDeformationGraph() { return std::vector<Edge>(); }
 	virtual Mesh getDeformationGraphMesh() { return Mesh(); };
 public:
 	virtual ~IRegistration() = default;

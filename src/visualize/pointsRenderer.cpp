@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "pointsRenderer.h"
+#include "algo/registration/hsv_to_rgb.h"
 using namespace ml;
 
 
@@ -35,7 +36,20 @@ void PointsRenderer::insertLine(std::string id, std::vector<ml::vec3f> points1, 
 	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 }
 
-
+void PointsRenderer::insertLine(std::string id, std::vector<Edge> edges, float point_size)
+{
+	std::vector<TriMeshf> meshes;
+	double max_cost = 0.;
+	std::for_each(edges.begin(), edges.end(), [&max_cost](const Edge & e) { if (e.cost > max_cost) max_cost = e.cost; });
+	for (auto & e : edges) {
+		auto cost = e.cost;
+		if (max_cost > 0.)
+			cost = e.cost / max_cost;
+		auto color = errorToRGB(cost);
+		meshes.push_back(ml::Shapesf::line(e.source_point, e.target_point, color, point_size));
+	}
+	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
+}
 
 void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, ml::RGBColor color, float point_size, bool draw_normals)
 {

@@ -39,7 +39,7 @@ private:
 	long long _total_time_in_ms = 0;
 	double a_smooth = 100.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 1.0;
+	double a_fit = 10.0;
 	std::shared_ptr<FileWriter> _logger;
 private:
 	void printCeresOptions();
@@ -62,7 +62,7 @@ public:
 	Mesh getDeformedPoints() override;
 	Mesh getInverseDeformedPoints() override;
 public:
-	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+	std::vector<Edge> getDeformationGraph() override;
 	Mesh getDeformationGraphMesh() override;
 	std::vector<ml::vec3f> getFixedPostions() override;
 public:
