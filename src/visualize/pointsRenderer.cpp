@@ -41,6 +41,7 @@ void PointsRenderer::insertLine(std::string id, std::vector<Edge> edges, float p
 	std::vector<TriMeshf> meshes;
 	double max_cost = 0.;
 	std::for_each(edges.begin(), edges.end(), [&max_cost](const Edge & e) { if (e.cost > max_cost) max_cost = e.cost; });
+	std::cout << "max cost " << max_cost << std::endl;
 	for (auto & e : edges) {
 		auto cost = e.cost;
 		if (max_cost > 0.)

@@ -57,7 +57,37 @@ std::vector<Edge> AsRigidAsPossible::getDeformationGraph()
 
 Mesh AsRigidAsPossible::getDeformationGraphMesh()
 {
-	return _deformation_graph.getDeformationGraph();
+	Mesh mesh;
+	auto & g = _deformation_graph._graph;
+	auto & nodes = boost::get(node_t(), g);
+	double max_error = 0.0;
+	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
+	{
+		auto & residuals = nodes[*vp.first].residual();
+		auto found = residuals.find("fit");
+		if (found != residuals.end() && !found->second.empty()) {
+			auto cost = found->second[0];
+			if (cost > max_error)
+				max_error = cost;
+		}
+	}
+	std::cout << "max error " << max_error << std::endl;
+	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
+
+		Mesh::Vertex vertex = _deformation_graph.deformNode(*vp.first);
+		double error = 0.;
+		auto & residuals = nodes[*vp.first].residual();
+		auto found = residuals.find("fit");
+		if (found != residuals.end() && !found->second.empty()) {			
+			error = found->second[0];
+		}
+		if (max_error > 0.)
+			error /= max_error;
+		vertex.color = errorToRGB(error);
+		mesh.m_vertices.push_back(vertex);
+	}
+	return mesh;
+	//return _deformation_graph.getDeformationGraph();
 }
 
 DeformationGraph<ARAPGraph, ARAPNode> & AsRigidAsPossible::getARAPDeformationGraph()
@@ -222,12 +252,11 @@ bool AsRigidAsPossible::solveIteration()
 
 		ceres::Solve(_options, &problem, &summary);
 
-		// evaluate
-		/*
+		// evaluate		
 		evaluateResidual(problem, fit_residual_ids, "fit");
 		evaluateResidual(problem, arap_residual_ids, "arap");
 		evaluateResidual(problem, conf_residual_ids, "conf");
-		*/
+		
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
@@ -268,34 +297,45 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 										 ARAPVertexResidualIds & vertex_residual_block_ids,
 										 std::string residual_name)
 {
-	std::vector<ceres::ResidualBlockId> residual_ids;
-	for (auto & r : vertex_residual_block_ids)
-	{
-		residual_ids.insert(residual_ids.end(), r.second.begin(), r.second.end());
+	auto & nodes = boost::get(node_t(), _deformation_graph._graph);
+	for (auto & r : vertex_residual_block_ids) {
+		ceres::Problem::EvaluateOptions evaluate_options;
+		evaluate_options.residual_blocks = r.second;
+		double total_cost = 0.0;
+		std::vector<double> residuals;
+		problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
+
+		nodes[r.first].residual()[residual_name].push_back(total_cost);
 	}
 
-	ceres::Problem::EvaluateOptions evaluate_options;
-	evaluate_options.residual_blocks = residual_ids;
-	double total_cost = 0.0;
-	std::vector<double> residuals;
-	problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
+	//std::vector<ceres::ResidualBlockId> residual_ids;
+	//for (auto & r : vertex_residual_block_ids)
+	//{
+	//	residual_ids.insert(residual_ids.end(), r.second.begin(), r.second.end());
+	//}
 
-	// set residual in deformation graph
-	std::map<vertex_index, std::vector<double>> point_residual;
-	int number_residuals = floor(residuals.size() / vertex_residual_block_ids.size());
-	if (number_residuals > 0) {
-		auto & nodes = boost::get(node_t(), _deformation_graph._graph);
-		int i = 0;
-		for (auto & r : vertex_residual_block_ids)
-		{
-			for (int j = 0; j < number_residuals; ++j)
-				nodes[r.first].residual()[residual_name].push_back(residuals[i + j]);
-			i + number_residuals;
-		}
-	}
-	else {
-		std::cout << "why? residual" << std::endl;
-	}
+	//ceres::Problem::EvaluateOptions evaluate_options;
+	//evaluate_options.residual_blocks = residual_ids;
+	//double total_cost = 0.0;
+	//std::vector<double> residuals;
+	//problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
+
+	//// set residual in deformation graph
+	//std::map<vertex_index, std::vector<double>> point_residual;
+	//int number_residuals = floor(residuals.size() / vertex_residual_block_ids.size());
+	//if (number_residuals > 0) {
+	//	auto & nodes = boost::get(node_t(), _deformation_graph._graph);
+	//	int i = 0;
+	//	for (auto & r : vertex_residual_block_ids)
+	//	{
+	//		for (int j = 0; j < number_residuals; ++j)
+	//			nodes[r.first].residual()[residual_name].push_back(residuals[i + j]);
+	//		i + number_residuals;
+	//	}
+	//}
+	//else {
+	//	std::cout << "why? residual" << std::endl;
+	//}
 }
 
 
@@ -303,33 +343,15 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 										 ARAPEdgeResidualIds & edge_residual_block_ids,
 										 std::string residual_name)
 {
-	std::vector<ceres::ResidualBlockId> residual_ids;
-	for (auto & r : edge_residual_block_ids)	{
-		residual_ids.insert(residual_ids.end(), r.second.begin(), r.second.end());
-	}
+	auto & edges = boost::get(edge_t(), _deformation_graph._graph);
+	for (auto & r : edge_residual_block_ids) {
+		ceres::Problem::EvaluateOptions evaluate_options;
+		evaluate_options.residual_blocks = r.second;
+		double total_cost = 0.0;
+		std::vector<double> residuals;
+		problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
 
-	ceres::Problem::EvaluateOptions evaluate_options;
-	evaluate_options.residual_blocks = residual_ids;
-	double total_cost = 0.0;
-	std::vector<double> residuals;
-
-	problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
-
-	// set residual in deformation graph
-	std::map<vertex_index, std::vector<double>> point_residual;
-	int number_residuals = floor(residuals.size() / edge_residual_block_ids.size());
-	if (number_residuals > 0) {
-		auto & edges = boost::get(edge_t(), _deformation_graph._graph);
-		int i = 0;
-		for (auto & r : edge_residual_block_ids)
-		{
-			for (int j = 0; j < number_residuals; ++j)
-				edges[r.first].residual().push_back(residuals[i + j]);
-			i + number_residuals;
-		}
-	}
-	else {
-		std::cout << "why? residual" << std::endl;
+		edges[r.first].residual().push_back(total_cost);
 	}
 }
 
