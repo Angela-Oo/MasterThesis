@@ -28,11 +28,11 @@ private:
 	FindCorrespondecePoint _find_correspondence_point;
 	bool _with_icp = true;
 private:
-	std::vector<ceres::ResidualBlockId> _fit_point_to_point_residuals_ids;
-	std::vector<ceres::ResidualBlockId> _fit_point_to_plane_residuals_ids;
-	std::vector<ceres::ResidualBlockId> _smooth_residuals_ids;
+	std::map<vertex_index, ceres::ResidualBlockId> _fit_point_to_point_residuals_ids;
+	std::map<vertex_index, ceres::ResidualBlockId> _fit_point_to_plane_residuals_ids;
+	std::map<vertex_index, std::vector<ceres::ResidualBlockId>> _smooth_residuals_ids;
 	std::vector<ceres::ResidualBlockId> _conf_residuals_ids;
-	ARAPGradient _gradient;
+	std::map<std::string, std::map<vertex_index, std::vector<double>>> _residuals;
 private:
 	double _current_cost = 1.;
 	double _last_cost = 2.;
@@ -45,7 +45,10 @@ private:
 	std::shared_ptr<FileWriter> _logger;
 private:
 	void printCeresOptions();
-	std::vector<NodeGradient> gradientOfResidualBlock(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_block_ids, int number_residuals);
+	std::map<vertex_index, std::vector<double>> evaluateResidual(ceres::Problem & problem,	
+																 std::map<vertex_index, ceres::ResidualBlockId> & residual_block_ids);
+	std::map<vertex_index, std::vector<double>> evaluateResidual(ceres::Problem & problem,
+																 std::map<vertex_index, std::vector<ceres::ResidualBlockId>> & residual_block_ids);
 private:
 	void addConfCost(ceres::Problem &problem);
 	void addFitCost(ceres::Problem &problem);
@@ -56,7 +59,7 @@ public:
 	bool solveIteration() override;	
 	bool solve() override;
 
-	ARAPGradient gradient() override;
+	std::map<std::string, std::map<vertex_index, std::vector<double>>> residuals() override;
 public:
 	const Mesh & getSource() override;
 	const Mesh & getTarget() override;

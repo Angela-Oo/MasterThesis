@@ -68,14 +68,15 @@ void ShowMesh::renderError()
 {
 	if (_registration)
 	{
-		auto gradient = _registration->gradient();
+		auto residuals = _registration->residuals();
 		
-		if (gradient.fit_point_to_point_gradient.size() == gradient.point.size()) {
+		//if (gradient.fit_point_to_point_gradient.size() == gradient.point.size()) {
+		for(auto & m : residuals)
 			//std::vector<ml::vec3f> point_to_plane;
 			std::vector<ml::vec3f> point_to_point;
 			//std::vector<ml::vec3f> smooth;
 			//std::vector<ml::vec3f> all;
-			for (int i = 0; i < gradient.point.size(); ++i)
+			for (int i = 0; i < m.size(); ++i)
 			{
 				//point_to_plane.emplace_back(ml::vec3f(gradient.point[i] + gradient.fit_point_to_plane_gradient[i].translation));
 				point_to_point.emplace_back(ml::vec3f(gradient.point[i] + gradient.fit_point_to_point_gradient[i].translation));

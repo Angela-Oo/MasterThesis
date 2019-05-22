@@ -29,7 +29,8 @@ public:
 	virtual bool solveIteration() = 0;
 	virtual bool solve() = 0;
 
-	virtual ARAPGradient gradient() { return ARAPGradient(); };
+	virtual std::map<std::string, std::map<vertex_index, std::vector<double>>> residuals()
+	{ return std::map<std::string, std::map<vertex_index, std::vector<double>>>(); };
 public:
 	virtual const Mesh & getSource() = 0;
 	virtual const Mesh & getTarget() = 0;

@@ -67,6 +67,7 @@ void AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &problem)
 	float point_to_plane_weighting = 0.9;
 
 	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
+		auto vertex_handle = *vp.first;
 		auto& src_i = nodes[*vp.first];
 		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), src_i.index()) != _fixed_positions.end()))
 		{
@@ -86,8 +87,8 @@ void AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &problem)
 			auto residual_id_point_to_plane = problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
 																	   global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 
-			_fit_point_to_point_residuals_ids.push_back(residual_id_point_to_point);
-			_fit_point_to_plane_residuals_ids.push_back(residual_id_point_to_plane);
+			_fit_point_to_point_residuals_ids[vertex_handle] = residual_id_point_to_point;
+			_fit_point_to_plane_residuals_ids[vertex_handle] = residual_id_point_to_plane;
 		}
 	}
 }
@@ -101,6 +102,7 @@ void AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 
 	int i = 0;
 	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
+		auto vertex_handle = *vp.first;
 		auto& src_i = nodes[*vp.first];
 
 		ml::vec3f pos = src_i.deformedPosition();
@@ -126,8 +128,8 @@ void AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 			auto residual_id_point_to_plane = problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
 																	   global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 
-			_fit_point_to_point_residuals_ids.push_back(residual_id_point_to_point);
-			_fit_point_to_plane_residuals_ids.push_back(residual_id_point_to_plane);
+			_fit_point_to_point_residuals_ids[vertex_handle] = residual_id_point_to_point;
+			_fit_point_to_plane_residuals_ids[vertex_handle] = residual_id_point_to_plane;
 		}
 	}
 	std::cout << "used " << i << " of " << g.m_vertices.size() << " deformation graph nodes" << std::endl;
@@ -137,7 +139,7 @@ void AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &problem)
 {
 	auto & g = _deformation_graph._graph;
 	auto & nodes = boost::get(node_t(), g);
-	for (auto ep = boost::edges(g); ep.first != ep.second; ++ep.first) {
+	for (auto ep = boost::edges(g); ep.first != ep.second; ++ep.first) {		
 		auto vi = boost::source(*ep.first, g);
 		auto vj = boost::target(*ep.first, g);
 
@@ -151,8 +153,8 @@ void AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &problem)
 		auto loss_function_j = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 		auto residual_id_smooth_e2 = problem.AddResidualBlock(cost_function_j, loss_function_j, src_j.r(), src_j.t(), src_i.t());
 
-		_smooth_residuals_ids.push_back(residual_id_smooth_e1);
-		_smooth_residuals_ids.push_back(residual_id_smooth_e2);
+		_smooth_residuals_ids[vi].push_back(residual_id_smooth_e1);
+		_smooth_residuals_ids[vj].push_back(residual_id_smooth_e2);
 	}
 }
 
@@ -179,12 +181,11 @@ bool AsRigidAsPossible::solveIteration()
 		ceres::Solver::Summary summary;
 		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration, _logger);
 
-		_gradient.point.clear();
+		_residuals.clear();
 		auto & nodes = boost::get(node_t(), _deformation_graph._graph);
 		for (auto vp = boost::vertices(_deformation_graph._graph); vp.first != vp.second; ++vp.first) {
 			auto& src_i = nodes[*vp.first];
 			ml::vec3f pos = _deformation_graph._global_rigid_deformation.deformPosition(src_i.deformedPosition());
-			_gradient.point.push_back(pos);
 		}
 		_fit_point_to_point_residuals_ids.clear();
 		_fit_point_to_plane_residuals_ids.clear();
@@ -203,14 +204,14 @@ bool AsRigidAsPossible::solveIteration()
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate
-		_gradient.fit_point_to_point_gradient = gradientOfResidualBlock(problem, _fit_point_to_point_residuals_ids, _gradient.point.size());
-		_gradient.fit_point_to_plane_gradient = gradientOfResidualBlock(problem, _fit_point_to_plane_residuals_ids, _gradient.point.size());
-		_gradient.smooth_gradient = gradientOfResidualBlock(problem, _smooth_residuals_ids, _gradient.point.size());
-		std::vector<ceres::ResidualBlockId> _ids;
-		_ids.insert(_ids.end(), _fit_point_to_point_residuals_ids.begin(), _fit_point_to_point_residuals_ids.end());
-		_ids.insert(_ids.end(), _fit_point_to_plane_residuals_ids.begin(), _fit_point_to_plane_residuals_ids.end());
-		_ids.insert(_ids.end(), _smooth_residuals_ids.begin(), _smooth_residuals_ids.end());
-		_gradient.all = gradientOfResidualBlock(problem, _ids, _gradient.point.size());
+		_residuals["fit_point_to_point_residual"] = evaluateResidual(problem, _fit_point_to_point_residuals_ids);
+		_residuals["fit_point_to_plane_residual"] = evaluateResidual(problem, _fit_point_to_plane_residuals_ids);
+		_residuals["smooth_residual"] = evaluateResidual(problem, _smooth_residuals_ids);
+		//std::map<vertex_index, std::vector<ceres::ResidualBlockId>> _ids;
+		//_ids.insert(_ids.end(), _fit_point_to_point_residuals_ids.begin(), _fit_point_to_point_residuals_ids.end());
+		//_ids.insert(_ids.end(), _fit_point_to_plane_residuals_ids.begin(), _fit_point_to_plane_residuals_ids.end());
+		//_ids.insert(_ids.end(), _smooth_residuals_ids.begin(), _smooth_residuals_ids.end());
+		//_gradient.all = gradientOfResidualBlock(problem, _ids, _gradient.point.size());
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
@@ -247,46 +248,83 @@ bool AsRigidAsPossible::finished()
 	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
-std::vector<NodeGradient> AsRigidAsPossible::gradientOfResidualBlock(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_block_ids, int number_points)
+std::map<vertex_index, std::vector<double>>
+AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
+									std::map<vertex_index, ceres::ResidualBlockId> & residual_block_ids)
 {
+	std::vector<ceres::ResidualBlockId> residual_ids;
+	for (auto & r : residual_block_ids)
+	{
+		residual_ids.push_back(r.second);
+	}
 	ceres::Problem::EvaluateOptions evaluate_options;
-	evaluate_options.residual_blocks = residual_block_ids;
 
-	//auto & g = _deformation_graph._graph;
+	evaluate_options.residual_blocks = residual_ids;
 
-	//auto & nodes = boost::get(node_t(), g);
-	//for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
-	//	auto& src_i = nodes[*vp.first];
-	//	evaluate_options.parameter_blocks.push_back(src_i.r());
-	//	evaluate_options.parameter_blocks.push_back(src_i.t());
-	//	evaluate_options.parameter_blocks.push_back(src_i.w());
-	//}
 	double total_cost = 0.0;
 	std::vector<double> residuals;
 
 	problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
 
-	std::vector<NodeGradient> node_gradients;
-	int number_residuals = floor(residuals.size() / number_points);
+	std::map<vertex_index, std::vector<double>> point_residual;
+	int number_residuals = floor(residuals.size() / residual_block_ids.size());
+	int i = 0;
 	if (number_residuals > 0) {
-		for (int i = 0; i < residuals.size(); i += number_residuals)
+		for (auto & r : residual_block_ids)
 		{
-			NodeGradient n;
-			if (number_residuals == 3)
-				n.translation = { residuals[i], residuals[i + 1], residuals[i + 2] };
-			else if (number_residuals == 1)
-				n.w = residuals[i];
-			node_gradients.push_back(n);
+			for (int j = 0; j < number_residuals; ++j)
+				point_residual[r.first].push_back(residuals[i + j]);
+			i += number_residuals;
 		}
 	}
-	return node_gradients;
+	else {
+		std::cout << "why? residual" << std::endl;
+	}
+	return point_residual;
+}
+
+
+std::map<vertex_index, std::vector<double>>
+AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
+									std::map<vertex_index, std::vector<ceres::ResidualBlockId>> & residual_block_ids)
+{
+	std::vector<ceres::ResidualBlockId> residual_ids;
+	for (auto & r : residual_block_ids)
+	{
+		residual_ids.insert(residual_ids.end(), r.second.begin(), r.second.end());
+	}
+	ceres::Problem::EvaluateOptions evaluate_options;
+
+	evaluate_options.residual_blocks = residual_ids;
+
+	double total_cost = 0.0;
+	std::vector<double> residuals;
+
+	problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
+
+	std::map<vertex_index, std::vector<double>> point_residual;
+	int number_residuals = floor(residuals.size() / residual_block_ids.size());
+	int i = 0;
+	if (number_residuals > 0) {
+		for (auto & r : residual_block_ids)
+		{
+			for (int j = 0; j < number_residuals; ++j)
+				point_residual[r.first].push_back(residuals[i + j]);
+			i += number_residuals;
+		}
+	}
+	else {
+		std::cout << "why? residual" << std::endl;
+	}
+	return point_residual;
 }
 
 
 
-ARAPGradient AsRigidAsPossible::gradient()
+
+std::map<std::string, std::map<vertex_index, std::vector<double>>> AsRigidAsPossible::residuals()
 {
-	return _gradient;
+	return _residuals;
 }
 
 void AsRigidAsPossible::printCeresOptions()
