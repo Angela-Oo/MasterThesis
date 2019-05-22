@@ -173,8 +173,10 @@ void ShowMesh::renderRegistrationTwoFrames()
 
 			auto render_dg_points = _registration->getDeformationGraphMesh();
 			_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, 0.01, true);
+			_mesh_renderer->insertMesh("deformation_graph_mesh", render_dg_points);
 		}
 		else {
+			_mesh_renderer->removeMesh("deformation_graph_mesh");
 			_point_renderer->removePoints("deformation_graph");
 		}
 	}
@@ -234,7 +236,7 @@ void ShowMesh::renderCurrentMesh()
 {
 	// current mesh
 	if (!_registration && !_registration_frames) {		
-		_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame));
+		_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame), ml::RGBColor::White.toVec4f());
 
 		// render mesh if selected
 		if (_selected_frame_for_registration.size() >= 1)
@@ -252,7 +254,7 @@ void ShowMesh::renderCurrentMesh()
 
 	// reference
 	if (_render_reference_mesh) {
-		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame));
+		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame), ml::RGBColor::White.toVec4f());
 	}
 	else {
 		_mesh_renderer->removeMesh("reference");

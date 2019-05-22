@@ -60,20 +60,23 @@ Mesh AsRigidAsPossible::getDeformationGraphMesh()
 	Mesh mesh;
 	auto & g = _deformation_graph._graph;
 	auto & nodes = boost::get(node_t(), g);
-	double max_error = 0.0;
+	double max_fit_cost = 0.0;
+	double max_conf_cost = 0.0;
 	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
 	{
-		if (nodes[*vp.first]._fit_cost > max_error)
-			max_error = nodes[*vp.first]._fit_cost;
+		if (nodes[*vp.first]._fit_cost > max_fit_cost)
+			max_fit_cost = nodes[*vp.first]._fit_cost;
+		if (nodes[*vp.first]._conf_cost > max_conf_cost)
+			max_conf_cost = nodes[*vp.first]._conf_cost;
 	}
-	std::cout << "max error " << max_error << std::endl;
+	std::cout << "max fit cost " << max_fit_cost << " max conf cost " << max_conf_cost << std::endl;
 	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 
 		Mesh::Vertex vertex = _deformation_graph.deformNode(*vp.first);
 		double error = nodes[*vp.first]._fit_cost;
-		if (max_error > 0.)
-			error /= max_error;
-		vertex.color = errorToRGB(error);
+		if (max_fit_cost > 0.)
+			error /= max_fit_cost;
+		vertex.color = errorToRGB(error, nodes[*vp.first].weight());
 		mesh.m_vertices.push_back(vertex);
 	}
 	return mesh;
@@ -112,10 +115,10 @@ ARAPVertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &pr
 			unsigned int i = src_i.index();
 			double weight = a_fit;
 			// point to point cost function
-			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
-			auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, point_to_point_weighting * weight, ceres::TAKE_OWNERSHIP);
-			auto residual_id_point_to_point = problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
-																	   global_node.r(), global_node.t(), src_i.t(), src_i.w());
+			//ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
+			//auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, point_to_point_weighting * weight, ceres::TAKE_OWNERSHIP);
+			//auto residual_id_point_to_point = problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
+			//														   global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
 
 
@@ -125,7 +128,7 @@ ARAPVertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &pr
 			auto residual_id_point_to_plane = problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
 																	   global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
 
-			residual_ids[vertex_handle].push_back(residual_id_point_to_point);
+			//residual_ids[vertex_handle].push_back(residual_id_point_to_point);
 			residual_ids[vertex_handle].push_back(residual_id_point_to_plane);
 		}
 	}
@@ -298,7 +301,7 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 	for (auto & r : arap_residual_block_ids) {
 		edges[r.first].residual().push_back(evaluateResidual(problem, r.second));
 	}
-	for (auto & r : fit_residual_block_ids) {
+	for (auto & r : conf_residual_block_ids) {
 		nodes[r.first]._conf_cost = evaluateResidual(problem, r.second);
 	}
 }
@@ -323,7 +326,6 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _deformation_graph(src)
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
-	//, _nn_search(dst)
 	, _find_correspondence_point(dst)
 	, _with_icp(false)
 	, a_smooth(10.)
@@ -344,7 +346,6 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _dst(dst)
 	, _options(option)
 	, _find_correspondence_point(dst)
-	//, _nn_search(dst)
 	, _logger(logger)
 {	
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
