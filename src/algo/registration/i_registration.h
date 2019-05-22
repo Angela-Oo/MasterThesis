@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mLibInclude.h"
+#include "graph_node_type.h"
 #include <vector>
 
 typedef ml::TriMeshf Mesh;
@@ -29,8 +30,8 @@ public:
 	virtual bool solveIteration() = 0;
 	virtual bool solve() = 0;
 
-	virtual std::map<std::string, std::map<vertex_index, std::vector<double>>> residuals()
-	{ return std::map<std::string, std::map<vertex_index, std::vector<double>>>(); };
+	//virtual std::map<std::string, std::map<vertex_index, std::vector<double>>> residuals()
+	//{ return std::map<std::string, std::map<vertex_index, std::vector<double>>>(); };
 public:
 	virtual const Mesh & getSource() = 0;
 	virtual const Mesh & getTarget() = 0;

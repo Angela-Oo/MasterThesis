@@ -62,6 +62,7 @@ ARAPNode::ARAPNode(const ARAPNode & node, bool inverse)
 	, _r(node._r)
 	, _t(node._t)
 	, _w(node._w)
+	, _residuals(node._residuals)
 {
 	if (inverse) {
 		_g = node.deformedPosition();

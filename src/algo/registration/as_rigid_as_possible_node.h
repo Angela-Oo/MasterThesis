@@ -11,6 +11,7 @@ private:
 	ml::vec3d _t; // translation vector	
 	double _w; // weight
 	int _index;
+	std::map<std::string, std::vector<double>> _residuals;
 public:
 	ml::vec3f & g() { return _g; }
 	ml::vec3d & n() { return _n; }
@@ -23,6 +24,7 @@ public:
 	const ml::vec3d & translation() const { return _t; }
 	double weight() const { return _w; };
 	int index() { return _index; }
+	std::map<std::string, std::vector<double>> & residual() { return _residuals; }
 public:
 	ml::vec3d deformedPosition() const;
 	ml::vec3d deformedNormal() const;
@@ -37,10 +39,17 @@ public:
 };
 
 
+class ARAPEdge {
+	std::vector<double> _residual;
+public:
+	std::vector<double> & residual() { return _residual; }
+};
+
 typedef boost::adjacency_list<
 	boost::vecS,
 	boost::vecS,
 	boost::undirectedS,
-	boost::property<node_t, ARAPNode>> ARAPGraph;
+	boost::property<node_t, ARAPNode>,
+	boost::property<edge_t, ARAPEdge>> ARAPGraph;
 
 

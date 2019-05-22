@@ -3,6 +3,7 @@
 #include "mLibInclude.h"
 #include "deformation_graph_knn.h"
 #include "node_weighting.h"
+#include "hsv_to_rgb.h"
 
 #include <vector>
 
@@ -10,6 +11,12 @@
 typedef ml::TriMeshf Mesh;
 
 
+//struct Edge
+//{
+//	ml::vec3f point_a;
+//	ml::vec3f point_b;
+//	ml::vec4f color;
+//};
 
 class NearestNodes
 {
@@ -40,6 +47,7 @@ public:
 	std::vector<double> weights(const ml::vec3f & point, std::vector<vertex_index>& nearest_nodes_indices) const;
 	std::vector<vertex_index> nearestNodes(const ml::vec3f & point) const;
 	ml::vec3f deformPoint(const ml::vec3f & point, const NearestNodes & nearest_nodes) const;
+	Mesh::Vertex deformNode(vertex_index node_index);
 public:
 	Mesh getDeformationGraph();
 	std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraphEdges();
@@ -149,6 +157,22 @@ ml::vec3f DeformationGraph<Graph, Node>::deformPoint(const ml::vec3f & point, co
 }
 
 template<typename Graph, typename Node>
+Mesh::Vertex DeformationGraph<Graph, Node>::deformNode(vertex_index node_index)
+{
+	Node & n = boost::get(node_t(), _graph)[node_index];
+
+	ml::vec3f pos = n.deformedPosition();
+	ml::vec3f normal = n.deformedNormal();
+	ml::vec3f global_pos = _global_rigid_deformation.deformPosition(pos);
+	ml::vec3f global_normal = _global_rigid_deformation.deformNormal(normal);
+
+	Mesh::Vertex v;
+	v.point = global_pos;
+	v.normal = global_normal;
+	return v;
+}
+
+template<typename Graph, typename Node>
 Mesh DeformationGraph<Graph, Node>::getDeformationGraph()
 {
 	Mesh mesh;
@@ -156,6 +180,21 @@ Mesh DeformationGraph<Graph, Node>::getDeformationGraph()
 	//std::vector<ml::vec3f> points;
 	auto & nodes = boost::get(node_t(), _graph);
 
+	double max_error = 0.0;
+	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first)
+	{
+		Node& src_i = nodes[*vp.first];
+		auto & residuals = src_i.residual();
+		auto found = residuals.find("fit");
+		if (found != residuals.end() && found->second.size() == 4) {
+			auto & r = found->second;
+			auto error = sqrt(pow(r[0], 2) + pow(r[1], 2) + pow(r[2], 2)); // point to point
+			error += r[3]; // point to plane
+			if (error > max_error)
+				max_error = error;
+		}
+	}
+	std::cout << "max error " << max_error << std::endl;
 	for (auto vp = boost::vertices(_graph); vp.first != vp.second; ++vp.first) {
 		Node& src_i = nodes[*vp.first];
 		ml::vec3f pos = src_i.deformedPosition();
@@ -165,9 +204,21 @@ Mesh DeformationGraph<Graph, Node>::getDeformationGraph()
 		Mesh::Vertex vertex;
 		vertex.position = global_pos;
 		vertex.normal = global_normal.getNormalized();
+		double error = 0.;
+		auto & residuals = src_i.residual();
+		auto found = residuals.find("fit");
+		if (found != residuals.end() && found->second.size() == 4) {
+			auto & r = found->second;
+			error = sqrt(pow(r[0], 2) + pow(r[1], 2) + pow(r[2], 2)); // point to point
+			error += r[3]; // point to plane
+		}
+		if(max_error > 0.)
+			error /= max_error;
+		vertex.color = errorToRGB(error);
 		mesh.m_vertices.push_back(vertex);
 		//points.push_back(global_pos);
 	}
+
 	return mesh;
 	//return points;
 }
@@ -178,10 +229,14 @@ std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> DeformationGraph<Graph
 {
 	std::vector<ml::vec3f> source_points;
 	std::vector<ml::vec3f> target_points;
+
+	//std::vector<Edge> edges;
 	auto & nodes = boost::get(node_t(), _graph);
+	auto & edges = boost::get(edge_t(), _graph);
 	boost::graph_traits<Graph>::edge_iterator ei, ei_end;
 	for (boost::tie(ei, ei_end) = boost::edges(_graph); ei != ei_end; ++ei) 
 	{
+		auto & edge = edges[*ei];
 		Node & n_i = nodes[boost::source(*ei, _graph)];
 		ml::vec3f pos_i = n_i.deformedPosition();
 		pos_i = _global_rigid_deformation.deformPosition(pos_i);
@@ -191,6 +246,12 @@ std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> DeformationGraph<Graph
 		ml::vec3f pos_j = n_j.deformedPosition();
 		pos_j = _global_rigid_deformation.deformPosition(pos_j);
 		target_points.push_back(pos_j);
+
+		//Edge e;
+		//e.point_a = pos_i;
+		//e.point_b = pos_j;
+		//e.color = edge.residual()[0];
+		//edges.push_back(e);
 	}
 	return std::make_pair(source_points, target_points);
 }

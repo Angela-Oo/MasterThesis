@@ -14,9 +14,14 @@ typedef ml::TriMeshf Mesh;
 typedef DeformationGraph<ARAPGraph, ARAPNode> ARAPDeformationGraph;
 typedef DeformedMesh<ARAPGraph, ARAPNode> ARAPDeformedMesh;
 
+typedef std::vector<ceres::ResidualBlockId> ResidualIds;
+typedef std::map<ARAPGraph::vertex_descriptor, ResidualIds> ARAPVertexResidualIds;
+typedef std::map<ARAPGraph::edge_descriptor, ResidualIds> ARAPEdgeResidualIds;
 
 class AsRigidAsPossible : public IRegistration
 {
+public:
+
 private:
 	Mesh _src;
 	Mesh _dst;
@@ -24,15 +29,8 @@ private:
 	ARAPDeformationGraph _deformation_graph;
 	std::unique_ptr<ARAPDeformedMesh> _deformed_mesh;
 	std::vector<int> _fixed_positions;
-	//TriMeshKNN _nn_search;
 	FindCorrespondecePoint _find_correspondence_point;
 	bool _with_icp = true;
-private:
-	std::map<vertex_index, ceres::ResidualBlockId> _fit_point_to_point_residuals_ids;
-	std::map<vertex_index, ceres::ResidualBlockId> _fit_point_to_plane_residuals_ids;
-	std::map<vertex_index, std::vector<ceres::ResidualBlockId>> _smooth_residuals_ids;
-	std::vector<ceres::ResidualBlockId> _conf_residuals_ids;
-	std::map<std::string, std::map<vertex_index, std::vector<double>>> _residuals;
 private:
 	double _current_cost = 1.;
 	double _last_cost = 2.;
@@ -45,21 +43,19 @@ private:
 	std::shared_ptr<FileWriter> _logger;
 private:
 	void printCeresOptions();
-	std::map<vertex_index, std::vector<double>> evaluateResidual(ceres::Problem & problem,	
-																 std::map<vertex_index, ceres::ResidualBlockId> & residual_block_ids);
-	std::map<vertex_index, std::vector<double>> evaluateResidual(ceres::Problem & problem,
-																 std::map<vertex_index, std::vector<ceres::ResidualBlockId>> & residual_block_ids);
+	void evaluateResidual(ceres::Problem & problem, ARAPVertexResidualIds & vertex_residual_block_ids, std::string residual_name);
+	void evaluateResidual(ceres::Problem & problem, ARAPEdgeResidualIds & edge_residual_block_ids, std::string residual_name);
 private:
-	void addConfCost(ceres::Problem &problem);
-	void addFitCost(ceres::Problem &problem);
-	void addFitCostWithoutICP(ceres::Problem &problem);
-	void addAsRigidAsPossibleCost(ceres::Problem &problem);
+	ARAPVertexResidualIds addConfCost(ceres::Problem &problem);
+	ARAPVertexResidualIds addFitCost(ceres::Problem &problem);
+	ARAPVertexResidualIds addFitCostWithoutICP(ceres::Problem &problem);
+	ARAPEdgeResidualIds addAsRigidAsPossibleCost(ceres::Problem &problem);
 public:
 	bool finished() override;
 	bool solveIteration() override;	
 	bool solve() override;
 
-	std::map<std::string, std::map<vertex_index, std::vector<double>>> residuals() override;
+	//std::map<std::string, std::map<vertex_index, std::vector<double>>> residuals() override;
 public:
 	const Mesh & getSource() override;
 	const Mesh & getTarget() override;
