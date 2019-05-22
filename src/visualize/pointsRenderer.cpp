@@ -52,19 +52,16 @@ void PointsRenderer::insertLine(std::string id, std::vector<Edge> edges, float p
 	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 }
 
-void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, ml::RGBColor color, float point_size, bool draw_normals)
+void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, float point_size, bool draw_normals)
 {
-	// render point clouds
-	std::vector<ml::vec4f> color_frame;// (points.getVertices().size());
-	//std::fill(color_frame.begin(), color_frame.end(), color);
-
+	std::vector<ml::vec4f> color_frame;
+	std::vector<ml::vec3f> vertices;
 	for (auto & p : points.m_vertices)
 	{
 		color_frame.push_back(p.color);
-	}
-	std::vector<ml::vec3f> vertices;
-	for (auto & p : points.getVertices())
 		vertices.push_back(p.position);
+	}
+	
 
 	if (!draw_normals) {
 		_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame));
@@ -76,10 +73,23 @@ void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, ml::R
 		meshes.push_back(mesh);
 		std::vector<ml::vec3f> normals;
 		for (auto & p : points.getVertices()) {
-			meshes.push_back(ml::Shapesf::line(p.position, p.position + p.normal * 0.05, p.color, point_size * 0.2));
+			meshes.push_back(ml::Shapesf::line(p.position, p.position + p.normal * 0.02, p.color, point_size * 0.2));
 		}
 		_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 	}
+}
+
+void PointsRenderer::insertPoints(std::string id, const ml::TriMeshf & points, ml::RGBColor color, float point_size, bool draw_normals)
+{
+	std::vector<ml::vec4f> color_frame;
+	std::vector<ml::vec3f> vertices;
+	for (auto & p : points.m_vertices)
+	{
+		color_frame.push_back(color);
+		vertices.push_back(p.position);
+	}
+	
+	_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame));
 }
 
 void PointsRenderer::insertLine(std::string id, const TriMeshf & points1, const TriMeshf & points2, ml::RGBColor color, float point_size)

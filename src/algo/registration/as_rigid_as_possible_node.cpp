@@ -49,6 +49,8 @@ ARAPNode::ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n, const ml
 	, _r(r)
 	, _t(t)
 	, _w(1.)
+	, _fit_cost(0.)
+	, _conf_cost(0.)
 {}
 
 ARAPNode::ARAPNode()
@@ -62,7 +64,8 @@ ARAPNode::ARAPNode(const ARAPNode & node, bool inverse)
 	, _r(node._r)
 	, _t(node._t)
 	, _w(node._w)
-	, _residuals(node._residuals)
+	, _fit_cost(node._fit_cost)
+	, _conf_cost(node._conf_cost)
 {
 	if (inverse) {
 		_g = node.deformedPosition();

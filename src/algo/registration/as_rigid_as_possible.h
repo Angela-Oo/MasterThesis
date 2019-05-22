@@ -43,8 +43,11 @@ private:
 	std::shared_ptr<FileWriter> _logger;
 private:
 	void printCeresOptions();
-	void evaluateResidual(ceres::Problem & problem, ARAPVertexResidualIds & vertex_residual_block_ids, std::string residual_name);
-	void evaluateResidual(ceres::Problem & problem, ARAPEdgeResidualIds & edge_residual_block_ids, std::string residual_name);
+	double evaluateResidual(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_ids);
+	void evaluateResidual(ceres::Problem & problem,
+						  ARAPVertexResidualIds & fit_residual_block_ids,
+						  ARAPEdgeResidualIds & arap_residual_block_ids,
+						  ARAPVertexResidualIds & conf_residual_block_ids);
 private:
 	ARAPVertexResidualIds addConfCost(ceres::Problem &problem);
 	ARAPVertexResidualIds addFitCost(ceres::Problem &problem);

@@ -9,9 +9,10 @@ std::pair<bool, ml::vec3f> FindCorrespondecePoint::correspondingPoint(ml::vec3f 
 	bool valid = true;
 	auto dot_product = ml::vec3f::dot(normal.getNormalized(), vertex.normal.getNormalized());
 	auto angle = acos(dot_product);
-	if (dot_product < 0.5) //abs(angle) < ml::math::degreesToRadians(45.))
+	//if (dot_product < 0.5)
+	if(abs(angle) > ml::math::degreesToRadians(30.))
 		valid = false;
-	if (dist(point, vertex.position) > 0.1)
+	if (dist(point, vertex.position) > 0.01)
 		valid = false;
 	return std::make_pair(valid, vertex.position);
 }

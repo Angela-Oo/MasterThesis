@@ -68,12 +68,12 @@ Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices)
 {
 	auto surface_mesh = convertToCGALMesh(mesh);
 
-	CGAL::Surface_mesh_simplification::Count_stop_predicate_vertices<SurfaceMesh> stop(number_of_vertices);
+	//CGAL::Surface_mesh_simplification::Count_stop_predicate_vertices<SurfaceMesh> stop(number_of_vertices);
 
 	// This is a stop predicate (defines when the algorithm terminates).
 	// In this example, the simplification stops when the number of undirected edges
 	// left in the surface mesh drops below the specified number (1000)
-	//CGAL::Surface_mesh_simplification::Count_stop_predicate<Mesh> stop(1000);
+	CGAL::Surface_mesh_simplification::Count_stop_predicate<SurfaceMesh> stop(number_of_vertices);
 
 	//CGAL::Surface_mesh_simplification::
 	int r = CGAL::Surface_mesh_simplification::edge_collapse(surface_mesh, stop);
