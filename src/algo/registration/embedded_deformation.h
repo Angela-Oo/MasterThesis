@@ -25,6 +25,7 @@ class EmbeddedDeformation : public IRegistration
 	ceres::Solver::Options _options;
 	EmbeddedDeformationGraph _deformation_graph;
 	std::unique_ptr<EmbeddedDeformedMesh> _deformed_mesh;
+	std::vector<int> _fixed_positions;
 	TriMeshKNN _nn_search;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
@@ -36,6 +37,9 @@ class EmbeddedDeformation : public IRegistration
 	double a_conf = 100.;// 1.;// 100;
 	double a_fit = 1.;
 	std::shared_ptr<FileWriter> _logger;
+private:
+	void addFitCostWithoutICP(ceres::Problem &problem);
+	void addFitCost(ceres::Problem &problem);
 public:
 	bool finished();
 	bool solveIteration() override;
@@ -46,8 +50,7 @@ public:
 	Mesh getDeformedPoints() override;
 	Mesh getInverseDeformedPoints() override;
 public:
-	// todo
-	//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+	std::vector<Edge> getDeformationGraph() override;
 public:
 	EmbeddedDeformationGraph & getEmbeddedDeformationGraph();
 public:
@@ -63,50 +66,58 @@ public:
 						ceres::Solver::Options option,
 						unsigned int number_of_deformation_nodes = 1000,
 						std::shared_ptr<FileWriter> logger = nullptr);
+	EmbeddedDeformation(const Mesh& src,
+						const Mesh& dst,
+						std::vector<int> fixed_positions,
+						ceres::Solver::Options option,
+						std::shared_ptr<FileWriter> logger);
 };
 
 
-
-
-class EmbeddedDeformationWithoutICP : public IRegistration
-{
-	Mesh _src;
-	Mesh _dst;
-	ceres::Solver::Options _options;
-	EmbeddedDeformationGraph _deformation_graph;
-	std::unique_ptr<EmbeddedDeformedMesh> _deformed_mesh;
-	std::vector<int> _fixed_positions;
-	double _current_cost = 1.;
-	double _last_cost = 2.;
-	size_t _solve_iteration = 0;
-	size_t _max_iterations = 200;
-	long long _total_time_in_ms = 0;
-	double a_rigid = 1000.;// 1000;
-	double a_smooth = 0.5;// 100;
-	double a_conf = 1.;// 100;
-	double a_fit = 1.0; // 0.1;
-	std::shared_ptr<FileWriter> _logger;
-public:
-	bool finished() override;
-	bool solveIteration() override;
-	bool solve() override;
-public:
-	const Mesh & getSource() override;
-	const Mesh & getTarget() override;
-	Mesh getDeformedPoints() override;
-	Mesh getInverseDeformedPoints() override;
-public:
-	std::vector<ml::vec3f> getFixedPostions() override;
-	// todo
-	//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
-public:
-	EmbeddedDeformationGraph & getEmeddedDeformationGraph();
-public:
-	EmbeddedDeformationWithoutICP(const Mesh& src,
-								  const Mesh& dst,
-								  std::vector<int> fixed_positions,
-								  ceres::Solver::Options option,
-								  std::shared_ptr<FileWriter> logger = nullptr);
-};
+//
+//
+//class EmbeddedDeformationWithoutICP : public IRegistration
+//{
+//	Mesh _src;
+//	Mesh _dst;
+//	ceres::Solver::Options _options;
+//	EmbeddedDeformationGraph _deformation_graph;
+//	std::unique_ptr<EmbeddedDeformedMesh> _deformed_mesh;
+//	std::vector<int> _fixed_positions;
+//	double _current_cost = 1.;
+//	double _last_cost = 2.;
+//	size_t _solve_iteration = 0;
+//	size_t _max_iterations = 200;
+//	long long _total_time_in_ms = 0;
+//	double a_rigid = 1000.;// 1000;
+//	double a_smooth = 0.5;// 100;
+//	double a_conf = 1.;// 100;
+//	double a_fit = 1.0; // 0.1;
+//	std::shared_ptr<FileWriter> _logger;
+//private:
+//	void addFitCost(ceres::Problem &problem);
+//public:
+//	bool finished() override;
+//	bool solveIteration() override;
+//	bool solve() override;
+//public:
+//	const Mesh & getSource() override;
+//	const Mesh & getTarget() override;
+//	Mesh getDeformedPoints() override;
+//	Mesh getInverseDeformedPoints() override;
+//public:
+//
+//	std::vector<ml::vec3f> getFixedPostions() override;
+//	// todo
+//	//std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>> getDeformationGraph() override;
+//public:
+//	EmbeddedDeformationGraph & getEmeddedDeformationGraph();
+//public:
+//	EmbeddedDeformationWithoutICP(const Mesh& src,
+//								  const Mesh& dst,
+//								  std::vector<int> fixed_positions,
+//								  ceres::Solver::Options option,
+//								  std::shared_ptr<FileWriter> logger = nullptr);
+//};
 
 }

@@ -70,7 +70,7 @@ void AsRigidAsPossible::updateMeanCost()
 	_smooth_mean_cost = mean_smooth_cost;
 
 	_k_mean_cost = std::max(_fit_mean_cost, _smooth_mean_cost);
-	_k_mean_cost *= 3.;
+	_k_mean_cost *= 10.;
 
 	std::cout << "max fit cost " << max_fit_cost << " max conf cost " << max_conf_cost << " max smooth cost " << max_smooth_cost << " used visualize cost " << _k_mean_cost << std::endl;
 }

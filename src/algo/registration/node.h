@@ -29,6 +29,7 @@ public:
 	ml::vec3d deformedPosition() const;
 	ml::vec3d deformedNormal() const;
 	ml::vec3d deformPosition(const ml::vec3f & pos) const;
+	ml::vec3d deformNormal(const ml::vec3f & normal) const;
 public:
 	Node(int index, const ml::vec3f & g, const ml::vec3d & n);
 	Node(int index, const ml::vec3f & g, const ml::vec3d & n, const ml::mat3d & r, const ml::vec3d & t);
@@ -37,7 +38,14 @@ public:
 	Node(const Node& node) = default;
 };
 
+class GraphEdge {
+public:
+	double _smooth_cost;
+};
+
 typedef boost::property<node_t, Node> VertexProperty;
-typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS, VertexProperty> Graph;
+typedef boost::property<edge_t, GraphEdge> EdgeProperty;
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS,	boost::undirectedS,	VertexProperty,	EdgeProperty> Graph;
 
 }

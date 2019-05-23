@@ -44,7 +44,7 @@ Registration::Registration(RegistrationType _registration_type,
 	if (_registration_type == RegistrationType::ED)
 		_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, _number_of_deformation_graph_nodes, _logger);
 	else if (_registration_type == RegistrationType::ED_WithoutICP)
-		_registration = std::make_unique<ED::EmbeddedDeformationWithoutICP>(source, target, mesh_reader->getFixedPositions(target_frame), option, _logger);
+		_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, mesh_reader->getFixedPositions(target_frame), option, _logger);
 	else if (_registration_type == RegistrationType::ASAP)
 		_registration = std::make_unique<AsRigidAsPossible>(source, target, option, _number_of_deformation_graph_nodes, _logger);
 	else if (_registration_type == RegistrationType::ASAP_WithoutICP)

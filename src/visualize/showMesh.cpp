@@ -19,7 +19,7 @@ void ShowMesh::nonRigidRegistration()
 		if(_registration_type == RegistrationType::ED)
 			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, _number_of_nodes, _logger);
 		else if(_registration_type == RegistrationType::ED_WithoutICP)
-			_registration = std::make_unique<ED::EmbeddedDeformationWithoutICP>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
+			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
 		else if(_registration_type == RegistrationType::ASAP)
 			_registration = std::make_unique<AsRigidAsPossible>(source, target, option, _number_of_nodes, _logger);
 		else if(_registration_type == RegistrationType::ASAP_WithoutICP)
@@ -423,7 +423,7 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-	_number_of_nodes = 1000;
+	_number_of_nodes = 300;
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ASAP;

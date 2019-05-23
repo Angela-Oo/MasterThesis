@@ -47,11 +47,9 @@ public:
 	double _smooth_cost;
 };
 
-typedef boost::adjacency_list<
-	boost::vecS,
-	boost::vecS,
-	boost::undirectedS,
-	boost::property<node_t, ARAPNode>,
-	boost::property<edge_t, ARAPEdge>> ARAPGraph;
+typedef boost::property<node_t, ARAPNode> VertexProperty;
+typedef boost::property<edge_t, ARAPEdge> EdgeProperty;
+
+typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,	VertexProperty,	EdgeProperty> ARAPGraph;
 
 

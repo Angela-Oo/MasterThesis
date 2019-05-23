@@ -23,6 +23,14 @@ ml::vec3d Node::deformPosition(const ml::vec3f & pos) const
 	return (rotation()*(pos - _g)) + _g + _t;
 }
 
+ml::vec3d Node::deformNormal(const ml::vec3f & normal) const
+{
+	auto r_t = rotation();
+	auto n = r_t * normal;
+	return n.getNormalized();
+}
+
+
 Node::Node(int index, const ml::vec3f & g, const ml::vec3d & n)
 	: Node(index, g, n, ml::mat3d::identity(), ml::vec3d::origin)
 {}
