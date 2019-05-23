@@ -19,6 +19,12 @@ public:
 	double * t() { return (&_t)->getData(); };
 	double * w() { return &_w; }
 public:
+	bool _found_nearest_point = true;
+	ml::vec3f _nearest_point;
+	double _fit_cost;
+	double _rotation_cost;
+	double _conf_cost;
+public:
 	ml::vec3f position() const { return _g; }
 	ml::vec3d normal() const { return _n; }
 	const ml::mat3d & rotation() const { return _r; }
@@ -40,7 +46,7 @@ public:
 
 class GraphEdge {
 public:
-	double _smooth_cost;
+	double _smooth_cost = 0.;
 };
 
 typedef boost::property<node_t, Node> VertexProperty;

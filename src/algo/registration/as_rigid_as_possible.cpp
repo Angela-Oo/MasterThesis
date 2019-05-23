@@ -218,28 +218,15 @@ ARAPVertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 		auto vertex = _deformation_graph.deformNode(vertex_handle);		
 
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex.position, vertex.normal);
-
-		//auto correspondent_point_distance = _find_correspondence_point->correspondingPointDistance(vertex.position);
-		//if (correspondent_point_distance.first) {
-		//	residual_ids[vertex_handle].push_back(addPointToPointCostForNode(problem, node, correspondent_point_distance.second));
-		//}
-		//if (correspondent_point.first) {
-		//	node._nearest_point = correspondent_point.second;
-		//	node._found_nearest_point = true;
-		//	i++;
-		//	residual_ids[vertex_handle].push_back(addPointToPlaneCostForNode(problem, node, correspondent_point.second));
-		//}
 				
 		if (correspondent_point.first) {
-			node._nearest_point = correspondent_point.second;
+			auto target_position = correspondent_point.second;
+			node._nearest_point = target_position;
 			node._found_nearest_point = true;
 			i++;
 
-			auto residual_id_point_to_point = addPointToPointCostForNode(problem, node, correspondent_point.second);
-			residual_ids[vertex_handle].push_back(residual_id_point_to_point);
-
-			auto residual_id_point_to_plane = addPointToPlaneCostForNode(problem, node, correspondent_point.second);
-			residual_ids[vertex_handle].push_back(residual_id_point_to_plane);
+			residual_ids[vertex_handle].push_back(addPointToPointCostForNode(problem, node, target_position));
+			residual_ids[vertex_handle].push_back(addPointToPlaneCostForNode(problem, node, target_position));
 		}
 		else {
 			node._nearest_point = vertex.position;

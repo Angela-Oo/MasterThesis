@@ -43,7 +43,7 @@ private:
 	const double _find_max_distance = 0.5;
 	const double _find_max_angle_deviation = 45.;
 	std::shared_ptr<FileWriter> _logger;
-
+private:
 	double _fit_mean_cost;
 	double _smooth_mean_cost;
 	double _k_mean_cost;

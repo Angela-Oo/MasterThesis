@@ -8,9 +8,9 @@
 
 
 struct FitStarPointToPointCostFunction {
-	const ml::vec3f& _point;
-	const ml::vec3f& _node_g;
-	const ml::vec3f& _global_g;
+	const ml::vec3f _point;
+	const ml::vec3f _node_g;
+	const ml::vec3f _global_g;
 
 	FitStarPointToPointCostFunction(const ml::vec3f &point, const ml::vec3f &node_g, const ml::vec3f &global_g) :
 		_point(point), _node_g(node_g), _global_g(global_g)

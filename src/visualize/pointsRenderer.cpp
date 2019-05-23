@@ -39,14 +39,8 @@ void PointsRenderer::insertLine(std::string id, std::vector<ml::vec3f> points1, 
 void PointsRenderer::insertLine(std::string id, std::vector<Edge> edges, float point_size)
 {
 	std::vector<TriMeshf> meshes;
-	double max_cost = 0.;
-	std::for_each(edges.begin(), edges.end(), [&max_cost](const Edge & e) { if (e.cost > max_cost) max_cost = e.cost; });
-	std::cout << "max cost " << max_cost << std::endl;
 	for (auto & e : edges) {
 		auto cost = e.cost;
-		if (max_cost > 0.)
-			cost = e.cost / max_cost;
-
 		auto color = errorToRGB(cost);
 		meshes.push_back(ml::Shapesf::line(e.source_point, e.target_point, color, point_size));
 	}
@@ -61,8 +55,7 @@ void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, float
 	{
 		color_frame.push_back(p.color);
 		vertices.push_back(p.position);
-	}
-	
+	}	
 
 	if (!draw_normals) {
 		_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame));
