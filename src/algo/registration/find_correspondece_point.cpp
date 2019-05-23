@@ -14,31 +14,80 @@ double FindCorrespondecePoint::median()
 	return _median;
 }
 
+
+std::pair<bool, ml::vec3f> FindCorrespondecePoint::correspondingPointAngle(ml::vec3f point, ml::vec3f normal)
+{
+	auto k_nearest_indices = _nn_search.k_nearest_indices(point, _k);
+
+	std::vector<std::pair<ml::vec3f, double>> valid_points;
+	for (auto i : k_nearest_indices) {
+		auto vertex = _mesh.getVertices()[i];
+		auto angle = angle_between_to_vectors_in_rad(normal, vertex.normal);
+		if (angle < _max_normal_angle_deviation) {
+			valid_points.push_back(std::make_pair(vertex.position, angle));
+		}
+	}
+	if (valid_points.empty()) {
+		return std::make_pair(false, point);
+	}
+	else {
+		auto sort_by_angle = [](const std::pair<ml::vec3f, double> & rhs, const std::pair<ml::vec3f, double> & lhs) { return rhs.second < lhs.second; };
+		std::sort(valid_points.begin(), valid_points.end(), sort_by_angle);
+		return std::make_pair(true, valid_points[0].first);
+	}
+}
+
+
+std::pair<bool, ml::vec3f> FindCorrespondecePoint::correspondingPointDistance(ml::vec3f point, ml::vec3f normal)
+{
+	auto k_nearest_indices = _nn_search.k_nearest_indices(point, _k);
+
+	std::vector<std::pair<ml::vec3f, double>> valid_points;
+	for (auto i : k_nearest_indices) {
+		auto vertex = _mesh.getVertices()[i];
+		auto distance = dist(point, vertex.position);
+		if (distance < 100. * median()) {
+			_median = (_median * 10000. + distance) / 10001.;
+		}
+		float k_median = 5. * median();
+		if (distance < k_median) {
+			valid_points.push_back(std::make_pair(vertex.position, distance));
+		}
+	}
+	if (valid_points.empty()) {
+		return std::make_pair(false, point);
+	}
+	else {
+		auto sort_by_distance = [](const std::pair<ml::vec3f, double> & rhs, const std::pair<ml::vec3f, double> & lhs) { return rhs.second < lhs.second; };
+		std::sort(valid_points.begin(), valid_points.end(), sort_by_distance);
+		return std::make_pair(true, valid_points[0].first);
+	}
+}
+
+
 std::pair<bool, ml::vec3f> FindCorrespondecePoint::correspondingPoint(ml::vec3f point, ml::vec3f normal)
 {
 	auto k_nearest_indices = _nn_search.k_nearest_indices(point, _k);
 
 	std::vector<std::pair<ml::vec3f, std::pair<double, double>>> valid_point_with_angle_and_distance;
 	for (auto i : k_nearest_indices) {
-		unsigned int i = _nn_search.nearest_index(point);
 		auto vertex = _mesh.getVertices()[i];
 		
 		auto angle = angle_between_to_vectors_in_rad(normal, vertex.normal);
 		auto distance = dist(point, vertex.position);
 
-		_median = (_median * 10000. + distance) / 10001.;
-		float k_median = 10. * median();
-
+		if (distance < 100. * median()) {
+			_median = (_median * 10000. + distance) / 10001.;
+		}
+		float k_median = 5. * median();
 		bool valid_angle = angle < _max_normal_angle_deviation;
 		bool valid_distance = distance < k_median;// _max_allowed_distance;
-
 
 		if (valid_angle && valid_distance) {
 			valid_point_with_angle_and_distance.push_back(std::make_pair(vertex.position, std::make_pair(angle, distance)));
 		}
 	}
-
-
+	
 	if (valid_point_with_angle_and_distance.empty()) {
 		return std::make_pair(false, point);
 	}

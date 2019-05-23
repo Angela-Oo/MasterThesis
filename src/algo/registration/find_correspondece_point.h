@@ -20,6 +20,8 @@ class FindCorrespondecePoint
 	double _median;
 public:
 	double median();
+	std::pair<bool, ml::vec3f> correspondingPointAngle(ml::vec3f point, ml::vec3f normal);
+	std::pair<bool, ml::vec3f> correspondingPointDistance(ml::vec3f point, ml::vec3f normal);
 	std::pair<bool, ml::vec3f> correspondingPoint(ml::vec3f point, ml::vec3f normal);
 	FindCorrespondecePoint(Mesh mesh, double max_allowed_distance = 0.05, double max_normal_angle_deviation = 30.);
 };

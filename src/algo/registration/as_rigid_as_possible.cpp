@@ -274,9 +274,9 @@ bool AsRigidAsPossible::solveIteration()
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 
-		auto scale_factor_tol = 0.0005;// 0.00001;
+		auto scale_factor_tol = 0.001;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-			(a_smooth > 0.1 && a_conf > 0.1))
+			(a_smooth > 0.5 && a_conf > 0.1))
 		{
 			a_smooth /= 2.;
 			a_conf /= 2.;

@@ -416,7 +416,7 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-	_number_of_nodes = 2000;
+	_number_of_nodes = 3000;
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ASAP;
