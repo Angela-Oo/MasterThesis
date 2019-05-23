@@ -33,6 +33,48 @@ Mesh AsRigidAsPossible::getInverseDeformedPoints()
 	return deformed.deformPoints();
 }
 
+
+void AsRigidAsPossible::updateMeanCost()
+{
+	auto & g = _deformation_graph._graph;
+	auto & nodes = boost::get(node_t(), g);
+	auto & graph_edges = boost::get(edge_t(), g);
+
+	double max_fit_cost = 0.0;
+	double max_conf_cost = 0.0;
+	double max_smooth_cost = 0.0;
+	double mean_fit_cost = 0.;
+	double mean_smooth_cost = 0.;
+	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
+	{
+		mean_fit_cost += nodes[*vp.first]._fit_cost;
+
+		if (nodes[*vp.first]._fit_cost > max_fit_cost)
+			max_fit_cost = nodes[*vp.first]._fit_cost;
+		if (nodes[*vp.first]._conf_cost > max_conf_cost)
+			max_conf_cost = nodes[*vp.first]._conf_cost;
+	}
+	mean_fit_cost /= boost::num_vertices(g);
+
+	boost::graph_traits<ARAPGraph>::edge_iterator ei, ei_end;
+	for (boost::tie(ei, ei_end) = boost::edges(g); ei != ei_end; ++ei)
+	{
+		mean_smooth_cost += graph_edges[*ei]._smooth_cost;
+
+		if (graph_edges[*ei]._smooth_cost > max_smooth_cost)
+			max_smooth_cost = graph_edges[*ei]._smooth_cost;
+	}
+	mean_smooth_cost /= boost::num_edges(g);
+
+	_fit_mean_cost = mean_fit_cost;
+	_smooth_mean_cost = mean_smooth_cost;
+
+	_k_mean_cost = std::max(_fit_mean_cost, _smooth_mean_cost);
+	_k_mean_cost *= 3.;
+
+	std::cout << "max fit cost " << max_fit_cost << " max conf cost " << max_conf_cost << " max smooth cost " << max_smooth_cost << " used visualize cost " << _k_mean_cost << std::endl;
+}
+
 std::vector<Edge> AsRigidAsPossible::getDeformationGraph()
 {
 	std::vector<Edge> edges;
@@ -42,62 +84,55 @@ std::vector<Edge> AsRigidAsPossible::getDeformationGraph()
 	boost::graph_traits<ARAPGraph>::edge_iterator ei, ei_end;
 	for (boost::tie(ei, ei_end) = boost::edges(g); ei != ei_end; ++ei)
 	{
-		//Edge e;
-		//auto & edge = graph_edges[*ei];
-
-		//auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
-		//e.source_point = vertex_i.position;
-
-		//auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
-		//e.target_point = vertex_j.position;
-		//e.cost = (edge.residual().empty()) ? 0. : edge.residual()[0];
-		//edges.push_back(e);
-
-		// test nearest point
 		Edge e;
 		auto & edge = graph_edges[*ei];
 
-		auto node = nodes[boost::source(*ei, g)];
 		auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
 		e.source_point = vertex_i.position;
 
-		e.target_point = node._nearest_point;// vertex_j.position;
-		if (dist(node._nearest_point, ml::vec3f::origin) < 0.0001)
-			e.target_point = e.source_point;
-		
-		e.cost = (edge.residual().empty()) ? 0. : edge.residual()[0];
+		auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
+		e.target_point = vertex_j.position;
+		e.cost = edge._smooth_cost;
+		if (_k_mean_cost > 0.)
+			e.cost /= _k_mean_cost;
+		e.cost = std::min(1., e.cost);
 		edges.push_back(e);
+
+		// test nearest point
+		//Edge e;
+		//auto & edge = graph_edges[*ei];
+
+		//auto node = nodes[boost::source(*ei, g)];
+		//auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
+		//e.source_point = vertex_i.position;
+
+		//e.target_point = node._nearest_point;// vertex_j.position;
+		//if (dist(node._nearest_point, ml::vec3f::origin) < 0.0001)
+		//	e.target_point = e.source_point;
+		//
+		//e.cost = (edge.residual().empty()) ? 0. : edge.residual()[0];
+		//edges.push_back(e);
 	}
 	return edges;
 }
+
 
 Mesh AsRigidAsPossible::getDeformationGraphMesh()
 {
 	Mesh mesh;
 	auto & g = _deformation_graph._graph;
 	auto & nodes = boost::get(node_t(), g);
-	double max_fit_cost = 0.0;
-	double max_conf_cost = 0.0;
-	double median_fit_cost = 0.;
-	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
-	{
-		median_fit_cost += nodes[*vp.first]._fit_cost;
-		if (nodes[*vp.first]._fit_cost > max_fit_cost)
-			max_fit_cost = nodes[*vp.first]._fit_cost;
-		if (nodes[*vp.first]._conf_cost > max_conf_cost)
-			max_conf_cost = nodes[*vp.first]._conf_cost;
-	}
-	median_fit_cost /= boost::num_vertices(g);
-	std::cout << "max fit cost " << max_fit_cost << " max conf cost " << max_conf_cost << std::endl;
+
 	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 
 		Mesh::Vertex vertex = _deformation_graph.deformNode(*vp.first);
-		double error = nodes[*vp.first]._fit_cost;
-		if (median_fit_cost > 0.)
-			error /= (5. * median_fit_cost);
-		error = std::min(1., error);
-		vertex.color = errorToRGB(error, nodes[*vp.first].weight());
 		auto & node = nodes[*vp.first];
+		double error = node._fit_cost;
+		if (_k_mean_cost > 0.)
+			error /= _k_mean_cost;
+		error = std::min(1., error);
+		vertex.color = errorToRGB(error, nodes[*vp.first].weight());		
+
 		if (node.weight() < 0.7)
 			vertex.color = ml::RGBColor::White.toVec4f();
 		else if (!node._found_nearest_point)
@@ -183,6 +218,17 @@ ARAPVertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 		auto vertex = _deformation_graph.deformNode(vertex_handle);		
 
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex.position, vertex.normal);
+
+		//auto correspondent_point_distance = _find_correspondence_point->correspondingPointDistance(vertex.position);
+		//if (correspondent_point_distance.first) {
+		//	residual_ids[vertex_handle].push_back(addPointToPointCostForNode(problem, node, correspondent_point_distance.second));
+		//}
+		//if (correspondent_point.first) {
+		//	node._nearest_point = correspondent_point.second;
+		//	node._found_nearest_point = true;
+		//	i++;
+		//	residual_ids[vertex_handle].push_back(addPointToPlaneCostForNode(problem, node, correspondent_point.second));
+		//}
 				
 		if (correspondent_point.first) {
 			node._nearest_point = correspondent_point.second;
@@ -276,7 +322,7 @@ bool AsRigidAsPossible::solveIteration()
 
 		auto scale_factor_tol = 0.001;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-			(a_smooth > 0.5 && a_conf > 0.1))
+			(a_smooth > 0.1 && a_conf > 0.1))
 		{
 			a_smooth /= 2.;
 			a_conf /= 2.;
@@ -284,7 +330,8 @@ bool AsRigidAsPossible::solveIteration()
 		}
 
 		_total_time_in_ms += logger.get_time_in_ms();
-	}	
+	}
+	updateMeanCost();
 	return finished();
 }
 
@@ -328,7 +375,7 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 		nodes[r.first]._fit_cost = evaluateResidual(problem, r.second);
 	}
 	for (auto & r : arap_residual_block_ids) {
-		edges[r.first].residual().push_back(evaluateResidual(problem, r.second));
+		edges[r.first]._smooth_cost = evaluateResidual(problem, r.second);
 	}
 	for (auto & r : conf_residual_block_ids) {
 		nodes[r.first]._conf_cost = evaluateResidual(problem, r.second);

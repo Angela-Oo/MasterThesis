@@ -109,10 +109,17 @@ void ShowMesh::renderError()
 			_logger->write(ss.str());
 
 		if (_render_error) {
-			std::vector<ml::vec3f> positions_a;
-			for (auto & p : registered_points_a.getVertices())
-				positions_a.push_back(p.position);
-			_point_renderer->insertLine("error", positions_a, nearest_reference_points, ml::RGBColor::Red, 0.0005);
+			std::vector<Edge> edges;
+			for (int i = 0; i < nearest_reference_points.size(); ++i) {
+				Edge e;
+				e.source_point = registered_points_a.m_vertices[i].position;
+				e.target_point = nearest_reference_points[i];
+				auto max_cost = distance_errors[distance_errors.size() / 2] * 10.;
+				e.cost = std::min(max_cost, dist(e.source_point, e.target_point));
+				e.cost /= max_cost;
+				edges.push_back(e);
+			}				
+			_point_renderer->insertLine("error", edges, 0.0005);
 		}
 		else {
 			_point_renderer->removePoints("error");
@@ -416,7 +423,7 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-	_number_of_nodes = 3000;
+	_number_of_nodes = 1000;
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ASAP;

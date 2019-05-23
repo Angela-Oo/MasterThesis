@@ -40,10 +40,15 @@ private:
 	double a_smooth = 50.;// 10.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
 	double a_fit = 10.;
-	const double _find_max_distance = 0.5;// 0.05;
+	const double _find_max_distance = 0.5;
 	const double _find_max_angle_deviation = 45.;
 	std::shared_ptr<FileWriter> _logger;
+
+	double _fit_mean_cost;
+	double _smooth_mean_cost;
+	double _k_mean_cost;
 private:
+	void updateMeanCost();
 	void printCeresOptions();
 	double evaluateResidual(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_ids);
 	void evaluateResidual(ceres::Problem & problem,

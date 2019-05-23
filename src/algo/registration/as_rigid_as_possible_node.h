@@ -42,10 +42,9 @@ public:
 };
 
 
-class ARAPEdge {
-	std::vector<double> _residual;
+class ARAPEdge {	
 public:
-	std::vector<double> & residual() { return _residual; }
+	double _smooth_cost;
 };
 
 typedef boost::adjacency_list<
