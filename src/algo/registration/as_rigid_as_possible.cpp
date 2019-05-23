@@ -61,8 +61,10 @@ std::vector<Edge> AsRigidAsPossible::getDeformationGraph()
 		auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
 		e.source_point = vertex_i.position;
 
-		//auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
 		e.target_point = node._nearest_point;// vertex_j.position;
+		if (dist(node._nearest_point, ml::vec3f::origin) < 0.0001)
+			e.target_point = e.source_point;
+		
 		e.cost = (edge.residual().empty()) ? 0. : edge.residual()[0];
 		edges.push_back(e);
 	}
@@ -76,23 +78,27 @@ Mesh AsRigidAsPossible::getDeformationGraphMesh()
 	auto & nodes = boost::get(node_t(), g);
 	double max_fit_cost = 0.0;
 	double max_conf_cost = 0.0;
+	double median_fit_cost = 0.;
 	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first)
 	{
+		median_fit_cost += nodes[*vp.first]._fit_cost;
 		if (nodes[*vp.first]._fit_cost > max_fit_cost)
 			max_fit_cost = nodes[*vp.first]._fit_cost;
 		if (nodes[*vp.first]._conf_cost > max_conf_cost)
 			max_conf_cost = nodes[*vp.first]._conf_cost;
 	}
+	median_fit_cost /= boost::num_vertices(g);
 	std::cout << "max fit cost " << max_fit_cost << " max conf cost " << max_conf_cost << std::endl;
 	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
 
 		Mesh::Vertex vertex = _deformation_graph.deformNode(*vp.first);
 		double error = nodes[*vp.first]._fit_cost;
-		if (max_fit_cost > 0.)
-			error /= max_fit_cost;
+		if (median_fit_cost > 0.)
+			error /= (5. * median_fit_cost);
+		error = std::min(1., error);
 		vertex.color = errorToRGB(error, nodes[*vp.first].weight());
 		auto & node = nodes[*vp.first];
-		if (node.weight() < 0.5)
+		if (node.weight() < 0.7)
 			vertex.color = ml::RGBColor::White.toVec4f();
 		else if (!node._found_nearest_point)
 			vertex.color = ml::RGBColor::Black.toVec4f();
@@ -170,12 +176,13 @@ ARAPVertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 	auto & nodes = boost::get(node_t(), _deformation_graph._graph);
 	int i = 0;
 
+	std::cout << "median dist " << _find_correspondence_point->median() << std::endl;
 	for (auto vp = boost::vertices(_deformation_graph._graph); vp.first != vp.second; ++vp.first) {
 		auto vertex_handle = *vp.first;
 		auto& node = nodes[vertex_handle];
 		auto vertex = _deformation_graph.deformNode(vertex_handle);		
 
-		auto correspondent_point = _find_correspondence_point.correspondingPoint(vertex.position, vertex.normal);
+		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex.position, vertex.normal);
 				
 		if (correspondent_point.first) {
 			node._nearest_point = correspondent_point.second;
@@ -267,9 +274,9 @@ bool AsRigidAsPossible::solveIteration()
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 
-		auto scale_factor_tol = 0.00002;// 0.00001;
+		auto scale_factor_tol = 0.0005;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-			(a_smooth > 0.1 && a_conf > 1.))
+			(a_smooth > 0.1 && a_conf > 0.1))
 		{
 			a_smooth /= 2.;
 			a_conf /= 2.;
@@ -348,12 +355,12 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _deformation_graph(src)
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
-	, _find_correspondence_point(dst)
 	, _with_icp(false)
 	, a_smooth(10.)
 	, a_fit(100.)
 	, a_conf(100.)
 {
+	_find_correspondence_point = std::make_unique<FindCorrespondecePoint>(dst, _find_max_distance, _find_max_angle_deviation);
 	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }
@@ -366,10 +373,10 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
-	, _options(option)
-	, _find_correspondence_point(dst)
+	, _options(option)	
 	, _logger(logger)
 {	
+	_find_correspondence_point = std::make_unique<FindCorrespondecePoint>(dst, _find_max_distance, _find_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
 	std::cout << "number of def nodes " << number_of_deformation_nodes << " true number " << reduced_mesh.m_vertices.size() << std::endl;
 	_deformation_graph = ARAPDeformationGraph(reduced_mesh);
@@ -386,10 +393,9 @@ AsRigidAsPossible::AsRigidAsPossible(const Mesh& src,
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
-	//, _nn_search(dst)
-	, _find_correspondence_point(dst)
 	, _logger(logger)
 {
+	_find_correspondence_point = std::make_unique<FindCorrespondecePoint>(dst, _find_max_distance, _find_max_angle_deviation);
 	_deformed_mesh = std::make_unique<ARAPDeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }

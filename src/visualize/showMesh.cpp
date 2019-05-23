@@ -416,7 +416,16 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-
+	_number_of_nodes = 2000;
+	_current_frame = 0;
+	_solve_registration = false;
+	_registration_type = RegistrationType::ASAP;
+	_render_points = true;
+	_render_mesh = Render::ALL;
+	_render_reference_mesh = true;
+	_render_error = false;
+	_render_deformation_graph = true;
+	_calculate_error = false;
 	_mesh_renderer = std::make_unique<MeshRenderer>(app);
 	_point_renderer = std::make_unique<PointsRenderer>(app);
 

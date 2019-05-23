@@ -29,7 +29,7 @@ private:
 	ARAPDeformationGraph _deformation_graph;
 	std::unique_ptr<ARAPDeformedMesh> _deformed_mesh;
 	std::vector<int> _fixed_positions;
-	FindCorrespondecePoint _find_correspondence_point;
+	std::unique_ptr<FindCorrespondecePoint> _find_correspondence_point;
 	bool _with_icp = true;
 private:
 	double _current_cost = 1.;
@@ -37,9 +37,11 @@ private:
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 200;
 	long long _total_time_in_ms = 0;
-	double a_smooth = 100.;// 0.1;// 100;
+	double a_smooth = 50.;// 10.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 10.0;
+	double a_fit = 10.;
+	const double _find_max_distance = 0.5;// 0.05;
+	const double _find_max_angle_deviation = 45.;
 	std::shared_ptr<FileWriter> _logger;
 private:
 	void printCeresOptions();
