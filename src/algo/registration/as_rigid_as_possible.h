@@ -48,11 +48,13 @@ private:
 						  ARAPVertexResidualIds & fit_residual_block_ids,
 						  ARAPEdgeResidualIds & arap_residual_block_ids,
 						  ARAPVertexResidualIds & conf_residual_block_ids);
-private:
-	ARAPVertexResidualIds addConfCost(ceres::Problem &problem);
+private:	
+	ceres::ResidualBlockId addPointToPointCostForNode(ceres::Problem &problem, ARAPNode & node, ml::vec3f target_position);
+	ceres::ResidualBlockId addPointToPlaneCostForNode(ceres::Problem &problem, ARAPNode & node, ml::vec3f target_position);
 	ARAPVertexResidualIds addFitCost(ceres::Problem &problem);
 	ARAPVertexResidualIds addFitCostWithoutICP(ceres::Problem &problem);
 	ARAPEdgeResidualIds addAsRigidAsPossibleCost(ceres::Problem &problem);
+	ARAPVertexResidualIds addConfCost(ceres::Problem &problem);
 public:
 	bool finished() override;
 	bool solveIteration() override;	

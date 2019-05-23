@@ -172,11 +172,11 @@ void ShowMesh::renderRegistrationTwoFrames()
 			_point_renderer->insertLine("deformation_graph", render_dg);
 
 			auto render_dg_points = _registration->getDeformationGraphMesh();
-			_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, 0.01, true);
-			_mesh_renderer->insertMesh("deformation_graph_mesh", render_dg_points);
+			_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, 0.01);// , true);
+			//_mesh_renderer->insertMesh("deformation_graph_mesh", render_dg_points);
 		}
 		else {
-			_mesh_renderer->removeMesh("deformation_graph_mesh");
+			//_mesh_renderer->removeMesh("deformation_graph_mesh");
 			_point_renderer->removePoints("deformation_graph");
 		}
 	}

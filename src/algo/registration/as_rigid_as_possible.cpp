@@ -38,17 +38,31 @@ std::vector<Edge> AsRigidAsPossible::getDeformationGraph()
 	std::vector<Edge> edges;
 	auto & g = _deformation_graph._graph;
 	auto & graph_edges = boost::get(edge_t(), g);
+	auto & nodes = boost::get(node_t(), g);
 	boost::graph_traits<ARAPGraph>::edge_iterator ei, ei_end;
 	for (boost::tie(ei, ei_end) = boost::edges(g); ei != ei_end; ++ei)
 	{
+		//Edge e;
+		//auto & edge = graph_edges[*ei];
+
+		//auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
+		//e.source_point = vertex_i.position;
+
+		//auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
+		//e.target_point = vertex_j.position;
+		//e.cost = (edge.residual().empty()) ? 0. : edge.residual()[0];
+		//edges.push_back(e);
+
+		// test nearest point
 		Edge e;
 		auto & edge = graph_edges[*ei];
 
+		auto node = nodes[boost::source(*ei, g)];
 		auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
 		e.source_point = vertex_i.position;
 
-		auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
-		e.target_point = vertex_j.position;
+		//auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
+		e.target_point = node._nearest_point;// vertex_j.position;
 		e.cost = (edge.residual().empty()) ? 0. : edge.residual()[0];
 		edges.push_back(e);
 	}
@@ -77,6 +91,11 @@ Mesh AsRigidAsPossible::getDeformationGraphMesh()
 		if (max_fit_cost > 0.)
 			error /= max_fit_cost;
 		vertex.color = errorToRGB(error, nodes[*vp.first].weight());
+		auto & node = nodes[*vp.first];
+		if (node.weight() < 0.5)
+			vertex.color = ml::RGBColor::White.toVec4f();
+		else if (!node._found_nearest_point)
+			vertex.color = ml::RGBColor::Black.toVec4f();
 		mesh.m_vertices.push_back(vertex);
 	}
 	return mesh;
@@ -96,39 +115,47 @@ std::vector<ml::vec3f> AsRigidAsPossible::getFixedPostions()
 	return positions;
 }
 
+ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &problem, ARAPNode & node, ml::vec3f target_position)
+{
+	float point_to_point_weighting = 0.1;
+	double weight = a_fit * point_to_point_weighting;	
+	auto & global_node = _deformation_graph._global_rigid_deformation;
+
+	ceres::CostFunction* cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_position, node.g(), global_node.g());
+	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
+
+	return problem.AddResidualBlock(cost_function, loss_function, global_node.r(), global_node.t(), node.t(), node.w());
+}
+
+ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &problem, ARAPNode & node, ml::vec3f target_position)
+{
+	float point_to_plane_weighting = 0.9;
+	double weight = a_fit * point_to_plane_weighting;
+	auto & global_node = _deformation_graph._global_rigid_deformation;
+
+	ceres::CostFunction* cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_position, node.g(), node.n(), global_node.g());
+	auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weighting * weight, ceres::TAKE_OWNERSHIP);
+
+	return problem.AddResidualBlock(cost_function, loss_function, global_node.r(), global_node.t(), node.r(), node.t(), node.w());
+}
+
+
 ARAPVertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &problem)
 {
 	ARAPVertexResidualIds residual_ids;
+	auto & nodes = boost::get(node_t(), _deformation_graph._graph);
 
-	auto & g = _deformation_graph._graph;
-	auto & global_node = _deformation_graph._global_rigid_deformation;
-	auto & nodes = boost::get(node_t(), g);
-
-	float point_to_point_weighting = 0.1;
-	float point_to_plane_weighting = 0.9;
-
-	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
+	for (auto vp = boost::vertices(_deformation_graph._graph); vp.first != vp.second; ++vp.first) {
 		auto vertex_handle = *vp.first;
-		auto& src_i = nodes[*vp.first];
-		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), src_i.index()) != _fixed_positions.end()))
+		auto& node = nodes[*vp.first];
+		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), node.index()) != _fixed_positions.end()))
 		{
-			unsigned int i = src_i.index();
-			double weight = a_fit;
-			// point to point cost function
-			//ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), global_node.g());
-			//auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, point_to_point_weighting * weight, ceres::TAKE_OWNERSHIP);
-			//auto residual_id_point_to_point = problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
-			//														   global_node.r(), global_node.t(), src_i.t(), src_i.w());
+			unsigned int i = node.index();
 
+			auto residual_id_point_to_point = addPointToPointCostForNode(problem, node, _dst.getVertices()[i].position);
+			residual_ids[vertex_handle].push_back(residual_id_point_to_point);
 
-
-			// point to plane cost function
-			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(_dst.getVertices()[i].position, src_i.g(), src_i.n(), global_node.g());
-			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, point_to_plane_weighting * weight, ceres::TAKE_OWNERSHIP);
-			auto residual_id_point_to_plane = problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-																	   global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
-
-			//residual_ids[vertex_handle].push_back(residual_id_point_to_point);
+			auto residual_id_point_to_plane = addPointToPlaneCostForNode(problem, node, _dst.getVertices()[i].position);			
 			residual_ids[vertex_handle].push_back(residual_id_point_to_plane);
 		}
 	}
@@ -140,38 +167,33 @@ ARAPVertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 {
 	ARAPVertexResidualIds residual_ids;
 
-	auto & g = _deformation_graph._graph;
-	auto & global_node = _deformation_graph._global_rigid_deformation;
-	auto & nodes = boost::get(node_t(), g);
-
+	auto & nodes = boost::get(node_t(), _deformation_graph._graph);
 	int i = 0;
-	for (auto vp = boost::vertices(g); vp.first != vp.second; ++vp.first) {
+
+	for (auto vp = boost::vertices(_deformation_graph._graph); vp.first != vp.second; ++vp.first) {
 		auto vertex_handle = *vp.first;
-		auto& src_i = nodes[vertex_handle];
-		auto vertex = _deformation_graph.deformNode(vertex_handle);
+		auto& node = nodes[vertex_handle];
+		auto vertex = _deformation_graph.deformNode(vertex_handle);		
 
 		auto correspondent_point = _find_correspondence_point.correspondingPoint(vertex.position, vertex.normal);
-
+				
 		if (correspondent_point.first) {
+			node._nearest_point = correspondent_point.second;
+			node._found_nearest_point = true;
 			i++;
-			double weight = a_fit;
-			// point to point cost function
-			ceres::CostFunction* cost_function_point_to_point = FitStarPointToPointAngleAxisCostFunction::Create(correspondent_point.second, src_i.g(), global_node.g());
-			auto loss_function_point_to_point = new ceres::ScaledLoss(NULL, 0.1 *weight, ceres::TAKE_OWNERSHIP);
-			auto residual_id_point_to_point = problem.AddResidualBlock(cost_function_point_to_point, loss_function_point_to_point,
-																	   global_node.r(), global_node.t(), src_i.t(), src_i.w());
 
-			// point to plane cost function
-			ceres::CostFunction* cost_function_point_to_plane = FitStarPointToPlaneAngleAxisCostFunction::Create(correspondent_point.second, src_i.g(), src_i.n(), global_node.g());
-			auto loss_function_point_to_plane = new ceres::ScaledLoss(NULL, 0.9 *weight, ceres::TAKE_OWNERSHIP);
-			auto residual_id_point_to_plane = problem.AddResidualBlock(cost_function_point_to_plane, loss_function_point_to_plane,
-																	   global_node.r(), global_node.t(), src_i.r(), src_i.t(), src_i.w());
-
+			auto residual_id_point_to_point = addPointToPointCostForNode(problem, node, correspondent_point.second);
 			residual_ids[vertex_handle].push_back(residual_id_point_to_point);
+
+			auto residual_id_point_to_plane = addPointToPlaneCostForNode(problem, node, correspondent_point.second);
 			residual_ids[vertex_handle].push_back(residual_id_point_to_plane);
 		}
+		else {
+			node._nearest_point = vertex.position;
+			node._found_nearest_point = false;
+		}
 	}
-	std::cout << "used " << i << " of " << g.m_vertices.size() << " deformation graph nodes" << std::endl;
+	std::cout << "used " << i << " of " << _deformation_graph._graph.m_vertices.size() << " deformation graph nodes" << std::endl;
 	return residual_ids;
 }
 

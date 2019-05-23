@@ -51,6 +51,7 @@ ARAPNode::ARAPNode(int index, const ml::vec3f & g, const ml::vec3d & n, const ml
 	, _w(1.)
 	, _fit_cost(0.)
 	, _conf_cost(0.)
+	, _found_nearest_point(true)
 {}
 
 ARAPNode::ARAPNode()
@@ -66,6 +67,7 @@ ARAPNode::ARAPNode(const ARAPNode & node, bool inverse)
 	, _w(node._w)
 	, _fit_cost(node._fit_cost)
 	, _conf_cost(node._conf_cost)
+	, _found_nearest_point(node._found_nearest_point)
 {
 	if (inverse) {
 		_g = node.deformedPosition();

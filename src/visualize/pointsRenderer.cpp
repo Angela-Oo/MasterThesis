@@ -46,6 +46,7 @@ void PointsRenderer::insertLine(std::string id, std::vector<Edge> edges, float p
 		auto cost = e.cost;
 		if (max_cost > 0.)
 			cost = e.cost / max_cost;
+
 		auto color = errorToRGB(cost);
 		meshes.push_back(ml::Shapesf::line(e.source_point, e.target_point, color, point_size));
 	}

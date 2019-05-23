@@ -12,6 +12,8 @@ private:
 	double _w; // weight
 	int _index;
 public:
+	bool _found_nearest_point = true;
+	ml::vec3f _nearest_point;
 	double _fit_cost;
 	double _conf_cost;
 public:
