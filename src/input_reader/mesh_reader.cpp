@@ -129,3 +129,43 @@ DeformationMesh::DeformationMesh()
 	}
 	_meshes.push_back(mesh_2);
 }
+
+
+
+
+ml::TriMeshf& DeformationMeshFrames::getMesh(unsigned int frame)
+{
+	return _meshes[frame];
+}
+
+std::vector<int> DeformationMeshFrames::getFixedPositions(unsigned int frame)
+{
+	return std::vector<int>();
+}
+
+unsigned int DeformationMeshFrames::frame()
+{
+	return _meshes.size();
+}
+
+DeformationMeshFrames::DeformationMeshFrames()
+{
+	auto mesh_1 = ml::Shapes<float>::cylinder(0.1, 1., _cylinder_height_points, _cylinder_width_points);
+	_meshes.push_back(mesh_1);
+		
+	auto rotation = ml::mat4f::rotationX(15.);
+	auto translation = ml::mat4f::translation({ -0.1, 0., 0.01 });
+	auto transformation = translation * rotation;
+
+	auto mesh_2 = mesh_1;
+	for (int i = 0; i < mesh_2.m_vertices.size(); ++i) {
+		mesh_2.m_vertices[i].position = transformation * mesh_2.m_vertices[i].position;
+	}
+	_meshes.push_back(mesh_2);
+
+	auto mesh_3 = mesh_2;
+	for (int i = 0; i < mesh_3.m_vertices.size(); ++i) {
+		mesh_3.m_vertices[i].position = transformation * mesh_3.m_vertices[i].position;
+	}
+	_meshes.push_back(mesh_3);
+}

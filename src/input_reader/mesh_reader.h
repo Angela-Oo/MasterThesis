@@ -51,3 +51,16 @@ public:
 public:
 	DeformationMesh();
 };
+
+class DeformationMeshFrames : public IMeshReader
+{
+	std::vector<ml::TriMeshf> _meshes;
+	const int _cylinder_width_points = 20;
+	const int _cylinder_height_points = 50;
+public:
+	ml::TriMeshf& getMesh(unsigned int frame) override;
+	std::vector<int> getFixedPositions(unsigned int frame) override;
+	unsigned int frame() override;
+public:
+	DeformationMeshFrames();
+};

@@ -35,7 +35,7 @@ private:
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
-	size_t _max_iterations = 200;
+	size_t _max_iterations = 100;
 	long long _total_time_in_ms = 0;
 	double a_smooth = 50.;// 10.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;

@@ -211,7 +211,7 @@ ARAPVertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 	auto & nodes = boost::get(node_t(), _deformation_graph._graph);
 	int i = 0;
 
-	std::cout << "median dist " << _find_correspondence_point->median() << std::endl;
+	//std::cout << "median dist " << _find_correspondence_point->median() << std::endl;
 	for (auto vp = boost::vertices(_deformation_graph._graph); vp.first != vp.second; ++vp.first) {
 		auto vertex_handle = *vp.first;
 		auto& node = nodes[vertex_handle];
@@ -233,7 +233,7 @@ ARAPVertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 			node._found_nearest_point = false;
 		}
 	}
-	std::cout << "used " << i << " of " << _deformation_graph._graph.m_vertices.size() << " deformation graph nodes" << std::endl;
+	//std::cout << "used " << i << " of " << _deformation_graph._graph.m_vertices.size() << " deformation graph nodes" << std::endl;
 	return residual_ids;
 }
 
