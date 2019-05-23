@@ -287,9 +287,6 @@ void ShowMesh::render(ml::Cameraf& camera)
 	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
 		nonRigidRegistration();
 	}
-	//else if (_solve_rigid_registration && _registration && _selected_frame_for_registration.size() == 2) {
-	//	rigidRegistration(_selected_frame_for_registration[1], _selected_frame_for_registration[0]);
-	//}
 }
 
 
