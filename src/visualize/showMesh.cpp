@@ -7,6 +7,9 @@
 #include "algo/registration/rigid_registration.h"
 #include "algo/registration/ceres_option.h"
 
+// test
+#include "algo/mesh_simplification/deformation_graph_mesh.h"
+
 void ShowMesh::nonRigidRegistration()
 {
 	if (!_registration && _selected_frame_for_registration.size() == 2) {
@@ -420,7 +423,7 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-	_number_of_nodes = 3000;
+	_number_of_nodes = 1000;
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ASAP;
@@ -439,7 +442,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = false;
+	bool test = true;
 	if (!test) {
 		// puppet
 		//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
@@ -469,10 +472,12 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_reference_registration_mesh = std::move(reference_registration_mesh);
 	}
 	else {
-		//_input_mesh = std::make_unique<DeformationMesh>();
-		//_reference_registration_mesh = std::make_unique<DeformationMesh>();
-		_input_mesh = std::make_unique<DeformationMeshFrames>();
-		_reference_registration_mesh = std::make_unique<DeformationMeshFrames>();
+		_input_mesh = std::make_unique<DeformationMesh>();
+		_reference_registration_mesh = std::make_unique<DeformationMesh>();
+
+		SurfaceMesh m = convertToDeformationGraphMesh(_input_mesh->getMesh(0));
+		//_input_mesh = std::make_unique<DeformationMeshFrames>();
+		//_reference_registration_mesh = std::make_unique<DeformationMeshFrames>();
 		_logger = std::make_shared<FileWriter>("test.txt");
 		_render_reference_mesh = false;
 		_calculate_error = false;

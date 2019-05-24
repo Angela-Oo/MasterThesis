@@ -2,6 +2,8 @@
 #include "mLibInclude.h"
 #include "graph_node_type.h"
 
+#include "algo/deformation_graph/i_node.h"
+
 class ARAPNode
 {
 private:
@@ -45,6 +47,8 @@ public:
 class ARAPEdge {	
 public:
 	double _smooth_cost;
+	vertex_index _triangle_vij;
+	vertex_index _triangle_vji;
 };
 
 typedef boost::property<node_t, ARAPNode> VertexProperty;
@@ -53,3 +57,48 @@ typedef boost::property<edge_t, ARAPEdge> EdgeProperty;
 typedef boost::adjacency_list<boost::vecS, boost::vecS, boost::undirectedS,	VertexProperty,	EdgeProperty> ARAPGraph;
 
 
+
+namespace ARAP {
+
+class Node : public INode
+{
+private:
+	ml::vec3f _g; // node position
+	ml::vec3d _n; // normal vector
+	ml::vec3d _r; // rotation matrix
+	ml::vec3d _t; // translation vector	
+	double _w; // weight
+public:
+	ml::vec3f & g() { return _g; }
+	ml::vec3d & n() { return _n; }
+public:
+	ml::vec3f & position() override { return _g; };
+	ml::vec3d & normal() override { return _n; };
+	double * r() override { return (&_r)->getData(); }
+	double * t() override { return (&_t)->getData(); }
+	double * w() override { return &_w; }
+public:
+	ml::mat3d rotation() const override;
+	ml::vec3d translation() const override { return _t; }
+	double weight() const override { return _w; };
+public:
+	ml::vec3d deformedPosition() const override;
+	ml::vec3d deformedNormal() const override;
+	ml::vec3d deformPosition(const ml::vec3f & pos) const override;
+	ml::vec3d deformNormal(const ml::vec3f & normal) const override;
+public:
+	Node(const ml::vec3f & g, const ml::vec3d & n);
+	Node(const ml::vec3f & g, const ml::vec3d & n, const ml::vec3d & r, const ml::vec3d & t);
+	Node();
+	Node(const Node& node, bool inverse);
+};
+
+
+class Edge {
+public:
+	double _smooth_cost;
+	vertex_index _triangle_vij;
+	vertex_index _triangle_vji;
+};
+
+}

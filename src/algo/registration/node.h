@@ -47,6 +47,8 @@ public:
 class GraphEdge {
 public:
 	double _smooth_cost = 0.;
+	vertex_index _triangle_vij;
+	vertex_index _triangle_vji;
 };
 
 typedef boost::property<node_t, Node> VertexProperty;

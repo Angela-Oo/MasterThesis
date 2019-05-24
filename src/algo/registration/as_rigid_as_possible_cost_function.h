@@ -38,9 +38,6 @@ struct AsRigidAsPossibleCostFunction {
 
 		substract(vj, vi, edge);
 
-		//T rotation_angle_axis[3];//
-		//ceres::RotationMatrixToAngleAxis(rotation, rotation_angle_axis);//
-		//ceres::AngleAxisRotatePoint(rotation_angle_axis, edge, rotated_edge);//
 		ceres::AngleAxisRotatePoint(rotation, edge, rotated_edge);
 
 		addition(vi, translation_i, vi_t);
@@ -48,25 +45,6 @@ struct AsRigidAsPossibleCostFunction {
 
 		substract(vj_t, vi_t, transformed_edge);
 		substract(rotated_edge, transformed_edge, residuals);
-
-		//T edge_src[3];		
-		//substract(vi, vj, edge_src);
-
-		//ceres::AngleAxisRotatePoint(rotation, edge_src, edge_src);
-		//
-		//T tj[3];
-		//vec3f_to_T(_t_j, tj);
-		//T v_dst_i[3];
-		//T v_dst_j[3];
-		//T edge_dst[3];
-		//addition(vi, translation, v_dst_i);
-		//addition(vj, tj, v_dst_j);
-		//substract(v_dst_i, v_dst_j, edge_dst);
-
-		//// The error is the difference between the predicted and observed position.
-		//residuals[0] = edge_dst[0] - edge_src[0];
-		//residuals[1] = edge_dst[1] - edge_src[1];
-		//residuals[2] = edge_dst[2] - edge_src[2];
 
 		return true;
 	}

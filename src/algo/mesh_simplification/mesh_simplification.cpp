@@ -2,20 +2,64 @@
 
 #include "mesh_simplification.h"
 #include "mLibCGAL.h"
-
+//
 #include <CGAL/Surface_mesh_simplification/edge_collapse.h>
 #include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/Count_ratio_stop_predicate.h>
-// Stop-condition policy
+//// Stop-condition policy
 #include <CGAL/Surface_mesh_simplification/Policies/Edge_collapse/Count_stop_predicate.h>
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Polyhedron_items_with_id_3.h>
+//
+//typedef CGAL::Simple_cartesian<double>                                   Kernel;
+//typedef CGAL::Surface_mesh<Kernel::Point_3> SurfaceMesh;
+//typedef boost::graph_traits<SurfaceMesh>::vertex_descriptor    vertex_descriptor;
+////typedef boost::graph_traits<SurfaceMesh>::vertex_iterator        vertex_iterator;
+//typedef SurfaceMesh::Face_index        face_descriptor;
 
-typedef CGAL::Simple_cartesian<double>                                   Kernel;
-typedef CGAL::Surface_mesh<Kernel::Point_3> SurfaceMesh;
-typedef boost::graph_traits<SurfaceMesh>::vertex_descriptor    vertex_descriptor;
-//typedef boost::graph_traits<SurfaceMesh>::vertex_iterator        vertex_iterator;
-typedef SurfaceMesh::Face_index        face_descriptor;
-
+//
+//class INode
+//{
+//public:
+//	virtual Kernel::Point_3 deformed() = 0;
+//};
+//
+//class NodeTest : public INode
+//{
+//public:
+//	Kernel::Point_3 x;
+//	Kernel::Point_3 deformed() {
+//		return x;
+//	}
+//	NodeTest(double f)
+//		: x(f, 0., 0.) 
+//	{}
+//};
+//
+//SurfaceMesh convertToDeformationGraphMesh(const Mesh& triMesh) {
+//	SurfaceMesh mesh;
+//
+//	auto property_map = mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("node", nullptr);
+//	
+//	std::vector<SurfaceMesh::Vertex_index> vertex_handles;
+//	vertex_handles.reserve(triMesh.getVertices().size());
+//
+//	for (const auto& v : triMesh.getVertices()) {
+//		auto vertex_handle = mesh.add_vertex(SurfaceMesh::Point(v.position.x, v.position.y, v.position.z));
+//		vertex_handles.push_back(vertex_handle);
+//		property_map.first[vertex_handle] = std::make_shared<NodeTest>(2.);
+//	}
+//
+//	for (const auto& f : triMesh.getIndices()) {
+//		mesh.add_face(vertex_handles[f.x], vertex_handles[f.y], vertex_handles[f.z]);
+//	}
+//	auto get = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("node");
+//	for (auto x : get.first)
+//	{
+//		std::cout << " " << x->deformed()[0] << std::endl;
+//	}
+//	return mesh;
+//}
+//
 SurfaceMesh convertToCGALMesh(const Mesh& triMesh) {
 	SurfaceMesh mesh;
 

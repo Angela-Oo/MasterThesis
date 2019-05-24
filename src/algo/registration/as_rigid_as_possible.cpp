@@ -250,12 +250,30 @@ ARAPEdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &
 
 		auto& src_i = nodes[vi];
 		auto& src_j = nodes[vj];
+
+		auto & e = boost::get(edge_t(), g)[edge_index];
+		
+		auto angle = [](ml::vec3f v1, ml::vec3f v2, ml::vec3f v3)
+		{
+			auto edge1 = (v3 - v1).getNormalized();
+			auto edge2 = (v3 - v2).getNormalized();
+			return acos(ml::vec3f::dot(edge1, edge2));
+		};
+
+		// todo!
+		double alpha_ij = angle(src_i.deformedPosition(), src_j.deformedPosition(), nodes[e._triangle_vij].deformedPosition());
+		double beta_ij = angle(src_j.deformedPosition(), src_i.deformedPosition(), nodes[e._triangle_vji].deformedPosition());
+		double wij = 0.5 * (cos(alpha_ij) + atan(beta_ij));
+		double wji = 0.5 * (cos(beta_ij) + atan(alpha_ij));
+		double weight_ij = a_smooth * wij;
+		double weight_ji = a_smooth * wji;
+
 		ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(src_i.g(), src_j.g());
-		auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
+		auto loss_function = new ceres::ScaledLoss(NULL, weight_ij, ceres::TAKE_OWNERSHIP);
 		auto residual_id_smooth_e1 = problem.AddResidualBlock(cost_function, loss_function, src_i.r(), src_i.t(), src_j.t());
 
 		ceres::CostFunction* cost_function_j = AsRigidAsPossibleCostFunction::Create(src_j.g(), src_i.g());
-		auto loss_function_j = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
+		auto loss_function_j = new ceres::ScaledLoss(NULL, weight_ji, ceres::TAKE_OWNERSHIP);
 		auto residual_id_smooth_e2 = problem.AddResidualBlock(cost_function_j, loss_function_j, src_j.r(), src_j.t(), src_i.t());
 
 		residual_ids[edge_index].push_back(residual_id_smooth_e1);

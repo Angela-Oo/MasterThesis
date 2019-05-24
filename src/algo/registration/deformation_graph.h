@@ -263,12 +263,19 @@ DeformationGraph<Graph, Node>::DeformationGraph(const Mesh & mesh)
 		auto n1 = index_to_vertex_index[indices[index][0]];
 		auto n2 = index_to_vertex_index[indices[index][1]];
 		auto n3 = index_to_vertex_index[indices[index][2]];
-		if (boost::edge(n1, n2, _graph).second == false)
-			boost::add_edge(n1, n2, _graph);
-		if (boost::edge(n2, n3, _graph).second == false)
-			boost::add_edge(n2, n3, _graph);
-		if (boost::edge(n3, n1, _graph).second == false)
-			boost::add_edge(n3, n1, _graph);
+
+
+		
+		auto addEdge = [&](vertex_index v1, vertex_index v2, vertex_index v3)
+		{
+			if (boost::edge(v1, v2, _graph).second == false)
+			{
+				boost::add_edge(n2, n3, _graph);
+			}
+		};
+		addEdge(n1, n2, n3);
+		addEdge(n2, n3, n1);
+		addEdge(n3, n1, n2);
 	}
 	_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
 

@@ -86,9 +86,9 @@ size_t NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getCurrent
 template <typename Registration, typename DeformationGraph>
 std::pair<std::vector<ml::vec3f>, std::vector<ml::vec3f>>  NonRigidRegistrationAllFrames<Registration, DeformationGraph>::getDeformationGraph(int frame)
 {
-	auto inverse_deformation = inverteDeformationGraph(_deformation_graphs[frame]);
-	return inverse_deformation.getDeformationGraphEdges();	
-	//return _deformation_graphs[frame].getDeformationGraphEdges();
+	//auto inverse_deformation = inverteDeformationGraph(_deformation_graphs[frame]);
+	//return inverse_deformation.getDeformationGraphEdges();	
+	return _deformation_graphs[frame].getDeformationGraphEdges();
 }
 
 template <typename Registration, typename DeformationGraph>
