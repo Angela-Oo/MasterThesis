@@ -1,36 +1,22 @@
 #include "nearest_neighbor_search.h"
-//
-//#include <CGAL/Search_traits_3.h>
-//#include <CGAL/Search_traits_adapter.h>
-//#include <CGAL/Orthogonal_k_neighbor_search.h>
-//#include <CGAL/Surface_mesh.h>
-//
-//typedef CGAL::Search_traits_3<Kernel>                                    Traits_base;
-//typedef CGAL::Search_traits_adapter<vertex_descriptor, NodeProperty, Traits_base> Traits;
-//typedef CGAL::Orthogonal_k_neighbor_search<Traits>                      K_neighbor_search;
-//typedef K_neighbor_search::Tree                                         Tree;
-//typedef Tree::Splitter                                                  Splitter;
-//typedef K_neighbor_search::Distance    Distance;
 
-void test(const SurfaceMesh &mesh, Point query, int N) {
 
-	//Tree tree(mesh.points().begin(), mesh.points().end());
-
-	//// Initialize the search structure, and search all N points
-	//Neighbor_search search(tree, query, N);
-	//// report the N nearest neighbors and their distance
- //  // This should sort all N points by increasing distance from origin
-	//for (Neighbor_search::iterator it = search.begin(); it != search.end(); ++it) {
-	//	std::cout << it->first << " " << std::sqrt(it->second) << std::endl;
-	//}
-}
-void FindNearestNeighbor::find()
+/// NearestNeighborSearch search(mesh);
+/// Neighbor_search s = search.neighbor_search(Point(0., 0., 0.), 5);
+/// for (Neighbor_search::iterator it = s.begin(); it != s.end(); ++it) {
+/// 	auto distance = std::sqrt(it->second);
+/// 	auto vertex_handle = it->first;
+/// }
+Neighbor_search NearestNeighborSearch::search(Point point, int K)
 {
-
+	Neighbor_search::Distance distance(_vertex_point_property_map);
+	Neighbor_search search(*_tree, point, K, 0, true, distance);
+	return search;
 }
 
-FindNearestNeighbor::FindNearestNeighbor(const SurfaceMesh & mesh)
-	: _mesh(mesh)
+NearestNeighborSearch::NearestNeighborSearch(const SurfaceMesh & mesh)
 {
-	
+	_vertex_point_property_map = get(CGAL::vertex_point, mesh);
+	_tree = std::make_unique<Tree>(vertices(mesh).begin(), vertices(mesh).end(), Tree::Splitter(), Traits(_vertex_point_property_map));
 }
+

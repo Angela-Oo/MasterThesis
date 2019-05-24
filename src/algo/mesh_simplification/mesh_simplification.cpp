@@ -123,3 +123,13 @@ Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices)
 	int r = CGAL::Surface_mesh_simplification::edge_collapse(surface_mesh, stop);
 	return convertToTriMesh(surface_mesh);
 }
+
+
+
+SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, int number_of_vertices)
+{
+	SurfaceMesh surface_mesh = mesh;
+	CGAL::Surface_mesh_simplification::Count_stop_predicate<SurfaceMesh> stop(number_of_vertices);
+	int r = CGAL::Surface_mesh_simplification::edge_collapse(surface_mesh, stop);
+	return surface_mesh;
+}

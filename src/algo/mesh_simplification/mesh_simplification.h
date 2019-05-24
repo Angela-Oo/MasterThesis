@@ -1,15 +1,8 @@
 #pragma once
 #include "mLibInclude.h"
-#include "boost/graph/adjacency_list.hpp"
-
+#include "algo/surface_mesh/mesh_definition.h"
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Surface_mesh.h>
-
-typedef CGAL::Simple_cartesian<double> Kernel;
-typedef CGAL::Surface_mesh<Kernel::Point_3> SurfaceMesh;
-typedef SurfaceMesh::Vertex_index vertex_descriptor;
-typedef SurfaceMesh::Edge_index edge_descriptor;
-typedef SurfaceMesh::Face_index face_descriptor;
 
 namespace CGAL
 {
@@ -49,3 +42,7 @@ typedef ml::TriMeshf Mesh;
 Mesh convertToTriMesh(SurfaceMesh& mesh);
 
 Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices);
+
+
+
+SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, int number_of_vertices);

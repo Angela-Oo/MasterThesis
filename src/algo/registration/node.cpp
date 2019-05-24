@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "node.h"
+#include "algo/registration/node.h"
 #include <ceres/rotation.h>
 
 namespace ED

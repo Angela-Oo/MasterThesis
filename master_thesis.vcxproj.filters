@@ -76,6 +76,9 @@
     <Filter Include="algo\deformation graph">
       <UniqueIdentifier>{7f786232-fe92-48ab-82b1-853958e87984}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algo\surface mesh">
+      <UniqueIdentifier>{dcf7f109-b74a-493f-9039-3aa02c5a9434}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -614,6 +617,21 @@
     <ClInclude Include="src\algo\deformation_graph\i_node.h">
       <Filter>algo\deformation graph</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap.h">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\find_corresponding_points\find_corresponding_points.h">
+      <Filter>algo\registration\find correspondences</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\surface_mesh\mesh_definition.h">
+      <Filter>algo\surface mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_node.h">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -734,6 +752,15 @@
     </ClCompile>
     <ClCompile Include="src\algo\deformation_graph\nearest_neighbor_search.cpp">
       <Filter>algo\deformation graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\arap\arap.cpp">
+      <Filter>algo\registration\as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\find_corresponding_points\find_corresponding_points.cpp">
+      <Filter>algo\registration\find correspondences</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\arap\arap_node.cpp">
+      <Filter>algo\registration\as rigid as possible</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

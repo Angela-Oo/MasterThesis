@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "deformation_graph_mesh.h"
+#include "algo/deformation_graph/i_node.h"
+
+#include "algo/deformation_graph/nearest_neighbor_search.h"
 
 
 DeformationGraphMesh convertToDeformationGraphMesh(const Mesh& triMesh) {
@@ -21,40 +24,17 @@ DeformationGraphMesh convertToDeformationGraphMesh(const Mesh& triMesh) {
 	for (const auto& f : triMesh.getIndices()) {
 		mesh.add_face(vertex_handles[f.x], vertex_handles[f.y], vertex_handles[f.z]);
 	}
-	//auto get = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("node");
-	//for (auto x : get.first)
-	//{
-	//	std::cout << " " << x->deformedPosition()[0] << std::endl;
-	//}
 
-	Vertex_point_pmap vppmap = get(CGAL::vertex_point, mesh);
-	Tree tree(vertices(mesh).begin(), vertices(mesh).end(), Tree::Splitter(), Traits(vppmap));
+	NearestNeighborSearch search(mesh);
 	Point query(0.05, 0., 0.);
-	int N = 5;
+	Neighbor_search s = search.search(query, 5);
 
-	Neighbor_search::Distance distance(vppmap);
-	// Initialize the search structure, and search all N points
-	//Neighbor_search search(tree, query, N);
-	Neighbor_search search(tree, query, N, 0, true, distance);
-	// report the N nearest neighbors and their distance
-   // This should sort all N points by increasing distance from origin
-	for (Neighbor_search::iterator it = search.begin(); it != search.end(); ++it) {
+	for (Neighbor_search::iterator it = s.begin(); it != s.end(); ++it) {
 		auto distance = std::sqrt(it->second);
 		auto vertex_handle = it->first;
 		auto point = mesh.point(vertex_handle);
 		std::cout << vertex_handle << " p: " << point << " dist " << distance << std::endl;
 	}
-
-	//Tree tree(mesh.points().begin(), mesh.points().end());
-	//Point query(0., 0., 0.);
-	//int N = 5;
-	//// Initialize the search structure, and search all N points
-	//Neighbor_search search(tree, query, N);
-	//// report the N nearest neighbors and their distance
- //  // This should sort all N points by increasing distance from origin
-	//for (Neighbor_search::iterator it = search.begin(); it != search.end(); ++it) {
-	//	std::cout << it->first << " " << std::sqrt(it->second) << std::endl;
-	//}
 	return mesh;
 }
 
