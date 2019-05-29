@@ -6,6 +6,7 @@
 #include <ceres/ceres.h>
 #include "algo/registration/ceres_option.h"
 #include "algo/registration/embedded_deformation/ed.h"
+#include "algo/surface_mesh/mesh_convertion.h"
 
 using namespace ml;
 

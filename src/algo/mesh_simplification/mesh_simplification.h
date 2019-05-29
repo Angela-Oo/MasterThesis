@@ -39,12 +39,6 @@ private:
 
 typedef ml::TriMeshf Mesh;
 
-SurfaceMesh convertToCGALMesh(const Mesh& triMesh);
-
-Mesh convertToTriMesh(const SurfaceMesh& mesh);
-
 Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices);
-
-
 
 SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, int number_of_vertices);

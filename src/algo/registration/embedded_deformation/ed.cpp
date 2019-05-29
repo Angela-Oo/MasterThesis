@@ -39,7 +39,7 @@ std::vector<Point> EmbeddedDeformation::getFixedPostions()
 	return positions;
 }
 
-const DG::DeformationGraphCgalMesh & EmbeddedDeformation::getDeformationGraph()
+const DG::DeformationGraph & EmbeddedDeformation::getDeformationGraph()
 {
 	return _deformation_graph;
 }
@@ -318,14 +318,14 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
 	std::cout << "number of def nodes " << number_of_deformation_nodes << " true number " << reduced_mesh.num_vertices() << std::endl;
-	_deformation_graph = DG::DeformationGraphCgalMesh(reduced_mesh, []() { return std::make_shared<Deformation>(); });
+	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 										 const SurfaceMesh& dst,
-										 const DG::DeformationGraphCgalMesh & deformation_graph,
+										 const DG::DeformationGraph & deformation_graph,
 										 ceres::Solver::Options option,
 										 std::shared_ptr<FileWriter> logger)
 	: _src(src)
@@ -339,9 +339,6 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }
-
-
-
 
 
 

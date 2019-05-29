@@ -2,7 +2,7 @@
 
 #include "mLibInclude.h"
 #include <vector>
-#include "nearest_neighbor_search.h"
+#include "algo/surface_mesh/nearest_neighbor_search.h"
 #include "i_node.h"
 #include <CGAL/squared_distance_3.h> //for 3D functions
 
@@ -45,7 +45,7 @@ Direction deformNodeNormal(NodeAndPoint point);
 Point deformPositionAtNode(Point point, NodeAndPoint node);
 Direction deformNormalAtNode(Direction normal, NodeAndPoint node);
 
-class DeformationGraphCgalMesh
+class DeformationGraph
 {
 public:
 	const int _k = 4;
@@ -67,26 +67,26 @@ public:
 	NodeAndPoint getNode(vertex_descriptor node_index);
 	//DeformationGraphMesh::Property_map<vertex_descriptor, std::shared_ptr<INode>> getDeformations();
 public:
-	DeformationGraphCgalMesh() = default;
+	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
-	DeformationGraphCgalMesh(const SurfaceMesh & nodes, std::function<std::shared_ptr<INode>()> create_node);
-	DeformationGraphCgalMesh(const SurfaceMesh & graph, const std::shared_ptr<INode> & global_rigid_deformation);
-	DeformationGraphCgalMesh(const DeformationGraphCgalMesh & deformation_graph);
-	DeformationGraphCgalMesh & operator=(DeformationGraphCgalMesh other);
+	DeformationGraph(const SurfaceMesh & nodes, std::function<std::shared_ptr<INode>()> create_node);
+	DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<INode> & global_rigid_deformation);
+	DeformationGraph(const DeformationGraph & deformation_graph);
+	DeformationGraph & operator=(DeformationGraph other);
 };
 
 
-SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraphCgalMesh & deformation_graph);
+SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph);
 
 class DeformedMesh
 {
 private:
-	const DeformationGraphCgalMesh & _deformation_graph;
+	const DeformationGraph & _deformation_graph;
 	SurfaceMesh _mesh;
 public:
 	SurfaceMesh deformPoints();
 public:
-	DeformedMesh(const SurfaceMesh & mesh, const DeformationGraphCgalMesh & deformation_graph);
+	DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph);
 };
 
 

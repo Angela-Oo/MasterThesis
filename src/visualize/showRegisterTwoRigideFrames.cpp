@@ -6,6 +6,7 @@
 #include "algo/registration/embedded_deformation/ed.h"
 #include "input_reader/depth_image_reader.h"
 #include "algo/registration/ceres_option.h"
+#include "algo/surface_mesh/mesh_convertion.h"
 
 void ShowTwoRigideRegisteredFrames::renderPoints()
 {

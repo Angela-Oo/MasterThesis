@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mLibInclude.h"
-#include "algo/registration/deformation_graph/deformation_graph_cgal_mesh.h"
+#include "algo/registration/deformation_graph/deformation_graph.h"
 #include "ed_node.h"
 #include "algo/file_writer.h"
 #include <vector>
@@ -22,7 +22,7 @@ class EmbeddedDeformation : public IRegistration
 	SurfaceMesh _src;
 	SurfaceMesh _dst;
 	ceres::Solver::Options _options;
-	DG::DeformationGraphCgalMesh _deformation_graph;
+	DG::DeformationGraph _deformation_graph;
 	std::unique_ptr<DG::DeformedMesh> _deformed_mesh;
 	std::vector<vertex_descriptor> _fixed_positions;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
@@ -73,7 +73,7 @@ public:
 	//Mesh getInverseDeformedPoints() override;
 	SurfaceMesh getDeformationGraphMesh() override;
 public:
-	const DG::DeformationGraphCgalMesh & getDeformationGraph() override;
+	const DG::DeformationGraph & getDeformationGraph() override;
 	std::vector<Point> getFixedPostions() override;
 public:
 	// without icp
@@ -91,7 +91,7 @@ public:
 	// with icp but init with passed deformation graph
 	EmbeddedDeformation(const SurfaceMesh& src,
 						const SurfaceMesh& dst,
-						const DG::DeformationGraphCgalMesh & deformation_graph,
+						const DG::DeformationGraph & deformation_graph,
 						ceres::Solver::Options option,
 						std::shared_ptr<FileWriter> logger = nullptr);
 

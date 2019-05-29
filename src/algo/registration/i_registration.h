@@ -3,7 +3,7 @@
 #include "mLibInclude.h"
 //#include "graph_node_type.h"
 
-#include "algo/registration/deformation_graph/deformation_graph_cgal_mesh.h"
+#include "algo/registration/deformation_graph/deformation_graph.h"
 
 struct Edge
 {
@@ -26,7 +26,7 @@ public:
 	//virtual SurfaceMesh getInverseDeformedPoints() = 0;
 public:
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
-	virtual const DG::DeformationGraphCgalMesh & getDeformationGraph() { return DG::DeformationGraphCgalMesh();	};
+	virtual const DG::DeformationGraph & getDeformationGraph() { return DG::DeformationGraph();	};
 	virtual SurfaceMesh getDeformationGraphMesh() = 0;// { return SurfaceMesh(); };
 public:
 	virtual ~IRegistration() = default;

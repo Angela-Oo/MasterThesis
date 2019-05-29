@@ -6,6 +6,8 @@
 #include <filesystem>
 #include "core-mesh/meshShapes.h"
 
+#include "algo/surface_mesh/mesh_convertion.h"
+
 std::string MeshReader::getFileName(unsigned int index)
 {
 	auto frame_number = [](unsigned int idx) {

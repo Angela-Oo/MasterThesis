@@ -584,14 +584,17 @@
     <ClInclude Include="src\algo\registration\rigid_deformation_cost_function.h">
       <Filter>algo\registration\rigid registration</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph_cgal_mesh.h">
-      <Filter>algo\registration\deformation graph</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\i_node.h">
       <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph\nearest_neighbor_search.h">
+    <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h">
       <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\surface_mesh\mesh_convertion.h">
+      <Filter>algo\surface mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\surface_mesh\nearest_neighbor_search.h">
+      <Filter>algo\surface mesh</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -693,11 +696,14 @@
     <ClCompile Include="src\algo\mesh_knn.cpp">
       <Filter>algo\evaluate registration</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\deformation_graph\deformation_graph_cgal_mesh.cpp">
+    <ClCompile Include="src\algo\registration\deformation_graph\deformation_graph.cpp">
       <Filter>algo\registration\deformation graph</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\deformation_graph\nearest_neighbor_search.cpp">
-      <Filter>algo\registration\deformation graph</Filter>
+    <ClCompile Include="src\algo\surface_mesh\mesh_convertion.cpp">
+      <Filter>algo\surface mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\surface_mesh\nearest_neighbor_search.cpp">
+      <Filter>algo\surface mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
