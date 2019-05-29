@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "showKinectData.h"
 #include <numeric>
-#include "algo/registration/icp.h"
+#include "algo/registration/rigid_registration.h"
 #include "input_reader/kinect_reader.h"
 #include <ceres/ceres.h>
 #include "algo/registration/ceres_option.h"
@@ -53,24 +53,25 @@ void ShowKinectData::icp(int frame_a, int frame_b)
 	auto points_a = _reader->getPoints(frame_a);
 	auto points_b = _reader->getPoints(frame_b);
 
-	ceres::Solver::Options options;
-	options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
-	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
-	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
-	options.max_num_iterations = 50;
-	options.logging_type = ceres::LoggingType::SILENT;
-	options.minimizer_progress_to_stdout = false;
-	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-	options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
-	options.preconditioner_type = ceres::PreconditionerType::JACOBI;
+	// todo
+	//ceres::Solver::Options options;
+	//options.sparse_linear_algebra_library_type = ceres::EIGEN_SPARSE;
+	//options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
+	//options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
+	//options.max_num_iterations = 50;
+	//options.logging_type = ceres::LoggingType::SILENT;
+	//options.minimizer_progress_to_stdout = false;
+	//options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
+	//options.linear_solver_type = ceres::LinearSolverType::SPARSE_NORMAL_CHOLESKY;
+	//options.preconditioner_type = ceres::PreconditionerType::JACOBI;
 
-	ICPNN icpnn(points_a, points_b, options);
-	ml::mat4f transformation = icpnn.solve();
+	//RigidRegistration icpnn(convertToCGALMesh( points_a), convertToCGALMesh(points_b), options);
+	//ml::mat4f transformation = icpnn.solve();
 
-	std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
+	//std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = transformation * p; });
 
-	_point_renderer->insertPoints("frameA", points_a, ml::RGBColor::Orange);
-	_point_renderer->insertPoints("frameB", points_b, ml::RGBColor::Green);
+	//_point_renderer->insertPoints("frameA", points_a, ml::RGBColor::Orange);
+	//_point_renderer->insertPoints("frameB", points_b, ml::RGBColor::Green);
 }
 
 void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)

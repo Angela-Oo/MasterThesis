@@ -198,7 +198,7 @@ bool RigidRegistration::finished()
 void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 										 std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids)
 {
-	auto fit_cost = _source.property_map<vertex_descriptor, double>("v:fit_cost").first;
+	auto fit_cost = _source.add_property_map<vertex_descriptor, double>("v:fit_cost").first;
 	for (auto & r : fit_residual_block_ids) {
 		ceres::Problem::EvaluateOptions evaluate_options;
 		evaluate_options.residual_blocks = r.second;

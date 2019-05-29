@@ -79,6 +79,9 @@
     <Filter Include="algo\surface mesh">
       <UniqueIdentifier>{dcf7f109-b74a-493f-9039-3aa02c5a9434}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algo\helper">
+      <UniqueIdentifier>{4d1110bb-fba2-4758-9bba-fd1603def0af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -494,16 +497,10 @@
     <ClInclude Include="src\kinect\SensorDataWrapper.h">
       <Filter>kinect</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\ceres_iteration_logger.h">
-      <Filter>algo</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\ceres_math.h">
       <Filter>algo</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\knn.h">
-      <Filter>algo</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\se3.h">
       <Filter>algo</Filter>
     </ClInclude>
     <ClInclude Include="src\input_reader\depth_image_reader.h">
@@ -533,29 +530,17 @@
     <ClInclude Include="src\algo\mesh_knn.h">
       <Filter>algo</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\file_writer.h">
-      <Filter>algo</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h">
       <Filter>algo\mesh simplification</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\graph_node_type.h">
-      <Filter>algo\registration\deformation graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\icp.h">
-      <Filter>algo\registration\rigid registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\icp_cost_function.h">
       <Filter>algo\registration\rigid registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_registration.h">
       <Filter>algo\registration\rigid registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\node_weighting.h">
-      <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\i_registration.h">
       <Filter>algo\registration</Filter>
@@ -608,6 +593,12 @@
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_node.h">
       <Filter>algo\registration\embedded deformation</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\file_writer.h">
+      <Filter>algo\helper</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\ceres_iteration_logger.h">
+      <Filter>algo\helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -648,13 +639,7 @@
     <ClCompile Include="src\kinect\SensorDataWrapper.cpp">
       <Filter>kinect</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\ceres_iteration_logger.cpp">
-      <Filter>algo</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\knn.cpp">
-      <Filter>algo</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\se3.cpp">
       <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\input_reader\depth_image_reader.cpp">
@@ -681,20 +666,11 @@
     <ClCompile Include="src\algo\mesh_knn.cpp">
       <Filter>algo</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\file_writer.cpp">
-      <Filter>algo</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
       <Filter>algo\mesh simplification</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\icp.cpp">
-      <Filter>algo\registration\rigid registration</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_registration.cpp">
       <Filter>algo\registration\rigid registration</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\node_weighting.cpp">
-      <Filter>algo\registration\deformation graph</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\registration.cpp">
       <Filter>algo\registration</Filter>
@@ -728,6 +704,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_node.cpp">
       <Filter>algo\registration\embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\file_writer.cpp">
+      <Filter>algo\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\ceres_iteration_logger.cpp">
+      <Filter>algo\helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,4 @@
 #include "deformation_graph_cgal_mesh.h"
-#include "algo/registration/node_weighting.h"
 #include <cassert>
 
 #include "algo/registration/hsv_to_rgb.h"

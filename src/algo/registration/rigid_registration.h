@@ -1,8 +1,9 @@
 #pragma once
 #include "i_registration.h"
-#include "icp.h"
 #include "algo/file_writer.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
+#include "algo/surface_mesh/mesh_definition.h"
+#include <ceres/ceres.h>
 
 class RigidDeformation
 {

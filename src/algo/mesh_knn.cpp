@@ -3,49 +3,6 @@
 #include "mesh_knn.h"
 
 
-TriMeshKNN::TriMeshKNN(const ml::TriMeshf & mesh, unsigned int max_k)
-	: _mesh(mesh)
-	, _neares_neighbor_search(50, 12)
-{
-	std::vector<const float*> nn_points;
-	auto & vertices = mesh.getVertices();
-	for (auto &v : vertices) {
-		nn_points.push_back(v.position.array);
-	}
-	_neares_neighbor_search.init(nn_points, 3, max_k);
-	nn_points.clear();
-}
-
-ml::TriMeshf::Vertex TriMeshKNN::nearest(const ml::vec3f & p)
-{
-	auto index = nearest_index(p);
-	return _mesh.getVertices()[index];
-}
-
-unsigned int TriMeshKNN::nearest_index(const ml::vec3f & p)
-{
-	return _neares_neighbor_search.nearest(p.array);
-}
-
-std::vector<unsigned int> TriMeshKNN::k_nearest_indices(const ml::vec3f & point, unsigned int k)
-{
-	return _neares_neighbor_search.kNearest(point.array, k, 0.000001);
-}
-
-std::vector<ml::TriMeshf::Vertex> TriMeshKNN::k_nearest(const ml::vec3f & point, unsigned int k)
-{
-	std::vector<unsigned int> indices = _neares_neighbor_search.kNearest(point.array, k, 0.000001);
-	std::vector<ml::TriMeshf::Vertex> graph_nodes;
-	for (auto & i : indices) {
-		graph_nodes.push_back(_mesh.getVertices()[i]);
-	}
-	return graph_nodes;
-}
-
-
-
-
-
 OpenMeshKNN::OpenMeshKNN(const ml::OpenMeshTriMesh::Mesh & mesh, unsigned int max_k)
 	: _mesh(mesh)
 	, _neares_neighbor_search(50, 12)
