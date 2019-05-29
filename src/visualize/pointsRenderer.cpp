@@ -38,13 +38,13 @@ void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, float 
 
 	auto vertex_colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
 	std::vector<ml::vec3f> positions;
-	std::vector<ml::vec4f> color_frame(mesh.number_of_vertices());
+	std::vector<ml::vec4f> color_frame;
 	for (auto & v : mesh.vertices()) {
 		auto p = mesh.point(v);
 		positions.push_back(ml::vec3f(p.x(), p.y(), p.z()));
 		color_frame.push_back(vertex_colors[v]);
 	}
-	meshes.push_back(ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size * 2.), positions, color_frame));
+	meshes.push_back(ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size * 10.), positions, color_frame));
 
 	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 }

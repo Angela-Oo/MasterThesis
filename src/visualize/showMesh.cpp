@@ -148,9 +148,9 @@ void ShowMesh::renderRegistrationTwoFrames()
 			
 			// render point clouds
 			if (_render_mesh == Render::NONE) {
-				_point_renderer->insertMesh("frame_registered_A", deformed_points, ml::RGBColor::Cyan);
+				_point_renderer->insertMesh("frame_registered_A", deformed_points, ml::RGBColor::Cyan, 0.0001);
 				if(!_point_renderer->keyExists("frame_registered_B"))
-					_point_renderer->insertMesh("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green);
+					_point_renderer->insertMesh("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green, 0.0001);
 			}
 			else {
 				_point_renderer->removePoints("frame_registered_A");
@@ -161,7 +161,7 @@ void ShowMesh::renderRegistrationTwoFrames()
 				_mesh_renderer->insertMesh("mesh_a", convertToTriMesh(deformed_points), ml::RGBColor::Cyan.toVec4f());
 				_mesh_renderer->removeMesh("mesh_b");
 				if (!_point_renderer->keyExists("frame_registered_B"))
-					_point_renderer->insertMesh("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green);
+					_point_renderer->insertMesh("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green, 0.0001);
 			}
 			else if (_render_mesh == Render::ALL) {
 				_mesh_renderer->insertMesh("mesh_a", convertToTriMesh(deformed_points), ml::RGBColor::Cyan.toVec4f());
@@ -446,7 +446,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = true;
+	bool test = false;
 	if (!test) {
 		// puppet
 		//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
