@@ -227,7 +227,6 @@
     <ClInclude Include="src\algo\deformation_graph\nearest_neighbor_search.h" />
     <ClInclude Include="src\algo\evaluate_registration.h" />
     <ClInclude Include="src\algo\file_writer.h" />
-    <ClInclude Include="src\algo\knn.h" />
     <ClInclude Include="src\algo\mesh_knn.h" />
     <ClInclude Include="src\algo\mesh_simplification\deformation_graph_mesh.h" />
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h" />
@@ -240,7 +239,7 @@
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_node.h" />
     <ClInclude Include="src\algo\registration\find_corresponding_points\find_corresponding_points.h" />
     <ClInclude Include="src\algo\registration\hsv_to_rgb.h" />
-    <ClInclude Include="src\algo\registration\icp_cost_function.h" />
+    <ClInclude Include="src\algo\registration\rigid_deformation_cost_function.h" />
     <ClInclude Include="src\algo\registration\i_registration.h" />
     <ClInclude Include="src\algo\registration\non_rigid_registration_all_frames.h" />
     <ClInclude Include="src\algo\registration\registration.h" />
@@ -278,7 +277,6 @@
     <ClCompile Include="src\algo\deformation_graph\nearest_neighbor_search.cpp" />
     <ClCompile Include="src\algo\evaluate_registration.cpp" />
     <ClCompile Include="src\algo\file_writer.cpp" />
-    <ClCompile Include="src\algo\knn.cpp" />
     <ClCompile Include="src\algo\mesh_knn.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\deformation_graph_mesh.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp" />

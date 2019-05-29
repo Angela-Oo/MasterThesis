@@ -82,6 +82,9 @@
     <Filter Include="algo\helper">
       <UniqueIdentifier>{4d1110bb-fba2-4758-9bba-fd1603def0af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algo\evaluate registration">
+      <UniqueIdentifier>{a6c1516d-ac45-4659-a6b9-82a24263f324}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -497,12 +500,6 @@
     <ClInclude Include="src\kinect\SensorDataWrapper.h">
       <Filter>kinect</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\ceres_math.h">
-      <Filter>algo</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\knn.h">
-      <Filter>algo</Filter>
-    </ClInclude>
     <ClInclude Include="src\input_reader\depth_image_reader.h">
       <Filter>input_reader</Filter>
     </ClInclude>
@@ -524,20 +521,11 @@
     <ClInclude Include="src\input_reader\mesh_reader.h">
       <Filter>input_reader</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\evaluate_registration.h">
-      <Filter>algo</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\mesh_knn.h">
-      <Filter>algo</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h">
       <Filter>algo\mesh simplification</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\icp_cost_function.h">
-      <Filter>algo\registration\rigid registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_registration.h">
       <Filter>algo\registration\rigid registration</Filter>
@@ -599,6 +587,18 @@
     <ClInclude Include="src\algo\ceres_iteration_logger.h">
       <Filter>algo\helper</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\evaluate_registration.h">
+      <Filter>algo\evaluate registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\mesh_knn.h">
+      <Filter>algo\evaluate registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\ceres_math.h">
+      <Filter>algo\registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_deformation_cost_function.h">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -639,9 +639,6 @@
     <ClCompile Include="src\kinect\SensorDataWrapper.cpp">
       <Filter>kinect</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\knn.cpp">
-      <Filter>algo</Filter>
-    </ClCompile>
     <ClCompile Include="src\input_reader\depth_image_reader.cpp">
       <Filter>input_reader</Filter>
     </ClCompile>
@@ -659,12 +656,6 @@
     </ClCompile>
     <ClCompile Include="src\input_reader\mesh_reader.cpp">
       <Filter>input_reader</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\evaluate_registration.cpp">
-      <Filter>algo</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\mesh_knn.cpp">
-      <Filter>algo</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
       <Filter>algo\mesh simplification</Filter>
@@ -710,6 +701,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\ceres_iteration_logger.cpp">
       <Filter>algo\helper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\evaluate_registration.cpp">
+      <Filter>algo\evaluate registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\mesh_knn.cpp">
+      <Filter>algo\evaluate registration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

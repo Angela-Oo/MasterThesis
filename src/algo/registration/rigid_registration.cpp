@@ -2,7 +2,7 @@
 #include "rigid_registration.h"
 #include "algo/ceres_iteration_logger.h"
 
-#include "icp_cost_function.h"
+#include "rigid_deformation_cost_function.h"
 
 Matrix RigidDeformation::rotation() const
 {
