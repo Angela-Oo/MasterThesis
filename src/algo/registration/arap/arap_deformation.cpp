@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
-#include "arap_node.h"
+#include "arap_deformation.h"
 #include <ceres/rotation.h>
 
 
 namespace ARAP {
 
-Matrix Node::rotation() const
+Matrix Deformation::rotation() const
 {
 	ml::mat3d r;
 	ceres::AngleAxisToRotationMatrix(_r.array, r.getData());
@@ -15,22 +15,22 @@ Matrix Node::rotation() const
 	return m;
 }
 
-Vector Node::translation() const
+Vector Deformation::translation() const
 {
 	return Vector(_t[0], _t[1], _t[2]);
 }
 
-Node::Node(const ml::vec3d & r, const ml::vec3d & t)
+Deformation::Deformation(const ml::vec3d & r, const ml::vec3d & t)
 	: _r(r)
 	, _t(t)
 	, _w(1.)
 {}
 
-Node::Node()
-	: Node(ml::vec3f::origin, ml::vec3f::origin)
+Deformation::Deformation()
+	: Deformation(ml::vec3f::origin, ml::vec3f::origin)
 {}
 
-Node::Node(const Node & node, bool inverse)
+Deformation::Deformation(const Deformation & node, bool inverse)
 	: _r(node._r)
 	, _t(node._t)
 	, _w(node._w)

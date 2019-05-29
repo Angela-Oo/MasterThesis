@@ -43,7 +43,7 @@ private:
 	//std::unique_ptr<IRegistration> _registration;
 	std::unique_ptr<IRegistration> _registration;
 	//std::unique_ptr<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>> _registration_frames;
-	//std::unique_ptr < NonRigidRegistrationAllFrames < ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Node>>> _registration_frames;
+	//std::unique_ptr < NonRigidRegistrationAllFrames < ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Deformation>>> _registration_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;
 private:
 	void renderRegistrationTwoFrames();

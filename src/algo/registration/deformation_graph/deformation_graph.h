@@ -3,7 +3,7 @@
 #include "mLibInclude.h"
 #include <vector>
 #include "algo/surface_mesh/nearest_neighbor_search.h"
-#include "i_node.h"
+#include "i_deformation.h"
 #include <CGAL/squared_distance_3.h> //for 3D functions
 
 typedef ml::TriMeshf Mesh;
@@ -30,7 +30,7 @@ public:
 class NodeAndPoint
 {
 public:
-	std::shared_ptr<INode> _deformation;
+	std::shared_ptr<IDeformation> _deformation;
 	Point _point;
 	Direction _normal;
 };
@@ -51,7 +51,7 @@ public:
 	const int _k = 4;
 	SurfaceMesh _mesh;
 	Point _global_center;
-	std::shared_ptr<INode> _global_deformation;
+	std::shared_ptr<IDeformation> _global_deformation;
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
 public:
 	std::vector<double> weights(const Point & point, std::vector<vertex_descriptor>& nearest_nodes_indices) const;
@@ -65,12 +65,12 @@ public:
 public:
 	NodeAndPoint deformNode(vertex_descriptor node_index) const;
 	NodeAndPoint getNode(vertex_descriptor node_index);
-	//DeformationGraphMesh::Property_map<vertex_descriptor, std::shared_ptr<INode>> getDeformations();
+	//DeformationGraphMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> getDeformations();
 public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
-	DeformationGraph(const SurfaceMesh & nodes, std::function<std::shared_ptr<INode>()> create_node);
-	DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<INode> & global_rigid_deformation);
+	DeformationGraph(const SurfaceMesh & nodes, std::function<std::shared_ptr<IDeformation>()> create_node);
+	DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<IDeformation> & global_rigid_deformation);
 	DeformationGraph(const DeformationGraph & deformation_graph);
 	DeformationGraph & operator=(DeformationGraph other);
 };

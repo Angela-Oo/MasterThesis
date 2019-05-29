@@ -96,7 +96,7 @@ std::vector<vertex_descriptor> DeformationGraph::nearestNodes(const Point & poin
 	Neighbor_search search = _knn_search->search(point);
 	vertex_descriptor nearest_node_index = search.begin()->first;
 
-	auto property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node");
+	auto property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
@@ -142,7 +142,7 @@ Point DeformationGraph::deformPoint(const Point & point, const NearestNodes & ne
 {
 	Vector deformed_point(0.,0.,0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node");
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
@@ -165,13 +165,13 @@ Point DeformationGraph::deformPoint(const Point & point, const NearestNodes & ne
 
 Point DeformationGraph::deformedPosition(vertex_descriptor vertex_index) const
 {
-	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
+	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 	return deformNodePosition(_mesh.point(vertex_index), nodes[vertex_index]->translation());
 }
 
 Direction DeformationGraph::deformedNormal(vertex_descriptor vertex_index) const
 {
-	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
+	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
 
 	return deformNodeNormal(vertex_normals[vertex_index], nodes[vertex_index]->rotation());
@@ -179,20 +179,20 @@ Direction DeformationGraph::deformedNormal(vertex_descriptor vertex_index) const
 
 Point DeformationGraph::deformedPositionAtNode(vertex_descriptor vertex_index, const Point & pos) const
 {
-	std::shared_ptr<INode> node = (_mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first)[vertex_index];
+	std::shared_ptr<IDeformation> node = (_mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first)[vertex_index];
 	return deformPositionAtNode(pos, _mesh.point(vertex_index), node->rotation(), node->translation());
 }
 
 Direction DeformationGraph::deformedNormalAtNode(vertex_descriptor vertex_index, const Direction & normal) const
 {
-	std::shared_ptr<INode> node = (_mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first)[vertex_index];
+	std::shared_ptr<IDeformation> node = (_mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first)[vertex_index];
 	
 	return deformNormalAtNode(normal, node->rotation());
 }
 
 NodeAndPoint DeformationGraph::deformNode(vertex_descriptor node_index) const
 {
-	auto & nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
+	auto & nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 
 	Point pos = deformedPosition(node_index);
 	Direction normal = deformedNormal(node_index);
@@ -212,7 +212,7 @@ NodeAndPoint DeformationGraph::deformNode(vertex_descriptor node_index) const
 NodeAndPoint DeformationGraph::getNode(vertex_descriptor node_index)
 {
 	NodeAndPoint node;
-	std::shared_ptr<INode> n = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first[node_index];
+	std::shared_ptr<IDeformation> n = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first[node_index];
 	node._deformation = n;
 	node._point = _mesh.point(node_index);
 	node._normal = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first[node_index];
@@ -220,13 +220,13 @@ NodeAndPoint DeformationGraph::getNode(vertex_descriptor node_index)
 }
 
 
-DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::shared_ptr<INode>()> create_node)
+DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node)
 	: _mesh(mesh)
 {
 
-	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<INode>> nodes;
+	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> nodes;
 	bool created;
-	boost::tie(nodes, created) = _mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node", create_node());
+	boost::tie(nodes, created) = _mesh.add_property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node", create_node());
 	assert(created);
 	_mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
 	_mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
@@ -251,13 +251,12 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::
 }
 
 
-DeformationGraph::DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<INode> & global_deformation)
+DeformationGraph::DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<IDeformation> & global_deformation)
 	: _mesh(graph)
 	, _global_deformation(global_deformation)
 {
 
-	//_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node");
-	//_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
+	//_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
 }
 
 

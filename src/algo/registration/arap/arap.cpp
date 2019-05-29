@@ -87,7 +87,7 @@ VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &proble
 	VertexResidualIds residual_ids;
 
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 	for (auto & v : mesh.vertices())
 	{
 		auto vertex = _deformation_graph.deformNode(v);
@@ -107,7 +107,7 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 	VertexResidualIds residual_ids;
 
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 	int i = 0;
 	for (auto & v : mesh.vertices())
 	{
@@ -129,7 +129,7 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 {
 	EdgeResidualIds residual_ids;
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 	for (auto e : mesh.halfedges())
 	{		
 		auto target = mesh.target(e);
@@ -150,7 +150,7 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 VertexResidualIds AsRigidAsPossible::addConfCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
+	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 	for(auto & v : _deformation_graph._mesh.vertices())
 	{
 		auto& deformation = deformations[v];
@@ -266,7 +266,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, []() { return std::make_shared<Node>(); })
+	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
 	, _with_icp(false)
@@ -293,7 +293,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
 	std::cout << "number of def nodes " << number_of_deformation_nodes << " true number " << reduced_mesh.num_vertices() << std::endl;
-	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Node>(); });
+	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }

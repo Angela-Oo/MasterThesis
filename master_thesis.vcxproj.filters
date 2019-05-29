@@ -554,16 +554,10 @@
     <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h">
       <Filter>algo\registration\as rigid as possible</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\arap\arap_node.h">
-      <Filter>algo\registration\as rigid as possible</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h">
       <Filter>algo\registration\embedded deformation</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h">
-      <Filter>algo\registration\embedded deformation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\embedded_deformation\ed_node.h">
       <Filter>algo\registration\embedded deformation</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\file_writer.h">
@@ -584,9 +578,6 @@
     <ClInclude Include="src\algo\registration\rigid_deformation_cost_function.h">
       <Filter>algo\registration\rigid registration</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph\i_node.h">
-      <Filter>algo\registration\deformation graph</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h">
       <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
@@ -595,6 +586,15 @@
     </ClInclude>
     <ClInclude Include="src\algo\surface_mesh\nearest_neighbor_search.h">
       <Filter>algo\surface mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph\i_deformation.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_deformation.h">
+      <Filter>algo\registration\as rigid as possible</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -675,13 +675,7 @@
     <ClCompile Include="src\algo\registration\find_corresponding_points\find_corresponding_points.cpp">
       <Filter>algo\registration\find correspondences</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\arap\arap_node.cpp">
-      <Filter>algo\registration\as rigid as possible</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp">
-      <Filter>algo\registration\embedded deformation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\embedded_deformation\ed_node.cpp">
       <Filter>algo\registration\embedded deformation</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\file_writer.cpp">
@@ -704,6 +698,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\surface_mesh\nearest_neighbor_search.cpp">
       <Filter>algo\surface mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp">
+      <Filter>algo\registration\as rigid as possible</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

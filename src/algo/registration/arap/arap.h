@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mLibInclude.h"
-#include "arap_node.h"
+#include "arap_deformation.h"
 #include "algo/file_writer.h"
 #include <ceres/ceres.h>
 #include "algo/registration/i_registration.h"

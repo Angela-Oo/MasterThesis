@@ -1,13 +1,13 @@
 #pragma once
 #include "mLibInclude.h"
-#include "algo/registration/deformation_graph/i_node.h"
+#include "algo/registration/deformation_graph/i_deformation.h"
 
-namespace ARAP {
+namespace ED {
 
-class Node : public INode
+class Deformation : public IDeformation
 {
 private:
-	ml::vec3d _r; // rotation matrix
+	ml::mat3d _r; // rotation matrix
 	ml::vec3d _t; // translation vector	
 	double _w; // weight
 public:
@@ -19,9 +19,9 @@ public:
 	Vector translation() const override;
 	double weight() const override { return _w; };
 public:
-	Node(const ml::vec3d & r, const ml::vec3d & t);
-	Node();
-	Node(const Node& node, bool inverse);
+	Deformation(const ml::mat3d & r, const ml::vec3d & t);
+	Deformation();
+	Deformation(const Deformation& node, bool inverse);
 };
 
 

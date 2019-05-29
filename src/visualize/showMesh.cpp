@@ -8,8 +8,8 @@
 #include "algo/registration/embedded_deformation/ed.h"
 #include "algo/registration/arap/arap.h"
 
-// test
-#include "algo/mesh_simplification/mesh_simplification.h"
+//#include "algo/mesh_simplification/mesh_simplification.h"
+#include "algo/surface_mesh/mesh_convertion.h"
 
 void ShowMesh::nonRigidRegistration()
 {
@@ -53,7 +53,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 	//	}
 	//	//_registration_frames = std::make_unique<NonRigidRegistrationFrames>(meshes, 300);
 	//	_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>>(meshes, _number_of_nodes);
-	//	//_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Node>>>(meshes, _number_of_nodes);
+	//	//_registration_frames = std::make_unique<NonRigidRegistrationAllFrames<ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Deformation>>>(meshes, _number_of_nodes);
 	//	renderRegistration();
 	//}
 	//else {
