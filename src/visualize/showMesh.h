@@ -13,6 +13,8 @@
 #include "algo/registration/embedded_deformation.h"
 #include "algo/registration/non_rigid_registration_all_frames.h"
 
+#include "algo/registration/arap/arap.h"
+
 enum Render
 {
 	NONE,
@@ -40,8 +42,9 @@ private:
 	bool _render_error;	
 	bool _render_deformation_graph;
 	bool _calculate_error;
-	std::unique_ptr<IRegistration> _registration;
-	std::unique_ptr<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>> _registration_frames;
+	//std::unique_ptr<IRegistration> _registration;
+	std::unique_ptr<ARAP::ITestRegistration> _registration;
+	//std::unique_ptr<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>> _registration_frames;
 	//std::unique_ptr < NonRigidRegistrationAllFrames < ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Node>>> _registration_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;
 private:

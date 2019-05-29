@@ -18,6 +18,45 @@ void PointsRenderer::render(ml::Cameraf& camera)
 	}
 }
 
+void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size)
+{
+	auto PointToVec3f = [](const Point & p)
+	{
+		return ml::vec3f(p.x(), p.y(), p.z());
+	};
+
+	//auto colors = mesh.property_map<vertex_descriptor, CGAL::Color>("v:color").first;
+	//std::vector<ml::vec4f> color_frame;
+	//std::vector<ml::vec3f> vertices;
+	//for (auto & v : mesh.vertices())
+	//{
+	//	auto color = colors[v];
+	//	color_frame.push_back({ color.r, color.g, color.b, 1. });
+	//	vertices.push_back(PointToVec3f(mesh.point(v)));
+	//}
+	//auto color = ml::vec4f(1., 0., 0., 1.); // todo
+	std::vector<TriMeshf> meshes;
+	for (auto & e : mesh.edges()) {
+		auto he = mesh.halfedge(e);
+		auto v0 = mesh.source(he);
+		auto v1 = mesh.target(he);
+		
+		meshes.push_back(ml::Shapesf::line(PointToVec3f(mesh.point(v0)), PointToVec3f(mesh.point(v1)), color.toVec4f(), point_size));
+	}
+	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
+}
+
+void PointsRenderer::insertPoints(std::string id, std::vector<Point> points, ml::RGBColor color, float point_size)
+{
+	std::vector<ml::vec3f> positions;
+	for (auto & p : points) {
+		positions.push_back(ml::vec3f(p.x(), p.y(), p.z()));
+	}
+	std::vector<ml::vec4f> color_frame(points.size());
+	std::fill(color_frame.begin(), color_frame.end(), color);
+	_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), positions, color_frame));
+}
+
 void PointsRenderer::insertPoints(std::string id, std::vector<ml::vec3f> points, ml::RGBColor color, float point_size)
 {
 	// render point clouds

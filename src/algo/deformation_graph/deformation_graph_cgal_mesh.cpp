@@ -2,7 +2,7 @@
 #include "algo/registration/node_weighting.h"
 #include <cassert>
 
-namespace DeformationGraph {
+namespace DG {
 
 
 Point deformNodePosition(Point point, Vector translation)
@@ -95,7 +95,7 @@ std::vector<vertex_descriptor> DeformationGraphCgalMesh::nearestNodes(const Poin
 	Neighbor_search search = _knn_search->search(point);
 	vertex_descriptor nearest_node_index = search.begin()->first;
 
-	auto property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("node");
+	auto property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
@@ -141,7 +141,7 @@ Point DeformationGraphCgalMesh::deformPoint(const Point & point, const NearestNo
 {
 	Vector deformed_point(0.,0.,0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("node");
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
@@ -172,7 +172,7 @@ Point DeformationGraphCgalMesh::deformedPosition(vertex_descriptor vertex_index)
 Direction DeformationGraphCgalMesh::deformedNormal(vertex_descriptor vertex_index) const
 {
 	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
-	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normals").first;
+	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
 
 	return deformNodeNormal(vertex_normals[vertex_index], nodes[vertex_index]->rotation());
 }
@@ -192,7 +192,7 @@ Direction DeformationGraphCgalMesh::deformedNormalAtNode(vertex_descriptor verte
 
 NodeAndPoint DeformationGraphCgalMesh::deformNode(vertex_descriptor node_index)
 {
-	auto & nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("node").first;
+	auto & nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
 
 	Point pos = deformedPosition(node_index);
 	Direction normal = deformedNormal(node_index);
@@ -227,9 +227,9 @@ DeformationGraphCgalMesh::DeformationGraphCgalMesh(const DeformationGraphMesh & 
 
 	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<INode>> nodes;
 	bool created;
-	boost::tie(nodes, created) = _mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("v:nodes", create_node());
+	boost::tie(nodes, created) = _mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node", create_node());
 	assert(created);
-	auto normals = _mesh.property_map<vertex_descriptor, Direction>("v:normals").first;
+	auto normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
 
 	Vector global_position(0., 0., 0.);
 	for (auto & v : _mesh.vertices()) {
@@ -251,7 +251,7 @@ DeformationGraphCgalMesh::DeformationGraphCgalMesh(const SurfaceMesh & graph, co
 	, _global_deformation(global_deformation)
 {
 
-	//_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("node");
+	//_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node");
 	//_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
 }
 
@@ -294,7 +294,7 @@ SurfaceMesh DeformedMesh::deformPoints()
 
 	SurfaceMesh deformed_points = _mesh;
 	for (auto & v : _mesh.vertices()) {
-		_mesh.point(v) = _deformation_graph.deformPoint(_mesh.point(v), nearest_nodes[v]);
+		deformed_points.point(v) = _deformation_graph.deformPoint(_mesh.point(v), nearest_nodes[v]);
 	}
 	return deformed_points;
 }

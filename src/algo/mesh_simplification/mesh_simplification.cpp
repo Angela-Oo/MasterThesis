@@ -38,7 +38,7 @@
 //SurfaceMesh convertToDeformationGraphMesh(const Mesh& triMesh) {
 //	SurfaceMesh mesh;
 //
-//	auto property_map = mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("node", nullptr);
+//	auto property_map = mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node", nullptr);
 //	
 //	std::vector<SurfaceMesh::Vertex_index> vertex_handles;
 //	vertex_handles.reserve(triMesh.getVertices().size());
@@ -52,7 +52,7 @@
 //	for (const auto& f : triMesh.getIndices()) {
 //		mesh.add_face(vertex_handles[f.x], vertex_handles[f.y], vertex_handles[f.z]);
 //	}
-//	auto get = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("node");
+//	auto get = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node");
 //	for (auto x : get.first)
 //	{
 //		std::cout << " " << x->deformed()[0] << std::endl;
@@ -65,11 +65,14 @@ SurfaceMesh convertToCGALMesh(const Mesh& triMesh) {
 
 	std::vector<SurfaceMesh::Vertex_index> vertex_handles;
 	vertex_handles.reserve(triMesh.getVertices().size());
-
+	auto normals = mesh.add_property_map<vertex_descriptor, Direction>("v:normal", Direction(0., 0., 1.)).first;
+	auto colors = mesh.add_property_map<vertex_descriptor, CGAL::Color>("v:color", CGAL::Color(1., 1., 1.)).first;
 	for (const auto& v : triMesh.getVertices()) {
 		auto vertex_handle = mesh.add_vertex(SurfaceMesh::Point(v.position.x, v.position.y, v.position.z));
+		normals[vertex_handle] = Direction(v.normal.x, v.normal.y, v.normal.z);
+		//colors[vertex_handle] = Color(v.normal.x, v.normal.y, v.normal.z);
 		vertex_handles.push_back(vertex_handle);
-	}
+	}	
 
 	for (const auto& f : triMesh.getIndices()) {
 		mesh.add_face(vertex_handles[f.x], vertex_handles[f.y], vertex_handles[f.z]);
@@ -77,7 +80,7 @@ SurfaceMesh convertToCGALMesh(const Mesh& triMesh) {
 	return mesh;
 }
 
-Mesh convertToTriMesh(SurfaceMesh& mesh) {
+Mesh convertToTriMesh(const SurfaceMesh& mesh) {
 
 	ml::MeshDataf mData;
 	mData.m_Vertices.resize(mesh.number_of_vertices());

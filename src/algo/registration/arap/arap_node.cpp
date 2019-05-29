@@ -27,7 +27,7 @@ Node::Node(const ml::vec3d & r, const ml::vec3d & t)
 {}
 
 Node::Node()
-	: Node(ml::vec3f::origin, ml::vec3f::eZ)
+	: Node(ml::vec3f::origin, ml::vec3f::origin)
 {}
 
 Node::Node(const Node & node, bool inverse)

@@ -4,11 +4,13 @@
 #include "kinect/ImageReaderSensor.h"
 #include "kinect/SensorDataWrapper.h"
 
+#include "algo/mesh_simplification/mesh_simplification.h"
+
 class IMeshReader
 {
 public:
-	virtual ml::TriMeshf& getMesh(unsigned int frame) = 0;
-	virtual std::vector<int> getFixedPositions(unsigned int frame) = 0;
+	virtual SurfaceMesh& getMesh(unsigned int frame) = 0;
+	virtual std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) = 0;
 	virtual unsigned int frame() = 0;
 };
 
@@ -18,15 +20,15 @@ class MeshReader : public IMeshReader
 private:
 	std::string _file_path;
 	std::string _file_name;
-	std::vector<ml::TriMeshf> _meshes;
+	std::vector<SurfaceMesh> _meshes;
 	ml::mat4f _transformation;
 	unsigned int _start_number;
 private:
 	std::string getFileName(unsigned int index);
 public:
-	ml::TriMeshf& getMesh(unsigned int frame) override;
-	std::vector<int> getFixedPositions(unsigned int frame) override {
-		return std::vector<int>();
+	SurfaceMesh& getMesh(unsigned int frame) override;
+	std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) override {
+		return std::vector<vertex_descriptor>();
 	};
 	bool processFrame();
 	unsigned int frame() override;
@@ -41,12 +43,12 @@ public:
 
 class DeformationMesh : public IMeshReader
 {
-	std::vector<ml::TriMeshf> _meshes;
-	const int _cylinder_width_points = 5;// 20;
-	const int _cylinder_height_points = 7;// 30;
+	std::vector<SurfaceMesh> _meshes;
+	const int _cylinder_width_points = 20;
+	const int _cylinder_height_points = 30;
 public:
-	ml::TriMeshf& getMesh(unsigned int frame) override;
-	std::vector<int> getFixedPositions(unsigned int frame) override;
+	SurfaceMesh& getMesh(unsigned int frame) override;
+	std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) override;
 	unsigned int frame() override;
 public:
 	DeformationMesh();
@@ -54,12 +56,12 @@ public:
 
 class DeformationMeshFrames : public IMeshReader
 {
-	std::vector<ml::TriMeshf> _meshes;
+	std::vector<SurfaceMesh> _meshes;
 	const int _cylinder_width_points = 20;
 	const int _cylinder_height_points = 50;
 public:
-	ml::TriMeshf& getMesh(unsigned int frame) override;
-	std::vector<int> getFixedPositions(unsigned int frame) override;
+	SurfaceMesh& getMesh(unsigned int frame) override;
+	std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) override;
 	unsigned int frame() override;
 public:
 	DeformationMeshFrames();

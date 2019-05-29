@@ -18,6 +18,12 @@ void MeshRenderer::render(ml::Cameraf& camera)
 	}
 }
 
+void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color)
+{
+	insertMesh(id, convertToTriMesh(mesh), color);
+}
+
+
 void MeshRenderer::insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color)
 {
 	_meshes[id] = D3D11MeshAndBuffer();

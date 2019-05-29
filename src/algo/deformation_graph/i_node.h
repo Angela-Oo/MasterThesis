@@ -3,7 +3,7 @@
 #include "stdafx.h"
 #include "algo/mesh_simplification/deformation_graph_mesh.h"
 
-// mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("node", nullptr);
+// mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node", nullptr);
 class INode
 {
 public:

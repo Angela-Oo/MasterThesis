@@ -41,15 +41,15 @@ Registration::Registration(RegistrationType _registration_type,
 	auto & target = mesh_reader->getMesh(target_frame);
 
 	auto option = ceresOption();
-	if (_registration_type == RegistrationType::ED)
-		_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, _number_of_deformation_graph_nodes, _logger);
-	else if (_registration_type == RegistrationType::ED_WithoutICP)
-		_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, mesh_reader->getFixedPositions(target_frame), option, _logger);
-	else if (_registration_type == RegistrationType::ASAP)
-		_registration = std::make_unique<AsRigidAsPossible>(source, target, option, _number_of_deformation_graph_nodes, _logger);
-	else if (_registration_type == RegistrationType::ASAP_WithoutICP)
-		_registration = std::make_unique<AsRigidAsPossible>(source, target, mesh_reader->getFixedPositions(target_frame), option, _logger);
-	else
-		_registration = std::make_unique<RigidRegistration>(source, target, option, _logger);
+	//if (_registration_type == RegistrationType::ED)
+	//	_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, _number_of_deformation_graph_nodes, _logger);
+	//else if (_registration_type == RegistrationType::ED_WithoutICP)
+	//	_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, mesh_reader->getFixedPositions(target_frame), option, _logger);
+	//else if (_registration_type == RegistrationType::ASAP)
+	//	_registration = std::make_unique<AsRigidAsPossible>(source, target, option, _number_of_deformation_graph_nodes, _logger);
+	//else if (_registration_type == RegistrationType::ASAP_WithoutICP)
+	//	_registration = std::make_unique<AsRigidAsPossible>(source, target, mesh_reader->getFixedPositions(target_frame), option, _logger);
+	//else
+	//	_registration = std::make_unique<RigidRegistration>(source, target, option, _logger);
 	
 }

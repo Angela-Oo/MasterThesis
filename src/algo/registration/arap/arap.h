@@ -21,11 +21,11 @@ public:
 public:
 	virtual const SurfaceMesh & getSource() = 0;
 	virtual const SurfaceMesh & getTarget() = 0;
-	//virtual SurfaceMesh getDeformedPoints() = 0;
+	virtual SurfaceMesh getDeformedPoints() = 0;
 	//virtual SurfaceMesh getInverseDeformedPoints() = 0;
 public:
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
-	//virtual std::vector<Edge> getDeformationGraph() { return std::vector<Edge>(); }
+	virtual const DG::DeformationGraphCgalMesh & getDeformationGraph() = 0;
 	//virtual Mesh getDeformationGraphMesh() { return Mesh(); };
 public:
 	virtual ~ITestRegistration() = default;
@@ -45,8 +45,8 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 		SurfaceMesh _src;
 		SurfaceMesh _dst;
 		ceres::Solver::Options _options;
-		DeformationGraph::DeformationGraphCgalMesh _deformation_graph;
-		std::unique_ptr<DeformationGraph::DeformedMesh> _deformed_mesh;
+		DG::DeformationGraphCgalMesh _deformation_graph;
+		std::unique_ptr<DG::DeformedMesh> _deformed_mesh;
 		std::vector<vertex_descriptor> _fixed_positions;
 		std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 		bool _with_icp = true;
@@ -90,10 +90,10 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 	public:
 		const SurfaceMesh & getSource() override;
 		const SurfaceMesh & getTarget() override;
-		//Mesh getDeformedPoints() override;
+		SurfaceMesh getDeformedPoints() override;
 		//Mesh getInverseDeformedPoints() override;
 	public:
-		//std::vector<Edge> getDeformationGraph() override;
+		const DG::DeformationGraphCgalMesh & getDeformationGraph() override;
 		//Mesh getDeformationGraphMesh() override;
 		std::vector<Point> getFixedPostions() override;
 	public:
@@ -114,7 +114,7 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 		// with icp but init with passed deformation graph
 		AsRigidAsPossible(const SurfaceMesh& src,
 						  const SurfaceMesh& dst,
-						  const DeformationGraph::DeformationGraphCgalMesh & deformation_graph,
+						  const DG::DeformationGraphCgalMesh & deformation_graph,
 						  ceres::Solver::Options option,
 						  std::shared_ptr<FileWriter> logger = nullptr);
 	};	

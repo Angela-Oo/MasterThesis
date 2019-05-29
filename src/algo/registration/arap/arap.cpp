@@ -21,11 +21,11 @@ const SurfaceMesh & AsRigidAsPossible::getTarget()
 	return _dst;
 }
 
-//Mesh AsRigidAsPossible::getDeformedPoints()
-//{
-//	return _deformed_mesh->deformPoints();
-//}
-//
+SurfaceMesh AsRigidAsPossible::getDeformedPoints()
+{
+	return _deformed_mesh->deformPoints();
+}
+
 //Mesh AsRigidAsPossible::getInverseDeformedPoints()
 //{
 //	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
@@ -75,31 +75,32 @@ const SurfaceMesh & AsRigidAsPossible::getTarget()
 //	std::cout << "max fit cost " << max_fit_cost << " max conf cost " << max_conf_cost << " max smooth cost " << max_smooth_cost << " used visualize cost " << _k_mean_cost << std::endl;
 //}
 //
-//std::vector<Edge> AsRigidAsPossible::getDeformationGraph()
-//{
-//	std::vector<Edge> edges;
-//	auto & g = _deformation_graph._graph;
-//	auto & graph_edges = boost::get(edge_t(), g);
-//	auto & nodes = boost::get(node_t(), g);
-//	boost::graph_traits<ARAPGraph>::edge_iterator ei, ei_end;
-//	for (boost::tie(ei, ei_end) = boost::edges(g); ei != ei_end; ++ei)
-//	{
-//		Edge e;
-//		auto & edge = graph_edges[*ei];
-//
-//		auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
-//		e.source_point = vertex_i.position;
-//
-//		auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
-//		e.target_point = vertex_j.position;
-//		e.cost = edge._smooth_cost;
-//		if (_k_mean_cost > 0.)
-//			e.cost /= _k_mean_cost;
-//		e.cost = std::min(1., e.cost);
-//		edges.push_back(e);
-//	}
-//	return edges;
-//}
+const DG::DeformationGraphCgalMesh & AsRigidAsPossible::getDeformationGraph()
+{
+	return _deformation_graph;
+	//std::vector<Edge> edges;
+	//auto & g = _deformation_graph._graph;
+	//auto & graph_edges = boost::get(edge_t(), g);
+	//auto & nodes = boost::get(node_t(), g);
+	//boost::graph_traits<ARAPGraph>::edge_iterator ei, ei_end;
+	//for (boost::tie(ei, ei_end) = boost::edges(g); ei != ei_end; ++ei)
+	//{
+	//	Edge e;
+	//	auto & edge = graph_edges[*ei];
+
+	//	auto vertex_i = _deformation_graph.deformNode(boost::source(*ei, g));
+	//	e.source_point = vertex_i.position;
+
+	//	auto vertex_j = _deformation_graph.deformNode(boost::target(*ei, g));
+	//	e.target_point = vertex_j.position;
+	//	e.cost = edge._smooth_cost;
+	//	if (_k_mean_cost > 0.)
+	//		e.cost /= _k_mean_cost;
+	//	e.cost = std::min(1., e.cost);
+	//	edges.push_back(e);
+	//}
+	//return edges;
+}
 
 //
 //Mesh AsRigidAsPossible::getDeformationGraphMesh()
@@ -178,15 +179,14 @@ VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &proble
 
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
-	auto fixed_position_index = mesh.property_map<vertex_descriptor, vertex_descriptor>("v:index").first;
 	for (auto & v : mesh.vertices())
 	{
 		auto vertex = _deformation_graph.deformNode(v);
-		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), fixed_position_index[v]) != _fixed_positions.end()))
+		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), v) != _fixed_positions.end()))
 		{
-			vertex_descriptor i = fixed_position_index[v];
-			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _dst.point(i)));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(i)));
+			auto src_v = _src.point(v);
+			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _dst.point(v)));
+			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v)));
 		}
 	}
 	//std::cout << "used " << i << " of " << _deformation_graph._graph.m_vertices.size() << " deformation graph nodes" << std::endl;
@@ -271,7 +271,7 @@ bool AsRigidAsPossible::solveIteration()
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate		
-		evaluateResidual(problem, fit_residual_ids, arap_residual_ids, conf_residual_ids);
+		//evaluateResidual(problem, fit_residual_ids, arap_residual_ids, conf_residual_ids);
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
@@ -363,7 +363,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, a_conf(100.)
 {
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
-	_deformed_mesh = std::make_unique<DeformationGraph::DeformedMesh>(src, _deformation_graph);
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }
 
@@ -381,14 +381,14 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
 	std::cout << "number of def nodes " << number_of_deformation_nodes << " true number " << reduced_mesh.num_vertices() << std::endl;
-	_deformation_graph = DeformationGraph::DeformationGraphCgalMesh(reduced_mesh, []() { return std::make_shared<Node>(); });
-	_deformed_mesh = std::make_unique<DeformationGraph::DeformedMesh>(src, _deformation_graph);
+	_deformation_graph = DG::DeformationGraphCgalMesh(reduced_mesh, []() { return std::make_shared<Node>(); });
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
-									 const DeformationGraph::DeformationGraphCgalMesh & deformation_graph,
+									 const DG::DeformationGraphCgalMesh & deformation_graph,
 									 ceres::Solver::Options option,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
@@ -398,7 +398,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _logger(logger)
 {
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
-	_deformed_mesh = std::make_unique<DeformationGraph::DeformedMesh>(src, _deformation_graph);
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }
 

@@ -20,7 +20,7 @@ std::pair<bool, Point> FindCorrespondingPoints::correspondingPoint(Point point, 
 	auto s = _nn_search.search(point, _k);
 
 	std::vector<std::pair<vertex_descriptor, std::pair<double, double>>> valid_point_with_angle_and_distance;
-	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normals").first;
+	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
 
 	for (Neighbor_search::iterator it = s.begin(); it != s.end(); ++it) {
 		auto distance = std::sqrt(it->second);

@@ -78,18 +78,19 @@ struct FitStarPointToPointAngleAxisCostFunction {
 		point_to_T(_global_g, global_g);
 		point_to_T(_point, point);
 
+		T deformed_node[3];
 		// local deformation of node position
-		addition(node_g, translation, node_g);
+		addition(node_g, translation, deformed_node);
 
 		// global deformation of node position
-		substract(node_g, global_g, node_g);
+		substract(deformed_node, global_g, deformed_node);
 		T tmp[3];
-		ceres::AngleAxisRotatePoint(global_rotation, node_g, tmp);
-		addition(tmp, global_g, node_g);
-		addition(node_g, global_translation, node_g);
+		ceres::AngleAxisRotatePoint(global_rotation, deformed_node, deformed_node);
+		addition(deformed_node, global_g, deformed_node);
+		addition(deformed_node, global_translation, deformed_node);
 
 		// The error is the difference between the predicted and observed position multiplied with the weight
-		substract(node_g, point, residuals);
+		substract(deformed_node, point, residuals);
 		scalar_multiply(residuals, w[0], residuals);
 		return true;
 	}

@@ -10,7 +10,7 @@
 
 typedef ml::TriMeshf Mesh;
 
-namespace DeformationGraph
+namespace DG
 {
 
 class NearestNodes

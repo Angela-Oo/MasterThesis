@@ -1,7 +1,7 @@
 #pragma once
 #include "../mLibInclude.h"
 #include "visualize/constantBuffer.h"
-
+#include "algo/mesh_simplification/mesh_simplification.h"
 
 struct D3D11MeshAndBuffer
 {
@@ -18,6 +18,8 @@ private:
 	ml::GraphicsDevice * _graphics;
 public:
 	void render(ml::Cameraf& camera);
+	//void insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color);
+	void insertMesh(std::string id, const SurfaceMesh& mesh, ml::vec4f color);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh);
 	bool keyExists(std::string id);
