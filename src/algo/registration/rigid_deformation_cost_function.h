@@ -5,7 +5,7 @@
 #include <ceres/rotation.h>
 #include <functional>
 #include "algo/ceres_math.h"
-#include "algo/mesh_simplification/deformation_graph_mesh.h"
+#include "algo/surface_mesh/mesh_definition.h"
 
 
 struct FitPointToPointAngleAxisCostFunction {

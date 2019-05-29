@@ -146,7 +146,6 @@ Point DeformationGraphCgalMesh::deformPoint(const Point & point, const NearestNo
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
-	DeformationGraphMesh::Property_map<vertex_descriptor, std::shared_ptr<INode>> PropertyMapNodes;
 	for (size_t i = 0; i < nearest_nodes.nodes.size() - 1; ++i)
 	{
 		auto vertex_index = nearest_nodes.nodes[i];
@@ -221,7 +220,7 @@ NodeAndPoint DeformationGraphCgalMesh::getNode(vertex_descriptor node_index)
 }
 
 
-DeformationGraphCgalMesh::DeformationGraphCgalMesh(const DeformationGraphMesh & mesh, std::function<std::shared_ptr<INode>()> create_node)
+DeformationGraphCgalMesh::DeformationGraphCgalMesh(const SurfaceMesh & mesh, std::function<std::shared_ptr<INode>()> create_node)
 	: _mesh(mesh)
 {
 

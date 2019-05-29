@@ -2,7 +2,7 @@
 
 #include "stdafx.h"
 
-#include "algo/deformation_graph/nearest_neighbor_search.h"
+#include "algo/registration/deformation_graph/nearest_neighbor_search.h"
 
 
 double angle_between_to_vectors_in_rad(Vector vector_a, Vector vector_b);

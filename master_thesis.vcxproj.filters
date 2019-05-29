@@ -73,9 +73,6 @@
     <Filter Include="algo\registration\find correspondences">
       <UniqueIdentifier>{e3268d0a-d09b-4b4c-8441-a59f423826a3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="algo\deformation graph">
-      <UniqueIdentifier>{7f786232-fe92-48ab-82b1-853958e87984}</UniqueIdentifier>
-    </Filter>
     <Filter Include="algo\surface mesh">
       <UniqueIdentifier>{dcf7f109-b74a-493f-9039-3aa02c5a9434}</UniqueIdentifier>
     </Filter>
@@ -545,18 +542,6 @@
     <ClInclude Include="src\algo\registration\hsv_to_rgb.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\mesh_simplification\deformation_graph_mesh.h">
-      <Filter>algo\mesh simplification</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\deformation_graph\deformation_graph_cgal_mesh.h">
-      <Filter>algo\deformation graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\deformation_graph\nearest_neighbor_search.h">
-      <Filter>algo\deformation graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\deformation_graph\i_node.h">
-      <Filter>algo\deformation graph</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\arap\arap.h">
       <Filter>algo\registration\as rigid as possible</Filter>
     </ClInclude>
@@ -598,6 +583,15 @@
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_deformation_cost_function.h">
       <Filter>algo\registration\rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph_cgal_mesh.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph\i_node.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph\nearest_neighbor_search.h">
+      <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -672,15 +666,6 @@
     <ClCompile Include="src\algo\registration\hsv_to_rgb.cpp">
       <Filter>algo\registration</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\mesh_simplification\deformation_graph_mesh.cpp">
-      <Filter>algo\mesh simplification</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\deformation_graph\deformation_graph_cgal_mesh.cpp">
-      <Filter>algo\deformation graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\deformation_graph\nearest_neighbor_search.cpp">
-      <Filter>algo\deformation graph</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap.cpp">
       <Filter>algo\registration\as rigid as possible</Filter>
     </ClCompile>
@@ -707,6 +692,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\mesh_knn.cpp">
       <Filter>algo\evaluate registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\deformation_graph\deformation_graph_cgal_mesh.cpp">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\deformation_graph\nearest_neighbor_search.cpp">
+      <Filter>algo\registration\deformation graph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

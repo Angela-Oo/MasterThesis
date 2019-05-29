@@ -1,7 +1,12 @@
 #pragma once
 
 #include <stdafx.h>
-#include "algo/mesh_simplification/deformation_graph_mesh.h"
+#include "algo/surface_mesh/mesh_definition.h"
+
+
+#include <CGAL/Search_traits_3.h>
+#include <CGAL/Search_traits_adapter.h>
+#include <CGAL/Orthogonal_k_neighbor_search.h>
 
 // search
 typedef boost::property_map<SurfaceMesh, CGAL::vertex_point_t>::type Vertex_point_pmap;

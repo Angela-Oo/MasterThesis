@@ -1,9 +1,7 @@
 #pragma once
 
 #include "mLibInclude.h"
-#include "algo/mesh_simplification/deformation_graph_mesh.h"
 #include <vector>
-
 #include "nearest_neighbor_search.h"
 #include "i_node.h"
 #include <CGAL/squared_distance_3.h> //for 3D functions
@@ -51,7 +49,7 @@ class DeformationGraphCgalMesh
 {
 public:
 	const int _k = 4;
-	DeformationGraphMesh _mesh;
+	SurfaceMesh _mesh;
 	Point _global_center;
 	std::shared_ptr<INode> _global_deformation;
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
@@ -72,7 +70,7 @@ public:
 	DeformationGraphCgalMesh() = default;
 	// all mesh vertices will be deformation nodes
 	DeformationGraphCgalMesh(const SurfaceMesh & nodes, std::function<std::shared_ptr<INode>()> create_node);
-	DeformationGraphCgalMesh(const DeformationGraphMesh & graph, const std::shared_ptr<INode> & global_rigid_deformation);
+	DeformationGraphCgalMesh(const SurfaceMesh & graph, const std::shared_ptr<INode> & global_rigid_deformation);
 	DeformationGraphCgalMesh(const DeformationGraphCgalMesh & deformation_graph);
 	DeformationGraphCgalMesh & operator=(DeformationGraphCgalMesh other);
 };

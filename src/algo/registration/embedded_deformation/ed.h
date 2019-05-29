@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mLibInclude.h"
-#include "algo/deformation_graph/deformation_graph_cgal_mesh.h"
+#include "algo/registration/deformation_graph/deformation_graph_cgal_mesh.h"
 #include "ed_node.h"
 #include "algo/file_writer.h"
 #include <vector>

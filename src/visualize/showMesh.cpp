@@ -9,7 +9,6 @@
 #include "algo/registration/arap/arap.h"
 
 // test
-#include "algo/mesh_simplification/deformation_graph_mesh.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
 
 void ShowMesh::nonRigidRegistration()

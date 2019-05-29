@@ -3,7 +3,7 @@
 #include "mLibInclude.h"
 //#include "graph_node_type.h"
 
-#include "algo/deformation_graph/deformation_graph_cgal_mesh.h"
+#include "algo/registration/deformation_graph/deformation_graph_cgal_mesh.h"
 
 struct Edge
 {

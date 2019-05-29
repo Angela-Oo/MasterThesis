@@ -1,6 +1,6 @@
 #pragma once
 #include "mLibInclude.h"
-#include "algo/deformation_graph/i_node.h"
+#include "algo/registration/deformation_graph/i_node.h"
 
 namespace ED {
 

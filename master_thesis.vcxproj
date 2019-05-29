@@ -222,18 +222,17 @@
     <ClInclude Include="mLib\include\mLibZLib.h" />
     <ClInclude Include="src\algo\ceres_iteration_logger.h" />
     <ClInclude Include="src\algo\ceres_math.h" />
-    <ClInclude Include="src\algo\deformation_graph\deformation_graph_cgal_mesh.h" />
-    <ClInclude Include="src\algo\deformation_graph\i_node.h" />
-    <ClInclude Include="src\algo\deformation_graph\nearest_neighbor_search.h" />
     <ClInclude Include="src\algo\evaluate_registration.h" />
     <ClInclude Include="src\algo\file_writer.h" />
     <ClInclude Include="src\algo\mesh_knn.h" />
-    <ClInclude Include="src\algo\mesh_simplification\deformation_graph_mesh.h" />
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h" />
     <ClInclude Include="src\algo\registration\arap\arap.h" />
     <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h" />
     <ClInclude Include="src\algo\registration\arap\arap_node.h" />
     <ClInclude Include="src\algo\registration\ceres_option.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph_cgal_mesh.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph\i_node.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph\nearest_neighbor_search.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_node.h" />
@@ -273,16 +272,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\algo\ceres_iteration_logger.cpp" />
-    <ClCompile Include="src\algo\deformation_graph\deformation_graph_cgal_mesh.cpp" />
-    <ClCompile Include="src\algo\deformation_graph\nearest_neighbor_search.cpp" />
     <ClCompile Include="src\algo\evaluate_registration.cpp" />
     <ClCompile Include="src\algo\file_writer.cpp" />
     <ClCompile Include="src\algo\mesh_knn.cpp" />
-    <ClCompile Include="src\algo\mesh_simplification\deformation_graph_mesh.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_node.cpp" />
     <ClCompile Include="src\algo\registration\ceres_option.cpp" />
+    <ClCompile Include="src\algo\registration\deformation_graph\deformation_graph_cgal_mesh.cpp" />
+    <ClCompile Include="src\algo\registration\deformation_graph\nearest_neighbor_search.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_node.cpp" />
     <ClCompile Include="src\algo\registration\find_corresponding_points\find_corresponding_points.cpp" />

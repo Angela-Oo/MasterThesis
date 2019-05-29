@@ -6,7 +6,7 @@
 #include <ceres/ceres.h>
 #include "algo/registration/i_registration.h"
 #include "algo/surface_mesh/mesh_definition.h"
-#include "algo/deformation_graph/deformation_graph_cgal_mesh.h"
+#include "algo/registration/deformation_graph/deformation_graph_cgal_mesh.h"
 
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 
