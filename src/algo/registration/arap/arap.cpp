@@ -221,8 +221,7 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
 	for (auto e : mesh.halfedges())
-	{
-		auto edge = _deformation_graph._mesh.edge(e);
+	{		
 		auto target = mesh.target(e);
 		auto source = mesh.source(e);
 
@@ -230,7 +229,9 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 		auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 		auto residual_id = problem.AddResidualBlock(cost_function, loss_function, 
 													deformations[source]->r(), deformations[source]->t(), deformations[target]->t());
-		residual_ids[e].push_back(residual_id);
+
+		auto edge = _deformation_graph._mesh.edge(e);
+		residual_ids[edge].push_back(residual_id);
 	}
 
 	return residual_ids;
@@ -271,7 +272,7 @@ bool AsRigidAsPossible::solveIteration()
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate		
-		//evaluateResidual(problem, fit_residual_ids, arap_residual_ids, conf_residual_ids);
+		evaluateResidual(problem, fit_residual_ids, arap_residual_ids, conf_residual_ids);
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
@@ -325,16 +326,18 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 										 std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 										 std::map<vertex_descriptor, ResidualIds> & conf_residual_block_ids)
 {
-	// TODO
-	//for (auto & r : fit_residual_block_ids) {
-	//	nodes[r.first]._fit_cost = evaluateResidual(problem, r.second);
-	//}
-	//for (auto & r : arap_residual_block_ids) {
-	//	edges[r.first]._smooth_cost = evaluateResidual(problem, r.second);
-	//}
-	//for (auto & r : conf_residual_block_ids) {
-	//	nodes[r.first]._conf_cost = evaluateResidual(problem, r.second);
-	//}
+	auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
+	for (auto & r : fit_residual_block_ids) {
+		fit_cost[r.first] = evaluateResidual(problem, r.second);
+	}
+	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
+	for (auto & r : arap_residual_block_ids) {
+		smooth_cost[r.first] = evaluateResidual(problem, r.second);
+	}
+	auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
+	for (auto & r : conf_residual_block_ids) {
+		conf_cost[r.first] = evaluateResidual(problem, r.second);
+	}
 }
 
 

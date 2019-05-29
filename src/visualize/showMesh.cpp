@@ -184,8 +184,8 @@ void ShowMesh::renderRegistrationTwoFrames()
 
 		// deformation graph
 		if (_render_deformation_graph) {
-			auto render_dg = _registration->getDeformationGraph()._mesh;
-			_point_renderer->insertMesh("deformation_graph", render_dg, ml::RGBColor::Purple);
+			auto render_dg = deformationGraphToSurfaceMesh(_registration->getDeformationGraph());
+			_point_renderer->insertMesh("deformation_graph", render_dg);
 
 			//auto render_dg_points = _registration->getDeformationGraphMesh();
 			//_point_renderer->insertPoints("deformation_graph_mesh", render_dg_points, 0.01);// , true);

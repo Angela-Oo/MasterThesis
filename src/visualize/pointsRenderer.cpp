@@ -18,6 +18,37 @@ void PointsRenderer::render(ml::Cameraf& camera)
 	}
 }
 
+void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, float point_size)
+{
+	auto PointToVec3f = [](const Point & p)
+	{
+		return ml::vec3f(p.x(), p.y(), p.z());
+	};
+
+	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
+	std::vector<TriMeshf> meshes;
+	for (auto & e : mesh.edges()) {
+		auto he = mesh.halfedge(e);
+		auto v0 = mesh.source(he);
+		auto v1 = mesh.target(he);
+
+		meshes.push_back(ml::Shapesf::line(PointToVec3f(mesh.point(v0)), PointToVec3f(mesh.point(v1)), edge_colors[e], point_size));
+	}
+
+
+	auto vertex_colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+	std::vector<ml::vec3f> positions;
+	std::vector<ml::vec4f> color_frame(mesh.number_of_vertices());
+	for (auto & v : mesh.vertices()) {
+		auto p = mesh.point(v);
+		positions.push_back(ml::vec3f(p.x(), p.y(), p.z()));
+		color_frame.push_back(vertex_colors[v]);
+	}
+	meshes.push_back(ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size * 2.), positions, color_frame));
+
+	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
+}
+
 void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size)
 {
 	auto PointToVec3f = [](const Point & p)

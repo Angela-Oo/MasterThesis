@@ -15,6 +15,7 @@ typedef Kernel::Aff_transformation_3 Matrix;
 typedef CGAL::Surface_mesh<Kernel::Point_3> SurfaceMesh;
 
 typedef SurfaceMesh::Vertex_index vertex_descriptor;
-typedef SurfaceMesh::halfedge_index edge_descriptor;
+typedef SurfaceMesh::edge_index edge_descriptor;
+typedef SurfaceMesh::halfedge_index halfedge_descriptor;
 typedef SurfaceMesh::Face_index face_descriptor;
 typedef SurfaceMesh::Point Point;

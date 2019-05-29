@@ -2,6 +2,8 @@
 #include "algo/registration/node_weighting.h"
 #include <cassert>
 
+#include "algo/registration/hsv_to_rgb.h"
+
 namespace DG {
 
 
@@ -190,7 +192,7 @@ Direction DeformationGraphCgalMesh::deformedNormalAtNode(vertex_descriptor verte
 	return deformNormalAtNode(normal, node->rotation());
 }
 
-NodeAndPoint DeformationGraphCgalMesh::deformNode(vertex_descriptor node_index)
+NodeAndPoint DeformationGraphCgalMesh::deformNode(vertex_descriptor node_index) const
 {
 	auto & nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
 
@@ -229,6 +231,10 @@ DeformationGraphCgalMesh::DeformationGraphCgalMesh(const DeformationGraphMesh & 
 	bool created;
 	boost::tie(nodes, created) = _mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node", create_node());
 	assert(created);
+	_mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
+	_mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
+	_mesh.add_property_map<vertex_descriptor, double>("v:conf_cost", 0.);
+
 	auto normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
 
 	Vector global_position(0., 0., 0.);
@@ -275,6 +281,105 @@ DeformationGraphCgalMesh & DeformationGraphCgalMesh::operator=(DeformationGraphC
 	//_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
 	return *this;
 }
+
+
+
+
+
+
+
+
+
+double getReferenceCost(const SurfaceMesh & mesh)
+{
+	auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
+	auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
+	auto conf_costs = mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
+	
+	double mean_fit_cost = 0.;
+	double max_fit_cost = 0.0;
+	double max_conf_cost = 0.0;
+
+	for (auto v : mesh.vertices()) {
+		mean_fit_cost += fit_costs[v];
+		if (fit_costs[v] > max_fit_cost)
+			max_fit_cost = fit_costs[v];
+		if (conf_costs[v] > max_conf_cost)
+			max_conf_cost = conf_costs[v];
+	}
+	mean_fit_cost /= mesh.number_of_vertices();
+
+	double mean_smooth_cost = 0.;
+	double max_smooth_cost = 0.0;
+	for (auto e : mesh.edges()) {
+		mean_smooth_cost += smooth_costs[e];
+		if (smooth_costs[e] > max_smooth_cost)
+			max_smooth_cost = smooth_costs[e];
+	}
+	mean_smooth_cost /= mesh.number_of_edges();
+
+	auto k_mean_cost = std::max(mean_fit_cost, mean_smooth_cost);
+	k_mean_cost *= 10.;
+
+	std::cout << "max fit cost " << max_fit_cost 
+		<< " max conf cost " << max_conf_cost 
+		<< " max smooth cost " << max_smooth_cost
+		<< " used visualize cost " << k_mean_cost << std::endl;
+
+	return k_mean_cost;
+}
+
+SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraphCgalMesh & deformation_graph)
+{
+	SurfaceMesh mesh = deformation_graph._mesh;
+	auto normals = mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
+	for (auto & v : mesh.vertices()) {
+		auto deformed = deformation_graph.deformNode(v);
+		mesh.point(v) = deformed._point;
+		normals[v] = deformed._normal;
+	}
+
+	// color
+	auto reference_cost = getReferenceCost(mesh);
+	auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
+	auto colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+	for (auto & v : mesh.vertices()) 
+	{
+		double error = (reference_cost > 0.) ? (fit_costs[v] / reference_cost) : fit_costs[v];
+		error = std::min(1., error);
+		colors[v] = errorToRGB(error);
+
+		//if (node.weight() < 0.7)
+		//	vertex.color = ml::RGBColor::White.toVec4f();
+		//else if (!node._found_nearest_point)
+		//	vertex.color = ml::RGBColor::Black.toVec4f();
+		//mesh.m_vertices.push_back(vertex);
+	}
+
+	auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
+	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
+	for (auto & e : mesh.edges())
+	{
+		double error = (reference_cost > 0.) ? (smooth_costs[e] / reference_cost) : smooth_costs[e];
+		error = std::min(1., error);
+		edge_colors[e] = errorToRGB(error);
+	}
+	return mesh;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

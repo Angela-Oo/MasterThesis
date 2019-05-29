@@ -65,7 +65,7 @@ public:
 	Point deformedPositionAtNode(vertex_descriptor vertex_index, const Point & pos) const;
 	Direction deformedNormalAtNode(vertex_descriptor vertex_index, const Direction & normal) const;
 public:
-	NodeAndPoint deformNode(vertex_descriptor node_index);
+	NodeAndPoint deformNode(vertex_descriptor node_index) const;
 	NodeAndPoint getNode(vertex_descriptor node_index);
 	//DeformationGraphMesh::Property_map<vertex_descriptor, std::shared_ptr<INode>> getDeformations();
 public:
@@ -78,7 +78,7 @@ public:
 };
 
 
-
+SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraphCgalMesh & deformation_graph);
 
 class DeformedMesh
 {

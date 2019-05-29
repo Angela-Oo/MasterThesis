@@ -10,7 +10,7 @@ DeformationGraphMesh convertToDeformationGraphMesh(const Mesh& triMesh) {
 	DeformationGraphMesh mesh;
 
 	auto property_map = mesh.add_property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node", nullptr);
-	auto property_map_edge = mesh.add_property_map<edge_descriptor, std::shared_ptr<IEdge>>("e:edge", nullptr);
+	//auto property_map_edge = mesh.add_property_map<edge_descriptor, std::shared_ptr<IEdge>>("e:edge", nullptr);
 
 	std::vector<vertex_descriptor> vertex_handles;
 	vertex_handles.reserve(triMesh.getVertices().size());

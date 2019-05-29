@@ -103,7 +103,7 @@ Mesh EmbeddedDeformation::getDeformationGraphMesh()
 		if (_k_mean_cost > 0.)
 			error /= _k_mean_cost;
 		error = std::min(1., error);
-		vertex.color = errorToRGB(error, nodes[*vp.first].weight());
+		//vertex.color = errorToRGB(error, nodes[*vp.first].weight());
 
 		if (node.weight() < 0.7)
 			vertex.color = ml::RGBColor::White.toVec4f();
