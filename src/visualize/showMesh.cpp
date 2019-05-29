@@ -5,6 +5,8 @@
 #include "algo/registration/rigid_registration.h"
 #include "algo/registration/ceres_option.h"
 
+#include "algo/registration/embedded_deformation/ed.h"
+#include "algo/registration/arap/arap.h"
 // test
 #include "algo/mesh_simplification/deformation_graph_mesh.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
@@ -18,21 +20,17 @@ void ShowMesh::nonRigidRegistration()
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
 		std::cout << "what " << _number_of_nodes << std::endl;
-		/*if(_registration_type == RegistrationType::ED)
-			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, _number_of_nodes, _logger);
+		if(_registration_type == RegistrationType::ED)
+			_registration = std::make_unique<EDT::EmbeddedDeformation>(source, target, option, _number_of_nodes, _logger);
 		else if(_registration_type == RegistrationType::ED_WithoutICP)
-			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
+			_registration = std::make_unique<EDT::EmbeddedDeformation>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
 		else if(_registration_type == RegistrationType::ASAP)
-			_registration = std::make_unique<AsRigidAsPossible>(source, target, option, _number_of_nodes, _logger);
-		else if(_registration_type == RegistrationType::ASAP_WithoutICP)
-			_registration = std::make_unique<AsRigidAsPossible>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
-		else
-			_registration = std::make_unique<RigidRegistration>(source, target, option, _logger);*/
-
-		if (_registration_type == RegistrationType::ASAP)
 			_registration = std::make_unique<ARAP::AsRigidAsPossible>(source, target, option, _number_of_nodes, _logger);
-		else if (_registration_type == RegistrationType::ASAP_WithoutICP)
+		else if(_registration_type == RegistrationType::ASAP_WithoutICP)
 			_registration = std::make_unique<ARAP::AsRigidAsPossible>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
+		//else
+		//	_registration = std::make_unique<RigidRegistration>(source, target, option, _logger);
+
 		renderRegistration();
 	}
 	else {
@@ -476,12 +474,11 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_reference_registration_mesh = std::move(reference_registration_mesh);
 	}
 	else {
-		//_input_mesh = std::make_unique<DeformationMesh>();
-		//_reference_registration_mesh = std::make_unique<DeformationMesh>();
+		_input_mesh = std::make_unique<DeformationMesh>();
+		_reference_registration_mesh = std::make_unique<DeformationMesh>();
 
-		//SurfaceMesh m = convertToDeformationGraphMesh(_input_mesh->getMesh(0));
-		_input_mesh = std::make_unique<DeformationMeshFrames>();
-		_reference_registration_mesh = std::make_unique<DeformationMeshFrames>();
+		//_input_mesh = std::make_unique<DeformationMeshFrames>();
+		//_reference_registration_mesh = std::make_unique<DeformationMeshFrames>();
 
 		_logger = std::make_shared<FileWriter>("test.txt");
 		_render_reference_mesh = false;

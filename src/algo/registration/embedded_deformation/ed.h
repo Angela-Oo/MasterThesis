@@ -1,28 +1,24 @@
 #pragma once
 
 #include "mLibInclude.h"
-#include "arap_node.h"
-#include "algo/file_writer.h"
-#include <ceres/ceres.h>
-#include "algo/registration/i_registration.h"
-#include "algo/surface_mesh/mesh_definition.h"
 #include "algo/deformation_graph/deformation_graph_cgal_mesh.h"
+#include "ed_node.h"
+#include "algo/file_writer.h"
+#include <vector>
+#include <ceres/ceres.h>
+
+#include "algo/registration/i_registration.h"
 
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 
-namespace ARAP {
-
-
+namespace EDT {
 
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 
-class AsRigidAsPossible : public ITestRegistration
+class EmbeddedDeformation : public ITestRegistration
 {
-public:
-
-private:
 	SurfaceMesh _src;
 	SurfaceMesh _dst;
 	ceres::Solver::Options _options;
@@ -30,36 +26,44 @@ private:
 	std::unique_ptr<DG::DeformedMesh> _deformed_mesh;
 	std::vector<vertex_descriptor> _fixed_positions;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
+
+	std::shared_ptr<FileWriter> _logger;
 private:
-	bool _with_icp = true;
+	bool _with_icp = false;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 100;
 	long long _total_time_in_ms = 0;
-private:
-	double a_smooth = 100.;// 10.;// 0.1;// 100;
+public:
+	double a_rigid = 1000.;// 1.;// 1000;
+	double a_smooth = 100.;// 0.1;// 100;
 	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 10.;
+	double a_fit = 1.;
 	const double _find_max_distance = 0.5;
 	const double _find_max_angle_deviation = 45.;
-	std::shared_ptr<FileWriter> _logger;
 private:
-	void printCeresOptions();
+	//double _k_mean_cost;
+	//void updateMeanCost();
+private:
 	double evaluateResidual(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_ids);
 	void evaluateResidual(ceres::Problem & problem,
-							std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
-							std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
-							std::map<vertex_descriptor, ResidualIds> & conf_residual_block_ids);
+						  VertexResidualIds & fit_residual_block_ids,
+						  EdgeResidualIds & smoot_residual_block_ids,
+						  VertexResidualIds & rotation_residual_block_ids,
+						  VertexResidualIds & conf_residual_block_ids);
 private:
-	ceres::ResidualBlockId addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, Point target_position);
-	ceres::ResidualBlockId addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, Point target_position);
-	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem);
-	std::map<vertex_descriptor, ResidualIds> addFitCostWithoutICP(ceres::Problem &problem);
-	std::map<edge_descriptor, ResidualIds> addAsRigidAsPossibleCost(ceres::Problem &problem);
-	std::map<vertex_descriptor, ResidualIds> addConfCost(ceres::Problem &problem);
+	ceres::ResidualBlockId addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position);
+	ceres::ResidualBlockId addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position);
+	VertexResidualIds addFitCostWithoutICP(ceres::Problem &problem);
+	VertexResidualIds addFitCost(ceres::Problem &problem);
+	EdgeResidualIds addSmoothCost(ceres::Problem &problem);
+	VertexResidualIds addRotationCost(ceres::Problem &problem);
+	VertexResidualIds addConfCost(ceres::Problem &problem);
+private:
+	void printCeresOptions();
 public:
-	bool finished() override;
+	bool finished();
 	bool solveIteration() override;
 	bool solve() override;
 public:
@@ -72,23 +76,25 @@ public:
 	std::vector<Point> getFixedPostions() override;
 public:
 	// without icp
-	AsRigidAsPossible(const SurfaceMesh& src,
+	EmbeddedDeformation(const SurfaceMesh& src,
 						const SurfaceMesh& dst,
 						std::vector<vertex_descriptor> fixed_positions,
 						ceres::Solver::Options option,
-						std::shared_ptr<FileWriter> logger = nullptr);
+						std::shared_ptr<FileWriter> logger);
 	// with icp
-	AsRigidAsPossible(const SurfaceMesh& src,
+	EmbeddedDeformation(const SurfaceMesh& src,
 						const SurfaceMesh& dst,
 						ceres::Solver::Options option,
 						unsigned int number_of_deformation_nodes = 1000,
 						std::shared_ptr<FileWriter> logger = nullptr);
 	// with icp but init with passed deformation graph
-	AsRigidAsPossible(const SurfaceMesh& src,
+	EmbeddedDeformation(const SurfaceMesh& src,
 						const SurfaceMesh& dst,
 						const DG::DeformationGraphCgalMesh & deformation_graph,
 						ceres::Solver::Options option,
 						std::shared_ptr<FileWriter> logger = nullptr);
-};	
+
+};
+
 
 }

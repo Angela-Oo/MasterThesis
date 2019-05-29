@@ -35,7 +35,6 @@ void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, float 
 		meshes.push_back(ml::Shapesf::line(PointToVec3f(mesh.point(v0)), PointToVec3f(mesh.point(v1)), edge_colors[e], point_size));
 	}
 
-
 	auto vertex_colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
 	std::vector<ml::vec3f> positions;
 	std::vector<ml::vec4f> color_frame;

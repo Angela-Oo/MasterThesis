@@ -542,15 +542,6 @@
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\as_rigid_as_possible.h">
-      <Filter>algo\registration\as rigid as possible</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\as_rigid_as_possible_cost_function.h">
-      <Filter>algo\registration\as rigid as possible</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\as_rigid_as_possible_node.h">
-      <Filter>algo\registration\as rigid as possible</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph.h">
       <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
@@ -632,6 +623,15 @@
     <ClInclude Include="src\algo\registration\arap\arap_node.h">
       <Filter>algo\registration\as rigid as possible</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed.h">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_node.h">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -711,12 +711,6 @@
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
       <Filter>algo\mesh simplification</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\as_rigid_as_possible.cpp">
-      <Filter>algo\registration\as rigid as possible</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\as_rigid_as_possible_node.cpp">
-      <Filter>algo\registration\as rigid as possible</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\embedded_deformation.cpp">
       <Filter>algo\registration\embedded deformation</Filter>
     </ClCompile>
@@ -761,6 +755,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap_node.cpp">
       <Filter>algo\registration\as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp">
+      <Filter>algo\registration\embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_node.cpp">
+      <Filter>algo\registration\embedded deformation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

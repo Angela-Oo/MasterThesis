@@ -107,8 +107,7 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 
 	FitStarPointToPlaneAngleAxisCostFunction(const Point& point, const Point& node_g, const Vector& node_normal, const Point &global_g) :
 		_point(point), _node_g(node_g), _node_normal(node_normal), _global_g(global_g)
-	{
-	}
+	{ }
 
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create(const Point& point, const Point& node_g, const Vector& node_normal, const Point &global_g)

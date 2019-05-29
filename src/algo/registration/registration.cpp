@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "registration.h"
-#include "as_rigid_as_possible.h"
 #include "embedded_deformation.h"
 #include "rigid_registration.h"
 #include "ceres_option.h"

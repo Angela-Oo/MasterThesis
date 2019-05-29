@@ -2,12 +2,12 @@
 #include "mLibInclude.h"
 #include "algo/deformation_graph/i_node.h"
 
-namespace ARAP {
+namespace EDT {
 
-class Node : public INode
+class Deformation : public INode
 {
 private:
-	ml::vec3d _r; // rotation matrix
+	ml::mat3d _r; // rotation matrix
 	ml::vec3d _t; // translation vector	
 	double _w; // weight
 public:
@@ -19,9 +19,9 @@ public:
 	Vector translation() const override;
 	double weight() const override { return _w; };
 public:
-	Node(const ml::vec3d & r, const ml::vec3d & t);
-	Node();
-	Node(const Node& node, bool inverse);
+	Deformation(const ml::mat3d & r, const ml::vec3d & t);
+	Deformation();
+	Deformation(const Deformation& node, bool inverse);
 };
 
 
