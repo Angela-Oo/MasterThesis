@@ -2,6 +2,7 @@
 
 #include "stdafx.h"
 #include "algo/mesh_knn.h"
+#include "mLibFLANN.h"
 #include <deque>
 
 typedef ml::TriMeshf Mesh;

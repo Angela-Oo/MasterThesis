@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "mLibInclude.h"
-#include "ext-flann/nearestNeighborSearchFLANN.h"
+#include "mLibFLANN.h"
 
 class KNNBruteForce {
 	const std::vector<ml::vec3f> & _points;

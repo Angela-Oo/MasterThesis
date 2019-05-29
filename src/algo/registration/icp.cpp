@@ -1,4 +1,5 @@
 #include "stdafx.h"
+#include "mLibFLANN.h"
 #include "icp.h"
 
 using namespace Eigen;

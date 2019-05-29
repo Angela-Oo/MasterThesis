@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include "mLibInclude.h"
-#include "ext-flann/nearestNeighborSearchFLANN.h"
+#include "mLibFLANN.h"
 #include "ext-openmesh/triMesh.h"
 
 class TriMeshKNN {

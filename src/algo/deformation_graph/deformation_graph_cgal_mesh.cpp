@@ -225,7 +225,6 @@ NodeAndPoint DeformationGraphCgalMesh::getNode(vertex_descriptor node_index)
 DeformationGraphCgalMesh::DeformationGraphCgalMesh(const DeformationGraphMesh & mesh, std::function<std::shared_ptr<INode>()> create_node)
 	: _mesh(mesh)
 {
-	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 
 	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<INode>> nodes;
 	bool created;
@@ -249,6 +248,8 @@ DeformationGraphCgalMesh::DeformationGraphCgalMesh(const DeformationGraphMesh & 
 
 	_global_center = CGAL::ORIGIN + global_position;
 	_global_deformation = create_node();
+
+	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
 
 
@@ -267,7 +268,7 @@ DeformationGraphCgalMesh::DeformationGraphCgalMesh(const DeformationGraphCgalMes
 	, _global_center(deformation_graph._global_center)
 	, _mesh(deformation_graph._mesh)
 {
-	//_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
+	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
 
 DeformationGraphCgalMesh & DeformationGraphCgalMesh::operator=(DeformationGraphCgalMesh other)
@@ -278,7 +279,7 @@ DeformationGraphCgalMesh & DeformationGraphCgalMesh::operator=(DeformationGraphC
 	_global_deformation = other._global_deformation;
 	_global_center = other._global_center;
 	_mesh = other._mesh;
-	//_deformation_graph_knn = std::make_unique<GraphKNN<Graph, Node>>(_graph, _k + 1);
+	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../mLibInclude.h"
+#include "mLibFLANN.h"
 #include "ext-openmesh/triMesh.h"
 #include "mesh_knn.h"
 

@@ -17,7 +17,7 @@ double FindCorrespondingPoints::median()
 
 std::pair<bool, Point> FindCorrespondingPoints::correspondingPoint(Point point, Vector normal)
 {
-	auto s = _nn_search.search(point, _k);
+	auto s = _nn_search->search(point, _k);
 
 	std::vector<std::pair<vertex_descriptor, std::pair<double, double>>> valid_point_with_angle_and_distance;
 	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
@@ -51,13 +51,13 @@ std::pair<bool, Point> FindCorrespondingPoints::correspondingPoint(Point point, 
 	}
 }
 
-FindCorrespondingPoints::FindCorrespondingPoints(SurfaceMesh mesh, double max_allowed_distance, double max_normal_angle_deviation)
+FindCorrespondingPoints::FindCorrespondingPoints(const SurfaceMesh & mesh, double max_allowed_distance, double max_normal_angle_deviation)
 	: _mesh(mesh)
-	, _k(10)
-	, _nn_search(mesh)
+	, _k(10)	
 	, _max_normal_angle_deviation(max_normal_angle_deviation)
 	, _median_distance(max_allowed_distance)
 {
+	_nn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	_max_normal_angle_deviation = ml::math::degreesToRadians(max_normal_angle_deviation);
 	std::cout << "allowed angle " << _max_normal_angle_deviation << " allowed distance " << _median_distance << std::endl;
 }

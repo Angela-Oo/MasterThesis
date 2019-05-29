@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "evaluate_registration.h"
-
+#include "mLibFLANN.h"
 
 
 class Plane
@@ -36,7 +36,7 @@ float area(OpenMesh::Vec3f point_a, OpenMesh::Vec3f point_b, OpenMesh::Vec3f poi
 
 	auto angle = OpenMesh::dot(c.normalized(), b.normalized());
 	auto hb = sin(angle) * b.length();
-	auto area = (hb * b.length()) / 2.;
+	float area = (hb * b.length()) / 2.;
 	return area;
 }
 
@@ -57,9 +57,9 @@ OpenMesh::Vec3f barycentricCoordinates(OpenMesh::Vec3f point_a, OpenMesh::Vec3f 
 OpenMesh::Vec3f barycentricCoordinates(ml::OpenMeshTriMesh::Mesh & mesh, OpenMesh::FaceHandle face_handle, OpenMesh::Vec3f point_on_plane)
 {
 	auto vertex_face_iter = mesh.cfv_iter(face_handle);
-	auto point_a = mesh.point(vertex_face_iter.handle());
-	auto point_b = mesh.point((++vertex_face_iter).handle());
-	auto point_c = mesh.point((++vertex_face_iter).handle());
+	auto point_a = mesh.point(*vertex_face_iter);
+	auto point_b = mesh.point(*(++vertex_face_iter));
+	auto point_c = mesh.point(*(++vertex_face_iter));
 
 	return barycentricCoordinates(point_a, point_b, point_c, point_on_plane);
 }

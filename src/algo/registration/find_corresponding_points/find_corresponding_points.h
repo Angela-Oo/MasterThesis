@@ -10,12 +10,12 @@ double angle_between_to_vectors_in_rad(Vector vector_a, Vector vector_b);
 class FindCorrespondingPoints
 {
 	SurfaceMesh _mesh;
-	NearestNeighborSearch _nn_search;
+	std::unique_ptr<NearestNeighborSearch> _nn_search;
 	double _max_normal_angle_deviation;
 	double _median_distance;
 	double _k;
 public:
 	double median();
 	std::pair<bool, Point> correspondingPoint(Point point, Vector normal);
-	FindCorrespondingPoints(SurfaceMesh mesh, double max_allowed_distance = 0.05, double max_normal_angle_deviation = 30.);
+	FindCorrespondingPoints(const SurfaceMesh & mesh, double max_allowed_distance = 0.05, double max_normal_angle_deviation = 30.);
 };

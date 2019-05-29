@@ -22,9 +22,9 @@ CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 	auto elapse = get_time_in_ms();
 	_total_time_in_ms += elapse;
 
-	auto time_to_string = [](long long time_in_ms) {
-		long long s = floor(static_cast<double>(time_in_ms) / 1000.);
-		long long ms = time_in_ms - (s * 1000);
+	auto time_to_string = [](double time_in_ms) {
+		double s = floor(static_cast<double>(time_in_ms) / 1000.);
+		double ms = time_in_ms - (s * 1000);
 		std::stringstream ss;
 		ss << std::setw(4) << s << " s " << std::setw(3) << ms << " ms";
 		return ss.str();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mLibInclude.h"
+#include "mLibFLANN.h"
 #include <vector>
 #include "graph_node_type.h"
 
