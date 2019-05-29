@@ -7,6 +7,88 @@
 #include <ceres/rotation.h>
 #include <functional>
 #include "../knn.h"
+#include "algo/ceres_math.h"
+
+#include "algo/mesh_simplification/deformation_graph_mesh.h"
+
+
+struct FitPointToPointAngleAxisCostFunction {
+	const Point _target;
+	const Point _source;
+	FitPointToPointAngleAxisCostFunction(const Point &target, const Point & source)
+		: _target(target), _source(source)
+	{ }
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(const Point &observed, const Point &worldPoint) {
+		return (new ceres::AutoDiffCostFunction<FitPointToPointAngleAxisCostFunction, 3, 3, 3>(new FitPointToPointAngleAxisCostFunction(observed, worldPoint)));
+	}
+
+	template <typename T>
+	bool operator()(const T* const rotation, const T* const translation, T* residuals) const {
+		T source[3];
+		T target[3];		
+		point_to_T(_source, source);
+		point_to_T(_target, target);
+
+		T deformed_point[3];
+		ceres::AngleAxisRotatePoint(rotation, source, deformed_point);
+		addition(deformed_point, translation, deformed_point);
+
+		// The error is the difference between the predicted and observed position.
+		substract(deformed_point, target, residuals);
+		return true;
+	}
+};
+
+
+
+
+
+struct FitPointToPlaneAngleAxisCostFunction {
+	const Point _target;
+	const Point _source;
+	const Vector _source_normal;
+
+	FitPointToPlaneAngleAxisCostFunction(const Point& target, const Point& source, const Vector& source_normal) :
+		_target(target), _source(source), _source_normal(source_normal)
+	{ }
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(const Point& target, const Point& source, const Vector& source_normal)
+	{
+		return (new ceres::AutoDiffCostFunction<FitPointToPlaneAngleAxisCostFunction, 1, 3, 3>(new FitPointToPlaneAngleAxisCostFunction(target, source, source_normal)));
+	}
+
+	template <typename T>
+	bool operator()(const T* const rotation, const T* const translation, T* residuals) const
+	{
+		T source[3];
+		T target[3];
+		T source_normal[3];
+		point_to_T(_source, source);
+		point_to_T(_target, target);
+		point_to_T(_source_normal, source_normal);
+
+		// local deformation of node position
+		addition(source, translation, source);
+
+		// deform the source normal
+		T rotation_t[9];
+		ceres::AngleAxisToRotationMatrix(rotation, rotation_t);
+		matrix_transpose(rotation_t, rotation_t);
+
+		matrix_multiplication(rotation_t, source_normal, source_normal);
+		normalize(source_normal, source_normal);
+
+		// The error is the difference between the predicted and observed position.
+		T difference[3];
+		substract(target, source, difference);
+		residuals[0] = dot(difference, source_normal);
+
+		return true;
+	}
+};
 
 
 struct PointToPointErrorSE3 {

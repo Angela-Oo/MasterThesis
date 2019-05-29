@@ -7,6 +7,7 @@
 
 #include "algo/registration/embedded_deformation/ed.h"
 #include "algo/registration/arap/arap.h"
+
 // test
 #include "algo/mesh_simplification/deformation_graph_mesh.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
@@ -19,17 +20,16 @@ void ShowMesh::nonRigidRegistration()
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
-		std::cout << "what " << _number_of_nodes << std::endl;
 		if(_registration_type == RegistrationType::ED)
-			_registration = std::make_unique<EDT::EmbeddedDeformation>(source, target, option, _number_of_nodes, _logger);
+			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, _number_of_nodes, _logger);
 		else if(_registration_type == RegistrationType::ED_WithoutICP)
-			_registration = std::make_unique<EDT::EmbeddedDeformation>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
+			_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
 		else if(_registration_type == RegistrationType::ASAP)
 			_registration = std::make_unique<ARAP::AsRigidAsPossible>(source, target, option, _number_of_nodes, _logger);
 		else if(_registration_type == RegistrationType::ASAP_WithoutICP)
 			_registration = std::make_unique<ARAP::AsRigidAsPossible>(source, target, _input_mesh->getFixedPositions(frame_b), option, _logger);
-		//else
-		//	_registration = std::make_unique<RigidRegistration>(source, target, option, _logger);
+		else
+			_registration = std::make_unique<RigidRegistration>(source, target, option, _logger);
 
 		renderRegistration();
 	}
@@ -180,7 +180,7 @@ void ShowMesh::renderRegistrationTwoFrames()
 
 		// deformation graph
 		if (_render_deformation_graph) {
-			auto render_dg = deformationGraphToSurfaceMesh(_registration->getDeformationGraph());
+			auto render_dg = _registration->getDeformationGraphMesh();
 			_point_renderer->insertMesh("deformation_graph", render_dg);
 
 			//auto render_dg_points = _registration->getDeformationGraphMesh();
@@ -444,7 +444,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = false;
+	bool test = true;
 	if (!test) {
 		// puppet
 		//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
@@ -474,11 +474,11 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_reference_registration_mesh = std::move(reference_registration_mesh);
 	}
 	else {
-		_input_mesh = std::make_unique<DeformationMesh>();
-		_reference_registration_mesh = std::make_unique<DeformationMesh>();
+		//_input_mesh = std::make_unique<DeformationMesh>();
+		//_reference_registration_mesh = std::make_unique<DeformationMesh>();
 
-		//_input_mesh = std::make_unique<DeformationMeshFrames>();
-		//_reference_registration_mesh = std::make_unique<DeformationMeshFrames>();
+		_input_mesh = std::make_unique<DeformationMeshFrames>();
+		_reference_registration_mesh = std::make_unique<DeformationMeshFrames>();
 
 		_logger = std::make_shared<FileWriter>("test.txt");
 		_render_reference_mesh = false;

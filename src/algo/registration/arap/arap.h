@@ -18,7 +18,7 @@ typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 
-class AsRigidAsPossible : public ITestRegistration
+class AsRigidAsPossible : public IRegistration
 {
 public:
 
@@ -67,6 +67,7 @@ public:
 	const SurfaceMesh & getTarget() override;
 	SurfaceMesh getDeformedPoints() override;
 	//Mesh getInverseDeformedPoints() override;
+	SurfaceMesh getDeformationGraphMesh() override;
 public:
 	const DG::DeformationGraphCgalMesh & getDeformationGraph() override;
 	std::vector<Point> getFixedPostions() override;

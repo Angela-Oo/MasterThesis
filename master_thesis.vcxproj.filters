@@ -542,21 +542,6 @@
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph.h">
-      <Filter>algo\registration\deformation graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph_knn.h">
-      <Filter>algo\registration\deformation graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\deformed_mesh.h">
-      <Filter>algo\registration\deformation graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\embedded_deformation.h">
-      <Filter>algo\registration\embedded deformation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\embedded_deformation_cost_function.h">
-      <Filter>algo\registration\embedded deformation</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\graph_node_type.h">
       <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
@@ -566,17 +551,11 @@
     <ClInclude Include="src\algo\registration\icp_cost_function.h">
       <Filter>algo\registration\rigid registration</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\node.h">
-      <Filter>algo\registration\embedded deformation</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_registration.h">
       <Filter>algo\registration\rigid registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\node_weighting.h">
       <Filter>algo\registration\deformation graph</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\non_rigid_registration_cost_function.h">
-      <Filter>algo\registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\i_registration.h">
       <Filter>algo\registration</Filter>
@@ -589,9 +568,6 @@
     </ClInclude>
     <ClInclude Include="src\algo\registration\ceres_option.h">
       <Filter>algo\registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\find_correspondece_point.h">
-      <Filter>algo\registration\find correspondences</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\hsv_to_rgb.h">
       <Filter>algo\registration</Filter>
@@ -711,14 +687,8 @@
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
       <Filter>algo\mesh simplification</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\embedded_deformation.cpp">
-      <Filter>algo\registration\embedded deformation</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\icp.cpp">
       <Filter>algo\registration\rigid registration</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\node.cpp">
-      <Filter>algo\registration\embedded deformation</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_registration.cpp">
       <Filter>algo\registration\rigid registration</Filter>
@@ -731,9 +701,6 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\ceres_option.cpp">
       <Filter>algo\registration</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\find_correspondece_point.cpp">
-      <Filter>algo\registration\find correspondences</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\hsv_to_rgb.cpp">
       <Filter>algo\registration</Filter>

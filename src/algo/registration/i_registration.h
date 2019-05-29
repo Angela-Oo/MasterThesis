@@ -31,30 +31,30 @@ struct Edge
 	double cost = 0.;
 };
 
+//class IRegistration
+//{
+//public:
+//	virtual bool finished() = 0;
+//	virtual bool solveIteration() = 0;
+//	virtual bool solve() = 0;
+//
+//	//virtual std::map<std::string, std::map<vertex_index, std::vector<double>>> residuals()
+//	//{ return std::map<std::string, std::map<vertex_index, std::vector<double>>>(); };
+//public:
+//	virtual const Mesh & getSource() = 0;
+//	virtual const Mesh & getTarget() = 0;
+//	virtual Mesh getDeformedPoints() = 0;
+//	virtual Mesh getInverseDeformedPoints() = 0;
+//public:
+//	virtual std::vector<ml::vec3f> getFixedPostions() { return std::vector<ml::vec3f>(); }
+//	virtual std::vector<Edge> getDeformationGraph() { return std::vector<Edge>(); }
+//	virtual Mesh getDeformationGraphMesh() { return Mesh(); };
+//public:
+//	virtual ~IRegistration() = default;
+//};
+
+
 class IRegistration
-{
-public:
-	virtual bool finished() = 0;
-	virtual bool solveIteration() = 0;
-	virtual bool solve() = 0;
-
-	//virtual std::map<std::string, std::map<vertex_index, std::vector<double>>> residuals()
-	//{ return std::map<std::string, std::map<vertex_index, std::vector<double>>>(); };
-public:
-	virtual const Mesh & getSource() = 0;
-	virtual const Mesh & getTarget() = 0;
-	virtual Mesh getDeformedPoints() = 0;
-	virtual Mesh getInverseDeformedPoints() = 0;
-public:
-	virtual std::vector<ml::vec3f> getFixedPostions() { return std::vector<ml::vec3f>(); }
-	virtual std::vector<Edge> getDeformationGraph() { return std::vector<Edge>(); }
-	virtual Mesh getDeformationGraphMesh() { return Mesh(); };
-public:
-	virtual ~IRegistration() = default;
-};
-
-
-class ITestRegistration
 {
 public:
 	virtual bool finished() = 0;
@@ -67,9 +67,9 @@ public:
 	//virtual SurfaceMesh getInverseDeformedPoints() = 0;
 public:
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
-	virtual const DG::DeformationGraphCgalMesh & getDeformationGraph() = 0;
-	//virtual Mesh getDeformationGraphMesh() { return Mesh(); };
+	virtual const DG::DeformationGraphCgalMesh & getDeformationGraph() { return DG::DeformationGraphCgalMesh();	};
+	virtual SurfaceMesh getDeformationGraphMesh() = 0;// { return SurfaceMesh(); };
 public:
-	virtual ~ITestRegistration() = default;
+	virtual ~IRegistration() = default;
 };
 

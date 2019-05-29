@@ -6,7 +6,7 @@
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
 
-namespace EDT
+namespace ED
 {
 
 

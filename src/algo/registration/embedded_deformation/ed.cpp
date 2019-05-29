@@ -6,7 +6,7 @@
 #include "algo/mesh_simplification/mesh_simplification.h"
 #include "ed_node.h"
 
-namespace EDT {
+namespace ED {
 
 const SurfaceMesh & EmbeddedDeformation::getSource()
 {
@@ -44,6 +44,10 @@ const DG::DeformationGraphCgalMesh & EmbeddedDeformation::getDeformationGraph()
 	return _deformation_graph;
 }
 
+SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
+{
+	return deformationGraphToSurfaceMesh(_deformation_graph);
+}
 
 ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position)
 {

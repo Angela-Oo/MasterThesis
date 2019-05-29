@@ -3,7 +3,7 @@
 #include <numeric>
 #include "ext-depthcamera/calibratedSensorData.h"
 #include "algo/registration/registration.h"
-#include "algo/registration/embedded_deformation.h"
+#include "algo/registration/embedded_deformation/ed.h"
 #include "input_reader/depth_image_reader.h"
 #include "algo/registration/ceres_option.h"
 
@@ -43,7 +43,7 @@ void ShowTwoRigideRegisteredFrames::initRegistration()
 	for (auto & p : points_b)
 		mesh_b.m_vertices.push_back(p);
 
-	_registration = std::make_unique<ED::EmbeddedDeformation>(mesh_a, mesh_b, ceresOption());
+	_registration = std::make_unique<ED::EmbeddedDeformation>(convertToCGALMesh(mesh_a), convertToCGALMesh(mesh_b), ceresOption());
 }
 
 void ShowTwoRigideRegisteredFrames::initReader()

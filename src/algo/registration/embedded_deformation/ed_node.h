@@ -2,7 +2,7 @@
 #include "mLibInclude.h"
 #include "algo/deformation_graph/i_node.h"
 
-namespace EDT {
+namespace ED {
 
 class Deformation : public INode
 {

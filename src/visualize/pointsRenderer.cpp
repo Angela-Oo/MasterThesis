@@ -3,6 +3,10 @@
 #include "algo/registration/hsv_to_rgb.h"
 using namespace ml;
 
+ml::vec3f PointToVec3f(const Point & p)
+{
+	return ml::vec3f(p.x(), p.y(), p.z());
+}
 
 void PointsRenderer::render(ml::Cameraf& camera)
 {
@@ -20,11 +24,6 @@ void PointsRenderer::render(ml::Cameraf& camera)
 
 void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, float point_size)
 {
-	auto PointToVec3f = [](const Point & p)
-	{
-		return ml::vec3f(p.x(), p.y(), p.z());
-	};
-
 	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
 	std::vector<TriMeshf> meshes;
 	for (auto & e : mesh.edges()) {
@@ -50,11 +49,6 @@ void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, float 
 
 void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size)
 {
-	auto PointToVec3f = [](const Point & p)
-	{
-		return ml::vec3f(p.x(), p.y(), p.z());
-	};
-
 	//auto colors = mesh.property_map<vertex_descriptor, CGAL::Color>("v:color").first;
 	//std::vector<ml::vec4f> color_frame;
 	//std::vector<ml::vec3f> vertices;
@@ -75,6 +69,33 @@ void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::RG
 	}
 	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 }
+
+void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, float point_size)
+{
+	auto vertex_colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+	std::vector<ml::vec3f> positions;
+	std::vector<ml::vec4f> color_frame;
+	for (auto & v : mesh.vertices()) {
+		auto p = mesh.point(v);
+		positions.push_back(ml::vec3f(p.x(), p.y(), p.z()));
+		color_frame.push_back(vertex_colors[v]);
+	}
+
+	_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), positions, color_frame));
+}
+
+void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size)
+{
+	std::vector<ml::vec3f> positions;
+	for (auto & v : mesh.vertices()) {
+		positions.push_back(PointToVec3f(mesh.point(v)));
+	}
+	std::vector<ml::vec4f> color_frame(mesh.number_of_vertices());
+	std::fill(color_frame.begin(), color_frame.end(), color);
+
+	_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), positions, color_frame));
+}
+
 
 void PointsRenderer::insertPoints(std::string id, std::vector<Point> points, ml::RGBColor color, float point_size)
 {

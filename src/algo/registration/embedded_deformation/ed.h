@@ -11,13 +11,13 @@
 
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 
-namespace EDT {
+namespace ED {
 
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 
-class EmbeddedDeformation : public ITestRegistration
+class EmbeddedDeformation : public IRegistration
 {
 	SurfaceMesh _src;
 	SurfaceMesh _dst;
@@ -71,6 +71,7 @@ public:
 	const SurfaceMesh & getTarget() override;
 	SurfaceMesh getDeformedPoints() override;
 	//Mesh getInverseDeformedPoints() override;
+	SurfaceMesh getDeformationGraphMesh() override;
 public:
 	const DG::DeformationGraphCgalMesh & getDeformationGraph() override;
 	std::vector<Point> getFixedPostions() override;

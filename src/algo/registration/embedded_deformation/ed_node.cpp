@@ -2,7 +2,7 @@
 
 #include "ed_node.h"
 
-namespace EDT {
+namespace ED {
 
 Matrix Deformation::rotation() const
 {

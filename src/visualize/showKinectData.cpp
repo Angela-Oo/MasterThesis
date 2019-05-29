@@ -2,10 +2,10 @@
 #include "showKinectData.h"
 #include <numeric>
 #include "algo/registration/icp.h"
-#include "algo/registration/embedded_deformation.h"
 #include "input_reader/kinect_reader.h"
 #include <ceres/ceres.h>
 #include "algo/registration/ceres_option.h"
+#include "algo/registration/embedded_deformation/ed.h"
 
 using namespace ml;
 
@@ -97,7 +97,7 @@ void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 		for (auto & p : points_b_icp)
 			mesh_b.m_vertices.push_back(p);
 
-		_registration = std::make_unique<ED::EmbeddedDeformation>(mesh_a, mesh_b, ceresOption());
+		_registration = std::make_unique<ED::EmbeddedDeformation>(convertToCGALMesh(mesh_a), convertToCGALMesh(mesh_b), ceresOption());
 		renderRegisteredPoints();
 	}
 	else {		

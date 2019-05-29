@@ -38,6 +38,10 @@ const DG::DeformationGraphCgalMesh & AsRigidAsPossible::getDeformationGraph()
 	return _deformation_graph;
 }
 
+SurfaceMesh AsRigidAsPossible::getDeformationGraphMesh()
+{
+	return deformationGraphToSurfaceMesh(_deformation_graph);
+}
 
 std::vector<Point> AsRigidAsPossible::getFixedPostions()
 {
@@ -86,6 +90,7 @@ VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &proble
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<INode>>("v:node").first;
 	for (auto & v : mesh.vertices())
 	{
+		auto vertex = _deformation_graph.deformNode(v);
 		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), v) != _fixed_positions.end()))
 		{
 			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _dst.point(v)));

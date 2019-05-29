@@ -20,20 +20,20 @@ enum class RegistrationType
 	AllFrames
 };
 
-class Registration
-{
-	std::unique_ptr<IRegistration> _registration;
-	const int _number_of_deformation_graph_nodes = 2000;
-	std::shared_ptr<FileWriter> _logger;
-public:
-	const Mesh & getSource();
-	const Mesh & getTarget();
-	Mesh getDeformedPoints();
-	Mesh getInverseDeformedPoints();
-	Registration(RegistrationType type,
-				 std::shared_ptr<IMeshReader> mesh_reader, 
-				 int source_frame, int target_frame,
-				 std::shared_ptr<FileWriter> logger = nullptr);
-	bool solve();
-};
+//class Registration
+//{
+//	std::unique_ptr<IRegistration> _registration;
+//	const int _number_of_deformation_graph_nodes = 2000;
+//	std::shared_ptr<FileWriter> _logger;
+//public:
+//	const Mesh & getSource();
+//	const Mesh & getTarget();
+//	Mesh getDeformedPoints();
+//	Mesh getInverseDeformedPoints();
+//	Registration(RegistrationType type,
+//				 std::shared_ptr<IMeshReader> mesh_reader, 
+//				 int source_frame, int target_frame,
+//				 std::shared_ptr<FileWriter> logger = nullptr);
+//	bool solve();
+//};
 

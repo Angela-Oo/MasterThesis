@@ -5,6 +5,8 @@
 
 #include "algo/mesh_simplification/mesh_simplification.h"
 
+ml::vec3f PointToVec3f(const Point & p);
+
 class PointsRenderer
 {
 private:
@@ -16,6 +18,9 @@ public:
 	void render(ml::Cameraf& camera);
 	void insertMesh(std::string id, const SurfaceMesh & mesh, float point_size = 0.001f);
 	void insertMesh(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.001f);
+	void insertPoints(std::string id, const SurfaceMesh & mesh, float point_size = 0.001f);
+	void insertPoints(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.001f);
+
 	void insertPoints(std::string id, std::vector<Point> points, ml::RGBColor color, float point_size = 0.001f);
 	void insertPoints(std::string id, std::vector<ml::vec3f> points, ml::RGBColor color, float point_size = 0.001f);
 	void insertPoints(std::string id, const ml::TriMeshf & points, float point_size = 0.001f, bool draw_normals = false);
