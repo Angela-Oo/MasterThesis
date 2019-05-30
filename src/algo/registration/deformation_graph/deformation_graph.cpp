@@ -285,6 +285,22 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 
 
 
+double getMeanFitCost(const SurfaceMesh & mesh)
+{
+	auto property_map_fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost");
+	if (property_map_fit_costs.second) {
+		auto fit_costs = property_map_fit_costs.first;
+		double mean_fit_cost = 0.;
+		for (auto v : mesh.vertices()) {
+			mean_fit_cost += fit_costs[v];
+		}
+		mean_fit_cost /= mesh.number_of_vertices();
+		return mean_fit_cost;
+	}
+	std::cout << " no fit property " << std::endl;
+	return 0.;
+}
+
 
 
 
@@ -327,6 +343,39 @@ double getReferenceCost(const SurfaceMesh & mesh)
 	return k_mean_cost;
 }
 
+void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
+{
+	auto property_fit = mesh.property_map<vertex_descriptor, double>("v:fit_cost");
+	if (property_fit.second)
+	{
+		auto fit_costs = property_fit.first;
+
+		// add color property if not already exists
+		auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+
+		// if vertex was used for optimization flag is set use it
+		auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used");
+
+		for (auto & v : mesh.vertices())
+		{
+			double error = (reference_cost > 0.) ? (fit_costs[v] / reference_cost) : fit_costs[v];
+			error = std::min(1., error);
+			colors[v] = errorToRGB(error);
+
+			if (vertex_used.second) {
+				if (!vertex_used.first[v]) {
+					colors[v] = ml::RGBColor::Black.toVec4f();
+				}
+			}
+			//if (node.weight() < 0.7)
+			//	vertex.color = ml::RGBColor::White.toVec4f();
+		}
+	}
+	else {
+		std::cout << "no fit property" << std::endl;
+	}
+}
+
 SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph)
 {
 	SurfaceMesh mesh = deformation_graph._mesh;
@@ -339,20 +388,21 @@ SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_g
 
 	// color
 	auto reference_cost = getReferenceCost(mesh);
-	auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
-	auto colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-	for (auto & v : mesh.vertices()) 
-	{
-		double error = (reference_cost > 0.) ? (fit_costs[v] / reference_cost) : fit_costs[v];
-		error = std::min(1., error);
-		colors[v] = errorToRGB(error);
+	setVertexColorBasedOnFitCost(mesh, reference_cost);
+	//auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
+	//auto colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+	//for (auto & v : mesh.vertices()) 
+	//{
+	//	double error = (reference_cost > 0.) ? (fit_costs[v] / reference_cost) : fit_costs[v];
+	//	error = std::min(1., error);
+	//	colors[v] = errorToRGB(error);
 
-		//if (node.weight() < 0.7)
-		//	vertex.color = ml::RGBColor::White.toVec4f();
-		//else if (!node._found_nearest_point)
-		//	vertex.color = ml::RGBColor::Black.toVec4f();
-		//mesh.m_vertices.push_back(vertex);
-	}
+	//	//if (node.weight() < 0.7)
+	//	//	vertex.color = ml::RGBColor::White.toVec4f();
+	//	//else if (!node._found_nearest_point)
+	//	//	vertex.color = ml::RGBColor::Black.toVec4f();
+	//	//mesh.m_vertices.push_back(vertex);
+	//}
 
 	auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
 	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;

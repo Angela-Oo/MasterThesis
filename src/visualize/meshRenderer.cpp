@@ -18,9 +18,11 @@ void MeshRenderer::render(ml::Cameraf& camera)
 	}
 }
 
-void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color)
+void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color, bool override)
 {
-	insertMesh(id, convertToTriMesh(mesh), color);
+	if (override || !keyExists(id)) {
+		insertMesh(id, convertToTriMesh(mesh), color);
+	}
 }
 
 

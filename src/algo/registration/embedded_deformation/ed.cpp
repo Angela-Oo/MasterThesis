@@ -110,7 +110,7 @@ VertexResidualIds EmbeddedDeformation::addFitCost(ceres::Problem &problem)
 
 		if (correspondent_point.first) {
 			// node._found_nearest_point = true;
-			auto target_position = correspondent_point.second;
+			auto target_position = _find_correspondence_point->getPoint(correspondent_point.second);
 			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_position));
 			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_position));
 			i++;

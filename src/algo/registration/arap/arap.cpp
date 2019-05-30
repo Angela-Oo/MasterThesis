@@ -115,7 +115,7 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
 
 		if (correspondent_point.first) {
-			auto target_position = correspondent_point.second;
+			auto target_position = _find_correspondence_point->getPoint(correspondent_point.second); // todo
 			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_position));
 			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_position));
 			i++;

@@ -18,8 +18,7 @@ private:
 	ml::GraphicsDevice * _graphics;
 public:
 	void render(ml::Cameraf& camera);
-	//void insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color);
-	void insertMesh(std::string id, const SurfaceMesh& mesh, ml::vec4f color);
+	void insertMesh(std::string id, const SurfaceMesh& mesh, ml::vec4f color, bool override = true);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh);
 	bool keyExists(std::string id);

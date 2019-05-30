@@ -15,7 +15,18 @@ double FindCorrespondingPoints::median()
 }
 
 
-std::pair<bool, Point> FindCorrespondingPoints::correspondingPoint(Point point, Vector normal)
+Point FindCorrespondingPoints::getPoint(vertex_descriptor v)
+{
+	return _mesh.point(v);
+}
+
+Direction FindCorrespondingPoints::getNormal(vertex_descriptor v)
+{
+	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
+	return vertex_normals[v];
+}
+
+std::pair<bool, vertex_descriptor> FindCorrespondingPoints::correspondingPoint(Point point, Vector normal)
 {
 	auto s = _nn_search->search(point, _k);
 
@@ -42,12 +53,12 @@ std::pair<bool, Point> FindCorrespondingPoints::correspondingPoint(Point point, 
 	}
 
 	if (valid_point_with_angle_and_distance.empty()) {
-		return std::make_pair(false, point);
+		return std::make_pair(false, vertex_descriptor(0));
 	}
 	else {
 		auto sort_by_angle = [](const std::pair<vertex_descriptor, std::pair<double, double>> & rhs, const std::pair<vertex_descriptor, std::pair<double, double>> & lhs) { return rhs.second.second < lhs.second.second; };
 		std::sort(valid_point_with_angle_and_distance.begin(), valid_point_with_angle_and_distance.end(), sort_by_angle);
-		return std::make_pair(true, _mesh.point(valid_point_with_angle_and_distance[0].first));
+		return std::make_pair(true, valid_point_with_angle_and_distance[0].first);
 	}
 }
 

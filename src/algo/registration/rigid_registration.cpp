@@ -4,6 +4,8 @@
 
 #include "rigid_deformation_cost_function.h"
 
+#include "algo/registration/deformation_graph/deformation_graph.h" // set color todo
+
 Matrix RigidDeformation::rotation() const
 {
 	ml::mat3d r;
@@ -27,7 +29,10 @@ Point RigidDeformation::deformPoint(const Point & point) const
 
 Vector RigidDeformation::deformNormal(const Vector & normal) const
 {
-	Vector rotated_normal = rotation()(normal);
+	ml::mat3d r;
+	ceres::AngleAxisToRotationMatrix(_r.array, r.getData());
+	Matrix rotation(r(0, 0), r(0, 1), r(0, 2), r(1, 0), r(1, 1), r(1, 2), r(2, 0), r(2, 1), r(2, 2));
+	Vector rotated_normal = rotation(normal);
 	return rotated_normal;
 }
 
@@ -72,17 +77,30 @@ SurfaceMesh RigidRegistration::getDeformedPoints()
 	return deformed.deformPoints();
 }
 
+SurfaceMesh RigidRegistration::getDeformationGraphMesh()
+{
+	RigidDeformedMesh deformed(_source, _deformation);
+	SurfaceMesh mesh = deformed.deformPoints();
+	double k_mean_fit_cost = DG::getMeanFitCost(mesh) * 10.;
+	DG::setVertexColorBasedOnFitCost(mesh, k_mean_fit_cost);
+	return mesh;
+};
+
 
 ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &problem, const Point & source_point, const Point & target_position)
 {
+	float point_to_point_weight = 0.1;
 	ceres::CostFunction* cost_function = FitPointToPointAngleAxisCostFunction::Create(target_position, source_point);
-	return problem.AddResidualBlock(cost_function, NULL, _deformation.r(), _deformation.t());
+	auto loss_function = new ceres::ScaledLoss(NULL, point_to_point_weight, ceres::TAKE_OWNERSHIP);
+	return problem.AddResidualBlock(cost_function, loss_function, _deformation.r(), _deformation.t());
 }
 
-ceres::ResidualBlockId RigidRegistration::addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, const Vector & source_normal, const Point & target_position)
+ceres::ResidualBlockId RigidRegistration::addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, const Vector & target_normal, const Point & target_position)
 {
-	ceres::CostFunction* cost_function = FitPointToPlaneAngleAxisCostFunction::Create(target_position, source_point, source_normal);
-	return problem.AddResidualBlock(cost_function, NULL, _deformation.r(), _deformation.t());
+	float point_to_plane_weight = 0.9;
+	ceres::CostFunction* cost_function = FitPointToPlaneAngleAxisCostFunction::Create(target_position, source_point, target_normal);
+	auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weight, ceres::TAKE_OWNERSHIP);
+	return problem.AddResidualBlock(cost_function, loss_function, _deformation.r(), _deformation.t());
 }
 
 
@@ -97,12 +115,12 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Pr
 		auto point = _source.point(v);
 		auto deformed_point = _deformation.deformPoint(point);
 		auto deformed_normal = _deformation.deformNormal(normal[v].vector());
-		// todo deform normal
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
 		if (correspondent_point.first) {
-			auto target_position = correspondent_point.second;
+			auto target_position = _find_correspondence_point->getPoint(correspondent_point.second);
+			auto target_normal = _find_correspondence_point->getNormal(correspondent_point.second);
 			residual_ids[v].push_back(addPointToPointCost(problem, point, target_position));
-			residual_ids[v].push_back(addPointToPlaneCost(problem, point, normal[v].vector(), target_position));
+			residual_ids[v].push_back(addPointToPlaneCost(problem, point, target_normal.vector(), target_position));
 			i++;
 		}
 	}
@@ -135,9 +153,10 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostSubSet(cer
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(point, normal[v].vector());
 
 		if (correspondent_point.first) {
-			auto target_position = correspondent_point.second;
+			auto target_position = _find_correspondence_point->getPoint(correspondent_point.second);
+			auto target_normal = _find_correspondence_point->getNormal(correspondent_point.second);
 			residual_ids[v].push_back(addPointToPointCost(problem, point, target_position));
-			residual_ids[v].push_back(addPointToPlaneCost(problem, point, normal[v].vector(), target_position));
+			residual_ids[v].push_back(addPointToPlaneCost(problem, point, target_normal.vector(), target_position));
 			i++;
 		}
 	}
@@ -201,7 +220,7 @@ bool RigidRegistration::finished()
 
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
-	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
+	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 10);
 }
 
 void RigidRegistration::evaluateResidual(ceres::Problem & problem,
@@ -218,11 +237,6 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 	}
 }
 
-SurfaceMesh RigidRegistration::getDeformationGraphMesh()
-{
-	RigidDeformedMesh deformed(_source, _deformation);
-	return deformed.deformPoints();
-};
 
 //Mesh RigidRegistration::getInverseDeformedPoints()
 //{
@@ -242,7 +256,7 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 	, _options(option)
 	, _logger(logger)
 {
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 1.5, 45.);
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45.);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
 }
 
