@@ -31,6 +31,7 @@ bool SequenceRegistration::solve()
 		}
 		else {
 			_deformed_meshes[_current] = _registration->getDeformedPoints();
+			_deformation_graphs[_current] = _registration->getDeformationGraph();
 		}
 	}
 	return true;
@@ -38,7 +39,11 @@ bool SequenceRegistration::solve()
 
 bool SequenceRegistration::finished()
 {
-	return (_current >= _meshes.size() - 1);
+	bool last_frame = (_current >= _meshes.size() - 1);
+	if (_registration) {
+		return last_frame && _registration->finished();
+	}
+	return last_frame;
 }
 
 SurfaceMesh SequenceRegistration::getMesh(int frame)

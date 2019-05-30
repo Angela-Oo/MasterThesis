@@ -155,21 +155,31 @@ unsigned int DeformationMeshFrames::frame()
 DeformationMeshFrames::DeformationMeshFrames()
 {
 	auto mesh_1 = ml::Shapes<float>::cylinder(0.1, 1., _cylinder_height_points, _cylinder_width_points);
+	mesh_1.computeNormals();
 	_meshes.push_back(convertToCGALMesh(mesh_1));
 		
 	auto rotation = ml::mat4f::rotationX(15.);
 	auto translation = ml::mat4f::translation({ -0.1, 0., 0.01 });
 	auto transformation = translation * rotation;
 
-	auto mesh_2 = mesh_1;
+	auto mesh_2 = mesh_1;	
 	for (int i = 0; i < mesh_2.m_vertices.size(); ++i) {
 		mesh_2.m_vertices[i].position = transformation * mesh_2.m_vertices[i].position;
 	}
+	mesh_2.computeNormals();
 	_meshes.push_back(convertToCGALMesh(mesh_2));
 
 	auto mesh_3 = mesh_2;
 	for (int i = 0; i < mesh_3.m_vertices.size(); ++i) {
 		mesh_3.m_vertices[i].position = transformation * mesh_3.m_vertices[i].position;
 	}
+	mesh_3.computeNormals();
 	_meshes.push_back(convertToCGALMesh(mesh_3));
+
+	auto mesh_4 = mesh_3;
+	for (int i = 0; i < mesh_4.m_vertices.size(); ++i) {
+		mesh_4.m_vertices[i].position = transformation * mesh_4.m_vertices[i].position;
+	}
+	mesh_4.computeNormals();
+	_meshes.push_back(convertToCGALMesh(mesh_4));
 }
