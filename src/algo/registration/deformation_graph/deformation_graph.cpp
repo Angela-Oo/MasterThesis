@@ -56,10 +56,10 @@ std::vector<vertex_descriptor> DeformationGraph::nearestNodes(const Point & poin
 
 	auto getNodeDistances = [&](vertex_descriptor vertex_index) {
 		std::map<vertex_descriptor, double> node_distance;
+		node_distance[vertex_index] = CGAL::squared_distance(point, _mesh.point(vertex_index));
 		for (auto & v : _mesh.vertices_around_target(_mesh.halfedge(vertex_index)))
 		{
 			auto neighbor_point = _mesh.point(v);
-			auto point = _mesh.point(vertex_index);
 			node_distance[v] = CGAL::squared_distance(point, neighbor_point);
 		}
 		return node_distance;

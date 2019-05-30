@@ -115,21 +115,23 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 	int i = 0;
 	for (auto & v : mesh.vertices())
 	{
+		vertex_used[v] = false;
 		bool valid_no_border_vertex = !mesh.is_border(v, true);
-		auto vertex = _deformation_graph.deformNode(v);
-		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
 
-		if (correspondent_point.first && valid_no_border_vertex) {
-			vertex_used[v] = true;
-			vertex_descriptor target_vertex = correspondent_point.second;
-			auto target_point = _find_correspondence_point->getPoint(target_vertex);
-			auto target_normal = _find_correspondence_point->getNormal(target_vertex);
-			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_point));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal.vector()));
-			i++;
-		}
-		else {
-			vertex_used[v] = false;
+		if (valid_no_border_vertex) {
+			auto vertex = _deformation_graph.deformNode(v);
+			auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
+
+			if (correspondent_point.first && valid_no_border_vertex) {		
+				vertex_descriptor target_vertex = correspondent_point.second;
+				auto target_point = _find_correspondence_point->getPoint(target_vertex);
+				auto target_normal = _find_correspondence_point->getNormal(target_vertex);
+				residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_point));
+				residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal.vector()));
+
+				i++;
+				vertex_used[v] = true;
+			}
 		}
 	}
 	
@@ -200,7 +202,7 @@ bool AsRigidAsPossible::solveIteration()
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 
-		auto scale_factor_tol = 0.00001;
+		auto scale_factor_tol = 0.0001;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
 			(a_smooth > 0.1 && a_conf > 0.1))
 		{
@@ -273,7 +275,7 @@ void AsRigidAsPossible::printCeresOptions()
 
 void AsRigidAsPossible::setParameters()
 {
-	a_smooth = 10.;//  0.1;// 100;
+	a_smooth = 5.;//  0.1;// 100;
 	a_conf = 100.;// 1.;// 100;
 	a_fit = 10.;
 	_find_max_distance = 0.1;

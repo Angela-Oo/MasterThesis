@@ -403,7 +403,7 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-	_number_of_nodes = 2000;
+	_number_of_nodes = 4000;
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ASAP;
@@ -422,7 +422,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = true;
+	bool test = false;
 	if (!test) {
 		// puppet
 		//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
