@@ -39,13 +39,14 @@ private:
 	size_t _max_iterations = 100;
 	long long _total_time_in_ms = 0;
 private:
-	double a_smooth = 100.;// 10.;// 0.1;// 100;
-	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 10.;
-	const double _find_max_distance = 0.5;
-	const double _find_max_angle_deviation = 45.;
+	double a_smooth;
+	double a_conf;
+	double a_fit;
+	double _find_max_distance;
+	double _find_max_angle_deviation;
 	std::shared_ptr<FileWriter> _logger;
 private:
+	void setParameters();
 	void printCeresOptions();
 	double evaluateResidual(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_ids);
 	void evaluateResidual(ceres::Problem & problem,

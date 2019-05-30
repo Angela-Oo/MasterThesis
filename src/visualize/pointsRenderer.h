@@ -25,8 +25,8 @@ public:
 	void render(ml::Cameraf& camera);
 	void insertMesh(std::string id, const SurfaceMesh & mesh, float point_size = 0.001f, bool draw_normals = false, bool override = true);
 	void insertMesh(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.001f, bool draw_normals = false, bool override = true);
-	void insertPoints(std::string id, const SurfaceMesh & mesh, float point_size = 0.001f);
-	void insertPoints(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.001f);
+	void insertPoints(std::string id, const SurfaceMesh & mesh, float point_size = 0.001f, bool override = true);
+	void insertPoints(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.001f, bool override = true);
 
 	void insertPoints(std::string id, std::vector<Point> points, ml::RGBColor color, float point_size = 0.001f);
 	void insertPoints(std::string id, std::vector<ml::vec3f> points, ml::RGBColor color, float point_size = 0.001f);

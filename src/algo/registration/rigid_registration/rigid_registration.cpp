@@ -74,7 +74,7 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Pr
 			i++;
 		}
 	}
-	std::cout << "used " << i << " of " << _source.number_of_vertices() << " deformation graph nodes" << std::endl;
+	std::cout << "used nodes " << i << " / " << _source.number_of_vertices();
 	return residual_ids;
 }
 
@@ -111,7 +111,7 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostSubSet(cer
 			i++;
 		}
 	}
-	std::cout << "used " << i << " of " << _source.number_of_vertices() << " deformation graph nodes" << std::endl;
+	std::cout << "used nodes " << i << " / " << _source.number_of_vertices();
 	return residual_ids;
 }
 

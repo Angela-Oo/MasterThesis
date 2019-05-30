@@ -99,7 +99,7 @@ VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &proble
 			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v), target_normals[v].vector()));
 		}
 	}
-	//std::cout << "used " << i << " of " << _deformation_graph._graph.m_vertices.size() << " deformation graph nodes" << std::endl;
+	//	std::cout << "used nodes " << i << " / " << mesh.number_of_vertices();
 	return residual_ids;
 }
 
@@ -110,6 +110,8 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+
+	auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used").first;
 	int i = 0;
 	for (auto & v : mesh.vertices())
 	{
@@ -117,6 +119,7 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
 
 		if (correspondent_point.first) {
+			vertex_used[v] = true;
 			vertex_descriptor target_vertex = correspondent_point.second;
 			auto target_point = _find_correspondence_point->getPoint(target_vertex);
 			auto target_normal = _find_correspondence_point->getNormal(target_vertex);
@@ -124,8 +127,13 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal.vector()));
 			i++;
 		}
+		else {
+			vertex_used[v] = false;
+		}
 	}
-	std::cout << "used " << i << " of " << mesh.number_of_vertices() << " deformation graph nodes" << std::endl;
+	
+	std::cout << "used nodes " << i << " / " << mesh.number_of_vertices() << " ";
+	std::cout << " allowed distance " <<  _find_correspondence_point->median() << " ";
 	return residual_ids;
 }
 
@@ -167,8 +175,8 @@ VertexResidualIds AsRigidAsPossible::addConfCost(ceres::Problem &problem)
 
 bool AsRigidAsPossible::solveIteration()
 {
-
 	if (!finished()) {
+		std::cout << std::endl;
 		_solve_iteration++;
 		ceres::Solver::Summary summary;
 		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration, _logger);
@@ -262,6 +270,15 @@ void AsRigidAsPossible::printCeresOptions()
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
 }
 
+void AsRigidAsPossible::setParameters()
+{
+	a_smooth = 20.;// 10.;// 0.1;// 100;
+	a_conf = 100.;// 1.;// 100;
+	a_fit = 1.;
+	_find_max_distance = 0.1;
+	_find_max_angle_deviation = 45.;
+}
+
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 std::vector<vertex_descriptor> fixed_positions,
@@ -274,10 +291,10 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
 	, _with_icp(false)
-	, a_smooth(10.)
-	, a_fit(100.)
-	, a_conf(100.)
 {
+	setParameters();
+	a_smooth = 10.;
+	a_fit = 100.;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
@@ -294,6 +311,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _options(option)
 	, _logger(logger)
 {
+	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
 	std::cout << "number of def nodes " << number_of_deformation_nodes << " true number " << reduced_mesh.num_vertices() << std::endl;
@@ -313,6 +331,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _deformation_graph(deformation_graph)
 	, _logger(logger)
 {
+	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();

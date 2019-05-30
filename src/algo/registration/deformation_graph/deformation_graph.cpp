@@ -159,6 +159,7 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::
 	_mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
 	_mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
 	_mesh.add_property_map<vertex_descriptor, double>("v:conf_cost", 0.);
+	_mesh.add_property_map<vertex_descriptor, bool>("v:vertex_used", true);
 
 	auto normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
 	for (auto & v : _mesh.vertices()) {

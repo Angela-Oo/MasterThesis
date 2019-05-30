@@ -52,10 +52,10 @@ double getReferenceCost(const SurfaceMesh & mesh)
 	auto k_mean_cost = std::max(mean_fit_cost, mean_smooth_cost);
 	k_mean_cost *= 10.;
 
-	std::cout << "max fit cost " << max_fit_cost
-		<< " max conf cost " << max_conf_cost
-		<< " max smooth cost " << max_smooth_cost
-		<< " used visualize cost " << k_mean_cost << std::endl;
+	std::cout << "max costs: fit " << max_fit_cost
+		<< " conf " << max_conf_cost
+		<< " smooth " << max_smooth_cost
+		<< " k mean visualize cost " << k_mean_cost << " ";
 
 	return k_mean_cost;
 }

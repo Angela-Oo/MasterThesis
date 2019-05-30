@@ -49,7 +49,7 @@ void ShowTwoRigideRegisteredFrames::initRegistration()
 
 void ShowTwoRigideRegisteredFrames::initReader()
 {
-	float scale_factor = 0.004;
+	float scale_factor = 0.004f;
 	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });
 	ml::mat4f rotation = ml::mat4f::rotationX(90.) * ml::mat4f::rotationY(180.);
 	ml::mat4f transform = ml::mat4f::translation({ -0.5f, -2.f, 1.2f });

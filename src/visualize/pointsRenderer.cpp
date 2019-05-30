@@ -138,14 +138,18 @@ void PointsRenderer::insertMesh(std::string id,
 	}
 }
 
-void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, float point_size)
+void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, float point_size, bool override)
 {
-	_pointClouds[id].init(*_graphics, createPointTriMesh(mesh, point_size));
+	if (override || !keyExists(id)) {
+		_pointClouds[id].init(*_graphics, createPointTriMesh(mesh, point_size));
+	}
 }
 
-void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size)
+void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size, bool override)
 {
-	_pointClouds[id].init(*_graphics, createPointTriMesh(mesh, color, point_size));
+	if (override || !keyExists(id)) {
+		_pointClouds[id].init(*_graphics, createPointTriMesh(mesh, color, point_size));
+	}
 }
 
 void PointsRenderer::insertPoints(std::string id, std::vector<Point> points, ml::RGBColor color, float point_size)

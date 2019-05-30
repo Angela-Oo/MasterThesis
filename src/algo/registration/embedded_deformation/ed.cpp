@@ -103,6 +103,8 @@ VertexResidualIds EmbeddedDeformation::addFitCost(ceres::Problem &problem)
 
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+
+	auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used").first;
 	int i = 0;
 	for (auto & v : mesh.vertices())
 	{
@@ -110,7 +112,7 @@ VertexResidualIds EmbeddedDeformation::addFitCost(ceres::Problem &problem)
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
 
 		if (correspondent_point.first) {
-			//node._found_nearest_point = true;
+			vertex_used[v] = true;
 			vertex_descriptor target_vertex = correspondent_point.second;
 			auto target_point = _find_correspondence_point->getPoint(target_vertex);
 			auto target_normal = _find_correspondence_point->getNormal(target_vertex);
@@ -119,10 +121,10 @@ VertexResidualIds EmbeddedDeformation::addFitCost(ceres::Problem &problem)
 			i++;
 		}
 		else {
-			//node._found_nearest_point = false;
+			vertex_used[v] = false;
 		}
 	}
-	std::cout << "used " << i << " of " << mesh.number_of_vertices() << " deformation graph nodes" << std::endl;
+	std::cout << "used nodes " << i << " / " << mesh.number_of_vertices();
 	return residual_ids;
 }
 
