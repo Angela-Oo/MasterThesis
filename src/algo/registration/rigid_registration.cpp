@@ -25,6 +25,12 @@ Point RigidDeformation::deformPoint(const Point & point) const
 	return CGAL::ORIGIN + rotated_point + moved_position;
 }
 
+Vector RigidDeformation::deformNormal(const Vector & normal) const
+{
+	Vector rotated_normal = rotation()(normal);
+	return rotated_normal;
+}
+
 RigidDeformation::RigidDeformation()
 	: _r(ml::vec3f::origin)
 	, _t(ml::vec3f::origin)
@@ -89,7 +95,10 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Pr
 	for (auto & v : _source.vertices())
 	{
 		auto point = _source.point(v);
-		auto correspondent_point = _find_correspondence_point->correspondingPoint(point, normal[v].vector());
+		auto deformed_point = _deformation.deformPoint(point);
+		auto deformed_normal = _deformation.deformNormal(normal[v].vector());
+		// todo deform normal
+		auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
 		if (correspondent_point.first) {
 			auto target_position = correspondent_point.second;
 			residual_ids[v].push_back(addPointToPointCost(problem, point, target_position));

@@ -66,21 +66,25 @@ struct FitPointToPlaneAngleAxisCostFunction {
 		point_to_T(_target, target);
 		point_to_T(_source_normal, source_normal);
 
+		T deformed_point[3];
+		ceres::AngleAxisRotatePoint(rotation, source, deformed_point);
+		addition(deformed_point, translation, deformed_point);
 		// local deformation of node position
-		addition(source, translation, source);
+		//addition(source, translation, source);
 
 		// deform the source normal
+		T deformed_normal[3];
 		T rotation_t[9];
 		ceres::AngleAxisToRotationMatrix(rotation, rotation_t);
 		matrix_transpose(rotation_t, rotation_t);
 
-		matrix_multiplication(rotation_t, source_normal, source_normal);
-		normalize(source_normal, source_normal);
+		matrix_multiplication(rotation_t, source_normal, deformed_normal);
+		normalize(deformed_normal, deformed_normal);
 
 		// The error is the difference between the predicted and observed position.
 		T difference[3];
-		substract(target, source, difference);
-		residuals[0] = dot(difference, source_normal);
+		substract(target, deformed_point, difference);
+		residuals[0] = dot(difference, deformed_normal);
 
 		return true;
 	}

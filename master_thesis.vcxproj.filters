@@ -82,6 +82,9 @@
     <Filter Include="algo\evaluate registration">
       <UniqueIdentifier>{a6c1516d-ac45-4659-a6b9-82a24263f324}</UniqueIdentifier>
     </Filter>
+    <Filter Include="visualize\render">
+      <UniqueIdentifier>{bfee125b-6f1b-4158-af15-6b56fc1354a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -506,13 +509,7 @@
     <ClInclude Include="src\input_reader\i_reader.h">
       <Filter>input_reader</Filter>
     </ClInclude>
-    <ClInclude Include="src\visualize\pointsRenderer.h">
-      <Filter>visualize</Filter>
-    </ClInclude>
     <ClInclude Include="src\visualize\showMesh.h">
-      <Filter>visualize</Filter>
-    </ClInclude>
-    <ClInclude Include="src\visualize\meshRenderer.h">
       <Filter>visualize</Filter>
     </ClInclude>
     <ClInclude Include="src\input_reader\mesh_reader.h">
@@ -596,6 +593,12 @@
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h">
       <Filter>algo\registration\as rigid as possible</Filter>
     </ClInclude>
+    <ClInclude Include="src\visualize\pointsRenderer.h">
+      <Filter>visualize\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\meshRenderer.h">
+      <Filter>visualize\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -642,13 +645,7 @@
     <ClCompile Include="src\input_reader\kinect_reader.cpp">
       <Filter>input_reader</Filter>
     </ClCompile>
-    <ClCompile Include="src\visualize\pointsRenderer.cpp">
-      <Filter>visualize</Filter>
-    </ClCompile>
     <ClCompile Include="src\visualize\showMesh.cpp">
-      <Filter>visualize</Filter>
-    </ClCompile>
-    <ClCompile Include="src\visualize\meshRenderer.cpp">
       <Filter>visualize</Filter>
     </ClCompile>
     <ClCompile Include="src\input_reader\mesh_reader.cpp">
@@ -704,6 +701,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp">
       <Filter>algo\registration\as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\meshRenderer.cpp">
+      <Filter>visualize\render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\pointsRenderer.cpp">
+      <Filter>visualize\render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

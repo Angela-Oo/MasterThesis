@@ -18,6 +18,7 @@ public:
 	Vector translation() const;
 public:
 	Point deformPoint(const Point & point) const;
+	Vector deformNormal(const Vector & normal) const;
 public:
 	RigidDeformation();
 };
