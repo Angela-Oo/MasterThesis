@@ -60,8 +60,8 @@ private:
 	void evaluateResidual(ceres::Problem & problem,
 						  std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids);
 private:
-	ceres::ResidualBlockId addPointToPointCost(ceres::Problem &problem, const Point & source_point, const Point & target_position);
-	ceres::ResidualBlockId addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, const Vector & source_normal, const Point & target_position);
+	ceres::ResidualBlockId addPointToPointCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex);
+	ceres::ResidualBlockId addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex);
 	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem);
 	std::map<vertex_descriptor, ResidualIds> addFitCostSubSet(ceres::Problem &problem);
 	std::map<vertex_descriptor, ResidualIds> addFitCostWithoutICP(ceres::Problem &problem);

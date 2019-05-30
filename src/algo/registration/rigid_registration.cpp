@@ -87,18 +87,24 @@ SurfaceMesh RigidRegistration::getDeformationGraphMesh()
 };
 
 
-ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &problem, const Point & source_point, const Point & target_position)
+ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex)
 {
 	float point_to_point_weight = 0.1;
-	ceres::CostFunction* cost_function = FitPointToPointAngleAxisCostFunction::Create(target_position, source_point);
+	auto target_point = _target.point(target_vertex);
+
+	auto cost_function = FitPointToPointAngleAxisCostFunction::Create(source_point, target_point);
 	auto loss_function = new ceres::ScaledLoss(NULL, point_to_point_weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function, _deformation.r(), _deformation.t());
 }
 
-ceres::ResidualBlockId RigidRegistration::addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, const Vector & target_normal, const Point & target_position)
+ceres::ResidualBlockId RigidRegistration::addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex)
 {
 	float point_to_plane_weight = 0.9;
-	ceres::CostFunction* cost_function = FitPointToPlaneAngleAxisCostFunction::Create(target_position, source_point, target_normal);
+	auto target_normals = _target.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto target_point = _target.point(target_vertex);
+	auto target_normal = target_normals[target_vertex].vector();
+
+	auto cost_function = FitPointToPlaneAngleAxisCostFunction::Create(source_point, target_point, target_normal);
 	auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function, _deformation.r(), _deformation.t());
 }
@@ -117,10 +123,9 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Pr
 		auto deformed_normal = _deformation.deformNormal(normal[v].vector());
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
 		if (correspondent_point.first) {
-			auto target_position = _find_correspondence_point->getPoint(correspondent_point.second);
-			auto target_normal = _find_correspondence_point->getNormal(correspondent_point.second);
-			residual_ids[v].push_back(addPointToPointCost(problem, point, target_position));
-			residual_ids[v].push_back(addPointToPlaneCost(problem, point, target_normal.vector(), target_position));
+			auto target_vertex = correspondent_point.second;
+			residual_ids[v].push_back(addPointToPointCost(problem, point, target_vertex));
+			residual_ids[v].push_back(addPointToPlaneCost(problem, point, target_vertex));
 			i++;
 		}
 	}
@@ -150,13 +155,14 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostSubSet(cer
 	// cost function
 	for(auto v : vertices) {
 		auto point = _source.point(v);
-		auto correspondent_point = _find_correspondence_point->correspondingPoint(point, normal[v].vector());
+		auto deformed_point = _deformation.deformPoint(point);
+		auto deformed_normal = _deformation.deformNormal(normal[v].vector());
+		auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
 
 		if (correspondent_point.first) {
-			auto target_position = _find_correspondence_point->getPoint(correspondent_point.second);
-			auto target_normal = _find_correspondence_point->getNormal(correspondent_point.second);
-			residual_ids[v].push_back(addPointToPointCost(problem, point, target_position));
-			residual_ids[v].push_back(addPointToPlaneCost(problem, point, target_normal.vector(), target_position));
+			auto target_vertex = correspondent_point.second;
+			residual_ids[v].push_back(addPointToPointCost(problem, point, target_vertex));
+			residual_ids[v].push_back(addPointToPlaneCost(problem, point, target_vertex));
 			i++;
 		}
 	}
@@ -171,8 +177,8 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostWithoutICP
 	auto normal = _source.property_map<vertex_descriptor, Direction>("v:normal").first;
 	for (auto & v : _source.vertices())
 	{
-		residual_ids[v].push_back(addPointToPointCost(problem, _source.point(v), _target.point(v)));
-		residual_ids[v].push_back(addPointToPlaneCost(problem, _source.point(v), normal[v].vector(), _target.point(v)));
+		residual_ids[v].push_back(addPointToPointCost(problem, _source.point(v), v));
+		residual_ids[v].push_back(addPointToPlaneCost(problem, _source.point(v), v));
 	}
 	return residual_ids;
 }
