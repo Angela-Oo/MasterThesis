@@ -22,6 +22,13 @@ SurfaceMesh RigidRegistration::getDeformedPoints()
 	return deformed.deformPoints();
 }
 
+SurfaceMesh RigidRegistration::getInverseDeformedPoints()
+{
+	auto inverseDeformation = _deformation.invertDeformation();
+	RigidDeformedMesh deformed(getSource(), inverseDeformation);
+	return deformed.deformPoints();
+}
+
 SurfaceMesh RigidRegistration::getDeformationGraphMesh()
 {
 	RigidDeformedMesh deformed(_source, _deformation);

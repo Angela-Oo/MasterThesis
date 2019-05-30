@@ -32,8 +32,17 @@ Vector RigidDeformation::deformNormal(const Vector & normal) const
 	return rotated_normal;
 }
 
+RigidDeformation RigidDeformation::invertDeformation()
+{
+	return RigidDeformation(-_r, -_t);
+}
+
 RigidDeformation::RigidDeformation()
 	: _r(ml::vec3f::origin)
 	, _t(ml::vec3f::origin)
 {}
 
+RigidDeformation::RigidDeformation(ml::vec3d r, ml::vec3d t)
+	: _r(r)
+	, _t(t)
+{ }

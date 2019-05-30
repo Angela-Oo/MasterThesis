@@ -132,6 +132,19 @@ PositionAndDeformation DeformationGraph::deformNode(vertex_descriptor node_index
 	PositionAndDeformation deformed_node;
 	deformed_node._point = _global.deformPosition(node.getDeformedPosition());
 	deformed_node._normal = _global.deformNormal(node.getDeformedNormal());
+	deformed_node._deformation = _create_node();
+	return deformed_node;
+}
+
+
+PositionAndDeformation DeformationGraph::invertNode(vertex_descriptor node_index) const
+{
+	PositionAndDeformation node = getNode(node_index);
+
+	PositionAndDeformation deformed_node;
+	deformed_node._point = _global.deformPosition(node.getDeformedPosition());
+	deformed_node._normal = _global.deformNormal(node.getDeformedNormal());
+	deformed_node._deformation = node._deformation->invertDeformation();
 	return deformed_node;
 }
 
@@ -150,6 +163,7 @@ void DeformationGraph::initGlobalDeformation(std::shared_ptr<IDeformation> globa
 
 DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node)
 	: _mesh(mesh)
+	, _create_node(create_node)
 {
 
 	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> nodes;
@@ -165,25 +179,28 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::
 	for (auto & v : _mesh.vertices()) {
 		//auto point = _mesh.point(v);
 		//auto normal = normals[v];// _mesh.normal[v];
-		nodes[v] = create_node();
+		nodes[v] = _create_node();
 	}
 
-	initGlobalDeformation(create_node());
+	initGlobalDeformation(_create_node());
 
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
 
 
-DeformationGraph::DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<IDeformation> & global_deformation)
+DeformationGraph::DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<IDeformation> & global_deformation, std::function<std::shared_ptr<IDeformation>()> create_node)
 	: _mesh(graph)
+	, _create_node(create_node)
 {
 	initGlobalDeformation(global_deformation);
+	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
 
 
 DeformationGraph::DeformationGraph(const DeformationGraph & deformation_graph)
 	: _global(deformation_graph._global)
 	, _mesh(deformation_graph._mesh)
+	, _create_node(deformation_graph._create_node)
 {
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
@@ -195,10 +212,62 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 
 	_global = other._global;
 	_mesh = other._mesh;
+	_create_node = other._create_node;
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
 }
 
 
+
+
+DeformationGraph invertDeformationGraph(const DeformationGraph & deformation_graph)
+{
+	SurfaceMesh mesh = deformation_graph._mesh;
+
+	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	assert(property_deformations.second);
+	auto property_normals = mesh.property_map<vertex_descriptor, Direction>("v:normal");
+	assert(property_normals.second);
+
+	auto normals = property_normals.first;
+	auto deformations = property_deformations.first;
+	for (auto v : mesh.vertices())
+	{
+		auto deformed_node = deformation_graph.invertNode(v);
+		mesh.point(v) = deformed_node._point;
+		normals[v] = deformed_node._normal;
+		deformations[v] = deformed_node._deformation;
+	}
+
+	auto global_deformation = deformation_graph._global._deformation->invertDeformation();
+	return DeformationGraph(mesh, global_deformation, deformation_graph._create_node);
+}
+
+DeformationGraph transformDeformationGraph(const DeformationGraph & deformation_graph)
+{
+	SurfaceMesh mesh = deformation_graph._mesh;
+	
+	//auto property_fit_cost = mesh.property_map<vertex_descriptor, double>("v:fit_cost");
+	//auto property_smooth_cost = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
+	//auto property_conf_cost = mesh.property_map<vertex_descriptor, double>("v:conf_cost");
+	//auto property_vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used");
+
+	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	assert(property_deformations.second);
+	auto property_normals = mesh.property_map<vertex_descriptor, Direction>("v:normal");
+	assert(property_normals.second);
+
+	auto normals = property_normals.first;
+	auto deformations = property_deformations.first;
+	for (auto v : mesh.vertices())
+	{
+		auto deformed_node = deformation_graph.deformNode(v);
+		mesh.point(v) = deformed_node._point;
+		normals[v] = deformed_node._normal;
+		deformations[v] = deformed_node._deformation;
+	}
+
+	return DeformationGraph(mesh, deformation_graph._create_node);
+}
 
 }

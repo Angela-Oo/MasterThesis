@@ -23,12 +23,12 @@ SurfaceMesh EmbeddedDeformation::getDeformedPoints()
 	return _deformed_mesh->deformPoints();
 }
 
-//Mesh EmbeddedDeformation::getInverseDeformedPoints()
-//{
-//	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
-//	EmbeddedDeformedMesh deformed(_dst, inverse_deformation);
-//	return deformed.deformPoints();
-//}
+SurfaceMesh EmbeddedDeformation::getInverseDeformedPoints()
+{
+	auto inverse_deformation = invertDeformationGraph(_deformation_graph);
+	DG::DeformedMesh deformed(_dst, inverse_deformation);
+	return deformed.deformPoints();
+}
 
 std::vector<Point> EmbeddedDeformation::getFixedPostions()
 {

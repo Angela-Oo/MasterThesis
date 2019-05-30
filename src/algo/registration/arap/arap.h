@@ -68,7 +68,7 @@ public:
 	const SurfaceMesh & getSource() override;
 	const SurfaceMesh & getTarget() override;
 	SurfaceMesh getDeformedPoints() override;
-	//Mesh getInverseDeformedPoints() override;
+	SurfaceMesh getInverseDeformedPoints() override;
 	SurfaceMesh getDeformationGraphMesh() override;
 public:
 	const DG::DeformationGraph & getDeformationGraph() override;
@@ -76,22 +76,22 @@ public:
 public:
 	// without icp
 	AsRigidAsPossible(const SurfaceMesh& src,
-						const SurfaceMesh& dst,
-						std::vector<vertex_descriptor> fixed_positions,
-						ceres::Solver::Options option,
-						std::shared_ptr<FileWriter> logger = nullptr);
+					  const SurfaceMesh& dst,
+					  std::vector<vertex_descriptor> fixed_positions,
+					  ceres::Solver::Options option,
+					  std::shared_ptr<FileWriter> logger = nullptr);
 	// with icp
 	AsRigidAsPossible(const SurfaceMesh& src,
-						const SurfaceMesh& dst,
-						ceres::Solver::Options option,
-						unsigned int number_of_deformation_nodes = 1000,
-						std::shared_ptr<FileWriter> logger = nullptr);
+					  const SurfaceMesh& dst,
+					  ceres::Solver::Options option,
+					  unsigned int number_of_deformation_nodes = 1000,
+					  std::shared_ptr<FileWriter> logger = nullptr);
 	// with icp but init with passed deformation graph
 	AsRigidAsPossible(const SurfaceMesh& src,
-						const SurfaceMesh& dst,
-						const DG::DeformationGraph & deformation_graph,
-						ceres::Solver::Options option,
-						std::shared_ptr<FileWriter> logger = nullptr);
+					  const SurfaceMesh& dst,
+					  const DG::DeformationGraph & deformation_graph,
+					  ceres::Solver::Options option,
+					  std::shared_ptr<FileWriter> logger = nullptr);
 };	
 
 }

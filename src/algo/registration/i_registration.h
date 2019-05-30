@@ -23,10 +23,10 @@ public:
 	virtual const SurfaceMesh & getSource() = 0;
 	virtual const SurfaceMesh & getTarget() = 0;
 	virtual SurfaceMesh getDeformedPoints() = 0;
-	//virtual SurfaceMesh getInverseDeformedPoints() = 0;
+	virtual SurfaceMesh getInverseDeformedPoints() = 0;
 public:
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
-	virtual const DG::DeformationGraph & getDeformationGraph() { return DG::DeformationGraph();	};
+	virtual const DG::DeformationGraph & getDeformationGraph() { return DG::DeformationGraph();	}; // todo
 	virtual SurfaceMesh getDeformationGraphMesh() = 0;// { return SurfaceMesh(); };
 public:
 	virtual ~IRegistration() = default;

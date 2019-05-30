@@ -109,7 +109,7 @@ void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, float 
 		meshes.push_back(createLineTriMesh(mesh, point_size));
 
 		// draw vertices
-		meshes.push_back(createPointTriMesh(mesh, point_size * 10.));
+		meshes.push_back(createPointTriMesh(mesh, point_size * 10.f));
 
 		// draw normals
 		if (draw_normals) {
@@ -156,7 +156,7 @@ void PointsRenderer::insertPoints(std::string id, std::vector<Point> points, ml:
 {
 	std::vector<ml::vec3f> positions;
 	for (auto & p : points) {
-		positions.push_back(ml::vec3f(p.x(), p.y(), p.z()));
+		positions.push_back(PointToVec3f(p));
 	}
 	std::vector<ml::vec4f> color_frame(points.size());
 	std::fill(color_frame.begin(), color_frame.end(), color);

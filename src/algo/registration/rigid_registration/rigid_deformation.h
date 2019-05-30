@@ -16,6 +16,9 @@ public:
 	Point deformPoint(const Point & point) const;
 	Vector deformNormal(const Vector & normal) const;
 public:
+	RigidDeformation invertDeformation();
+public:
 	RigidDeformation();
+	RigidDeformation(ml::vec3d r, ml::vec3d t);
 };
 

@@ -18,8 +18,9 @@ public:
 	Matrix rotation() const override;
 	Vector translation() const override;
 	double weight() const override { return _w; };
+	std::shared_ptr<IDeformation> invertDeformation() const override;
 public:
-	Deformation(const ml::vec3d & r, const ml::vec3d & t);
+	Deformation(const ml::vec3d & r, const ml::vec3d & t, double w = 1.);
 	Deformation();
 	Deformation(const Deformation& node, bool inverse);
 };

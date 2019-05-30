@@ -46,8 +46,8 @@ public:
 	const SurfaceMesh & getSource() override;
 	const SurfaceMesh & getTarget() override;
 	SurfaceMesh getDeformedPoints() override;
-	SurfaceMesh getDeformationGraphMesh() override;
-	//SurfaceMesh getInverseDeformedPoints() override;
+	SurfaceMesh getInverseDeformedPoints() override;
+	SurfaceMesh getDeformationGraphMesh() override;	
 public:
 	RigidRegistration(const SurfaceMesh & points_a,
 					  const SurfaceMesh & points_b,

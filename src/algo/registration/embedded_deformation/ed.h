@@ -71,7 +71,7 @@ public:
 	const SurfaceMesh & getSource() override;
 	const SurfaceMesh & getTarget() override;
 	SurfaceMesh getDeformedPoints() override;
-	//Mesh getInverseDeformedPoints() override;
+	SurfaceMesh getInverseDeformedPoints() override;
 	SurfaceMesh getDeformationGraphMesh() override;
 public:
 	const DG::DeformationGraph & getDeformationGraph() override;

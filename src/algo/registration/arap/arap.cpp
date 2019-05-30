@@ -26,13 +26,13 @@ SurfaceMesh AsRigidAsPossible::getDeformedPoints()
 	return _deformed_mesh->deformPoints();
 }
 
-//Mesh AsRigidAsPossible::getInverseDeformedPoints()
-//{
-//	auto inverse_deformation = inverteDeformationGraph(_deformation_graph);
-//	ARAPDeformedMesh deformed(_dst, inverse_deformation);
-//	return deformed.deformPoints();
-//}
-//
+SurfaceMesh AsRigidAsPossible::getInverseDeformedPoints()
+{
+	auto inverse_deformation = invertDeformationGraph(_deformation_graph);
+	DG::DeformedMesh deformed(_dst, inverse_deformation);
+	return deformed.deformPoints();
+}
+
 const DG::DeformationGraph & AsRigidAsPossible::getDeformationGraph()
 {
 	return _deformation_graph;

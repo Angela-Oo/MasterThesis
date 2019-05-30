@@ -17,8 +17,8 @@ bool SequenceRegistration::solve()
 	if (_registration) {
 		if (_registration->solveIteration())
 		{
-			//_deformed_meshes[_current] = _registration->getInverseDeformedPoints(); // todo
-			_deformed_meshes[_current] = _registration->getDeformedPoints();
+			_deformed_meshes[_current] = _registration->getInverseDeformedPoints(); // todo
+			//_deformed_meshes[_current] = _registration->getDeformedPoints();
 			_deformation_graphs[_current] = _registration->getDeformationGraph();
 			std::cout << std::endl << "frame " << _current << " solved" << std::endl;
 			if (_current < _meshes.size() - 1) {

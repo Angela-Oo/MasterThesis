@@ -20,10 +20,15 @@ Vector Deformation::translation() const
 	return Vector(_t[0], _t[1], _t[2]);
 }
 
-Deformation::Deformation(const ml::vec3d & r, const ml::vec3d & t)
+std::shared_ptr<IDeformation> Deformation::invertDeformation() const
+{
+	return std::make_shared<Deformation>(-_r, -_t, _w);
+}
+
+Deformation::Deformation(const ml::vec3d & r, const ml::vec3d & t, double w)
 	: _r(r)
 	, _t(t)
-	, _w(1.)
+	, _w(w)
 {}
 
 Deformation::Deformation()
