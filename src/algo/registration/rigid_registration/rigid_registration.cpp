@@ -34,7 +34,7 @@ SurfaceMesh RigidRegistration::getDeformationGraphMesh()
 
 ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex)
 {
-	float point_to_point_weight = 0.1;
+	float point_to_point_weight = 0.1f;
 	auto target_point = _target.point(target_vertex);
 
 	auto cost_function = FitPointToPointAngleAxisCostFunction::Create(source_point, target_point);
@@ -44,7 +44,7 @@ ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &pr
 
 ceres::ResidualBlockId RigidRegistration::addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex)
 {
-	float point_to_plane_weight = 0.9;
+	float point_to_plane_weight = 0.9f;
 	auto target_normals = _target.property_map<vertex_descriptor, Direction>("v:normal").first;
 	auto target_point = _target.point(target_vertex);
 	auto target_normal = target_normals[target_vertex].vector();

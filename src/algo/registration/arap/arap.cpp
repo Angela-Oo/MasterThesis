@@ -54,7 +54,7 @@ std::vector<Point> AsRigidAsPossible::getFixedPostions()
 
 ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point)
 {
-	float point_to_point_weighting = 0.1;
+	float point_to_point_weighting = 0.1f;
 	double weight = a_fit * point_to_point_weighting;
 
 	auto & global = _deformation_graph._global;
@@ -70,7 +70,7 @@ ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Prob
 																	 const Point & target_point, 
 																	 const Vector & target_normal)
 {
-	float point_to_plane_weighting = 0.9;
+	float point_to_plane_weighting = 0.9f;
 	double weight = a_fit * point_to_plane_weighting;
 	auto & g = _deformation_graph._mesh;
 	auto & global = _deformation_graph._global;

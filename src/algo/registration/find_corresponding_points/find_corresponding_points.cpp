@@ -43,7 +43,7 @@ std::pair<bool, vertex_descriptor> FindCorrespondingPoints::correspondingPoint(P
 		if (distance < 100. * median()) {
 			_median_distance = (_median_distance * 10000. + distance) / 10001.;
 		}
-		float k_median = 10. * median();
+		double k_median = 10. * median();
 		bool valid_angle = angle < _max_normal_angle_deviation;
 		bool valid_distance = distance < k_median;
 

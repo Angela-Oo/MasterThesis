@@ -2,7 +2,7 @@
 #include "showMesh.h"
 #include <algorithm>
 #include <cmath>
-#include "algo/registration/rigid_registration.h"
+#include "algo/registration/rigid_registration/rigid_registration.h"
 #include "algo/registration/ceres_option.h"
 
 #include "algo/registration/embedded_deformation/ed.h"
@@ -145,8 +145,8 @@ void ShowMesh::renderRegistrationTwoFrames()
 			
 			// render point clouds
 			if (_render_mesh == Render::NONE) {
-				_point_renderer->insertMesh("frame_registered_A", deformed_points, ml::RGBColor::Cyan, 0.0001);
-				_point_renderer->insertMesh("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green, 0.0001, false);
+				_point_renderer->insertMesh("frame_registered_A", deformed_points, ml::RGBColor::Cyan, 0.0001f);
+				_point_renderer->insertMesh("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green, 0.0001f, false);
 			}
 			else {
 				_point_renderer->removePoints("frame_registered_A");
@@ -156,7 +156,7 @@ void ShowMesh::renderRegistrationTwoFrames()
 			if (_render_mesh == Render::DEFORMATION) {
 				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
 				_mesh_renderer->removeMesh("mesh_b");
-				_point_renderer->insertMesh("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green, 0.0001, false);
+				_point_renderer->insertMesh("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green, 0.0001f, false);
 			}
 			else if (_render_mesh == Render::ALL) {
 				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
@@ -171,12 +171,12 @@ void ShowMesh::renderRegistrationTwoFrames()
 		// fixed positions
 		std::vector<Point> render_fixed_positions = _registration->getFixedPostions();
 		if (!render_fixed_positions.empty())
-			_point_renderer->insertPoints("frame_fixed_positions", render_fixed_positions, ml::RGBColor::Red, 0.005);
+			_point_renderer->insertPoints("frame_fixed_positions", render_fixed_positions, ml::RGBColor::Red, 0.005f);
 
 		// deformation graph
 		if (_render_deformation_graph) {
 			auto render_dg = _registration->getDeformationGraphMesh();
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001, true);
+			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, true);
 		}
 		else {
 			_point_renderer->removePoints("deformation_graph");

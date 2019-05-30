@@ -51,7 +51,7 @@ SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
 
 ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position)
 {
-	float point_to_point_weighting = 0.1;
+	float point_to_point_weighting = 0.1f;
 	double weight = a_fit * point_to_point_weighting;
 	
 	auto & global = _deformation_graph._global;
@@ -65,7 +65,7 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Pr
 
 ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position)
 {
-	float point_to_plane_weighting = 0.9;
+	float point_to_plane_weighting = 0.9f;
 	double weight = a_fit * point_to_plane_weighting;
 
 	auto & global = _deformation_graph._global;

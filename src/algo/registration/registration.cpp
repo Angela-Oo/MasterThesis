@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include "registration.h"
-#include "rigid_registration.h"
 #include "ceres_option.h"
 //
 //const Mesh & Registration::getSource()

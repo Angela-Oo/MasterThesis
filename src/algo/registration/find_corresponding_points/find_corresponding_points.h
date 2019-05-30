@@ -13,7 +13,7 @@ class FindCorrespondingPoints
 	std::unique_ptr<NearestNeighborSearch> _nn_search;
 	double _max_normal_angle_deviation;
 	double _median_distance;
-	double _k;
+	int _k;
 public:
 	double median();
 	Point getPoint(vertex_descriptor);

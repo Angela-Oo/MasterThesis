@@ -84,7 +84,6 @@ struct FitStarPointToPointAngleAxisCostFunction {
 
 		// global deformation of node position
 		substract(deformed_node, global_g, deformed_node);
-		T tmp[3];
 		ceres::AngleAxisRotatePoint(global_rotation, deformed_node, deformed_node);
 		addition(deformed_node, global_g, deformed_node);
 		addition(deformed_node, global_translation, deformed_node);
