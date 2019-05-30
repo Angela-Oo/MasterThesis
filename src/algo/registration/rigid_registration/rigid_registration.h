@@ -1,39 +1,12 @@
 #pragma once
-#include "i_registration.h"
+
+#include "rigid_deformation.h"
+#include "rigid_deformed_mesh.h"
+#include "algo/registration/i_registration.h"
 #include "algo/file_writer.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include <ceres/ceres.h>
-
-class RigidDeformation
-{
-private:
-	ml::vec3d _r; // rotation matrix in angle axis
-	ml::vec3d _t; // translation vector	
-public:
-	double * r() { return (&_r)->getData(); }
-	double * t() { return (&_t)->getData(); }
-public:
-	Matrix rotation() const;
-	Vector translation() const;
-public:
-	Point deformPoint(const Point & point) const;
-	Vector deformNormal(const Vector & normal) const;
-public:
-	RigidDeformation();
-};
-
-
-class RigidDeformedMesh
-{
-private:
-	const RigidDeformation & _deformation;
-	SurfaceMesh _mesh;
-public:
-	SurfaceMesh deformPoints();
-public:
-	RigidDeformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation_graph);
-};
 
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;

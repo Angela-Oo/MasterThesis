@@ -521,9 +521,6 @@
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\rigid_registration.h">
-      <Filter>algo\registration\rigid registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\i_registration.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
@@ -572,9 +569,6 @@
     <ClInclude Include="src\algo\ceres_math.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\rigid_deformation_cost_function.h">
-      <Filter>algo\registration\rigid registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h">
       <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
@@ -598,6 +592,18 @@
     </ClInclude>
     <ClInclude Include="src\visualize\meshRenderer.h">
       <Filter>visualize\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformation.h">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformation_cost_function.h">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_registration\rigid_registration.h">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.h">
+      <Filter>algo\registration\rigid registration</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -654,9 +660,6 @@
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
       <Filter>algo\mesh simplification</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\rigid_registration.cpp">
-      <Filter>algo\registration\rigid registration</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\registration.cpp">
       <Filter>algo\registration</Filter>
     </ClCompile>
@@ -707,6 +710,15 @@
     </ClCompile>
     <ClCompile Include="src\visualize\pointsRenderer.cpp">
       <Filter>visualize\render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformation.cpp">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\rigid_registration\rigid_registration.cpp">
+      <Filter>algo\registration\rigid registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.cpp">
+      <Filter>algo\registration\rigid registration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
