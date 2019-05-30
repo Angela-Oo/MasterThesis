@@ -95,7 +95,7 @@ TriMeshf PointsRenderer::createNormalTriMesh(const SurfaceMesh & mesh, ml::RGBCo
 	std::vector<ml::vec3f> normal_positions;
 	for (auto & v : mesh.vertices()) {
 		auto p = mesh.point(v);
-		auto normal = PointToVec3f(p + (normals[v].vector() * 0.1));
+		auto normal = PointToVec3f(p + (normals[v].vector() * 0.05));
 		meshes.push_back(ml::Shapesf::line(PointToVec3f(p), normal, color, point_size));
 	}
 	return ml::meshutil::createUnifiedMesh(meshes);

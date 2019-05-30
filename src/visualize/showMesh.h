@@ -9,7 +9,7 @@
 #include "algo/file_writer.h"
 #include "algo/evaluate_registration.h"
 #include "algo/registration/registration.h"
-#include "algo/registration/non_rigid_registration_all_frames.h"
+#include "algo/registration/sequence_registration/sequence_registration.h"
 
 #include "algo/registration/arap/arap.h"
 
@@ -42,7 +42,7 @@ private:
 	bool _calculate_error;
 	//std::unique_ptr<IRegistration> _registration;
 	std::unique_ptr<IRegistration> _registration;
-	//std::unique_ptr<NonRigidRegistrationAllFrames<AsRigidAsPossible, DeformationGraph<ARAPGraph, ARAPNode>>> _registration_frames;
+	std::unique_ptr<SequenceRegistration> _register_sequence_of_frames;
 	//std::unique_ptr < NonRigidRegistrationAllFrames < ED::EmbeddedDeformation, DeformationGraph<ED::Graph, ED::Deformation>>> _registration_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;
 private:

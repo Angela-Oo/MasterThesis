@@ -138,18 +138,6 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 		// translation
 		addition(deformed_node, global_translation, deformed_node);
 
-		// deform the node normal
-		//T rotation_t[9];
-		//T global_rotation_t[9];
-		//ceres::AngleAxisToRotationMatrix(rotation, rotation_t);
-		//ceres::AngleAxisToRotationMatrix(global_rotation, global_rotation_t);
-		//matrix_transpose(rotation_t, rotation_t);
-		//matrix_transpose(global_rotation_t, global_rotation_t);
-		//matrix_multiplication(rotation_t, normal, normal);
-		//matrix_multiplication(global_rotation_t, normal, normal);
-		//normalize(normal, normal);
-		//matrix_transpose()
-
 		// The error is the difference between the predicted and observed position.
 		T difference[3];
 		substract(deformed_node, target_point, difference);

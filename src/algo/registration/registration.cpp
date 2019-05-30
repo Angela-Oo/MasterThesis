@@ -2,6 +2,48 @@
 
 #include "registration.h"
 #include "ceres_option.h"
+#include "algo/registration/rigid_registration/rigid_registration.h"
+#include "algo/registration/embedded_deformation/ed.h"
+#include "algo/registration/arap/arap.h"
+
+std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source, 
+												  const SurfaceMesh & target, 												  
+												  RegistrationType registration_type,
+												  const ceres::Solver::Options & options,
+												  std::shared_ptr<FileWriter> logger,
+												  int number_of_deformation_graph_nodes,
+												  std::vector<vertex_descriptor> fixed_positions)
+{
+	if (registration_type == RegistrationType::ED)
+		return std::make_unique<ED::EmbeddedDeformation>(source, target, options, number_of_deformation_graph_nodes, logger);
+	else if (registration_type == RegistrationType::ED_WithoutICP)
+		return std::make_unique<ED::EmbeddedDeformation>(source, target, fixed_positions, options, logger);
+	else if (registration_type == RegistrationType::ASAP)
+		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, options, number_of_deformation_graph_nodes, logger);
+	else if (registration_type == RegistrationType::ASAP_WithoutICP)
+		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, fixed_positions, options, logger);
+	else
+		return std::make_unique<RigidRegistration>(source, target, options, logger);
+}
+
+
+std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
+												  const SurfaceMesh & target,
+												  RegistrationType registration_type,
+												  DG::DeformationGraph deformation_graph,
+												  const ceres::Solver::Options & options,
+												  std::shared_ptr<FileWriter> logger)
+{
+	if (registration_type == RegistrationType::ED)
+		return std::make_unique<ED::EmbeddedDeformation>(source, target, deformation_graph, options, logger);
+	else if (registration_type == RegistrationType::ASAP)
+		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, deformation_graph, options, logger);
+	//else if (registration_type == RegistrationType::Rigid)
+	//	return std::make_unique<RigidRegistration>(source, target, options, logger);
+	else
+		return nullptr;
+}
+
 //
 //const Mesh & Registration::getSource()
 //{

@@ -40,10 +40,10 @@ std::pair<bool, vertex_descriptor> FindCorrespondingPoints::correspondingPoint(P
 		//auto vertex = _mesh.point(v);
 		auto angle = angle_between_to_vectors_in_rad(normal, vertex_normals[v].vector());
 
-		if (distance < 100. * median()) {
-			_median_distance = (_median_distance * 10000. + distance) / 10001.;
-		}
-		double k_median = 2. * median();
+		//if (distance < 100. * median()) {
+		_median_distance = (_median_distance * 10000. + distance) / 10001.;
+		//}
+		double k_median = 5. * median();
 		bool valid_angle = angle < _max_normal_angle_deviation;
 		bool valid_distance = distance < k_median;
 

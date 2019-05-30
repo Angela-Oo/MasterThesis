@@ -85,6 +85,9 @@
     <Filter Include="visualize\render">
       <UniqueIdentifier>{bfee125b-6f1b-4158-af15-6b56fc1354a8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algo\registration\sequence registration">
+      <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -614,6 +617,9 @@
     <ClInclude Include="src\algo\registration\deformation_graph\deformed_mesh.h">
       <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h">
+      <Filter>algo\registration\sequence registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -734,6 +740,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\deformed_mesh.cpp">
       <Filter>algo\registration\deformation graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\sequence_registration\sequence_registration.cpp">
+      <Filter>algo\registration\sequence registration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
