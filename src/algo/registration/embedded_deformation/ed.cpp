@@ -49,7 +49,7 @@ SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
 	return deformationGraphToSurfaceMesh(_deformation_graph);
 }
 
-ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position)
+ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point)
 {
 	float point_to_point_weighting = 0.1f;
 	double weight = a_fit * point_to_point_weighting;
@@ -57,13 +57,13 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Pr
 	auto & global = _deformation_graph._global;
 	auto n = _deformation_graph.getNode(node);
 
-	auto cost_function = FitStarPointToPointCostFunction::Create(target_position, n._point, global._point);
+	auto cost_function = FitStarPointToPointCostFunction::Create(target_point, n._point, global._point);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function,
 									global._deformation->r(), global._deformation->t(), n._deformation->t(), n._deformation->w());
 }
 
-ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position)
+ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal)
 {
 	float point_to_plane_weighting = 0.9f;
 	double weight = a_fit * point_to_plane_weighting;
@@ -71,7 +71,7 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Pr
 	auto & global = _deformation_graph._global;
 	auto n = _deformation_graph.getNode(node);
 
-	ceres::CostFunction* cost_function = FitStarPointToPlaneCostFunction::Create(target_position, n._point, n._normal.vector(), global._point);
+	ceres::CostFunction* cost_function = FitStarPointToPlaneCostFunction::Create(target_point, target_normal, n._point, global._point);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function, global._deformation->r(), global._deformation->t(), n._deformation->r(), n._deformation->t(), n._deformation->w());
 }
@@ -83,12 +83,14 @@ VertexResidualIds EmbeddedDeformation::addFitCostWithoutICP(ceres::Problem &prob
 
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+	
+	auto target_normals = _dst.property_map<vertex_descriptor, Direction>("v:normal").first;
 	for (auto & v : mesh.vertices())
 	{
 		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), v) != _fixed_positions.end()))
 		{
 			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _dst.point(v)));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v)));
+			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v), target_normals[v].vector()));
 		}
 	}
 	return residual_ids;
@@ -108,10 +110,12 @@ VertexResidualIds EmbeddedDeformation::addFitCost(ceres::Problem &problem)
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
 
 		if (correspondent_point.first) {
-			// node._found_nearest_point = true;
-			auto target_position = _find_correspondence_point->getPoint(correspondent_point.second);
-			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_position));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_position));
+			//node._found_nearest_point = true;
+			vertex_descriptor target_vertex = correspondent_point.second;
+			auto target_point = _find_correspondence_point->getPoint(target_vertex);
+			auto target_normal = _find_correspondence_point->getNormal(target_vertex);
+			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_point));
+			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal.vector()));
 			i++;
 		}
 		else {

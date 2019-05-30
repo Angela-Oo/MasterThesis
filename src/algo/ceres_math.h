@@ -74,7 +74,7 @@ void matrix_transpose(const T * const m, T * m_transpose)
 
 
 template<typename T>
-void scalar_multiply(const T * const v, const T const scalar, T* result)
+void scalar_multiply(const T * const v, T scalar, T* result)
 {
 	result[0] = v[0] * scalar;
 	result[1] = v[1] * scalar;

@@ -54,8 +54,8 @@ private:
 						  VertexResidualIds & rotation_residual_block_ids,
 						  VertexResidualIds & conf_residual_block_ids);
 private:
-	ceres::ResidualBlockId addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position);
-	ceres::ResidualBlockId addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position);
+	ceres::ResidualBlockId addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point);
+	ceres::ResidualBlockId addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal);
 	VertexResidualIds addFitCostWithoutICP(ceres::Problem &problem);
 	VertexResidualIds addFitCost(ceres::Problem &problem);
 	EdgeResidualIds addSmoothCost(ceres::Problem &problem);
