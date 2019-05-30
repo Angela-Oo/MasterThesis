@@ -52,34 +52,34 @@ std::vector<Point> AsRigidAsPossible::getFixedPostions()
 	return positions;
 }
 
-ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, Point target_position)
+ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point)
 {
 	float point_to_point_weighting = 0.1;
 	double weight = a_fit * point_to_point_weighting;
-	auto & g = _deformation_graph._mesh;
-	auto & global_node = _deformation_graph._global_deformation;
 
+	auto & global = _deformation_graph._global;
 	auto n = _deformation_graph.getNode(node);
 
-	ceres::CostFunction* cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_position, n._point, _deformation_graph._global_center);
+	auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, n._point, global._point);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-
-	return problem.AddResidualBlock(cost_function, loss_function, global_node->r(), global_node->t(), n._deformation->t(), n._deformation->w());
+	return problem.AddResidualBlock(cost_function, loss_function, global._deformation->r(), global._deformation->t(), n._deformation->t(), n._deformation->w());
 }
 
-ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, Point target_position)
+ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &problem,
+																	 vertex_descriptor node,
+																	 const Point & target_point, 
+																	 const Vector & target_normal)
 {
 	float point_to_plane_weighting = 0.9;
 	double weight = a_fit * point_to_plane_weighting;
 	auto & g = _deformation_graph._mesh;
-	auto & global_node = _deformation_graph._global_deformation;
-
+	auto & global = _deformation_graph._global;
 	auto n = _deformation_graph.getNode(node);
 
-	ceres::CostFunction* cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_position, n._point, n._normal.vector(), _deformation_graph._global_center);
+	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal, n._point, global._point);
 	auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weighting * weight, ceres::TAKE_OWNERSHIP);
-
-	return problem.AddResidualBlock(cost_function, loss_function, global_node->r(), global_node->t(), n._deformation->r(), n._deformation->t(), n._deformation->w());
+	return problem.AddResidualBlock(cost_function, loss_function,
+									global._deformation->r(), global._deformation->t(), n._deformation->r(), n._deformation->t(), n._deformation->w());
 }
 
 VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &problem)
@@ -88,13 +88,15 @@ VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &proble
 
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+
+	auto target_normals = _dst.property_map<vertex_descriptor, Direction>("v:normal").first;
 	for (auto & v : mesh.vertices())
 	{
 		auto vertex = _deformation_graph.deformNode(v);
 		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), v) != _fixed_positions.end()))
 		{
 			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _dst.point(v)));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v)));
+			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v), target_normals[v].vector()));
 		}
 	}
 	//std::cout << "used " << i << " of " << _deformation_graph._graph.m_vertices.size() << " deformation graph nodes" << std::endl;
@@ -115,9 +117,11 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
 
 		if (correspondent_point.first) {
-			auto target_position = _find_correspondence_point->getPoint(correspondent_point.second); // todo
-			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_position));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_position));
+			vertex_descriptor target_vertex = correspondent_point.second;
+			auto target_point = _find_correspondence_point->getPoint(target_vertex);
+			auto target_normal = _find_correspondence_point->getNormal(target_vertex);
+			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_point));
+			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal.vector()));
 			i++;
 		}
 	}

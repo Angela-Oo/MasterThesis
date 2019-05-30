@@ -11,6 +11,6 @@ ceres::Solver::Options ceresOption() {
 	options.max_num_iterations = 50;// 100;
 	options.logging_type = ceres::LoggingType::SILENT;
 	options.minimizer_progress_to_stdout = false;
-	options.function_tolerance = 1e-7;// 1e-6;
+	options.function_tolerance = 1e-8;// 1e-6;
 	return options;
 }

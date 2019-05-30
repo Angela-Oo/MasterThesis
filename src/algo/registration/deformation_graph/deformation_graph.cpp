@@ -1,54 +1,9 @@
 #include "deformation_graph.h"
 #include <cassert>
 
-#include "algo/registration/hsv_to_rgb.h"
+
 
 namespace DG {
-
-
-Point deformNodePosition(Point point, Vector translation)
-{
-	Vector v = point - CGAL::ORIGIN;
-	return CGAL::ORIGIN + v + translation;
-}
-
-Direction deformNodeNormal(Direction normal, Matrix rotation)
-{
-	return rotation(normal);
-}
-
-Point deformPositionAtNode(Point point, Point node_position, Matrix node_rotation, Vector node_translation)
-{
-	Vector rotated_point = node_rotation(point - node_position);
-	Vector moved_position = (node_position - CGAL::ORIGIN) + node_translation;
-	return CGAL::ORIGIN + moved_position + rotated_point;
-}
-
-Direction deformNormalAtNode(Direction normal, Matrix node_rotation)
-{
-	return node_rotation(normal);
-}
-
-Point deformNodePosition(NodeAndPoint point)
-{
-	Vector v = point._point - CGAL::ORIGIN;
-	return CGAL::ORIGIN + v + point._deformation->translation();
-}
-Direction deformNodeNormal(NodeAndPoint point)
-{
-	return deformNodeNormal(point._normal, point._deformation->rotation());
-}
-Point deformPositionAtNode(Point point, NodeAndPoint node)
-{
-	Vector rotated_point = node._deformation->rotation()(point - node._point);
-	Vector moved_position = (node._point - CGAL::ORIGIN) + node._deformation->translation();
-	return CGAL::ORIGIN + moved_position + rotated_point;
-}
-Direction deformNormalAtNode(Direction normal, NodeAndPoint node)
-{
-	return node._deformation->rotation()(normal);
-}
-
 
 
 std::vector<double> nodeDistanceWeighting(const ml::vec3f & point, const std::vector<ml::vec3f>& node_positions)
@@ -68,7 +23,6 @@ std::vector<double> nodeDistanceWeighting(const ml::vec3f & point, const std::ve
 	std::for_each(weights.begin(), weights.end(), [sum](double & w) { w = w / sum; });
 	return weights;
 }
-
 
 
 std::vector<double> DeformationGraph::weights(const Point & point, std::vector<vertex_descriptor>& nearest_nodes) const
@@ -151,67 +105,19 @@ Point DeformationGraph::deformPoint(const Point & point, const NearestNodes & ne
 		auto vertex_index = nearest_nodes.nodes[i];
 		double w = nearest_nodes.weights[i];
 
-		Vector transformed_point = deformedPositionAtNode(vertex_index, point) - CGAL::ORIGIN;
+		auto node = getNode(vertex_index);
+		Vector transformed_point = node.deformPosition(point) - CGAL::ORIGIN;
 		transformed_point *= w;
 		deformed_point += transformed_point;
 	}
 
-	Point global_deformed_point = deformPositionAtNode(CGAL::ORIGIN + deformed_point,
-													   _global_center, 
-													   _global_deformation->rotation(),
-													   _global_deformation->translation());
+	Point global_deformed_point = _global.deformPosition(CGAL::ORIGIN + deformed_point);
 	return global_deformed_point;
 }
 
-Point DeformationGraph::deformedPosition(vertex_descriptor vertex_index) const
+PositionAndDeformation DeformationGraph::getNode(vertex_descriptor node_index) const
 {
-	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
-	return deformNodePosition(_mesh.point(vertex_index), nodes[vertex_index]->translation());
-}
-
-Direction DeformationGraph::deformedNormal(vertex_descriptor vertex_index) const
-{
-	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
-	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
-
-	return deformNodeNormal(vertex_normals[vertex_index], nodes[vertex_index]->rotation());
-}
-
-Point DeformationGraph::deformedPositionAtNode(vertex_descriptor vertex_index, const Point & pos) const
-{
-	std::shared_ptr<IDeformation> node = (_mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first)[vertex_index];
-	return deformPositionAtNode(pos, _mesh.point(vertex_index), node->rotation(), node->translation());
-}
-
-Direction DeformationGraph::deformedNormalAtNode(vertex_descriptor vertex_index, const Direction & normal) const
-{
-	std::shared_ptr<IDeformation> node = (_mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first)[vertex_index];
-	
-	return deformNormalAtNode(normal, node->rotation());
-}
-
-NodeAndPoint DeformationGraph::deformNode(vertex_descriptor node_index) const
-{
-	auto & nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
-
-	Point pos = deformedPosition(node_index);
-	Direction normal = deformedNormal(node_index);
-	Point global_pos = deformPositionAtNode(pos, _global_center, _global_deformation->rotation(), _global_deformation->translation());
-	Direction global_normal = deformNormalAtNode(normal, _global_deformation->rotation());
-
-	NodeAndPoint n;
-	n._point = global_pos;
-	n._normal = global_normal;
-	return n;
-	//Mesh::Vertex v;
-	//v.position = global_pos;
-	//v.normal = global_normal;
-	//return v;
-}
-
-NodeAndPoint DeformationGraph::getNode(vertex_descriptor node_index)
-{
-	NodeAndPoint node;
+	PositionAndDeformation node;
 	std::shared_ptr<IDeformation> n = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first[node_index];
 	node._deformation = n;
 	node._point = _mesh.point(node_index);
@@ -219,6 +125,28 @@ NodeAndPoint DeformationGraph::getNode(vertex_descriptor node_index)
 	return node;
 }
 
+PositionAndDeformation DeformationGraph::deformNode(vertex_descriptor node_index) const
+{
+	PositionAndDeformation node = getNode(node_index);
+
+	PositionAndDeformation deformed_node;
+	deformed_node._point = _global.deformPosition(node.getDeformedPosition());
+	deformed_node._normal = _global.deformNormal(node.getDeformedNormal());
+	return deformed_node;
+}
+
+void DeformationGraph::initGlobalDeformation(std::shared_ptr<IDeformation> global_deformation)
+{
+	Vector global_position(0., 0., 0.);
+	for (auto & v : _mesh.vertices()) {
+		global_position += _mesh.point(v) - CGAL::ORIGIN;
+	}
+	global_position /= _mesh.number_of_vertices();
+
+	_global._point = CGAL::ORIGIN + global_position;
+	_global._normal = Direction(0., 0., 1.);
+	_global._deformation = global_deformation;
+}
 
 DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node)
 	: _mesh(mesh)
@@ -233,19 +161,13 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::
 	_mesh.add_property_map<vertex_descriptor, double>("v:conf_cost", 0.);
 
 	auto normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
-
-	Vector global_position(0., 0., 0.);
 	for (auto & v : _mesh.vertices()) {
-		auto point = _mesh.point(v);
-		auto normal = normals[v];// _mesh.normal[v];
+		//auto point = _mesh.point(v);
+		//auto normal = normals[v];// _mesh.normal[v];
 		nodes[v] = create_node();
-
-		global_position += point - CGAL::ORIGIN;
 	}
-	global_position /= _mesh.number_of_vertices();
 
-	_global_center = CGAL::ORIGIN + global_position;
-	_global_deformation = create_node();
+	initGlobalDeformation(create_node());
 
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
@@ -253,16 +175,13 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::
 
 DeformationGraph::DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<IDeformation> & global_deformation)
 	: _mesh(graph)
-	, _global_deformation(global_deformation)
 {
-
-	//_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	initGlobalDeformation(global_deformation);
 }
 
 
 DeformationGraph::DeformationGraph(const DeformationGraph & deformation_graph)
-	: _global_deformation(deformation_graph._global_deformation)
-	, _global_center(deformation_graph._global_center)
+	: _global(deformation_graph._global)
 	, _mesh(deformation_graph._mesh)
 {
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
@@ -273,202 +192,12 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 	if (&other == this)
 		return *this;
 
-	_global_deformation = other._global_deformation;
-	_global_center = other._global_center;
+	_global = other._global;
 	_mesh = other._mesh;
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
 }
 
-
-
-
-
-
-double getMeanFitCost(const SurfaceMesh & mesh)
-{
-	auto property_map_fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost");
-	if (property_map_fit_costs.second) {
-		auto fit_costs = property_map_fit_costs.first;
-		double mean_fit_cost = 0.;
-		for (auto v : mesh.vertices()) {
-			mean_fit_cost += fit_costs[v];
-		}
-		mean_fit_cost /= mesh.number_of_vertices();
-		return mean_fit_cost;
-	}
-	std::cout << " no fit property " << std::endl;
-	return 0.;
-}
-
-
-
-
-double getReferenceCost(const SurfaceMesh & mesh)
-{
-	auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
-	auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
-	auto conf_costs = mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
-	
-	double mean_fit_cost = 0.;
-	double max_fit_cost = 0.0;
-	double max_conf_cost = 0.0;
-
-	for (auto v : mesh.vertices()) {
-		mean_fit_cost += fit_costs[v];
-		if (fit_costs[v] > max_fit_cost)
-			max_fit_cost = fit_costs[v];
-		if (conf_costs[v] > max_conf_cost)
-			max_conf_cost = conf_costs[v];
-	}
-	mean_fit_cost /= mesh.number_of_vertices();
-
-	double mean_smooth_cost = 0.;
-	double max_smooth_cost = 0.0;
-	for (auto e : mesh.edges()) {
-		mean_smooth_cost += smooth_costs[e];
-		if (smooth_costs[e] > max_smooth_cost)
-			max_smooth_cost = smooth_costs[e];
-	}
-	mean_smooth_cost /= mesh.number_of_edges();
-
-	auto k_mean_cost = std::max(mean_fit_cost, mean_smooth_cost);
-	k_mean_cost *= 10.;
-
-	std::cout << "max fit cost " << max_fit_cost 
-		<< " max conf cost " << max_conf_cost 
-		<< " max smooth cost " << max_smooth_cost
-		<< " used visualize cost " << k_mean_cost << std::endl;
-
-	return k_mean_cost;
-}
-
-void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
-{
-	auto property_fit = mesh.property_map<vertex_descriptor, double>("v:fit_cost");
-	if (property_fit.second)
-	{
-		auto fit_costs = property_fit.first;
-
-		// add color property if not already exists
-		auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-
-		// if vertex was used for optimization flag is set use it
-		auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used");
-
-		for (auto & v : mesh.vertices())
-		{
-			double error = (reference_cost > 0.) ? (fit_costs[v] / reference_cost) : fit_costs[v];
-			error = std::min(1., error);
-			colors[v] = errorToRGB(error);
-
-			if (vertex_used.second) {
-				if (!vertex_used.first[v]) {
-					colors[v] = ml::RGBColor::Black.toVec4f();
-				}
-			}
-			//if (node.weight() < 0.7)
-			//	vertex.color = ml::RGBColor::White.toVec4f();
-		}
-	}
-	else {
-		std::cout << "no fit property" << std::endl;
-	}
-}
-
-SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph)
-{
-	SurfaceMesh mesh = deformation_graph._mesh;
-	auto normals = mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
-	for (auto & v : mesh.vertices()) {
-		auto deformed = deformation_graph.deformNode(v);
-		mesh.point(v) = deformed._point;
-		normals[v] = deformed._normal;
-	}
-
-	// color
-	auto reference_cost = getReferenceCost(mesh);
-	setVertexColorBasedOnFitCost(mesh, reference_cost);
-	//auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
-	//auto colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-	//for (auto & v : mesh.vertices()) 
-	//{
-	//	double error = (reference_cost > 0.) ? (fit_costs[v] / reference_cost) : fit_costs[v];
-	//	error = std::min(1., error);
-	//	colors[v] = errorToRGB(error);
-
-	//	//if (node.weight() < 0.7)
-	//	//	vertex.color = ml::RGBColor::White.toVec4f();
-	//	//else if (!node._found_nearest_point)
-	//	//	vertex.color = ml::RGBColor::Black.toVec4f();
-	//	//mesh.m_vertices.push_back(vertex);
-	//}
-
-	auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
-	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
-	for (auto & e : mesh.edges())
-	{
-		double error = (reference_cost > 0.) ? (smooth_costs[e] / reference_cost) : smooth_costs[e];
-		error = std::min(1., error);
-		edge_colors[e] = errorToRGB(error);
-	}
-	return mesh;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-SurfaceMesh DeformedMesh::deformPoints()
-{
-	SurfaceMesh::Property_map<vertex_descriptor, NearestNodes> nearest_nodes;
-	bool found;
-	boost::tie(nearest_nodes, found) = _mesh.property_map<vertex_descriptor, NearestNodes>("v:nearest_nodes");
-
-	SurfaceMesh deformed_points = _mesh;
-	for (auto & v : _mesh.vertices()) {
-		deformed_points.point(v) = _deformation_graph.deformPoint(_mesh.point(v), nearest_nodes[v]);
-	}
-	return deformed_points;
-}
-
-
-DeformedMesh::DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph)
-	: _mesh(mesh)
-	, _deformation_graph(deformation_graph)
-{
-	SurfaceMesh::Property_map<vertex_descriptor, NearestNodes> nearest_nodes;
-	bool created;
-	boost::tie(nearest_nodes, created) = _mesh.add_property_map<vertex_descriptor, NearestNodes>("v:nearest_nodes", NearestNodes());
-	assert(created);
-
-	for (auto & v : _mesh.vertices()) {
-		auto point = _mesh.point(v);
-		std::vector<vertex_descriptor> knn_nodes_indices = _deformation_graph.nearestNodes(point);
-		std::vector<double> weights = _deformation_graph.weights(point, knn_nodes_indices);
-		nearest_nodes[v] = NearestNodes(point, knn_nodes_indices, weights);
-	}
-}
 
 
 }

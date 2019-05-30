@@ -2,7 +2,7 @@
 #include "rigid_registration.h"
 #include "rigid_deformation_cost_function.h"
 #include "algo/ceres_iteration_logger.h"
-#include "algo/registration/deformation_graph/deformation_graph.h" // set color todo
+#include "algo/registration/deformation_graph/deformed_mesh.h" // set color todo
 
 
 

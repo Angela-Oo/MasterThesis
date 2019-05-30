@@ -100,19 +100,19 @@ struct FitStarPointToPointAngleAxisCostFunction {
 
 
 struct FitStarPointToPlaneAngleAxisCostFunction {
-	const Point _point;
-	const Point _node_g;
-	const Vector _node_normal;
+	const Point _target_point;
+	const Vector _target_normal;
+	const Point _node_g;	
 	const Point _global_g;
 
-	FitStarPointToPlaneAngleAxisCostFunction(const Point& point, const Point& node_g, const Vector& node_normal, const Point &global_g) :
-		_point(point), _node_g(node_g), _node_normal(node_normal), _global_g(global_g)
+	FitStarPointToPlaneAngleAxisCostFunction(const Point& target_point, const Vector & target_normal, const Point& node_g, const Point &global_g) :
+		_target_point(target_point), _target_normal(target_normal), _node_g(node_g),  _global_g(global_g)
 	{ }
 
 	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create(const Point& point, const Point& node_g, const Vector& node_normal, const Point &global_g)
+	static ceres::CostFunction* Create(const Point& target_position, const Vector & target_normal, const Point& node_g, const Point &global_g)
 	{
-		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneAngleAxisCostFunction, 1, 3, 3, 3, 3, 1>(new FitStarPointToPlaneAngleAxisCostFunction(point, node_g, node_normal, global_g)));
+		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneAngleAxisCostFunction, 1, 3, 3, 3, 3, 1>(new FitStarPointToPlaneAngleAxisCostFunction(target_position, target_normal, node_g, global_g)));
 	}
 
 	template <typename T>
@@ -120,39 +120,41 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 	{
 		T node_g[3];
 		T global_g[3];
-		T point[3];
-		T normal[3];
+		T target_point[3];
+		T target_normal[3];
 		point_to_T(_node_g, node_g);
 		point_to_T(_global_g, global_g);
-		point_to_T(_point, point);
-		point_to_T(_node_normal, normal);
+		point_to_T(_target_point, target_point);
+		point_to_T(_target_normal, target_normal);
 
-		// local deformation of node position
-		addition(node_g, translation, node_g);
+		T deformed_node[3];
+		// local deformation (only translation) of node position
+		addition(node_g, translation, deformed_node);
 
-		// global deformation of node position
-		substract(node_g, global_g, node_g);
-
-		ceres::AngleAxisRotatePoint(global_rotation, node_g, node_g);
-		addition(node_g, global_g, node_g);
-		addition(node_g, global_translation, node_g);
+		// global deformation (rotation and translation) of node position
+		// rotation
+		substract(deformed_node, global_g, deformed_node);
+		ceres::AngleAxisRotatePoint(global_rotation, deformed_node, deformed_node);
+		addition(deformed_node, global_g, deformed_node);
+		// translation
+		addition(deformed_node, global_translation, deformed_node);
 
 		// deform the node normal
-		T rotation_t[9];
-		T global_rotation_t[9];
-		ceres::AngleAxisToRotationMatrix(rotation, rotation_t);
-		ceres::AngleAxisToRotationMatrix(global_rotation, global_rotation_t);
-		matrix_transpose(rotation_t, rotation_t);
-		matrix_transpose(global_rotation_t, global_rotation_t);
-		matrix_multiplication(rotation_t, normal, normal);
-		matrix_multiplication(global_rotation_t, normal, normal);
-		normalize(normal, normal);
+		//T rotation_t[9];
+		//T global_rotation_t[9];
+		//ceres::AngleAxisToRotationMatrix(rotation, rotation_t);
+		//ceres::AngleAxisToRotationMatrix(global_rotation, global_rotation_t);
+		//matrix_transpose(rotation_t, rotation_t);
+		//matrix_transpose(global_rotation_t, global_rotation_t);
+		//matrix_multiplication(rotation_t, normal, normal);
+		//matrix_multiplication(global_rotation_t, normal, normal);
+		//normalize(normal, normal);
 		//matrix_transpose()
 
 		// The error is the difference between the predicted and observed position.
 		T difference[3];
-		substract(point, node_g, difference);
-		residuals[0] = dot(difference, normal) * w[0];
+		substract(deformed_node, target_point, difference);
+		residuals[0] = dot(difference, target_normal) * w[0];
 
 		return true;
 	}

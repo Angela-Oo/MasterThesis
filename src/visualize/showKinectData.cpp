@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "showKinectData.h"
 #include <numeric>
-#include "algo/registration/rigid_registration.h"
+#include "algo/registration/rigid_registration/rigid_registration.h"
 #include "input_reader/kinect_reader.h"
 #include <ceres/ceres.h>
 #include "algo/registration/ceres_option.h"

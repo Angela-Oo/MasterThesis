@@ -2,70 +2,33 @@
 
 #include "mLibInclude.h"
 #include <vector>
+#include "algo/surface_mesh/mesh_definition.h"
 #include "algo/surface_mesh/nearest_neighbor_search.h"
 #include "i_deformation.h"
 #include <CGAL/squared_distance_3.h> //for 3D functions
-
-typedef ml::TriMeshf Mesh;
+#include "nearest_nodes.h"
+#include "position_and_deformation.h"
 
 namespace DG
 {
 
-class NearestNodes
-{
-public:
-	Point point;
-	std::vector<vertex_descriptor> nodes;
-	std::vector<double> weights;
-public:
-	NearestNodes() {}
-	NearestNodes(Point p, const std::vector<vertex_descriptor> & n, const std::vector<double> & w)
-		: point(p)
-		, nodes(n)
-		, weights(w)
-	{}
-};
-
-
-class NodeAndPoint
-{
-public:
-	std::shared_ptr<IDeformation> _deformation;
-	Point _point;
-	Direction _normal;
-};
-
-Point deformNodePosition(Point point, Vector translation);
-Direction deformNodeNormal(Direction normal, Matrix rotation);
-Point deformPositionAtNode(Point point, Point node_position, Matrix node_rotation, Vector node_translation);
-Direction deformNormalAtNode(Direction normal, Matrix node_rotation);
-
-Point deformNodePosition(NodeAndPoint point);
-Direction deformNodeNormal(NodeAndPoint point);
-Point deformPositionAtNode(Point point, NodeAndPoint node);
-Direction deformNormalAtNode(Direction normal, NodeAndPoint node);
 
 class DeformationGraph
 {
 public:
 	const int _k = 4;
 	SurfaceMesh _mesh;
-	Point _global_center;
-	std::shared_ptr<IDeformation> _global_deformation;
+	PositionAndDeformation _global;
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
+private:
+	void initGlobalDeformation(std::shared_ptr<IDeformation> global_deformation);
 public:
 	std::vector<double> weights(const Point & point, std::vector<vertex_descriptor>& nearest_nodes_indices) const;
 	std::vector<vertex_descriptor> nearestNodes(const Point & point) const;
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 public:
-	Point deformedPosition(vertex_descriptor vertex_index) const;
-	Direction deformedNormal(vertex_descriptor vertex_index) const;
-	Point deformedPositionAtNode(vertex_descriptor vertex_index, const Point & pos) const;
-	Direction deformedNormalAtNode(vertex_descriptor vertex_index, const Direction & normal) const;
-public:
-	NodeAndPoint deformNode(vertex_descriptor node_index) const;
-	NodeAndPoint getNode(vertex_descriptor node_index);
-	//DeformationGraphMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> getDeformations();
+	PositionAndDeformation deformNode(vertex_descriptor node_index) const;
+	PositionAndDeformation getNode(vertex_descriptor node_index) const;
 public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
@@ -75,21 +38,6 @@ public:
 	DeformationGraph & operator=(DeformationGraph other);
 };
 
-double getMeanFitCost(const SurfaceMesh & mesh);
-void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost);
-
-SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph);
-
-class DeformedMesh
-{
-private:
-	const DeformationGraph & _deformation_graph;
-	SurfaceMesh _mesh;
-public:
-	SurfaceMesh deformPoints();
-public:
-	DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph);
-};
 
 
 }

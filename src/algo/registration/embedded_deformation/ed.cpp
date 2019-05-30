@@ -53,28 +53,27 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Pr
 {
 	float point_to_point_weighting = 0.1;
 	double weight = a_fit * point_to_point_weighting;
-	auto & g = _deformation_graph._mesh;
-	auto & global_node = _deformation_graph._global_deformation;
-
+	
+	auto & global = _deformation_graph._global;
 	auto n = _deformation_graph.getNode(node);
 
-	ceres::CostFunction* cost_function = FitStarPointToPointCostFunction::Create(target_position, n._point, _deformation_graph._global_center);
+	auto cost_function = FitStarPointToPointCostFunction::Create(target_position, n._point, global._point);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function, global_node->r(), global_node->t(), n._deformation->t(), n._deformation->w());
+	return problem.AddResidualBlock(cost_function, loss_function,
+									global._deformation->r(), global._deformation->t(), n._deformation->t(), n._deformation->w());
 }
 
 ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_position)
 {
 	float point_to_plane_weighting = 0.9;
 	double weight = a_fit * point_to_plane_weighting;
-	auto & g = _deformation_graph._mesh;
-	auto & global_node = _deformation_graph._global_deformation;
 
+	auto & global = _deformation_graph._global;
 	auto n = _deformation_graph.getNode(node);
 
-	ceres::CostFunction* cost_function = FitStarPointToPlaneCostFunction::Create(target_position, n._point, n._normal.vector(), _deformation_graph._global_center);
+	ceres::CostFunction* cost_function = FitStarPointToPlaneCostFunction::Create(target_position, n._point, n._normal.vector(), global._point);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function, global_node->r(), global_node->t(), n._deformation->r(), n._deformation->t(), n._deformation->w());
+	return problem.AddResidualBlock(cost_function, loss_function, global._deformation->r(), global._deformation->t(), n._deformation->r(), n._deformation->t(), n._deformation->w());
 }
 
 
@@ -195,7 +194,7 @@ bool EmbeddedDeformation::solveIteration()
 		// add global rotation cost
 		ceres::CostFunction* cost_function = RotationCostFunction::Create();
 		auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), a_rigid, ceres::TAKE_OWNERSHIP);
-		problem.AddResidualBlock(cost_function, loss_function, _deformation_graph._global_deformation->r());
+		problem.AddResidualBlock(cost_function, loss_function, _deformation_graph._global._deformation->r());
 
 
 		ceres::Solve(_options, &problem, &summary);

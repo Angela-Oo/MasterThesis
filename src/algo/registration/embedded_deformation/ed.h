@@ -2,6 +2,7 @@
 
 #include "mLibInclude.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
+#include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "ed_deformation.h"
 #include "algo/file_writer.h"
 #include <vector>
