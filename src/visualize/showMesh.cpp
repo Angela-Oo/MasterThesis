@@ -51,6 +51,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 		}
 		else {
 			std::cout << std::endl << "finished registration" << std::endl;
+			renderRegistration();
 			_solve_registration = false;
 		}
 	}
@@ -165,7 +166,7 @@ void ShowMesh::renderRegistrationTwoFrames()
 		// deformation graph
 		if (_render_deformation_graph) {
 			auto render_dg = _registration->getDeformationGraphMesh();
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, true);
+			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, false);
 		}
 		else {
 			_point_renderer->removePoints("deformation_graph");
@@ -178,42 +179,29 @@ void ShowMesh::renderRegistrationAllFrames()
 	if (_register_sequence_of_frames) {
 		auto current = _register_sequence_of_frames->getCurrent();
 
-		// mesh
-		if (_render_mesh == Render::DEFORMATION || _render_mesh == Render::ALL)
-		{
+		if (!_register_sequence_of_frames->finished()) {
+			_mesh_renderer->insertMesh("target", _register_sequence_of_frames->getMesh(_register_sequence_of_frames->getCurrent()), ml::RGBColor::Green);
+			//_point_renderer->insertPoints("target", _register_sequence_of_frames->getMesh(_register_sequence_of_frames->getCurrent()), ml::RGBColor::Yellow);
+
 			auto current = _register_sequence_of_frames->getCurrent();
 			auto deformed_points = _register_sequence_of_frames->getDeformedMesh(current);
-			_mesh_renderer->insertMesh("mesh_" + current, deformed_points, ml::RGBColor::Cyan.toVec4f());
-
-			if (current > 0) {
-				auto deformed_points = _register_sequence_of_frames->getDeformedMesh(current - 1);
-				_mesh_renderer->insertMesh("mesh_" + current - 1, deformed_points, ml::RGBColor::Cyan.toVec4f());
-			}
+			_mesh_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan.toVec4f());
 		}
-		if (_render_mesh == Render::TARGET || _render_mesh == Render::ALL) {
-			auto target_points = _register_sequence_of_frames->getDeformedMesh(0);
-			_mesh_renderer->insertMesh("mesh_" + 0, target_points, ml::RGBColor::Green.toVec4f());
-		}
-
-		// points
-		if (_render_mesh == Render::NONE) {
-			auto deformed_points = _register_sequence_of_frames->getDeformedMesh(0);
-			auto target_points = _register_sequence_of_frames->getDeformedMesh(current);
-			_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Green);
-			_point_renderer->insertPoints("frame_registered_B", target_points, ml::RGBColor::Cyan);
-		}
-
-		// target mesh 
-		if (!_register_sequence_of_frames->finished())
-			_point_renderer->insertPoints("frame_B", _register_sequence_of_frames->getMesh(_register_sequence_of_frames->getCurrent()), ml::RGBColor::Yellow);
 		else {
-			_point_renderer->removePoints("frame_B");
+			_point_renderer->removePoints("target");
+			_point_renderer->removePoints("deformed");
+
+			auto current = _register_sequence_of_frames->getCurrent();
+			for (int i = 0; i < current; ++i) {
+				auto deformed_points = _register_sequence_of_frames->getDeformedMesh(current);
+				_mesh_renderer->insertMesh("mesh_" + current, deformed_points, ml::RGBColor::Cyan.toVec4f());
+			}
 		}
 
 		// deformation graph
 		if (_render_deformation_graph && !_register_sequence_of_frames->finished()) {
 			auto render_dg = _register_sequence_of_frames->getDeformationGraphMesh(_register_sequence_of_frames->getCurrent());
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, true);
+			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, false);
 		}
 		else {
 			_point_renderer->removePoints("deformation_graph");
@@ -403,7 +391,8 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-	_number_of_nodes = 4000;
+	//_number_of_nodes = 1500;
+	_number_of_nodes = 5000;
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ASAP;
@@ -444,7 +433,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_logger = std::make_shared<FileWriter>("hand_log.txt");	
 
 		////_mesh_reader->processAllFrames();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 20; i++) {
 			input_mesh->processFrame();
 			reference_registration_mesh->processFrame();
 		}
