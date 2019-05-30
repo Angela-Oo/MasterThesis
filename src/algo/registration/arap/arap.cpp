@@ -115,10 +115,11 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 	int i = 0;
 	for (auto & v : mesh.vertices())
 	{
+		bool valid_no_border_vertex = !mesh.is_border(v, true);
 		auto vertex = _deformation_graph.deformNode(v);
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
 
-		if (correspondent_point.first) {
+		if (correspondent_point.first && valid_no_border_vertex) {
 			vertex_used[v] = true;
 			vertex_descriptor target_vertex = correspondent_point.second;
 			auto target_point = _find_correspondence_point->getPoint(target_vertex);
@@ -249,15 +250,15 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 {
 	auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
 	for (auto & r : fit_residual_block_ids) {
-		fit_cost[r.first] = evaluateResidual(problem, r.second);
+		fit_cost[r.first] = evaluateResidual(problem, r.second) * a_fit;
 	}
 	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
 	for (auto & r : arap_residual_block_ids) {
-		smooth_cost[r.first] = evaluateResidual(problem, r.second);
+		smooth_cost[r.first] = evaluateResidual(problem, r.second) * a_smooth;
 	}
 	auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
 	for (auto & r : conf_residual_block_ids) {
-		conf_cost[r.first] = evaluateResidual(problem, r.second);
+		conf_cost[r.first] = evaluateResidual(problem, r.second) * a_conf;
 	}
 }
 
@@ -272,9 +273,9 @@ void AsRigidAsPossible::printCeresOptions()
 
 void AsRigidAsPossible::setParameters()
 {
-	a_smooth = 20.;// 10.;// 0.1;// 100;
+	a_smooth = 10.;//  0.1;// 100;
 	a_conf = 100.;// 1.;// 100;
-	a_fit = 1.;
+	a_fit = 10.;
 	_find_max_distance = 0.1;
 	_find_max_angle_deviation = 45.;
 }
