@@ -18,6 +18,7 @@ private:
 	size_t _current;
 	unsigned int _number_of_deformation_nodes;
 	std::unique_ptr<IRegistration> _registration;
+	bool _evaluate_residuals;
 	std::shared_ptr<FileWriter> _logger;
 public:
 	bool solve();

@@ -19,7 +19,8 @@ void ShowMesh::nonRigidRegistration()
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
-		_registration = createRegistration(source, target, _registration_type, option, _logger, _number_of_nodes, _input_mesh->getFixedPositions(frame_b));
+		bool evaluate_residuals = true;
+		_registration = createRegistration(source, target, _registration_type, option, evaluate_residuals, _logger, _number_of_nodes, _input_mesh->getFixedPositions(frame_b));
 
 		renderRegistration();
 	}

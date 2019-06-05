@@ -10,7 +10,8 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 												  const SurfaceMesh & target, 												  
 												  RegistrationType registration_type,
 												  const ceres::Solver::Options & options,
-												  std::shared_ptr<FileWriter> logger,
+												  bool evaluate_residuals,
+												  std::shared_ptr<FileWriter> logger,												  
 												  int number_of_deformation_graph_nodes,
 												  std::vector<vertex_descriptor> fixed_positions)
 {
@@ -19,9 +20,9 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 	else if (registration_type == RegistrationType::ED_WithoutICP)
 		return std::make_unique<ED::EmbeddedDeformation>(source, target, fixed_positions, options, logger);
 	else if (registration_type == RegistrationType::ASAP)
-		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, options, number_of_deformation_graph_nodes, logger);
+		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, options, number_of_deformation_graph_nodes, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ASAP_WithoutICP)
-		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, fixed_positions, options, logger);
+		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, fixed_positions, options, evaluate_residuals, logger);
 	else
 		return std::make_unique<RigidRegistration>(source, target, options, logger);
 }
@@ -32,12 +33,13 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 												  RegistrationType registration_type,
 												  DG::DeformationGraph deformation_graph,
 												  const ceres::Solver::Options & options,
+												  bool evaluate_residuals,
 												  std::shared_ptr<FileWriter> logger)
 {
 	if (registration_type == RegistrationType::ED)
 		return std::make_unique<ED::EmbeddedDeformation>(source, target, deformation_graph, options, logger);
 	else if (registration_type == RegistrationType::ASAP)
-		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, deformation_graph, options, logger);
+		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, deformation_graph, options, evaluate_residuals, logger);
 	//else if (registration_type == RegistrationType::Rigid)
 	//	return std::make_unique<RigidRegistration>(source, target, options, logger);
 	else

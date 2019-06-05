@@ -32,6 +32,7 @@ private:
 	std::vector<vertex_descriptor> _fixed_positions;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 private:
+	bool _evaluate_residuals;
 	bool _with_icp = true;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
@@ -79,18 +80,21 @@ public:
 					  const SurfaceMesh& dst,
 					  std::vector<vertex_descriptor> fixed_positions,
 					  ceres::Solver::Options option,
+					  bool evaluate_residuals = false,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 	// with icp
 	AsRigidAsPossible(const SurfaceMesh& src,
 					  const SurfaceMesh& dst,
 					  ceres::Solver::Options option,
 					  unsigned int number_of_deformation_nodes = 1000,
+					  bool evaluate_residuals = false,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 	// with icp but init with passed deformation graph
 	AsRigidAsPossible(const SurfaceMesh& src,
 					  const SurfaceMesh& dst,
 					  const DG::DeformationGraph & deformation_graph,
 					  ceres::Solver::Options option,
+					  bool evaluate_residuals = false,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 };	
 

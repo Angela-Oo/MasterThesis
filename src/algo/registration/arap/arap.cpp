@@ -196,8 +196,10 @@ bool AsRigidAsPossible::solveIteration()
 
 		ceres::Solve(_options, &problem, &summary);
 
-		// evaluate		
-		evaluateResidual(problem, fit_residual_ids, arap_residual_ids, conf_residual_ids);
+		// evaluate
+		if (_evaluate_residuals) {
+			evaluateResidual(problem, fit_residual_ids, arap_residual_ids, conf_residual_ids);
+		}
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
@@ -286,6 +288,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 std::vector<vertex_descriptor> fixed_positions,
 									 ceres::Solver::Options option,
+									 bool evaluate_residuals,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
@@ -293,6 +296,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
+	, _evaluate_residuals(evaluate_residuals)
 	, _with_icp(false)
 {
 	setParameters();
@@ -308,11 +312,13 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 ceres::Solver::Options option,
 									 unsigned int number_of_deformation_nodes,
+									 bool evaluate_residuals,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _logger(logger)
+	, _evaluate_residuals(evaluate_residuals)
 {
 	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
@@ -327,12 +333,14 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 const DG::DeformationGraph & deformation_graph,
 									 ceres::Solver::Options option,
+									 bool evaluate_residuals,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
 	, _logger(logger)
+	, _evaluate_residuals(evaluate_residuals)
 {
 	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);

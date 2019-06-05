@@ -12,7 +12,7 @@ bool SequenceRegistration::solve()
 		auto & source = _meshes[0];
 		auto & target = _meshes[_current];
 		auto & deformation_graph = _deformation_graphs[_current - 1];
-		_registration = createRegistration(source, target, _registration_type, deformation_graph, ceresOption(), nullptr);
+		_registration = createRegistration(source, target, _registration_type, deformation_graph, ceresOption(), _evaluate_residuals, _logger);
 	}
 	if (_registration) {
 		if (_registration->solveIteration())
@@ -80,6 +80,7 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 	, _current(1)
 	, _logger(logger)
 	, _registration_type(registration_type)
+	, _evaluate_residuals(false)
 {
 	_deformation_graphs.resize(_meshes.size());
 	_deformed_meshes.resize(_meshes.size());
@@ -88,7 +89,7 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 
 	auto & source = _meshes[0];
 	auto & target = _meshes[_current];
-	_registration = createRegistration(source, target, _registration_type, ceresOption(), logger, _number_of_deformation_nodes);
+	_registration = createRegistration(source, target, _registration_type, ceresOption(), _evaluate_residuals, _logger, _number_of_deformation_nodes);
 	_deformation_graphs[0] = _registration->getDeformationGraph();
 	_deformed_meshes[0] = _meshes[0];
 }
