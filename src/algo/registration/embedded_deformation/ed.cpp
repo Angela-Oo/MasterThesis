@@ -213,7 +213,8 @@ bool EmbeddedDeformation::solveIteration()
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 
-		if (abs(_current_cost - _last_cost) < 0.00001 *(1 + _current_cost) &&
+		auto scale_factor_tol = 0.0001;// 0.00001;
+		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
 			(a_rigid > 1 || a_smooth > 0.1 || a_conf > 1.))
 		{
 			a_rigid /= 2.;
@@ -281,6 +282,16 @@ void EmbeddedDeformation::evaluateResidual(ceres::Problem & problem,
 	//}
 }
 
+void EmbeddedDeformation::setParameters()
+{
+	a_rigid = 100.;// 1.;// 1000;
+	a_smooth = 5.;// 0.1;// 100;
+	a_conf = 10.;// 1.;// 100;
+	a_fit = 10.;
+	_find_max_distance = 0.1;
+	_find_max_angle_deviation = 45.;
+}
+
 void EmbeddedDeformation::printCeresOptions()
 {
 	std::cout << "\nCeres Solver" << std::endl;
@@ -301,10 +312,10 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	, _fixed_positions(fixed_positions)
 	, _logger(logger)
 	, _with_icp(false)
-	, a_smooth(10.)
-	, a_rigid(1000.)
-	, a_fit(10.)
 {
+	setParameters();
+	a_smooth = 10.;
+	a_fit = 10.;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
@@ -323,6 +334,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	, _logger(logger)
 	, _with_icp(true)
 {
+	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
 	std::cout << "number of def nodes " << number_of_deformation_nodes << " true number " << reduced_mesh.num_vertices() << std::endl;
@@ -343,6 +355,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	, _logger(logger)
 	, _with_icp(true)
 {
+	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();

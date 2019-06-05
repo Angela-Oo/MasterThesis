@@ -37,12 +37,12 @@ private:
 	size_t _max_iterations = 100;
 	long long _total_time_in_ms = 0;
 public:
-	double a_rigid = 1000.;// 1.;// 1000;
-	double a_smooth = 100.;// 0.1;// 100;
-	double a_conf = 100.;// 1.;// 100;
-	double a_fit = 1.;
-	const double _find_max_distance = 0.5;
-	const double _find_max_angle_deviation = 45.;
+	double a_rigid;
+	double a_smooth;
+	double a_conf;
+	double a_fit;
+	double _find_max_distance = 0.5;
+	double _find_max_angle_deviation = 45.;
 private:
 	//double _k_mean_cost;
 	//void updateMeanCost();
@@ -62,6 +62,7 @@ private:
 	VertexResidualIds addRotationCost(ceres::Problem &problem);
 	VertexResidualIds addConfCost(ceres::Problem &problem);
 private:
+	void setParameters();
 	void printCeresOptions();
 public:
 	bool finished();
