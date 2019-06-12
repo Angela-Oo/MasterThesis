@@ -2,7 +2,7 @@
 #include "../mLibInclude.h"
 #include "kinect/SensorDataWrapper.h"
 #include "i_showData.h"
-#include "pointsRenderer.h"
+#include "render/pointsRenderer.h"
 #include "kinect/PrimeSenseSensor.h"
 #include "algo/registration/registration.h"
 #include "input_reader/i_reader.h"

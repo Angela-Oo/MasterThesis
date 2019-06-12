@@ -14,7 +14,7 @@ void ShowKinectData::init(ml::ApplicationData &app)
 {
 	_start_time = std::chrono::system_clock::now();
 	_reader = std::make_unique<KinectReader>();
-	_point_renderer = std::make_unique<PointsRenderer>(app);
+	_point_renderer = std::make_unique<PointsRenderer>(&app.graphics);
 }
 
 void ShowKinectData::renderPoints(int frame)

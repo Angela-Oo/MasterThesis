@@ -6,7 +6,7 @@
 
 void ShowRGBDImageData::init(ml::ApplicationData &app)
 {
-	_point_renderer = std::make_unique<PointsRenderer>(app);
+	_point_renderer = std::make_unique<PointsRenderer>(&app.graphics);
 
 	float scale_factor = 0.004;
 	ml::mat4f scale = ml::mat4f::scale({ scale_factor, scale_factor, scale_factor });

@@ -269,8 +269,10 @@
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\visualize\constantBuffer.h" />
     <ClInclude Include="src\visualize\i_showData.h" />
-    <ClInclude Include="src\visualize\meshRenderer.h" />
-    <ClInclude Include="src\visualize\pointsRenderer.h" />
+    <ClInclude Include="src\visualize\render\meshRenderer.h" />
+    <ClInclude Include="src\visualize\render\pointsRenderer.h" />
+    <ClInclude Include="src\visualize\render\render_registration.h" />
+    <ClInclude Include="src\visualize\render\render_sequence_registration.h" />
     <ClInclude Include="src\visualize\showMesh.h" />
     <ClInclude Include="src\visualize\showRegisterTwoRigideFrames.h" />
     <ClInclude Include="src\visualize\showKinectData.h" />
@@ -321,8 +323,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="src\visualize\meshRenderer.cpp" />
-    <ClCompile Include="src\visualize\pointsRenderer.cpp" />
+    <ClCompile Include="src\visualize\render\meshRenderer.cpp" />
+    <ClCompile Include="src\visualize\render\pointsRenderer.cpp" />
+    <ClCompile Include="src\visualize\render\render_registration.cpp" />
+    <ClCompile Include="src\visualize\render\render_sequence_registration.cpp" />
     <ClCompile Include="src\visualize\showMesh.cpp" />
     <ClCompile Include="src\visualize\showRegisterTwoRigideFrames.cpp" />
     <ClCompile Include="src\visualize\showKinectData.cpp" />

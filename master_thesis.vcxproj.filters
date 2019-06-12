@@ -590,12 +590,6 @@
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h">
       <Filter>algo\registration\as rigid as possible</Filter>
     </ClInclude>
-    <ClInclude Include="src\visualize\pointsRenderer.h">
-      <Filter>visualize\render</Filter>
-    </ClInclude>
-    <ClInclude Include="src\visualize\meshRenderer.h">
-      <Filter>visualize\render</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformation.h">
       <Filter>algo\registration\rigid registration</Filter>
     </ClInclude>
@@ -619,6 +613,18 @@
     </ClInclude>
     <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h">
       <Filter>algo\registration\sequence registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\render\render_registration.h">
+      <Filter>visualize\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\render\render_sequence_registration.h">
+      <Filter>visualize\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\render\meshRenderer.h">
+      <Filter>visualize\render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\render\pointsRenderer.h">
+      <Filter>visualize\render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -720,12 +726,6 @@
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp">
       <Filter>algo\registration\as rigid as possible</Filter>
     </ClCompile>
-    <ClCompile Include="src\visualize\meshRenderer.cpp">
-      <Filter>visualize\render</Filter>
-    </ClCompile>
-    <ClCompile Include="src\visualize\pointsRenderer.cpp">
-      <Filter>visualize\render</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformation.cpp">
       <Filter>algo\registration\rigid registration</Filter>
     </ClCompile>
@@ -743,6 +743,18 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\sequence_registration\sequence_registration.cpp">
       <Filter>algo\registration\sequence registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\render\render_registration.cpp">
+      <Filter>visualize\render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\render\render_sequence_registration.cpp">
+      <Filter>visualize\render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\render\meshRenderer.cpp">
+      <Filter>visualize\render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\render\pointsRenderer.cpp">
+      <Filter>visualize\render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

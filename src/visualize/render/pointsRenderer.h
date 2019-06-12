@@ -1,5 +1,5 @@
 #pragma once
-#include "../mLibInclude.h"
+#include "mLibInclude.h"
 #include "visualize/constantBuffer.h"
 #include "algo/registration/i_registration.h"
 
@@ -39,5 +39,5 @@ public:
 	void removePoints(std::string id);
 	void clear();
 public:
-	PointsRenderer(ml::ApplicationData &app);
+	PointsRenderer(ml::GraphicsDevice * graphics);
 };

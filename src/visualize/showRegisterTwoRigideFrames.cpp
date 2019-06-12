@@ -60,7 +60,7 @@ void ShowTwoRigideRegisteredFrames::initReader()
 
 void ShowTwoRigideRegisteredFrames::init(ml::ApplicationData &app)
 {
-	_point_renderer = std::make_unique<PointsRenderer>(app);
+	_point_renderer = std::make_unique<PointsRenderer>(&app.graphics);
 	initReader();
 	initRegistration();
 	renderPoints();

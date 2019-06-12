@@ -19,7 +19,7 @@ void ShowMesh::nonRigidRegistration()
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
-		bool evaluate_residuals = true;
+		bool evaluate_residuals = false;
 		_registration = createRegistration(source, target, _registration_type, option, evaluate_residuals, _logger, _number_of_nodes, _input_mesh->getFixedPositions(frame_b));
 
 		renderRegistration();
@@ -29,6 +29,7 @@ void ShowMesh::nonRigidRegistration()
 			renderRegistration();
 		}
 		else {
+			//_mesh_renderer->saveCurrentWindowAsImage();
 			_selected_frame_for_registration.clear();
 			_solve_registration = false;
 			std::cout << std::endl << "finished, select next two frames" << std::endl;
@@ -120,143 +121,44 @@ void ShowMesh::renderError()
 			_point_renderer->removePoints("error");
 		}*/
 	}
-	else {
-		_point_renderer->removePoints("error");
-	}
+	//else {
+	//	_point_renderer->removePoints("error");
+	//}
 }
 
-
-
-void ShowMesh::renderRegistrationTwoFrames()
-{
-	if (_registration)
-	{
-		if (_render_points || _render_mesh != Render::NONE) {
-			auto deformed_points = _registration->getDeformedPoints();
-			
-			// render point clouds
-			if (_render_mesh == Render::NONE) {
-				_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Cyan, 0.001f);
-				_point_renderer->insertPoints("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green, 0.001f, false);
-			}
-			else {
-				_point_renderer->removePoints("frame_registered_A");
-				_point_renderer->removePoints("frame_registered_B");
-			}
-			// render mesh
-			if (_render_mesh == Render::DEFORMATION) {
-				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
-				_mesh_renderer->removeMesh("mesh_b");
-				_point_renderer->insertPoints("frame_registered_B", _registration->getTarget(), ml::RGBColor::Green, 0.001f, false);
-			}
-			else if (_render_mesh == Render::ALL) {
-				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
-				_mesh_renderer->insertMesh("mesh_b", _registration->getTarget(), ml::RGBColor::Green.toVec4f(), false);
-			}
-			else if(_render_mesh == Render::TARGET)	{
-				_mesh_renderer->insertMesh("mesh_b", _registration->getTarget(), ml::RGBColor::Green.toVec4f(), false);
-				_mesh_renderer->removeMesh("mesh_a");
-			}
-		}
-
-		// fixed positions
-		std::vector<Point> render_fixed_positions = _registration->getFixedPostions();
-		if (!render_fixed_positions.empty())
-			_point_renderer->insertPoints("frame_fixed_positions", render_fixed_positions, ml::RGBColor::Red, 0.005f);
-
-		// deformation graph
-		if (_render_deformation_graph) {
-			auto render_dg = _registration->getDeformationGraphMesh();
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, false);
-		}
-		else {
-			_point_renderer->removePoints("deformation_graph");
-		}
-	}
-}
-
-void ShowMesh::renderRegistrationAllFrames()
-{
-	if (_register_sequence_of_frames) {
-		auto current = _register_sequence_of_frames->getCurrent();
-
-		if (!_register_sequence_of_frames->finished()) {
-			_mesh_renderer->insertMesh("target", _register_sequence_of_frames->getMesh(_register_sequence_of_frames->getCurrent()), ml::RGBColor::Green);
-			//_point_renderer->insertPoints("target", _register_sequence_of_frames->getMesh(_register_sequence_of_frames->getCurrent()), ml::RGBColor::Yellow);
-
-			auto current = _register_sequence_of_frames->getCurrent();
-			auto deformed_points = _register_sequence_of_frames->getDeformedMesh(current);
-			_mesh_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan.toVec4f());
-		}
-		else {
-			_point_renderer->removePoints("target");
-			_point_renderer->removePoints("deformed");
-
-			auto current = _register_sequence_of_frames->getCurrent();
-			for (int i = 0; i < current; ++i) {
-				auto deformed_points = _register_sequence_of_frames->getDeformedMesh(current);
-				_mesh_renderer->insertMesh("mesh_" + current, deformed_points, ml::RGBColor::Cyan.toVec4f());
-			}
-		}
-
-		// deformation graph
-		if (_render_deformation_graph && !_register_sequence_of_frames->finished()) {
-			auto render_dg = _register_sequence_of_frames->getDeformationGraphMesh(_register_sequence_of_frames->getCurrent());
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, false);
-		}
-		else {
-			_point_renderer->removePoints("deformation_graph");
-		}
-	}
-}
 
 
 void ShowMesh::renderCurrentMesh()
 {
-	// current mesh
-	if (!_registration && !_register_sequence_of_frames) {
-		_mesh_renderer->insertMesh("mesh", _input_mesh->getMesh(_current_frame), ml::RGBColor::White.toVec4f());
+	// current mesh	
+	bool render_current_frame = (!_registration && !_register_sequence_of_frames);
+	_renderer->renderCurrentFrame(_input_mesh, _current_frame, render_current_frame);
 
-		// render mesh if selected
-		if (_selected_frame_for_registration.size() >= 1)
-		{
-			_mesh_renderer->insertMesh("mesh_a", _input_mesh->getMesh(_selected_frame_for_registration[0]), ml::RGBColor::Cyan.toVec4f());
-			if (_selected_frame_for_registration.size() >= 2)
-			{
-				_mesh_renderer->insertMesh("mesh_b", _input_mesh->getMesh(_selected_frame_for_registration[1]), ml::RGBColor::Green.toVec4f());
-			}
-		}
-	}
-	else {
-		_mesh_renderer->removeMesh("mesh");
-	}
+	// selected frames
+	_renderer->renderSelectedFrames(_input_mesh, _selected_frame_for_registration);
 
 	// reference
-	if (_render_reference_mesh) {
-		_mesh_renderer->insertMesh("reference", _reference_registration_mesh->getMesh(_current_frame), ml::RGBColor::White.toVec4f());
-	}
-	else {
-		_mesh_renderer->removeMesh("reference");
-	}
+	_renderer->renderReference(_reference_registration_mesh, _current_frame);
 }
 
 void ShowMesh::renderRegistration()
 {
 	renderCurrentMesh();
-	renderRegistrationTwoFrames();
-	renderRegistrationAllFrames();
+	_renderer->renderRegistration(_registration);
+	_renderer->renderRegistrationSequence(_register_sequence_of_frames);
 	renderError();
 }
 
 void ShowMesh::render(ml::Cameraf& camera)
 {
-	_mesh_renderer->render(camera);
-	_point_renderer->render(camera);
+	_renderer->render(camera);
 
 	if (_solve_registration && _register_sequence_of_frames && _registration_type == RegistrationType::AllFrames) {
-		solveAllNonRigidRegistration();
+		_renderer->renderRegistrationSequence(_register_sequence_of_frames);
+		//solveAllNonRigidRegistration();
 	}
 	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
+		_renderer->renderRegistration(_registration);
 		nonRigidRegistration();
 	}
 }
@@ -347,30 +249,23 @@ void ShowMesh::key(UINT key)
 	}
 	else if (key == KEY_G)
 	{
-		_render_deformation_graph = !_render_deformation_graph;
-		std::string visible = (_render_deformation_graph) ? "show" : "hide";
+		_renderer->_render_deformation_graph = !_renderer->_render_deformation_graph;
+		std::string visible = (_renderer->_render_deformation_graph) ? "show" : "hide";
 		std::cout << visible << " deformation graph" << std::endl;
 		renderRegistration();
 	}
 	else if (key == KEY_H)
 	{
-		if (_render_mesh == Render::NONE)
-			_render_mesh = Render::DEFORMATION;
-		else if(_render_mesh == Render::DEFORMATION)
-			_render_mesh = Render::TARGET;
-		else if (_render_mesh == Render::TARGET)
-			_render_mesh = Render::ALL;
-		else
-			_render_mesh = Render::NONE;
-		std::string visible = (_render_mesh != Render::NONE) ? "show" : "hide";
+		auto mode = _renderer->nextRenderMeshMode();
+		std::string visible = (mode != Render::NONE) ? "show" : "hide";
 		std::cout << visible << " mesh" << std::endl;
-		_mesh_renderer->clear();
+		//_mesh_renderer->clear();
 		renderRegistration();
 	}
 	else if (key == KEY_J)
 	{
-		_render_reference_mesh = !_render_reference_mesh;
-		std::string visible = (_render_reference_mesh) ? "show" : "hide";
+		_renderer->_render_reference_mesh = !_renderer->_render_reference_mesh;
+		std::string visible = (_renderer->_render_reference_mesh) ? "show" : "hide";
 		std::cout << visible << " reference mesh" << std::endl;
 		renderRegistration();
 	}
@@ -397,14 +292,9 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ASAP;
-	_render_points = true;
-	_render_mesh = Render::ALL;
-	_render_reference_mesh = true;
 	_render_error = false;
-	_render_deformation_graph = true;
 	_calculate_error = false;
-	_mesh_renderer = std::make_unique<MeshRenderer>(app);
-	_point_renderer = std::make_unique<PointsRenderer>(app);
+	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
 
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
@@ -424,8 +314,8 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 0);
 
 		// head
-		auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
-		auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
+		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
+		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
 		_logger = std::make_shared<FileWriter>("head_log.txt");
 	
 		// hand
@@ -434,7 +324,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_logger = std::make_shared<FileWriter>("hand_log.txt");	
 
 		////_mesh_reader->processAllFrames();
-		for (int i = 0; i < 20; i++) {
+		for (int i = 0; i < 10; i++) {
 			input_mesh->processFrame();
 			reference_registration_mesh->processFrame();
 		}
@@ -445,15 +335,16 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_input_mesh = std::make_unique<DeformationMesh>();
 		//_reference_registration_mesh = std::make_unique<DeformationMesh>();
 
-		_input_mesh = std::make_unique<DeformationMeshFrames>();
-		_reference_registration_mesh = std::make_unique<DeformationMeshFrames>();
+		_input_mesh = std::make_shared<DeformationMeshFrames>();
+		_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
 
 		_logger = std::make_shared<FileWriter>("test.txt");
-		_render_reference_mesh = false;
+		_renderer->_render_reference_mesh = false;
 		_calculate_error = false;
-		_render_deformation_graph = true;
+		_renderer->_render_deformation_graph = true;
 	}
 	renderRegistration();
+
 
 	std::cout << "controls:" << std::endl;
 	std::cout << "    show / hide deformation graph:             KEY_G" << std::endl;

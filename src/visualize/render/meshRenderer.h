@@ -1,5 +1,5 @@
 #pragma once
-#include "../mLibInclude.h"
+#include "mLibInclude.h"
 #include "visualize/constantBuffer.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
 
@@ -18,6 +18,7 @@ private:
 	ml::GraphicsDevice * _graphics;
 public:
 	void render(ml::Cameraf& camera);
+	void saveCurrentWindowAsImage();
 	void insertMesh(std::string id, const SurfaceMesh& mesh, ml::vec4f color, bool override = true);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh);
@@ -25,5 +26,5 @@ public:
 	void removeMesh(std::string id);
 	void clear();
 public:
-	MeshRenderer(ml::ApplicationData &app);
+	MeshRenderer(ml::GraphicsDevice * graphics);
 };

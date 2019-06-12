@@ -5,7 +5,7 @@ using namespace ml;
 
 ml::vec3f PointToVec3f(const Point & p)
 {
-	return ml::vec3f(p.x(), p.y(), p.z());
+	return ml::vec3f(static_cast<float>(p.x()), static_cast<float>(p.y()), static_cast<float>(p.z()));
 }
 
 void PointsRenderer::render(ml::Cameraf& camera)
@@ -256,10 +256,10 @@ void PointsRenderer::clear()
 	_pointClouds.clear();
 }
 
-PointsRenderer::PointsRenderer(ml::ApplicationData &app)
+PointsRenderer::PointsRenderer(ml::GraphicsDevice * graphics)
 {
-	_graphics = &app.graphics;
-	_shaderManager.init(app.graphics);
+	_graphics = graphics;
+	_shaderManager.init(*graphics);
 	_shaderManager.registerShader("shaders/pointCloud.hlsl", "pointCloud");
-	_constants.init(app.graphics);
+	_constants.init(*graphics);
 }

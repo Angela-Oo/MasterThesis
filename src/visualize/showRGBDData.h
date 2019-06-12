@@ -4,7 +4,7 @@
 #include "kinect/SensorDataWrapper.h"
 #include "kinect/ImageReaderSensor.h"
 #include "input_reader/i_reader.h"
-#include "pointsRenderer.h"
+#include "render/pointsRenderer.h"
 
 
 class ShowRGBDImageData : public IShowData
