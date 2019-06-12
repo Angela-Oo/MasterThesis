@@ -228,6 +228,11 @@ bool EmbeddedDeformation::solveIteration()
 	return finished();
 }
 
+int EmbeddedDeformation::currentIteration()
+{
+	return _solve_iteration;
+}
+
 bool EmbeddedDeformation::solve()
 {
 	while (!finished()) {

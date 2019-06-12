@@ -19,6 +19,11 @@ Render RenderRegistration::nextRenderMeshMode()
 	return _render_mesh;
 }
 
+void RenderRegistration::saveCurrentWindowAsImage(std::string folder, std::string filename)
+{
+	_mesh_renderer->saveCurrentWindowAsImage(folder, filename);
+}
+
 void RenderRegistration::renderMesh(std::string id, SurfaceMesh & mesh, ml::RGBColor color)
 {
 	_mesh_renderer->insertMesh(id, mesh, color);

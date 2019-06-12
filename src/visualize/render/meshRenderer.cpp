@@ -19,15 +19,24 @@ void MeshRenderer::render(ml::Cameraf& camera)
 	}
 }
 
-void MeshRenderer::saveCurrentWindowAsImage()
+void MeshRenderer::saveCurrentWindowAsImage(std::string folder, std::string filename)
 {
 	auto image = _graphics->captureBackBufferColor();
 	auto color = _graphics->castD3D11().captureBackBufferColor();
 	auto depth = _graphics->castD3D11().captureBackBufferDepth();
-	ml::FreeImageWrapper::saveImage("screenshot_color.png", color);
-	ml::FreeImageWrapper::saveImage("screenshot_depth.png", ml::ColorImageR32G32B32A32(depth));/*
-	FreeImageWrapper:: void saveImage(const std::string &filename, const Image& image, bool debugPrint = false) {
-	image.saveAsBinaryMImage("test_image.mbinRGB");*/
+
+	std::string color_folder = folder + "\\screenshot_color\\";
+	std::string depth_folder = folder + "\\screenshot_depth\\";
+
+	std::cout << color_folder;
+	//system(("mkdir " + color_folder).c_str());
+	//system(("mkdir " + depth_folder).c_str());
+	CreateDirectoryA(color_folder.c_str(), NULL);
+	CreateDirectoryA(depth_folder.c_str(), NULL);
+	//std::filesystem::path dir(folder);
+	//std::filesystem::create_directory(dir);
+	ml::FreeImageWrapper::saveImage(color_folder + filename + "_color.png", color);
+	ml::FreeImageWrapper::saveImage(depth_folder + filename + "_depth.png", ml::ColorImageR32G32B32A32(depth));
 }
 
 void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color, bool override)

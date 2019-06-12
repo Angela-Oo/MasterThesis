@@ -2,6 +2,7 @@
 #include "showMesh.h"
 #include <algorithm>
 #include <cmath>
+
 #include "algo/registration/rigid_registration/rigid_registration.h"
 #include "algo/registration/ceres_option.h"
 
@@ -10,6 +11,10 @@
 
 //#include "algo/mesh_simplification/mesh_simplification.h"
 #include "algo/surface_mesh/mesh_convertion.h"
+
+#include <chrono>  // chrono::system_clock
+#include <ctime>   // localtime
+#include <iomanip> // put_time
 
 void ShowMesh::nonRigidRegistration()
 {
@@ -22,11 +27,29 @@ void ShowMesh::nonRigidRegistration()
 		bool evaluate_residuals = false;
 		_registration = createRegistration(source, target, _registration_type, option, evaluate_residuals, _logger, _number_of_nodes, _input_mesh->getFixedPositions(frame_b));
 
+		auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+		std::stringstream ss;
+		ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%X");
+
+		std::string folder_name = "registration_";
+		if (_registration_type == RegistrationType::ASAP) {
+			folder_name = "ASAP_";
+		}
+		else if (_registration_type == RegistrationType::ED) {
+			folder_name = "ED_";
+		}
+		else if (_registration_type == RegistrationType::Rigid) {
+			folder_name = "Rigid_";
+		}
+		_save_images_folder = "images\\" + folder_name + ss.str();
+
 		renderRegistration();
 	}
 	else {
 		if (!_registration->solveIteration()) {
 			renderRegistration();
+
+			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_registration->currentIteration()));
 		}
 		else {
 			//_mesh_renderer->saveCurrentWindowAsImage();

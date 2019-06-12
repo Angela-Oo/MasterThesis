@@ -64,5 +64,5 @@ float4 pixelShaderMain(VertexShaderOutput input) : SV_Target
 	float ambient_lighting = ambient;
 
 	float lighting = diffuse_lighting + ambient_lighting;
-	return float4(input.color.x * lighting, input.color.y * lighting, input.color.z * lighting, 0.5f);	
+	return float4(input.color.x * lighting, input.color.y * lighting, input.color.z * lighting, 0.9f);	
 }

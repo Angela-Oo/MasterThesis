@@ -163,6 +163,10 @@ bool RigidRegistration::solveIteration()
 	return finished();
 }
 
+int RigidRegistration::currentIteration()
+{
+	return _solve_iteration;
+}
 
 bool RigidRegistration::solve()
 {

@@ -28,6 +28,7 @@ public:
 	bool _render_deformation_graph;
 public:
 	Render nextRenderMeshMode();
+	void saveCurrentWindowAsImage(std::string folder, std::string filename);
 public:
 	void render(ml::Cameraf& camera);
 	void renderMesh(std::string id, SurfaceMesh & mesh, ml::RGBColor color);
@@ -36,5 +37,6 @@ public:
 	void renderReference(std::shared_ptr<IMeshReader> mesh_reader, unsigned int current_frame);
 	void renderRegistration(std::shared_ptr<IRegistration> registration);
 	void renderRegistrationSequence(std::shared_ptr<SequenceRegistration> registration);
+public:
 	RenderRegistration(ml::GraphicsDevice * graphics);
 };

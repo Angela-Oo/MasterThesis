@@ -25,6 +25,7 @@ private:
 	std::vector<unsigned int> _selected_frame_for_registration;
 	bool _solve_registration;
 	RegistrationType _registration_type;
+	std::string _save_images_folder;
 	bool _render_error;	
 	bool _calculate_error;
 	std::shared_ptr<IRegistration> _registration;

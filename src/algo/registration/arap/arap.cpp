@@ -218,6 +218,10 @@ bool AsRigidAsPossible::solveIteration()
 	return finished();
 }
 
+int AsRigidAsPossible::currentIteration()
+{
+	return _solve_iteration;
+}
 
 bool AsRigidAsPossible::solve()
 {

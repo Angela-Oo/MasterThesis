@@ -67,6 +67,7 @@ private:
 public:
 	bool finished();
 	bool solveIteration() override;
+	int  currentIteration() override;
 	bool solve() override;
 public:
 	const SurfaceMesh & getSource() override;
