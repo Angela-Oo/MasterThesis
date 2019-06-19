@@ -45,10 +45,10 @@ void RenderRegistration::renderSelectedFrames(std::shared_ptr<IMeshReader> mesh_
 		// render mesh if selected
 	if (!selected_frames.empty())
 	{
-		_mesh_renderer->insertMesh("selected_mesh_a", mesh_reader->getMesh(selected_frames[0]), ml::RGBColor::Cyan.toVec4f());
+		_mesh_renderer->insertMesh("selected_mesh_a", mesh_reader->getMesh(selected_frames[0]), ml::RGBColor::Cyan.toVec4f(), false);
 		if (selected_frames.size() >= 2)
 		{
-			_mesh_renderer->insertMesh("selected_mesh_b", mesh_reader->getMesh(selected_frames[1]), ml::RGBColor::Green.toVec4f());
+			_mesh_renderer->insertMesh("selected_mesh_b", mesh_reader->getMesh(selected_frames[1]), ml::RGBColor::Green.toVec4f(), false);
 		}
 	}
 	else {
@@ -61,7 +61,7 @@ void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reade
 {
 	// reference
 	if (_render_reference_mesh) {
-		_mesh_renderer->insertMesh("reference", mesh_reader->getMesh(current_frame), ml::RGBColor::White.toVec4f());
+		_mesh_renderer->insertMesh("reference", mesh_reader->getMesh(current_frame), ml::RGBColor::White.toVec4f(), false);
 	}
 	else {
 		_mesh_renderer->removeMesh("reference");

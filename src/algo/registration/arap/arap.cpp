@@ -116,23 +116,22 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 	for (auto & v : mesh.vertices())
 	{
 		vertex_used[v] = false;
-		bool valid_no_border_vertex = !mesh.is_border(v, true);
 
-		if (valid_no_border_vertex) {
-			auto vertex = _deformation_graph.deformNode(v);
-			auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
+		//if (!mesh.is_border(v, true)) {
+		auto vertex = _deformation_graph.deformNode(v);
+		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
 
-			if (correspondent_point.first && valid_no_border_vertex) {		
-				vertex_descriptor target_vertex = correspondent_point.second;
-				auto target_point = _find_correspondence_point->getPoint(target_vertex);
-				auto target_normal = _find_correspondence_point->getNormal(target_vertex);
-				residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_point));
-				residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal.vector()));
+		if (correspondent_point.first) {		
+			vertex_descriptor target_vertex = correspondent_point.second;
+			auto target_point = _find_correspondence_point->getPoint(target_vertex);
+			auto target_normal = _find_correspondence_point->getNormal(target_vertex);
+			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_point));
+			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal.vector()));
 
-				i++;
-				vertex_used[v] = true;
-			}
+			i++;
+			vertex_used[v] = true;
 		}
+		//}
 	}
 	
 	std::cout << "used nodes " << i << " / " << mesh.number_of_vertices() << " ";
