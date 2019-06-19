@@ -21,7 +21,7 @@ std::string ShowMesh::getImageFolderName(RegistrationType type)
 	std::stringstream ss;
 	ss << std::put_time(std::localtime(&in_time_t), "%d-%m-%Y_%H-%M");
 	std::string folder_name = "registration_";
-	if (type == RegistrationType::ASAP) {
+	if (type == RegistrationType::ARAP) {
 		folder_name = "ASAP_";
 	}
 	else if (type == RegistrationType::ED) {
@@ -30,8 +30,11 @@ std::string ShowMesh::getImageFolderName(RegistrationType type)
 	else if (type == RegistrationType::Rigid) {
 		folder_name = "Rigid_";
 	}
-	else if (type == RegistrationType::AllFrames) {
-		folder_name = "AllFrames_ASAP_";
+	else if (type == RegistrationType::ARAP_AllFrames) {
+		folder_name = "ARAP_AllFrames";
+	}
+	else if (type == RegistrationType::ED_AllFrames) {
+		folder_name = "ED_AllFrames_";
 	}
 	return "images/" + folder_name + ss.str();
 }
@@ -73,7 +76,8 @@ void ShowMesh::solveAllNonRigidRegistration()
 		for (int i = 0; i < _input_mesh->frame(); ++i) {
 			meshes.push_back(_input_mesh->getMesh(i));
 		}
-		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, RegistrationType::ASAP, _logger, _number_of_nodes);
+		RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
+		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, type, _logger, _number_of_nodes);
 		_save_images_folder = getImageFolderName(_registration_type);
 	}
 	else {
@@ -87,32 +91,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 }
 
 void ShowMesh::renderError()
-{
-	if (_registration)
-	{
-		//auto residuals = _registration->residuals();
-		//
-		////if (gradient.fit_point_to_point_gradient.size() == gradient.point.size()) {
-		//for(auto & m : residuals) {
-		//	
-		//	//std::vector<ml::vec3f> point_to_plane;
-		//	std::vector<ml::vec3f> point_to_point;
-		//	//std::vector<ml::vec3f> smooth;
-		//	//std::vector<ml::vec3f> all;
-		//
-		//	for (int i = 0; i < m.second.size(); ++i)
-		//	{
-		//		//point_to_plane.emplace_back(ml::vec3f(gradient.point[i] + gradient.fit_point_to_plane_gradient[i].translation));
-		//		point_to_point.emplace_back(ml::vec3f(m.second..point[i] + gradient.fit_point_to_point_gradient[i].translation));
-		//		//smooth.emplace_back(ml::vec3f(gradient.point[i] + gradient.smooth_gradient[i].translation));
-		//		//all.emplace_back(ml::vec3f(gradient.point[i] + gradient.all[i].translation * 1000.));
-		//	}
-		//	//_point_renderer->insertLine("gradient", gradient.point, point_to_plane, ml::RGBColor::Red);
-		//	_point_renderer->insertLine("gradient_point", gradient.point, point_to_point, ml::RGBColor::Orange);
-		//	//_point_renderer->insertLine("gradient_smooth", gradient.point, smooth, ml::RGBColor::Yellow);
-		//	//_point_renderer->insertLine("gradient", gradient.point, all, ml::RGBColor::Orange);
-		//}
-	}
+{	
 	if (_registration && _calculate_error) {
 		if (!_error_evaluation) {
 			_error_evaluation = std::make_unique<ErrorEvaluation>(_reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
@@ -162,7 +141,7 @@ void ShowMesh::renderRegistration()
 void ShowMesh::render(ml::Cameraf& camera)
 {
 	_renderer->render(camera);
-	if (_solve_registration && _register_sequence_of_frames && _registration_type == RegistrationType::AllFrames) {
+	if (_solve_registration && _register_sequence_of_frames) {
 		solveAllNonRigidRegistration();
 	}
 	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
@@ -218,11 +197,11 @@ void ShowMesh::key(UINT key)
 				}
 				else if (key == KEY_N) {
 					std::cout << "init as rigid as possible non rigid registration between the two selected frames" << std::endl;
-					_registration_type = RegistrationType::ASAP;
+					_registration_type = RegistrationType::ARAP;
 				}
 				else if (key == KEY_M) {
 					std::cout << "init as rigid as possible non rigid registration without icpbetween the two selected frames" << std::endl;
-					_registration_type = RegistrationType::ASAP_WithoutICP;
+					_registration_type = RegistrationType::ARAP_WithoutICP;
 				}
 				nonRigidRegistration();
 			}
@@ -233,11 +212,21 @@ void ShowMesh::key(UINT key)
 	}
 	else if (key == KEY_U)
 	{
-		std::cout << "register all frames " << std::endl;
+		std::cout << "register all frames as rigid as possible " << std::endl;
 		if (!_register_sequence_of_frames) {
 			_current_frame = 0;
-			_registration_type = RegistrationType::AllFrames;
+			_registration_type = RegistrationType::ARAP_AllFrames;
 			solveAllNonRigidRegistration();			
+			_solve_registration = true;
+		}
+	}
+	else if (key == KEY_P)
+	{
+		std::cout << "register all frames embdedded deformation " << std::endl;
+		if (!_register_sequence_of_frames) {
+			_current_frame = 0;
+			_registration_type = RegistrationType::ED_AllFrames;
+			solveAllNonRigidRegistration();
 			_solve_registration = true;
 		}
 	}
@@ -250,7 +239,7 @@ void ShowMesh::key(UINT key)
 			_selected_frame_for_registration.push_back(1);
 
 			//_registration_type = RegistrationType::ED_WithoutICP;
-			_registration_type = RegistrationType::ASAP_WithoutICP;
+			_registration_type = RegistrationType::ARAP_WithoutICP;
 			nonRigidRegistration();
 			_solve_registration = true;
 		}
@@ -299,7 +288,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_number_of_nodes = 5000;
 	_current_frame = 0;
 	_solve_registration = false;
-	_registration_type = RegistrationType::ASAP;
+	_registration_type = RegistrationType::ARAP;
 	_calculate_error = false;
 	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
 
@@ -309,7 +298,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = true;
+	bool test = false;
 	if (!test) {
 		// puppet
 		//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
@@ -354,19 +343,20 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 
 	std::cout << "controls:" << std::endl;
-	std::cout << "    show / hide deformation graph:             KEY_G" << std::endl;
-	std::cout << "    show / hide mesh:                          KEY_H" << std::endl;
-	std::cout << "    show / hide reference mesh:                KEY_J" << std::endl;
-	std::cout << "    show / hide error to reference mesh:       KEY_K" << std::endl;
-	std::cout << "    enable / disable error evalutation:        KEY_L" << std::endl;
-	std::cout << "    show next frame:                           KEY_2" << std::endl;
-	std::cout << "    show previous frame:                       KEY_1" << std::endl;
-	std::cout << "    select frame for registration:             KEY_I" << std::endl;
-	std::cout << "    rigid registration:                        KEY_O" << std::endl;
-	std::cout << "    non rigid registration (ed):               KEY_V" << std::endl;
-	std::cout << "    non rigid registration (ed without icp):   KEY_B" << std::endl;
-	std::cout << "    non rigid registration (arap):             KEY_N" << std::endl;
-	std::cout << "    non rigid registration (arap without icp): KEY_M" << std::endl;
-	std::cout << "    non rigid registration for all frames:     KEY_U" << std::endl;
+	std::cout << "    show / hide deformation graph:                 KEY_G" << std::endl;
+	std::cout << "    show / hide mesh:                              KEY_H" << std::endl;
+	std::cout << "    show / hide reference mesh:                    KEY_J" << std::endl;
+	std::cout << "    show / hide error to reference mesh:           KEY_K" << std::endl;
+	std::cout << "    enable / disable error evalutation:            KEY_L" << std::endl;
+	std::cout << "    show next frame:                               KEY_2" << std::endl;
+	std::cout << "    show previous frame:                           KEY_1" << std::endl;
+	std::cout << "    select frame for registration:                 KEY_I" << std::endl;
+	std::cout << "    rigid registration:                            KEY_O" << std::endl;
+	std::cout << "    non rigid registration (ed):                   KEY_V" << std::endl;
+	std::cout << "    non rigid registration (ed without icp):       KEY_B" << std::endl;
+	std::cout << "    non rigid registration (arap):                 KEY_N" << std::endl;
+	std::cout << "    non rigid registration (arap without icp):     KEY_M" << std::endl;
+	std::cout << "    non rigid registration for all frames (arap):  KEY_U" << std::endl;
+	std::cout << "    non rigid registration for all frames (ed):    KEY_P" << std::endl;
 
 }

@@ -19,9 +19,9 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 		return std::make_unique<ED::EmbeddedDeformation>(source, target, options, number_of_deformation_graph_nodes, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ED_WithoutICP)
 		return std::make_unique<ED::EmbeddedDeformation>(source, target, fixed_positions, options, evaluate_residuals, logger);
-	else if (registration_type == RegistrationType::ASAP)
+	else if (registration_type == RegistrationType::ARAP)
 		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, options, number_of_deformation_graph_nodes, evaluate_residuals, logger);
-	else if (registration_type == RegistrationType::ASAP_WithoutICP)
+	else if (registration_type == RegistrationType::ARAP_WithoutICP)
 		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, fixed_positions, options, evaluate_residuals, logger);
 	else
 		return std::make_unique<RigidRegistration>(source, target, options, logger);
@@ -38,7 +38,7 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 {
 	if (registration_type == RegistrationType::ED)
 		return std::make_unique<ED::EmbeddedDeformation>(source, target, deformation_graph, options, evaluate_residuals, logger);
-	else if (registration_type == RegistrationType::ASAP)
+	else if (registration_type == RegistrationType::ARAP)
 		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, deformation_graph, options, evaluate_residuals, logger);
 	//else if (registration_type == RegistrationType::Rigid)
 	//	return std::make_unique<RigidRegistration>(source, target, options, logger);
@@ -86,9 +86,9 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 //	//	_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, option, _number_of_deformation_graph_nodes, _logger);
 //	//else if (_registration_type == RegistrationType::ED_WithoutICP)
 //	//	_registration = std::make_unique<ED::EmbeddedDeformation>(source, target, mesh_reader->getFixedPositions(target_frame), option, _logger);
-//	//else if (_registration_type == RegistrationType::ASAP)
+//	//else if (_registration_type == RegistrationType::ARAP)
 //	//	_registration = std::make_unique<AsRigidAsPossible>(source, target, option, _number_of_deformation_graph_nodes, _logger);
-//	//else if (_registration_type == RegistrationType::ASAP_WithoutICP)
+//	//else if (_registration_type == RegistrationType::ARAP_WithoutICP)
 //	//	_registration = std::make_unique<AsRigidAsPossible>(source, target, mesh_reader->getFixedPositions(target_frame), option, _logger);
 //	//else
 //	//	_registration = std::make_unique<RigidRegistration>(source, target, option, _logger);

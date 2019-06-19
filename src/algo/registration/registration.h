@@ -12,12 +12,13 @@ typedef ml::TriMeshf Mesh;
 
 enum class RegistrationType
 {
-	ASAP,
-	ASAP_WithoutICP,
+	ARAP,
+	ARAP_WithoutICP,
 	ED,
 	ED_WithoutICP,
 	Rigid,
-	AllFrames
+	ARAP_AllFrames,
+	ED_AllFrames
 };
 
 std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
