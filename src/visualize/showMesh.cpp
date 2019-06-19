@@ -9,7 +9,6 @@
 #include "algo/registration/embedded_deformation/ed.h"
 #include "algo/registration/arap/arap.h"
 
-//#include "algo/mesh_simplification/mesh_simplification.h"
 #include "algo/surface_mesh/mesh_convertion.h"
 
 #include <chrono>  // chrono::system_clock
@@ -55,14 +54,14 @@ void ShowMesh::nonRigidRegistration()
 	else {
 		if (!_registration->solveIteration()) {
 			renderRegistration();
-			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_registration->currentIteration()));
 		}
 		else {
-			//_mesh_renderer->saveCurrentWindowAsImage();
+			renderRegistration();
 			_selected_frame_for_registration.clear();
 			_solve_registration = false;
 			std::cout << std::endl << "finished, select next two frames" << std::endl;
 		}
+		_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_registration->currentIteration()));
 	}
 }
 
@@ -75,21 +74,16 @@ void ShowMesh::solveAllNonRigidRegistration()
 			meshes.push_back(_input_mesh->getMesh(i));
 		}
 		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, RegistrationType::ASAP, _logger, _number_of_nodes);
-
 		_save_images_folder = getImageFolderName(_registration_type);
-		renderRegistration();
 	}
 	else {
-		if (_register_sequence_of_frames->solve()) {
-			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_register_sequence_of_frames->getCurrent()));
-			renderRegistration();
-		}
-		else {
+		if (!_register_sequence_of_frames->solve()) {
 			std::cout << std::endl << "finished registration" << std::endl;
-			renderRegistration();
 			_solve_registration = false;
 		}
+		_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_register_sequence_of_frames->getCurrent()));
 	}
+	renderRegistration();
 }
 
 void ShowMesh::renderError()
@@ -168,7 +162,8 @@ void ShowMesh::renderCurrentMesh()
 	_renderer->renderCurrentFrame(_input_mesh, _current_frame, render_current_frame);
 
 	// selected frames
-	_renderer->renderSelectedFrames(_input_mesh, _selected_frame_for_registration);
+	auto selected_frames = render_current_frame ? _selected_frame_for_registration : std::vector<unsigned int>();
+	_renderer->renderSelectedFrames(_input_mesh, selected_frames);	
 
 	// reference
 	_renderer->renderReference(_reference_registration_mesh, _current_frame);
@@ -185,15 +180,13 @@ void ShowMesh::renderRegistration()
 void ShowMesh::render(ml::Cameraf& camera)
 {
 	_renderer->render(camera);
-
 	if (_solve_registration && _register_sequence_of_frames && _registration_type == RegistrationType::AllFrames) {
-		_renderer->renderRegistrationSequence(_register_sequence_of_frames);
 		solveAllNonRigidRegistration();
 	}
 	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
-		_renderer->renderRegistration(_registration);
 		nonRigidRegistration();
 	}
+	renderRegistration();
 }
 
 
