@@ -74,9 +74,12 @@ SequenceRegistration::SequenceRegistration()
 {
 }
 
-SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & meshes, RegistrationType registration_type, std::shared_ptr<FileWriter> logger, unsigned int number_of_deformation_nodes)
+SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & meshes, 
+										   RegistrationType registration_type, 
+										   std::shared_ptr<FileWriter> logger, 
+										   double deformation_graph_edge_length)
 	: _meshes(meshes)
-	, _number_of_deformation_nodes(number_of_deformation_nodes)
+	, _deformation_graph_edge_length(deformation_graph_edge_length)
 	, _current(1)
 	, _logger(logger)
 	, _registration_type(registration_type)
@@ -85,11 +88,11 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 	_deformation_graphs.resize(_meshes.size());
 	_deformed_meshes.resize(_meshes.size());
 
-	auto reduced_mesh = createReducedMesh(_meshes[0], _number_of_deformation_nodes);
+	auto reduced_mesh = createReducedMesh(_meshes[0], deformation_graph_edge_length);
 
 	auto & source = _meshes[0];
 	auto & target = _meshes[_current];
-	_registration = createRegistration(source, target, _registration_type, ceresOption(), _evaluate_residuals, _logger, _number_of_deformation_nodes);
+	_registration = createRegistration(source, target, _registration_type, ceresOption(), _evaluate_residuals, _logger, _deformation_graph_edge_length);
 	_deformation_graphs[0] = _registration->getDeformationGraph();
 	_deformed_meshes[0] = _meshes[0];
 }

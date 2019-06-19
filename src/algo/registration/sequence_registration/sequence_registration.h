@@ -16,7 +16,7 @@ private:
 	std::vector<SurfaceMesh> _deformed_meshes;
 	std::vector<DG::DeformationGraph> _deformation_graphs;
 	size_t _current;
-	unsigned int _number_of_deformation_nodes;
+	double _deformation_graph_edge_length;
 	std::unique_ptr<IRegistration> _registration;
 	bool _evaluate_residuals;
 	std::shared_ptr<FileWriter> _logger;
@@ -32,6 +32,6 @@ public:
 	SequenceRegistration(const std::vector<SurfaceMesh> & meshes,
 						 RegistrationType registration_type, 
 						 std::shared_ptr<FileWriter> logger, 
-						 unsigned int number_of_deformation_nodes = 1000);
+						 double deformation_graph_edge_length = 0.05);
 };
 

@@ -19,10 +19,10 @@
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/Polyhedron_3.h>
 
-Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices)
+Mesh createReducedMesh(const Mesh & mesh, double target_edge_length)
 {
 	auto surface_mesh = convertToCGALMesh(mesh);
-	surface_mesh = createReducedMesh(surface_mesh, number_of_vertices);
+	surface_mesh = createReducedMesh(surface_mesh, target_edge_length);
 	return convertToTriMesh(surface_mesh);
 }
 
@@ -41,7 +41,7 @@ struct halfedge2edge
 };
 
 
-SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, int number_of_vertices)
+SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_length)
 {
 	SurfaceMesh surface_mesh = mesh;
 
@@ -49,7 +49,6 @@ SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, int number_of_vertices)
 	//int r = CGAL::Surface_mesh_simplification::edge_collapse(surface_mesh, stop);
 
 	try {
-		double target_edge_length = 0.05;
 		std::vector<edge_descriptor> border;
 		CGAL::Polygon_mesh_processing::border_halfedges(faces(surface_mesh), surface_mesh, boost::make_function_output_iterator(halfedge2edge(surface_mesh, border)));
 		CGAL::Polygon_mesh_processing::split_long_edges(border, target_edge_length, surface_mesh);

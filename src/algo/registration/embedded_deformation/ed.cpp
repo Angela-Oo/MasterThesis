@@ -333,7 +333,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 										 const SurfaceMesh& dst,
 										 ceres::Solver::Options option,
-										 unsigned int number_of_deformation_nodes,
+										 double deformation_graph_edge_length,
 										 bool evaluate_residuals,
 										 std::shared_ptr<FileWriter> logger)
 	: _src(src)
@@ -345,8 +345,8 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 {
 	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
-	auto reduced_mesh = createReducedMesh(src, number_of_deformation_nodes);
-	std::cout << "number of def nodes " << number_of_deformation_nodes << " true number " << reduced_mesh.num_vertices() << std::endl;
+	auto reduced_mesh = createReducedMesh(src, deformation_graph_edge_length);
+	std::cout << "number of nodes " << reduced_mesh.num_vertices() << std::endl;
 	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();

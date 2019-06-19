@@ -49,7 +49,7 @@ void ShowMesh::nonRigidRegistration()
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
 		bool evaluate_residuals = false;
-		_registration = createRegistration(source, target, _registration_type, option, evaluate_residuals, _logger, _number_of_nodes, _input_mesh->getFixedPositions(frame_b));
+		_registration = createRegistration(source, target, _registration_type, option, evaluate_residuals, _logger, _deformation_graph_edge_length, _input_mesh->getFixedPositions(frame_b));
 
 		_save_images_folder = getImageFolderName(_registration_type);
 		renderRegistration();
@@ -77,7 +77,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 			meshes.push_back(_input_mesh->getMesh(i));
 		}
 		RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
-		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, type, _logger, _number_of_nodes);
+		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, type, _logger, _deformation_graph_edge_length);
 		_save_images_folder = getImageFolderName(_registration_type);
 	}
 	else {
@@ -285,7 +285,7 @@ void ShowMesh::key(UINT key)
 void ShowMesh::init(ml::ApplicationData &app)
 {
 	//_number_of_nodes = 1500;
-	_number_of_nodes = 5000;
+	_deformation_graph_edge_length = 0.05;
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ARAP;

@@ -39,6 +39,6 @@ private:
 
 typedef ml::TriMeshf Mesh;
 
-Mesh createReducedMesh(const Mesh & mesh, int number_of_vertices);
+Mesh createReducedMesh(const Mesh & mesh, double target_edge_length = 0.05);
 
-SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, int number_of_vertices);
+SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_length = 0.05);

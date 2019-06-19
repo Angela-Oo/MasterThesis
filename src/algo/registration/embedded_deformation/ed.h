@@ -91,7 +91,7 @@ public:
 	EmbeddedDeformation(const SurfaceMesh& src,
 						const SurfaceMesh& dst,
 						ceres::Solver::Options option,
-						unsigned int number_of_deformation_nodes = 1000,
+						double deformation_graph_edge_length = 0.05,
 						bool evaluate_residuals = false,
 						std::shared_ptr<FileWriter> logger = nullptr);
 	// with icp but init with passed deformation graph
