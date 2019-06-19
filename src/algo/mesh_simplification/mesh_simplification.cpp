@@ -48,14 +48,19 @@ SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, int number_of_vertices)
 	//CGAL::Surface_mesh_simplification::Count_stop_predicate<SurfaceMesh> stop(number_of_vertices);
 	//int r = CGAL::Surface_mesh_simplification::edge_collapse(surface_mesh, stop);
 
-	double target_edge_length = 0.05;
-	std::vector<edge_descriptor> border;
-	CGAL::Polygon_mesh_processing::border_halfedges(faces(surface_mesh), surface_mesh, boost::make_function_output_iterator(halfedge2edge(surface_mesh, border)));
-	CGAL::Polygon_mesh_processing::split_long_edges(border, target_edge_length, surface_mesh);
+	try {
+		double target_edge_length = 0.05;
+		std::vector<edge_descriptor> border;
+		CGAL::Polygon_mesh_processing::border_halfedges(faces(surface_mesh), surface_mesh, boost::make_function_output_iterator(halfedge2edge(surface_mesh, border)));
+		CGAL::Polygon_mesh_processing::split_long_edges(border, target_edge_length, surface_mesh);
 
-	CGAL::Polygon_mesh_processing::isotropic_remeshing(faces(surface_mesh),
-													   target_edge_length,
-													   surface_mesh,
-													   CGAL::Polygon_mesh_processing::parameters::number_of_iterations(10));// .protect_constraints(true));
+		CGAL::Polygon_mesh_processing::isotropic_remeshing(faces(surface_mesh),
+														   target_edge_length,
+														   surface_mesh,
+														   CGAL::Polygon_mesh_processing::parameters::number_of_iterations(10));// .protect_constraints(true));
+	}
+	catch (...) {
+		return mesh;
+	}
 	return surface_mesh;
 }
