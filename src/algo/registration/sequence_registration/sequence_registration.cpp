@@ -66,7 +66,7 @@ SurfaceMesh SequenceRegistration::getDeformationGraphMesh(int frame)
 	//auto inverse_deformation = inverteDeformationGraph(_deformation_graphs[frame]);
 	//return inverse_deformation.getDeformationGraphEdges();	
 
-	return deformationGraphToSurfaceMesh(_deformation_graphs[frame]);
+	return deformationGraphToSurfaceMesh(_deformation_graphs[frame], _evaluate_residuals);
 }
 
 SequenceRegistration::SequenceRegistration()

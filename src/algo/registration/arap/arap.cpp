@@ -40,7 +40,7 @@ const DG::DeformationGraph & AsRigidAsPossible::getDeformationGraph()
 
 SurfaceMesh AsRigidAsPossible::getDeformationGraphMesh()
 {
-	return deformationGraphToSurfaceMesh(_deformation_graph);
+	return deformationGraphToSurfaceMesh(_deformation_graph, _evaluate_residuals);
 }
 
 std::vector<Point> AsRigidAsPossible::getFixedPostions()

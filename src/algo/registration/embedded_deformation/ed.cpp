@@ -46,7 +46,7 @@ const DG::DeformationGraph & EmbeddedDeformation::getDeformationGraph()
 
 SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
 {
-	return deformationGraphToSurfaceMesh(_deformation_graph);
+	return deformationGraphToSurfaceMesh(_deformation_graph, _evaluate_residuals);
 }
 
 ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point)
@@ -208,7 +208,8 @@ bool EmbeddedDeformation::solveIteration()
 
 		ceres::Solve(_options, &problem, &summary);
 
-		evaluateResidual(problem, fit_residual_ids, smooth_residual_ids, rotation_residual_ids, conf_residual_ids);
+		if(_evaluate_residuals)
+			evaluateResidual(problem, fit_residual_ids, smooth_residual_ids, rotation_residual_ids, conf_residual_ids);
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
@@ -309,12 +310,14 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 										 const SurfaceMesh& dst,
 										 std::vector<vertex_descriptor> fixed_positions,
 										 ceres::Solver::Options option,
+										 bool evaluate_residuals,
 										 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
 	, _fixed_positions(fixed_positions)
+	, _evaluate_residuals(evaluate_residuals)
 	, _logger(logger)
 	, _with_icp(false)
 {
@@ -332,10 +335,12 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 										 const SurfaceMesh& dst,
 										 ceres::Solver::Options option,
 										 unsigned int number_of_deformation_nodes,
+										 bool evaluate_residuals,
 										 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
+	, _evaluate_residuals(evaluate_residuals)
 	, _logger(logger)
 	, _with_icp(true)
 {
@@ -352,11 +357,13 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 										 const SurfaceMesh& dst,
 										 const DG::DeformationGraph & deformation_graph,
 										 ceres::Solver::Options option,
+										 bool evaluate_residuals,
 										 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
+	, _evaluate_residuals(evaluate_residuals)
 	, _logger(logger)
 	, _with_icp(true)
 {

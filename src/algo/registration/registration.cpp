@@ -16,9 +16,9 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 												  std::vector<vertex_descriptor> fixed_positions)
 {
 	if (registration_type == RegistrationType::ED)
-		return std::make_unique<ED::EmbeddedDeformation>(source, target, options, number_of_deformation_graph_nodes, logger);
+		return std::make_unique<ED::EmbeddedDeformation>(source, target, options, number_of_deformation_graph_nodes, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ED_WithoutICP)
-		return std::make_unique<ED::EmbeddedDeformation>(source, target, fixed_positions, options, logger);
+		return std::make_unique<ED::EmbeddedDeformation>(source, target, fixed_positions, options, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ASAP)
 		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, options, number_of_deformation_graph_nodes, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ASAP_WithoutICP)
@@ -37,7 +37,7 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 												  std::shared_ptr<FileWriter> logger)
 {
 	if (registration_type == RegistrationType::ED)
-		return std::make_unique<ED::EmbeddedDeformation>(source, target, deformation_graph, options, logger);
+		return std::make_unique<ED::EmbeddedDeformation>(source, target, deformation_graph, options, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ASAP)
 		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, deformation_graph, options, evaluate_residuals, logger);
 	//else if (registration_type == RegistrationType::Rigid)

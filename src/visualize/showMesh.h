@@ -32,13 +32,12 @@ private:
 	std::shared_ptr<SequenceRegistration> _register_sequence_of_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;
 private:
-	//void renderRegistrationTwoFrames();
-	//void renderRegistrationAllFrames();
 	void renderCurrentMesh();
 	void renderError();
+	std::string getImageFolderName(RegistrationType type);
 private:
 	void renderRegistration();
-	void nonRigidRegistration();
+	void nonRigidRegistration();	
 	void solveAllNonRigidRegistration();
 public:
 	void init(ml::ApplicationData &app) override;

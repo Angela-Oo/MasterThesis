@@ -10,7 +10,7 @@ double getMeanFitCost(const SurfaceMesh & mesh);
 
 void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost);
 
-SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph);
+SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost);
 
 class DeformedMesh
 {

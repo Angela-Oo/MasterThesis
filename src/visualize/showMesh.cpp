@@ -16,6 +16,28 @@
 #include <ctime>   // localtime
 #include <iomanip> // put_time
 
+std::string ShowMesh::getImageFolderName(RegistrationType type)
+{
+	auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+	std::stringstream ss;
+	ss << std::put_time(std::localtime(&in_time_t), "%d-%m-%Y_%H-%M");
+	std::string folder_name = "registration_";
+	if (type == RegistrationType::ASAP) {
+		folder_name = "ASAP_";
+	}
+	else if (type == RegistrationType::ED) {
+		folder_name = "ED_";
+	}
+	else if (type == RegistrationType::Rigid) {
+		folder_name = "Rigid_";
+	}
+	else if (type == RegistrationType::AllFrames) {
+		folder_name = "AllFrames_ASAP_";
+	}
+	return "images/" + folder_name + ss.str();
+}
+
+
 void ShowMesh::nonRigidRegistration()
 {
 	if (!_registration && _selected_frame_for_registration.size() == 2) {
@@ -27,27 +49,12 @@ void ShowMesh::nonRigidRegistration()
 		bool evaluate_residuals = false;
 		_registration = createRegistration(source, target, _registration_type, option, evaluate_residuals, _logger, _number_of_nodes, _input_mesh->getFixedPositions(frame_b));
 
-		auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-		std::stringstream ss;
-		ss << std::put_time(std::localtime(&in_time_t), "%d-%m-%Y_%H-%M");
-		std::string folder_name = "registration_";
-		if (_registration_type == RegistrationType::ASAP) {
-			folder_name = "ASAP_";
-		}
-		else if (_registration_type == RegistrationType::ED) {
-			folder_name = "ED_";
-		}
-		else if (_registration_type == RegistrationType::Rigid) {
-			folder_name = "Rigid_";
-		}
-		_save_images_folder = "images/" + folder_name + ss.str();
-
+		_save_images_folder = getImageFolderName(_registration_type);
 		renderRegistration();
 	}
 	else {
 		if (!_registration->solveIteration()) {
 			renderRegistration();
-
 			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_registration->currentIteration()));
 		}
 		else {
@@ -59,6 +66,7 @@ void ShowMesh::nonRigidRegistration()
 	}
 }
 
+
 void ShowMesh::solveAllNonRigidRegistration()
 {	
 	if (!_register_sequence_of_frames) {
@@ -67,10 +75,13 @@ void ShowMesh::solveAllNonRigidRegistration()
 			meshes.push_back(_input_mesh->getMesh(i));
 		}
 		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, RegistrationType::ASAP, _logger, _number_of_nodes);
+
+		_save_images_folder = getImageFolderName(_registration_type);
 		renderRegistration();
 	}
 	else {
 		if (_register_sequence_of_frames->solve()) {
+			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_register_sequence_of_frames->getCurrent()));
 			renderRegistration();
 		}
 		else {
@@ -177,7 +188,7 @@ void ShowMesh::render(ml::Cameraf& camera)
 
 	if (_solve_registration && _register_sequence_of_frames && _registration_type == RegistrationType::AllFrames) {
 		_renderer->renderRegistrationSequence(_register_sequence_of_frames);
-		//solveAllNonRigidRegistration();
+		solveAllNonRigidRegistration();
 	}
 	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
 		_renderer->renderRegistration(_registration);

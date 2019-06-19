@@ -94,7 +94,7 @@ void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
 }
 
 
-SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph)
+SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost)
 {
 	SurfaceMesh mesh = deformation_graph._mesh;
 	auto normals = mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
@@ -105,7 +105,10 @@ SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_g
 	}
 
 	// color
-	auto reference_cost = getReferenceCost(mesh);
+	double reference_cost = 0.;
+	if (color_based_on_cost) {
+		reference_cost = getReferenceCost(mesh);		
+	}
 	setVertexColorBasedOnFitCost(mesh, reference_cost);
 	//auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
 	//auto colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;

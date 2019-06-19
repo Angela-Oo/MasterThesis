@@ -36,6 +36,7 @@ private:
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 100;
 	long long _total_time_in_ms = 0;
+	bool _evaluate_residuals;
 public:
 	double a_rigid;
 	double a_smooth;
@@ -84,18 +85,21 @@ public:
 						const SurfaceMesh& dst,
 						std::vector<vertex_descriptor> fixed_positions,
 						ceres::Solver::Options option,
+						bool evaluate_residuals,
 						std::shared_ptr<FileWriter> logger);
 	// with icp
 	EmbeddedDeformation(const SurfaceMesh& src,
 						const SurfaceMesh& dst,
 						ceres::Solver::Options option,
 						unsigned int number_of_deformation_nodes = 1000,
+						bool evaluate_residuals = false,
 						std::shared_ptr<FileWriter> logger = nullptr);
 	// with icp but init with passed deformation graph
 	EmbeddedDeformation(const SurfaceMesh& src,
 						const SurfaceMesh& dst,
 						const DG::DeformationGraph & deformation_graph,
 						ceres::Solver::Options option,
+						bool evaluate_residuals = false,
 						std::shared_ptr<FileWriter> logger = nullptr);
 
 };
