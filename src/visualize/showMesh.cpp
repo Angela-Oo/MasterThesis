@@ -114,15 +114,15 @@ void ShowMesh::renderError()
 		//}
 	}
 	if (_registration && _calculate_error) {
-		/*if (!_error_evaluation) {
+		if (!_error_evaluation) {
 			_error_evaluation = std::make_unique<ErrorEvaluation>(_reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
 		}
 
 		auto registered_points_a = _registration->getDeformedPoints();
 		auto nearest_reference_points = _error_evaluation->evaluate_error(registered_points_a);
 
-		auto distance_errors = evaluate_distance_error(registered_points_a, nearest_reference_points);
-		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
+		auto distance_errors = evaluate_distance_error(nearest_reference_points);
+		/*float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
 		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
 
 		std::stringstream ss;
@@ -130,27 +130,9 @@ void ShowMesh::renderError()
 		std::cout << ss.str();
 		if(_logger)
 			_logger->write(ss.str());
-
-		if (_render_error) {
-			std::vector<Edge> edges;
-			for (int i = 0; i < nearest_reference_points.size(); ++i) {
-				Edge e;
-				e.source_point = registered_points_a.m_vertices[i].position;
-				e.target_point = nearest_reference_points[i];
-				auto max_cost = distance_errors[distance_errors.size() / 2] * 10.;
-				e.cost = std::min(max_cost, dist(e.source_point, e.target_point));
-				e.cost /= max_cost;
-				edges.push_back(e);
-			}				
-			_point_renderer->insertLine("error", edges, 0.0005);
-		}
-		else {
-			_point_renderer->removePoints("error");
-		}*/
+		*/
+		_renderer->renderError(nearest_reference_points);
 	}
-	//else {
-	//	_point_renderer->removePoints("error");
-	//}
 }
 
 
@@ -297,8 +279,8 @@ void ShowMesh::key(UINT key)
 	}
 	else if (key == KEY_K)
 	{
-		_render_error = !_render_error;
-		std::string visible = (_render_error) ? "show" : "hide";
+		_renderer->_render_error = !_renderer->_render_error;
+		std::string visible = (_renderer->_render_error) ? "show" : "hide";
 		std::cout << visible << " error to reference mesh" << std::endl;
 		renderRegistration();
 	}
@@ -318,7 +300,6 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ASAP;
-	_render_error = false;
 	_calculate_error = false;
 	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
 
@@ -328,7 +309,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = false;
+	bool test = true;
 	if (!test) {
 		// puppet
 		//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);

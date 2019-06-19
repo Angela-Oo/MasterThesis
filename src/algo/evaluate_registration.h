@@ -1,23 +1,22 @@
 #pragma once
 
-#include "../mLibInclude.h"
-#include "mLibFLANN.h"
-#include "ext-openmesh/triMesh.h"
-#include "mesh_knn.h"
+#include "mLibInclude.h"
+#include "algo/surface_mesh/mesh_definition.h"
+#include "algo/surface_mesh/nearest_neighbor_search.h"
 
-typedef ml::TriMeshf Mesh;
-std::vector<ml::vec3f> evaluate_error(const Mesh & result, const Mesh & reference_mesh);
-
-std::vector<float> evaluate_distance_error(const Mesh& points_a, const std::vector<ml::vec3f>& points_b);
+std::vector<float> evaluate_distance_error(std::vector<std::pair<Point, Point>> nearest_points);
 
 
 class ErrorEvaluation
 {
-	Mesh _reference_mesh;
-	ml::OpenMeshTriMesh::Mesh _reference_open_mesh;
-	std::unique_ptr<OpenMeshKNN> _knn;
+	SurfaceMesh _reference_mesh;
+	std::unique_ptr<NearestNeighborSearch> _nn_search;
+	SurfaceMesh::Property_map<face_descriptor, Vector> _fnormal;
+private:
+	Point barycentricCoordinates(Point point_a, Point point_b, Point point_c, Point point_on_triangle);
+	Point getNearestPointOnSurface(SurfaceMesh::Point & point);
 public:
-	std::vector<ml::vec3f> evaluate_error(const Mesh & mesh);
+	std::vector<std::pair<Point, Point>> evaluate_error(const SurfaceMesh & mesh);
 public:
-	ErrorEvaluation(const Mesh & reference_mesh);
+	ErrorEvaluation(const SurfaceMesh & reference_mesh);
 };

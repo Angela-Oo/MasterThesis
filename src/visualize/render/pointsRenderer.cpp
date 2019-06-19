@@ -181,16 +181,16 @@ void PointsRenderer::insertPoints(std::string id, std::vector<ml::vec3f> points,
 //	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 //}
 //
-//void PointsRenderer::insertLine(std::string id, std::vector<Edge> edges, float point_size)
-//{
-//	std::vector<TriMeshf> meshes;
-//	for (auto & e : edges) {
-//		auto cost = e.cost;
-//		auto color = errorToRGB(cost);
-//		meshes.push_back(ml::Shapesf::line(e.source_point, e.target_point, color, point_size));
-//	}
-//	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
-//}
+void PointsRenderer::insertLine(std::string id, std::vector<Edge> edges, float point_size)
+{
+	std::vector<TriMeshf> meshes;
+	for (auto & e : edges) {
+		auto cost = e.cost;
+		auto color = errorToRGB(cost);
+		meshes.push_back(ml::Shapesf::line(e.source_point, e.target_point, color, point_size));
+	}
+	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
+}
 
 void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, float point_size, bool draw_normals)
 {

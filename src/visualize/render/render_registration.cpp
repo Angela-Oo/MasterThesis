@@ -1,5 +1,7 @@
 #include "render_registration.h"
 
+#include "algo/evaluate_registration.h"
+
 void RenderRegistration::render(ml::Cameraf& camera)
 {
 	_mesh_renderer->render(camera);
@@ -45,7 +47,7 @@ void RenderRegistration::renderSelectedFrames(std::shared_ptr<IMeshReader> mesh_
 		// render mesh if selected
 	if (!selected_frames.empty())
 	{
-		_mesh_renderer->insertMesh("selected_mesh_a", mesh_reader->getMesh(selected_frames[0]), ml::RGBColor::Cyan.toVec4f(), false);
+		_mesh_renderer->insertMesh("selected_mesh_a", mesh_reader->getMesh(selected_frames[0]), ml::RGBColor::Cyan.toVec4f());
 		if (selected_frames.size() >= 2)
 		{
 			_mesh_renderer->insertMesh("selected_mesh_b", mesh_reader->getMesh(selected_frames[1]), ml::RGBColor::Green.toVec4f(), false);
@@ -152,6 +154,30 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 	}
 }
 
+
+void RenderRegistration::renderError(std::vector<std::pair<Point, Point>> error_points)
+{
+	if (_render_error) {
+		auto distance_errors = evaluate_distance_error(error_points);
+		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
+		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
+
+		std::vector<Edge> edges;
+		for (int i = 0; i < error_points.size(); ++i) {
+			Edge e;
+			e.source_point = PointToVec3f(error_points[i].first);
+			e.target_point = PointToVec3f(error_points[i].second);
+			auto max_cost = distance_errors[distance_errors.size() / 2] * 10.;
+			e.cost = std::min(max_cost, dist(e.source_point, e.target_point));
+			e.cost /= max_cost;
+			edges.push_back(e);
+		}
+		_point_renderer->insertLine("error", edges, 0.0005);
+	}
+	else {
+		_point_renderer->removePoints("error");
+	}
+}
 
 RenderRegistration::RenderRegistration(ml::GraphicsDevice * graphics)
 {

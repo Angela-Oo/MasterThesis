@@ -37,6 +37,7 @@ public:
 	void renderReference(std::shared_ptr<IMeshReader> mesh_reader, unsigned int current_frame);
 	void renderRegistration(std::shared_ptr<IRegistration> registration);
 	void renderRegistrationSequence(std::shared_ptr<SequenceRegistration> registration);
+	void renderError(std::vector<std::pair<Point, Point>> error_points);
 public:
 	RenderRegistration(ml::GraphicsDevice * graphics);
 };
