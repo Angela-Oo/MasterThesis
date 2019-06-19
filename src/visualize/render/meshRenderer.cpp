@@ -2,6 +2,7 @@
 #include "meshRenderer.h"
 #include "algo/surface_mesh/mesh_convertion.h"
 #include "ext-freeimage/freeImageWrapper.h"
+#include <experimental/filesystem>
 
 void MeshRenderer::render(ml::Cameraf& camera)
 {
@@ -25,18 +26,21 @@ void MeshRenderer::saveCurrentWindowAsImage(std::string folder, std::string file
 	auto color = _graphics->castD3D11().captureBackBufferColor();
 	auto depth = _graphics->castD3D11().captureBackBufferDepth();
 
-	std::string color_folder = folder + "\\screenshot_color\\";
-	std::string depth_folder = folder + "\\screenshot_depth\\";
-
-	std::cout << color_folder;
-	//system(("mkdir " + color_folder).c_str());
-	//system(("mkdir " + depth_folder).c_str());
-	CreateDirectoryA(color_folder.c_str(), NULL);
-	CreateDirectoryA(depth_folder.c_str(), NULL);
-	//std::filesystem::path dir(folder);
-	//std::filesystem::create_directory(dir);
-	ml::FreeImageWrapper::saveImage(color_folder + filename + "_color.png", color);
-	ml::FreeImageWrapper::saveImage(depth_folder + filename + "_depth.png", ml::ColorImageR32G32B32A32(depth));
+	std::string color_folder = folder + "/color";
+	std::string depth_folder = folder + "/depth";
+	
+	std::experimental::filesystem::path color_dir(color_folder);
+	std::experimental::filesystem::path depth_dir(depth_folder);
+	try {
+		std::experimental::filesystem::create_directories(color_dir);
+		std::experimental::filesystem::create_directories(depth_dir);
+	}
+	catch (std::exception e)
+	{
+		std::cout << color_folder << " " << depth_folder << " " << e.what() << std::endl;
+	}
+	ml::FreeImageWrapper::saveImage(color_folder + "/" + filename + "_color.png", color);
+	ml::FreeImageWrapper::saveImage(depth_folder + "/" + filename + "_depth.png", ml::ColorImageR32G32B32A32(depth));
 }
 
 void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color, bool override)

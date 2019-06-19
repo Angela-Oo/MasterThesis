@@ -29,8 +29,7 @@ void ShowMesh::nonRigidRegistration()
 
 		auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 		std::stringstream ss;
-		ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%X");
-
+		ss << std::put_time(std::localtime(&in_time_t), "%d-%m-%Y_%H-%M");
 		std::string folder_name = "registration_";
 		if (_registration_type == RegistrationType::ASAP) {
 			folder_name = "ASAP_";
@@ -41,7 +40,7 @@ void ShowMesh::nonRigidRegistration()
 		else if (_registration_type == RegistrationType::Rigid) {
 			folder_name = "Rigid_";
 		}
-		_save_images_folder = "images\\" + folder_name + ss.str();
+		_save_images_folder = "images/" + folder_name + ss.str();
 
 		renderRegistration();
 	}
