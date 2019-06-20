@@ -46,12 +46,12 @@ bool SequenceRegistration::finished()
 	return last_frame;
 }
 
-SurfaceMesh SequenceRegistration::getMesh(int frame)
+SurfaceMesh SequenceRegistration::getMesh(size_t frame)
 {
 	return _meshes[frame];
 }
 
-SurfaceMesh SequenceRegistration::getDeformedMesh(int frame)
+SurfaceMesh SequenceRegistration::getDeformedMesh(size_t frame)
 {
 	return _deformed_meshes[frame];
 }
@@ -61,7 +61,7 @@ size_t SequenceRegistration::getCurrent()
 	return _current;
 }
 
-SurfaceMesh SequenceRegistration::getDeformationGraphMesh(int frame)
+SurfaceMesh SequenceRegistration::getDeformationGraphMesh(size_t frame)
 {
 	//auto inverse_deformation = inverteDeformationGraph(_deformation_graphs[frame]);
 	//return inverse_deformation.getDeformationGraphEdges();	

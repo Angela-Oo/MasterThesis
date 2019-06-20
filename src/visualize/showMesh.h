@@ -26,11 +26,13 @@ private:
 	bool _solve_registration;
 	RegistrationType _registration_type;
 	std::string _save_images_folder;
+	unsigned int _saved_image;
+	std::string _image_name;
 	std::string _data_name;
 	bool _calculate_error;
 	std::shared_ptr<IRegistration> _registration;
 	std::shared_ptr<SequenceRegistration> _register_sequence_of_frames;
-	std::unique_ptr<ErrorEvaluation> _error_evaluation;
+	std::unique_ptr<ErrorEvaluation> _error_evaluation;	
 private:
 	void renderCurrentMesh();
 	void renderError();

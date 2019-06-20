@@ -23,9 +23,9 @@ public:
 	bool solve();
 	bool finished();
 	size_t getCurrent();
-	SurfaceMesh getMesh(int frame);
-	SurfaceMesh getDeformedMesh(int frame);
-	SurfaceMesh getDeformationGraphMesh(int frame);
+	SurfaceMesh getMesh(size_t frame);
+	SurfaceMesh getDeformedMesh(size_t frame);
+	SurfaceMesh getDeformationGraphMesh(size_t frame);
 public:
 	SequenceRegistration();
 	SequenceRegistration(const std::vector<SurfaceMesh> & meshes,

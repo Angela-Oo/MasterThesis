@@ -55,15 +55,16 @@ void ShowMesh::nonRigidRegistration()
 		renderRegistration();
 	}
 	else {
-		_registration->solveIteration();
-		renderRegistration();
-		_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_registration->currentIteration()));
-		if (_registration->finished()) {
+		bool finished = _registration->finished();
+		if (!finished) {
+			_registration->solveIteration();
+			_image_name = "frame_" + std::to_string(_registration->currentIteration());
+		}
+		else {
 			_selected_frame_for_registration.clear();
 			_solve_registration = false;
 			std::cout << std::endl << "finished, select next two frames" << std::endl;
-			renderRegistration();
-			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_finished");
+			_image_name = "frame_finished";
 		}		
 	}
 }
@@ -73,7 +74,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 {	
 	if (!_register_sequence_of_frames) {
 		std::vector<SurfaceMesh> meshes;
-		for (int i = 0; i < _input_mesh->frame(); ++i) {
+		for (unsigned int i = 0; i < _input_mesh->frame(); ++i) {
 			meshes.push_back(_input_mesh->getMesh(i));
 		}
 		RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
@@ -81,14 +82,19 @@ void ShowMesh::solveAllNonRigidRegistration()
 		_save_images_folder = getImageFolderName(_registration_type);
 	}
 	else {
-		_register_sequence_of_frames->solve();
-		renderRegistration();
-		_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_register_sequence_of_frames->getCurrent()));
-		if (_register_sequence_of_frames->finished()) {
+		bool finished = _register_sequence_of_frames->finished();
+		if (!finished) {
+			auto last_frame = _register_sequence_of_frames->getCurrent();
+			_register_sequence_of_frames->solve();
+			if (last_frame != _register_sequence_of_frames->getCurrent())
+				_saved_image = 0;
+			_image_name = "frame_" + std::to_string(_register_sequence_of_frames->getCurrent()) + "_" + std::to_string(_saved_image);
+			_saved_image++;
+		}
+		else {		
 			std::cout << std::endl << "finished registration" << std::endl;
 			_solve_registration = false;
-			renderRegistration();
-			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_finished");
+			_image_name = "frame_finished";
 		}
 	}
 }
@@ -143,14 +149,18 @@ void ShowMesh::renderRegistration()
 
 void ShowMesh::render(ml::Cameraf& camera)
 {
-	_renderer->render(camera);
 	if (_solve_registration && _register_sequence_of_frames) {
-		solveAllNonRigidRegistration();
+		solveAllNonRigidRegistration();		
 	}
 	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
 		nonRigidRegistration();
 	}
 	renderRegistration();
+	_renderer->render(camera);
+	if (_image_name != "") {
+		_renderer->saveCurrentWindowAsImage(_save_images_folder, _image_name);
+		_image_name = "";
+	}
 }
 
 
@@ -294,6 +304,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_registration_type = RegistrationType::ARAP;
 	_calculate_error = false;
 	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
+	_saved_image = 0;
 
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
@@ -325,7 +336,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_data_name = "hand";		
 
 		////_mesh_reader->processAllFrames();
-		for (int i = 0; i < 10; i++) {
+		for (int i = 0; i < 50; i++) {
 			input_mesh->processFrame();
 			reference_registration_mesh->processFrame();
 		}
