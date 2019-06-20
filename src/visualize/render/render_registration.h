@@ -19,6 +19,10 @@ enum Render
 class RenderRegistration {
 	std::unique_ptr<PointsRenderer> _point_renderer;
 	std::unique_ptr<MeshRenderer> _mesh_renderer;
+private:
+	unsigned int _current_frame;
+	unsigned int _current_reference_frame;
+	bool _reigistration_finished;
 public:
 	RegistrationType _registration_type;
 	bool _render_points = true;

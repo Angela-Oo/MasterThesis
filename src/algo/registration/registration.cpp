@@ -12,15 +12,15 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 												  const ceres::Solver::Options & options,
 												  bool evaluate_residuals,
 												  std::shared_ptr<FileWriter> logger,												  
-												  int number_of_deformation_graph_nodes,
+												  double deformation_graph_edge_length,
 												  std::vector<vertex_descriptor> fixed_positions)
 {
 	if (registration_type == RegistrationType::ED)
-		return std::make_unique<ED::EmbeddedDeformation>(source, target, options, number_of_deformation_graph_nodes, evaluate_residuals, logger);
+		return std::make_unique<ED::EmbeddedDeformation>(source, target, options, deformation_graph_edge_length, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ED_WithoutICP)
 		return std::make_unique<ED::EmbeddedDeformation>(source, target, fixed_positions, options, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ARAP)
-		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, options, number_of_deformation_graph_nodes, evaluate_residuals, logger);
+		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, options, deformation_graph_edge_length, evaluate_residuals, logger);
 	else if (registration_type == RegistrationType::ARAP_WithoutICP)
 		return std::make_unique<ARAP::AsRigidAsPossible>(source, target, fixed_positions, options, evaluate_residuals, logger);
 	else

@@ -16,7 +16,6 @@ private:
 	std::vector<SurfaceMesh> _deformed_meshes;
 	std::vector<DG::DeformationGraph> _deformation_graphs;
 	size_t _current;
-	double _deformation_graph_edge_length;
 	std::unique_ptr<IRegistration> _registration;
 	bool _evaluate_residuals;
 	std::shared_ptr<FileWriter> _logger;

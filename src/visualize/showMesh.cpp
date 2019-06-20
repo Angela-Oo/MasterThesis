@@ -36,7 +36,7 @@ std::string ShowMesh::getImageFolderName(RegistrationType type)
 	else if (type == RegistrationType::ED_AllFrames) {
 		folder_name = "ED_AllFrames_";
 	}
-	return "images/" + folder_name + ss.str();
+	return "images/" + _data_name + "/" + folder_name + ss.str();
 }
 
 
@@ -55,16 +55,16 @@ void ShowMesh::nonRigidRegistration()
 		renderRegistration();
 	}
 	else {
-		if (!_registration->solveIteration()) {
-			renderRegistration();
-		}
-		else {
-			renderRegistration();
+		_registration->solveIteration();
+		renderRegistration();
+		_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_registration->currentIteration()));
+		if (_registration->finished()) {
 			_selected_frame_for_registration.clear();
 			_solve_registration = false;
 			std::cout << std::endl << "finished, select next two frames" << std::endl;
-		}
-		_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_registration->currentIteration()));
+			renderRegistration();
+			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_finished");
+		}		
 	}
 }
 
@@ -81,13 +81,16 @@ void ShowMesh::solveAllNonRigidRegistration()
 		_save_images_folder = getImageFolderName(_registration_type);
 	}
 	else {
-		if (!_register_sequence_of_frames->solve()) {
+		_register_sequence_of_frames->solve();
+		renderRegistration();
+		_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_register_sequence_of_frames->getCurrent()));
+		if (_register_sequence_of_frames->finished()) {
 			std::cout << std::endl << "finished registration" << std::endl;
 			_solve_registration = false;
+			renderRegistration();
+			_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_finished");
 		}
-		_renderer->saveCurrentWindowAsImage(_save_images_folder, "frame_" + std::to_string(_register_sequence_of_frames->getCurrent()));
 	}
-	renderRegistration();
 }
 
 void ShowMesh::renderError()
@@ -306,18 +309,20 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_logger = std::make_shared<FileWriter>("puppet_log.txt");
 
 		// paperbag
-		//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
-		//_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 0);
+		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
+		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 0);
+		//_logger = std::make_shared<FileWriter>("paperbag.txt");
 
 		// head
-		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
-		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
-		_logger = std::make_shared<FileWriter>("head_log.txt");
+		//auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
+		//auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
+		//_data_name = "head";
+		//_logger = std::make_shared<FileWriter>("head_log.txt");
 	
 		// hand
-		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
-		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);
-		//_logger = std::make_shared<FileWriter>("hand_log.txt");	
+		auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
+		auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
+		_data_name = "hand";		
 
 		////_mesh_reader->processAllFrames();
 		for (int i = 0; i < 10; i++) {
@@ -326,6 +331,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		}
 		_input_mesh = std::move(input_mesh);
 		_reference_registration_mesh = std::move(reference_registration_mesh);
+		_logger = std::make_shared<FileWriter>(_data_name + "_log.txt");
 	}
 	else {
 		//_input_mesh = std::make_unique<DeformationMesh>();
