@@ -26,7 +26,6 @@ private:
 	bool _solve_registration;
 	RegistrationType _registration_type;
 	std::string _save_images_folder;
-	unsigned int _saved_image;
 	std::string _image_name;
 	std::string _data_name;
 	bool _calculate_error;

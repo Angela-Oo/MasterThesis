@@ -84,12 +84,9 @@ void ShowMesh::solveAllNonRigidRegistration()
 	else {
 		bool finished = _register_sequence_of_frames->finished();
 		if (!finished) {
-			auto last_frame = _register_sequence_of_frames->getCurrent();
-			_register_sequence_of_frames->solve();
-			if (last_frame != _register_sequence_of_frames->getCurrent())
-				_saved_image = 0;
-			_image_name = "frame_" + std::to_string(_register_sequence_of_frames->getCurrent()) + "_" + std::to_string(_saved_image);
-			_saved_image++;
+			bool iteration_finished = _register_sequence_of_frames->solve();
+			if(iteration_finished)
+				_image_name = "frame_" + std::to_string(_register_sequence_of_frames->getCurrent());
 		}
 		else {		
 			std::cout << std::endl << "finished registration" << std::endl;
@@ -150,7 +147,8 @@ void ShowMesh::renderRegistration()
 void ShowMesh::render(ml::Cameraf& camera)
 {
 	if (_solve_registration && _register_sequence_of_frames) {
-		solveAllNonRigidRegistration();		
+		solveAllNonRigidRegistration();	
+		_current_frame = _register_sequence_of_frames->getCurrent();
 	}
 	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
 		nonRigidRegistration();
@@ -304,7 +302,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_registration_type = RegistrationType::ARAP;
 	_calculate_error = false;
 	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
-	_saved_image = 0;
+	//_saved_image = 0;
 
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
@@ -317,29 +315,31 @@ void ShowMesh::init(ml::ApplicationData &app)
 		// puppet
 		//_reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
 		//_input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);
-		//_logger = std::make_shared<FileWriter>("puppet_log.txt");
+		//_data_name = "puppet";
 
 		// paperbag
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
-		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 0);
-		//_logger = std::make_shared<FileWriter>("paperbag.txt");
+		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 1);
+		//_deformation_graph_edge_length = 0.1;
+		//_data_name = "paperbag";
 
 		// head
-		//auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
-		//auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
-		//_data_name = "head";
-		//_logger = std::make_shared<FileWriter>("head_log.txt");
+		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
+		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
+		//_deformation_graph_edge_length = 0.1;
+		_data_name = "head";
 	
 		// hand
-		auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
-		auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
-		_data_name = "hand";		
+		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
+		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
+		//_data_name = "hand";		
 
-		////_mesh_reader->processAllFrames();
-		for (int i = 0; i < 50; i++) {
-			input_mesh->processFrame();
-			reference_registration_mesh->processFrame();
-		}
+		input_mesh->processAllFrames();
+		reference_registration_mesh->processAllFrames();
+		//for (int i = 0; i < 20; i++) {
+		//	input_mesh->processFrame();
+		//	reference_registration_mesh->processFrame();
+		//}
 		_input_mesh = std::move(input_mesh);
 		_reference_registration_mesh = std::move(reference_registration_mesh);
 		_logger = std::make_shared<FileWriter>(_data_name + "_log.txt");

@@ -15,7 +15,8 @@ bool SequenceRegistration::solve()
 		_registration = createRegistration(source, target, _registration_type, deformation_graph, ceresOption(), _evaluate_residuals, _logger);
 	}
 	if (_registration) {
-		if (_registration->solveIteration())
+		auto frame_finished = _registration->finished();		
+		if (frame_finished)
 		{
 			_deformed_meshes[_current] = _registration->getInverseDeformedPoints(); // todo
 			//_deformed_meshes[_current] = _registration->getDeformedPoints();
@@ -25,13 +26,13 @@ bool SequenceRegistration::solve()
 				_current++;
 				_registration.reset();
 			}
-			else {
-				return false;
-			}
+			return false;
 		}
 		else {
+			auto finished = _registration->solveIteration();
 			_deformed_meshes[_current] = _registration->getDeformedPoints();
 			_deformation_graphs[_current] = _registration->getDeformationGraph();
+			return finished;
 		}
 	}
 	return true;
