@@ -163,7 +163,7 @@ bool RigidRegistration::solveIteration()
 	return finished();
 }
 
-int RigidRegistration::currentIteration()
+size_t RigidRegistration::currentIteration()
 {
 	return _solve_iteration;
 }

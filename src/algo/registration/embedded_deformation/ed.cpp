@@ -228,7 +228,7 @@ bool EmbeddedDeformation::solveIteration()
 	return finished();
 }
 
-int EmbeddedDeformation::currentIteration()
+size_t EmbeddedDeformation::currentIteration()
 {
 	return _solve_iteration;
 }

@@ -32,6 +32,7 @@ private:
 	std::vector<vertex_descriptor> _fixed_positions;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 private:
+	bool _ignore_deformation_graph_border_vertices;
 	bool _evaluate_residuals;
 	bool _with_icp = true;
 	double _current_cost = 1.;
@@ -64,7 +65,7 @@ private:
 public:
 	bool finished() override;
 	bool solveIteration() override;
-	int  currentIteration() override;
+	size_t currentIteration() override;
 	bool solve() override;
 public:
 	const SurfaceMesh & getSource() override;

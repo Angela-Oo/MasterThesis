@@ -18,7 +18,7 @@ class IRegistration
 public:
 	virtual bool finished() = 0;
 	virtual bool solveIteration() = 0;
-	virtual int  currentIteration() = 0;
+	virtual size_t currentIteration() = 0;
 	virtual bool solve() = 0;
 public:
 	virtual const SurfaceMesh & getSource() = 0;
