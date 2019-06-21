@@ -23,41 +23,44 @@ double getMeanFitCost(const SurfaceMesh & mesh)
 
 double getReferenceCost(const SurfaceMesh & mesh)
 {
-	auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
-	auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
-	auto conf_costs = mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
+	if (mesh.number_of_vertices() > 0) {
+		auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
+		auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
+		auto conf_costs = mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
 
-	double mean_fit_cost = 0.;
-	double max_fit_cost = 0.0;
-	double max_conf_cost = 0.0;
+		double mean_fit_cost = 0.;
+		double max_fit_cost = 0.0;
+		double max_conf_cost = 0.0;
 
-	for (auto v : mesh.vertices()) {
-		mean_fit_cost += fit_costs[v];
-		if (fit_costs[v] > max_fit_cost)
-			max_fit_cost = fit_costs[v];
-		if (conf_costs[v] > max_conf_cost)
-			max_conf_cost = conf_costs[v];
+		for (auto v : mesh.vertices()) {
+			mean_fit_cost += fit_costs[v];
+			if (fit_costs[v] > max_fit_cost)
+				max_fit_cost = fit_costs[v];
+			if (conf_costs[v] > max_conf_cost)
+				max_conf_cost = conf_costs[v];
+		}
+		mean_fit_cost /= mesh.number_of_vertices();
+
+		double mean_smooth_cost = 0.;
+		double max_smooth_cost = 0.0;
+		for (auto e : mesh.edges()) {
+			mean_smooth_cost += smooth_costs[e];
+			if (smooth_costs[e] > max_smooth_cost)
+				max_smooth_cost = smooth_costs[e];
+		}
+		mean_smooth_cost /= mesh.number_of_edges();
+
+		auto k_mean_cost = std::max(mean_fit_cost, mean_smooth_cost);
+		k_mean_cost *= 10.;
+
+		std::cout << "max costs: fit " << max_fit_cost
+			<< " conf " << max_conf_cost
+			<< " smooth " << max_smooth_cost
+			<< " k mean visualize cost " << k_mean_cost << " ";
+
+		return k_mean_cost;
 	}
-	mean_fit_cost /= mesh.number_of_vertices();
-
-	double mean_smooth_cost = 0.;
-	double max_smooth_cost = 0.0;
-	for (auto e : mesh.edges()) {
-		mean_smooth_cost += smooth_costs[e];
-		if (smooth_costs[e] > max_smooth_cost)
-			max_smooth_cost = smooth_costs[e];
-	}
-	mean_smooth_cost /= mesh.number_of_edges();
-
-	auto k_mean_cost = std::max(mean_fit_cost, mean_smooth_cost);
-	k_mean_cost *= 10.;
-
-	std::cout << "max costs: fit " << max_fit_cost
-		<< " conf " << max_conf_cost
-		<< " smooth " << max_smooth_cost
-		<< " k mean visualize cost " << k_mean_cost << " ";
-
-	return k_mean_cost;
+	return 0.1;
 }
 
 void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
@@ -73,6 +76,8 @@ void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
 		// if vertex was used for optimization flag is set use it
 		auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used");
 
+		auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+
 		for (auto & v : mesh.vertices())
 		{
 			double error = (reference_cost > 0.) ? (fit_costs[v] / reference_cost) : fit_costs[v];
@@ -84,8 +89,8 @@ void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
 					colors[v] = ml::RGBColor::Black.toVec4f();
 				}
 			}
-			//if (node.weight() < 0.7)
-			//	vertex.color = ml::RGBColor::White.toVec4f();
+			if (deformations[v]->weight() < 0.7)
+				colors[v] = ml::RGBColor::White.toVec4f();
 		}
 	}
 	else {
@@ -97,7 +102,7 @@ void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
 SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost)
 {
 	SurfaceMesh mesh = deformation_graph._mesh;
-	auto normals = mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto normals = mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : mesh.vertices()) {
 		auto deformed = deformation_graph.deformNode(v);
 		mesh.point(v) = deformed._point;
