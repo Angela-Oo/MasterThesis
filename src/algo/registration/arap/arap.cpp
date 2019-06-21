@@ -130,7 +130,13 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 				auto target_point = _find_correspondence_point->getPoint(target_vertex);
 				auto target_normal = _find_correspondence_point->getNormal(target_vertex);
 				residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_point));
-				residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal.vector()));
+
+				if (target_normal.squared_length() > 0.) {
+					residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal));
+				}
+				else {
+					std::cout << "normal is degenerated" << std::endl;
+				}
 
 				i++;
 				vertex_used[v] = true;
@@ -209,7 +215,7 @@ bool AsRigidAsPossible::solveIteration()
 
 		auto scale_factor_tol = 0.0001;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-			(a_smooth > 0.05 && a_conf > 0.05))
+			(a_smooth > 0.005 && a_conf > 0.05))
 		{
 			a_smooth /= 2.;
 			a_conf /= 2.;
@@ -284,12 +290,12 @@ void AsRigidAsPossible::printCeresOptions()
 
 void AsRigidAsPossible::setParameters()
 {
-	a_smooth = 5.;//  0.1;// 100;
-	a_conf = 100.;// 1.;// 100;
-	a_fit = 20.;
+	a_smooth = 5.; //0.1;
+	a_conf = 100.;// 10.;
+	a_fit = 100.; // 100.;
 	_find_max_distance = 0.1;
 	_find_max_angle_deviation = 45.;
-	_ignore_deformation_graph_border_vertices = true;
+	_ignore_deformation_graph_border_vertices = false;
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
@@ -306,7 +312,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _logger(logger)
 	, _evaluate_residuals(evaluate_residuals)
 	, _with_icp(false)
-	, _ignore_deformation_graph_border_vertices(false)
+
 {
 	setParameters();
 	a_smooth = 10.;

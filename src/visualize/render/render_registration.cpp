@@ -131,6 +131,7 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 		if (_reigistration_finished) {
 			_mesh_renderer->removeMesh("target");
 			_mesh_renderer->removeMesh("deformed");
+			//_point_renderer->removePoints("deformed");
 
 			for (int i = 0; i < current; ++i) {
 				std::string key = "mesh_" + std::to_string(i);
@@ -143,7 +144,7 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 		else {
 			_reigistration_finished = sequence_registration->finished();
 			_mesh_renderer->insertMesh("target", sequence_registration->getMesh(current), ml::RGBColor::Green.toVec4f());
-			//_point_renderer->insertPoints("target", _register_sequence_of_frames->getMesh(_register_sequence_of_frames->getCurrent()), ml::RGBColor::Yellow);
+			//_point_renderer->insertPoints("target", sequence_registration->getMesh(current), ml::RGBColor::Green, 0.002);
 
 			auto deformed_points = sequence_registration->getDeformedMesh(current);
 			_mesh_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan.toVec4f());
@@ -165,7 +166,7 @@ void RenderRegistration::renderError(std::vector<std::pair<Point, Point>> error_
 {
 	if (_render_error) {
 		auto distance_errors = evaluate_distance_error(error_points);
-		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / static_cast<float>(distance_errors.size());
+		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0f) / static_cast<float>(distance_errors.size());
 		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
 
 		std::vector<Edge> edges;
