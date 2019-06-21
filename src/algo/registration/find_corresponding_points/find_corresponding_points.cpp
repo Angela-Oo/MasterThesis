@@ -20,9 +20,9 @@ Point FindCorrespondingPoints::getPoint(vertex_descriptor v)
 	return _mesh.point(v);
 }
 
-Direction FindCorrespondingPoints::getNormal(vertex_descriptor v)
+Vector FindCorrespondingPoints::getNormal(vertex_descriptor v)
 {
-	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto vertex_normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	return vertex_normals[v];
 }
 
@@ -31,14 +31,14 @@ std::pair<bool, vertex_descriptor> FindCorrespondingPoints::correspondingPoint(P
 	auto s = _nn_search->search(point, _k);
 
 	std::vector<std::pair<vertex_descriptor, std::pair<double, double>>> valid_point_with_angle_and_distance;
-	auto vertex_normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto vertex_normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 
 	for (Neighbor_search::iterator it = s.begin(); it != s.end(); ++it) {
 		auto distance = std::sqrt(it->second);
 		auto v = it->first;
 
 		//auto vertex = _mesh.point(v);
-		auto angle = angle_between_to_vectors_in_rad(normal, vertex_normals[v].vector());
+		auto angle = angle_between_to_vectors_in_rad(normal, vertex_normals[v]);
 
 		//if (distance < 100. * median()) {
 		_median_distance = (_median_distance * 10000. + distance) / 10001.;

@@ -12,13 +12,13 @@ class PositionAndDeformation
 public:
 	std::shared_ptr<IDeformation> _deformation;
 	Point _point;
-	Direction _normal;
+	Vector _normal;
 public:
 	Point getDeformedPosition() const;
-	Direction getDeformedNormal() const;
+	Vector getDeformedNormal() const;
 
 	Point deformPosition(Point point) const;
-	Direction deformNormal(Direction normal) const;
+	Vector deformNormal(Vector normal) const;
 };
 
 }

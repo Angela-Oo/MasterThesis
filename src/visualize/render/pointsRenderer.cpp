@@ -78,11 +78,11 @@ TriMeshf PointsRenderer::createNormalTriMesh(const SurfaceMesh & mesh, float poi
 {
 	std::vector<TriMeshf> meshes;
 	auto vertex_colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-	auto normals = mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto normals = mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	std::vector<ml::vec3f> normal_positions;
 	for (auto & v : mesh.vertices()) {
 		auto p = mesh.point(v);
-		auto normal = PointToVec3f(p + (normals[v].vector() * 0.1));
+		auto normal = PointToVec3f(p + (normals[v] * 0.1));
 		meshes.push_back(ml::Shapesf::line(PointToVec3f(p), normal, vertex_colors[v], point_size));
 	}
 	return ml::meshutil::createUnifiedMesh(meshes);
@@ -91,11 +91,11 @@ TriMeshf PointsRenderer::createNormalTriMesh(const SurfaceMesh & mesh, float poi
 TriMeshf PointsRenderer::createNormalTriMesh(const SurfaceMesh & mesh, ml::RGBColor color, float point_size)
 {
 	std::vector<TriMeshf> meshes;
-	auto normals = mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto normals = mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	std::vector<ml::vec3f> normal_positions;
 	for (auto & v : mesh.vertices()) {
 		auto p = mesh.point(v);
-		auto normal = PointToVec3f(p + (normals[v].vector() * 0.05));
+		auto normal = PointToVec3f(p + (normals[v] * 0.05));
 		meshes.push_back(ml::Shapesf::line(PointToVec3f(p), normal, color, point_size));
 	}
 	return ml::meshutil::createUnifiedMesh(meshes);

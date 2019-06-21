@@ -17,7 +17,7 @@ class FindCorrespondingPoints
 public:
 	double median();
 	Point getPoint(vertex_descriptor);
-	Direction getNormal(vertex_descriptor);
+	Vector getNormal(vertex_descriptor);
 	std::pair<bool, vertex_descriptor> correspondingPoint(Point point, Vector normal);
 	FindCorrespondingPoints(const SurfaceMesh & mesh, double max_allowed_distance = 0.05, double max_normal_angle_deviation = 30.);
 };

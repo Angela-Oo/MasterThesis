@@ -52,9 +52,9 @@ ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &pr
 ceres::ResidualBlockId RigidRegistration::addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex)
 {
 	float point_to_plane_weight = 0.9f;
-	auto target_normals = _target.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto target_normals = _target.property_map<vertex_descriptor, Vector>("v:normal").first;
 	auto target_point = _target.point(target_vertex);
-	auto target_normal = target_normals[target_vertex].vector();
+	auto target_normal = target_normals[target_vertex];
 
 	auto cost_function = FitPointToPlaneAngleAxisCostFunction::Create(source_point, target_point, target_normal);
 	auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weight, ceres::TAKE_OWNERSHIP);
@@ -67,12 +67,12 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Pr
 	VertexResidualIds residual_ids;
 
 	int i = 0;
-	auto normal = _source.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto normal = _source.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : _source.vertices())
 	{
 		auto point = _source.point(v);
 		auto deformed_point = _deformation.deformPoint(point);
-		auto deformed_normal = _deformation.deformNormal(normal[v].vector());
+		auto deformed_normal = _deformation.deformNormal(normal[v]);
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
 		if (correspondent_point.first) {
 			auto target_vertex = correspondent_point.second;
@@ -90,7 +90,7 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostSubSet(cer
 	VertexResidualIds residual_ids;
 
 	int i = 0;
-	auto normal = _source.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto normal = _source.property_map<vertex_descriptor, Vector>("v:normal").first;
 	
 	int _sub_set_size = 100;
 	// select random vertices
@@ -108,7 +108,7 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostSubSet(cer
 	for(auto v : vertices) {
 		auto point = _source.point(v);
 		auto deformed_point = _deformation.deformPoint(point);
-		auto deformed_normal = _deformation.deformNormal(normal[v].vector());
+		auto deformed_normal = _deformation.deformNormal(normal[v]);
 		auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
 
 		if (correspondent_point.first) {
@@ -126,7 +126,7 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostWithoutICP
 {
 	VertexResidualIds residual_ids;
 	// asuming points are ordered
-	auto normal = _source.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto normal = _source.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : _source.vertices())
 	{
 		residual_ids[v].push_back(addPointToPointCost(problem, _source.point(v), v));

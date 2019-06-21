@@ -10,7 +10,7 @@ Point PositionAndDeformation::getDeformedPosition() const
 	return CGAL::ORIGIN + v + _deformation->translation();
 }
 
-Direction PositionAndDeformation::getDeformedNormal() const
+Vector PositionAndDeformation::getDeformedNormal() const
 {
 	return _deformation->rotation()(_normal);
 }
@@ -22,7 +22,7 @@ Point PositionAndDeformation::deformPosition(Point point) const
 	return CGAL::ORIGIN + moved_position + rotated_point;
 }
 
-Direction PositionAndDeformation::deformNormal(Direction normal) const
+Vector PositionAndDeformation::deformNormal(Vector normal) const
 {
 	return _deformation->rotation()(normal);
 }

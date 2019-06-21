@@ -89,14 +89,14 @@ VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &proble
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 
-	auto target_normals = _dst.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto target_normals = _dst.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : mesh.vertices())
 	{
 		auto vertex = _deformation_graph.deformNode(v);
 		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), v) != _fixed_positions.end()))
 		{
 			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _dst.point(v)));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v), target_normals[v].vector()));
+			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v), target_normals[v]));
 		}
 	}
 	//	std::cout << "used nodes " << i << " / " << mesh.number_of_vertices();
@@ -123,7 +123,7 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 
 		if(use_vertex) {
 			auto vertex = _deformation_graph.deformNode(v);
-			auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal.vector());
+			auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal);
 
 			if (correspondent_point.first) {		
 				vertex_descriptor target_vertex = correspondent_point.second;
@@ -289,6 +289,7 @@ void AsRigidAsPossible::setParameters()
 	a_fit = 20.;
 	_find_max_distance = 0.1;
 	_find_max_angle_deviation = 45.;
+	_ignore_deformation_graph_border_vertices = true;
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,

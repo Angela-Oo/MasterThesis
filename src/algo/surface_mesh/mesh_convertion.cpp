@@ -1,24 +1,36 @@
 #include "stdafx.h"
 
 #include "mesh_convertion.h"
+#include <CGAL/Polygon_mesh_processing/compute_normal.h>
 
 SurfaceMesh convertToCGALMesh(const Mesh& triMesh) {
 	SurfaceMesh mesh;
 
 	std::vector<SurfaceMesh::Vertex_index> vertex_handles;
 	vertex_handles.reserve(triMesh.getVertices().size());
-	auto normals = mesh.add_property_map<vertex_descriptor, Direction>("v:normal", Direction(0., 0., 1.)).first;
+	auto normals = mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 1.)).first;
 	auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.)).first;
 	auto edge_colors = mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.)).first;
+
+	bool calculate_normals = false;
 	for (const auto& v : triMesh.getVertices()) {
 		auto vertex_handle = mesh.add_vertex(SurfaceMesh::Point(v.position.x, v.position.y, v.position.z));
-		normals[vertex_handle] = Direction(v.normal.x, v.normal.y, v.normal.z);
+		normals[vertex_handle] = Vector(v.normal.x, v.normal.y, v.normal.z);
+		if (v.normal.length() <= 0. && calculate_normals == false)
+		{
+			std::cout << "no vertex normal given" << std::endl;
+			calculate_normals = true;
+		}
 		//colors[vertex_handle] = Color(v.normal.x, v.normal.y, v.normal.z);
 		vertex_handles.push_back(vertex_handle);
 	}
 
 	for (const auto& f : triMesh.getIndices()) {
 		mesh.add_face(vertex_handles[f.x], vertex_handles[f.y], vertex_handles[f.z]);
+	}
+
+	if (calculate_normals) {
+		CGAL::Polygon_mesh_processing::compute_vertex_normals(mesh, normals);
 	}
 	return mesh;
 }

@@ -121,7 +121,7 @@ PositionAndDeformation DeformationGraph::getNode(vertex_descriptor node_index) c
 	std::shared_ptr<IDeformation> n = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first[node_index];
 	node._deformation = n;
 	node._point = _mesh.point(node_index);
-	node._normal = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first[node_index];
+	node._normal = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first[node_index];
 	return node;
 }
 
@@ -157,7 +157,7 @@ void DeformationGraph::initGlobalDeformation(std::shared_ptr<IDeformation> globa
 	global_position /= _mesh.number_of_vertices();
 
 	_global._point = CGAL::ORIGIN + global_position;
-	_global._normal = Direction(0., 0., 1.);
+	_global._normal = Vector(0., 0., 1.);
 	_global._deformation = global_deformation;
 }
 
@@ -175,7 +175,7 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::
 	_mesh.add_property_map<vertex_descriptor, double>("v:conf_cost", 0.);
 	_mesh.add_property_map<vertex_descriptor, bool>("v:vertex_used", true);
 
-	auto normals = _mesh.property_map<vertex_descriptor, Direction>("v:normal").first;
+	auto normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : _mesh.vertices()) {
 		//auto point = _mesh.point(v);
 		//auto normal = normals[v];// _mesh.normal[v];
@@ -226,7 +226,7 @@ DeformationGraph invertDeformationGraph(const DeformationGraph & deformation_gra
 
 	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
 	assert(property_deformations.second);
-	auto property_normals = mesh.property_map<vertex_descriptor, Direction>("v:normal");
+	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
 	assert(property_normals.second);
 
 	auto normals = property_normals.first;
@@ -254,7 +254,7 @@ DeformationGraph transformDeformationGraph(const DeformationGraph & deformation_
 
 	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
 	assert(property_deformations.second);
-	auto property_normals = mesh.property_map<vertex_descriptor, Direction>("v:normal");
+	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
 	assert(property_normals.second);
 
 	auto normals = property_normals.first;
