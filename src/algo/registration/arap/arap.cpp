@@ -191,7 +191,8 @@ bool AsRigidAsPossible::solveIteration()
 		std::cout << std::endl;
 		_solve_iteration++;
 		ceres::Solver::Summary summary;
-		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration, _logger);
+		auto logger = _ceres_logger.CreateCeresIterationLogger(summary);
+		//CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration, _logger);
 
 		ceres::Problem problem;
 
@@ -221,8 +222,6 @@ bool AsRigidAsPossible::solveIteration()
 			a_conf /= 2.;
 			std::cout << std::endl << "scale factor: smooth " << a_smooth << " conf " << a_conf << std::endl;
 		}
-
-		_total_time_in_ms += logger.get_time_in_ms();
 	}
 	return finished();
 }
@@ -310,7 +309,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _options(option)
 	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
 	, _fixed_positions(fixed_positions)
-	, _logger(logger)
+	, _ceres_logger(logger)
 	, _evaluate_residuals(evaluate_residuals)
 	, _with_icp(false)
 
@@ -333,7 +332,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _logger(logger)
+	, _ceres_logger(logger)
 	, _evaluate_residuals(evaluate_residuals)
 	, _ignore_deformation_graph_border_vertices(false)
 {
@@ -356,7 +355,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
-	, _logger(logger)
+	, _ceres_logger(logger)
 	, _evaluate_residuals(evaluate_residuals)
 	, _ignore_deformation_graph_border_vertices(false)
 {

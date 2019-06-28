@@ -6,7 +6,9 @@
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/i_registration.h"
 #include "algo/registration/registration.h"
+#include "algo/ceres_iteration_logger.h"
 #include <ceres/ceres.h>
+#include <memory>
 
 class SequenceRegistration
 {
@@ -19,6 +21,7 @@ private:
 	std::unique_ptr<IRegistration> _registration;
 	bool _evaluate_residuals;
 	std::shared_ptr<FileWriter> _logger;
+	std::unique_ptr<CeresLogger> _ceres_logger;
 public:
 	bool solve();
 	bool finished();

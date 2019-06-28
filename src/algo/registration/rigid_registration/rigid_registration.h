@@ -7,6 +7,7 @@
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include <ceres/ceres.h>
+#include "algo/ceres_iteration_logger.h"
 
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
@@ -19,7 +20,7 @@ private:
 	SurfaceMesh _target;
 	ceres::Solver::Options _options;
 	RigidDeformation _deformation;
-	std::shared_ptr<FileWriter> _logger;
+	CeresLogger _ceres_logger;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 	std::unique_ptr<RigidDeformedMesh> _rigid_deformed_mesh;
 private:

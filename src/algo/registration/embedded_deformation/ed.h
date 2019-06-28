@@ -12,6 +12,8 @@
 
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 
+#include "algo/ceres_iteration_logger.h"
+
 namespace ED {
 
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
@@ -28,7 +30,7 @@ class EmbeddedDeformation : public IRegistration
 	std::vector<vertex_descriptor> _fixed_positions;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 
-	std::shared_ptr<FileWriter> _logger;
+	CeresLogger _ceres_logger;
 private:
 	bool _with_icp = false;
 	double _current_cost = 1.;

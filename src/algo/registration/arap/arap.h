@@ -11,6 +11,8 @@
 
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 
+#include "algo/ceres_iteration_logger.h"
+
 namespace ARAP {
 
 
@@ -46,7 +48,7 @@ private:
 	double a_fit;
 	double _find_max_distance;
 	double _find_max_angle_deviation;
-	std::shared_ptr<FileWriter> _logger;
+	CeresLogger _ceres_logger;
 private:
 	void setParameters();
 	void printCeresOptions();

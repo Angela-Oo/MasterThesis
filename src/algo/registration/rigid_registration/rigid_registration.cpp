@@ -140,7 +140,8 @@ bool RigidRegistration::solveIteration()
 	if (!finished()) {
 		_solve_iteration++;
 		ceres::Solver::Summary summary;
-		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration, _logger);
+
+		auto logger = _ceres_logger.CreateCeresIterationLogger(summary);
 
 		ceres::Problem problem;
 
@@ -216,7 +217,7 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 	: _source(source)
 	, _target(target)
 	, _options(option)
-	, _logger(logger)
+	, _ceres_logger(logger)
 {
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45.);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);

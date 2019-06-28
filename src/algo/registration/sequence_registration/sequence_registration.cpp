@@ -12,7 +12,10 @@ bool SequenceRegistration::solve()
 		auto & source = _meshes[0];
 		auto & target = _meshes[_current];
 		auto & deformation_graph = _deformation_graphs[_current - 1];
+		if(!_ceres_logger)
+			_ceres_logger = std::make_unique<CeresLogger>(_logger);
 		_registration = createRegistration(source, target, _registration_type, deformation_graph, ceresOption(), _evaluate_residuals, _logger);
+
 	}
 	if (_registration) {
 		auto frame_finished = _registration->finished();		
@@ -25,6 +28,9 @@ bool SequenceRegistration::solve()
 			if (_current < _meshes.size() - 1) {
 				_current++;
 				_registration.reset();
+			}
+			else {
+				_ceres_logger.reset();
 			}
 			return false;
 		}

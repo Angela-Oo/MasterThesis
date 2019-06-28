@@ -186,7 +186,8 @@ bool EmbeddedDeformation::solveIteration()
 		_solve_iteration++;
 
 		ceres::Solver::Summary summary;
-		CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration, _logger);
+
+		auto logger = _ceres_logger.CreateCeresIterationLogger(summary);
 		ceres::Problem problem;
 
 		// cost functions
@@ -317,7 +318,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
 	, _fixed_positions(fixed_positions)
 	, _evaluate_residuals(evaluate_residuals)
-	, _logger(logger)
+	, _ceres_logger(logger)
 	, _with_icp(false)
 {
 	setParameters();
@@ -340,7 +341,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	, _dst(dst)
 	, _options(option)
 	, _evaluate_residuals(evaluate_residuals)
-	, _logger(logger)
+	, _ceres_logger(logger)
 	, _with_icp(true)
 {
 	setParameters();
@@ -363,7 +364,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	, _options(option)
 	, _deformation_graph(deformation_graph)
 	, _evaluate_residuals(evaluate_residuals)
-	, _logger(logger)
+	, _ceres_logger(logger)
 	, _with_icp(true)
 {
 	setParameters();

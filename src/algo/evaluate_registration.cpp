@@ -33,7 +33,7 @@ std::vector<float> evaluate_distance_error(std::vector<std::pair<Point, Point>> 
 	std::vector<float> distances;
 	for (auto p : nearest_points) {
 		auto vector = p.first - p.second;
-		auto distance = sqrt(vector.squared_length());
+		float distance = sqrt(vector.squared_length());
 		if (isnan(distance) || isinf(distance))
 			std::cout << "bad" << std::endl;
 		distances.push_back(distance);
@@ -49,10 +49,10 @@ float area(Point point_a, Point point_b, Point point_c)
 	auto b = point_c - point_a;
 	assert(c.squared_length() != 0.f && b.squared_length() != 0.f);
 
-	auto angle = CGAL::scalar_product(c, b);
-	auto b_length = sqrt(b.squared_length());
-	auto hb = sin(angle) * b_length;
-	float area = (hb * b_length) / 2.;
+	float angle = CGAL::scalar_product(c, b);
+	float b_length = sqrt(b.squared_length());
+	float hb = sin(angle) * b_length;
+	float area = (hb * b_length) / 2.f;
 	return area;
 }
 
