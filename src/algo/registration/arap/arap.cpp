@@ -215,7 +215,7 @@ bool AsRigidAsPossible::solveIteration()
 
 		auto scale_factor_tol = 0.0001;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-			(a_smooth > 0.005 && a_conf > 0.05))
+			(a_smooth > 0.005))// && a_conf > 0.05))
 		{
 			a_smooth /= 2.;
 			a_conf /= 2.;
@@ -291,10 +291,11 @@ void AsRigidAsPossible::printCeresOptions()
 void AsRigidAsPossible::setParameters()
 {
 	a_smooth = 5.; //0.1;
-	a_conf = 100.;// 10.;
-	a_fit = 100.; // 100.;
+	a_conf = 0.02;// 1.;// 10.;
+	a_fit = 20.; // 100.;
 	_find_max_distance = 0.1;
 	_find_max_angle_deviation = 45.;
+	_max_iterations = 25;
 	_ignore_deformation_graph_border_vertices = false;
 }
 

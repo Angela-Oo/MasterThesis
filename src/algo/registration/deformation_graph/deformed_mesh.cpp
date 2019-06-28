@@ -89,7 +89,7 @@ void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
 					colors[v] = ml::RGBColor::Black.toVec4f();
 				}
 			}
-			if (deformations[v]->weight() < 0.7)
+			if (deformations[v]->weight() < 0.5)
 				colors[v] = ml::RGBColor::White.toVec4f();
 		}
 	}

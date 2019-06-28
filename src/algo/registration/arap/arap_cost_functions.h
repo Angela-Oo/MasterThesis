@@ -45,6 +45,10 @@ struct AsRigidAsPossibleCostFunction {
 		addition(vj, translation_j, vj_t);
 
 		substract(vj_t, vi_t, transformed_edge);
+
+		//normalize(rotated_edge, rotated_edge);
+		//normalize(transformed_edge, transformed_edge);
+		
 		substract(rotated_edge, transformed_edge, residuals);
 		return true;
 	}
