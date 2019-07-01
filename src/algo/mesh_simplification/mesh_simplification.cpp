@@ -57,6 +57,8 @@ SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_lengt
 														   target_edge_length,
 														   surface_mesh,
 														   CGAL::Polygon_mesh_processing::parameters::number_of_iterations(10));// .protect_constraints(true));
+		auto normals = surface_mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 1.)).first;
+		CGAL::Polygon_mesh_processing::compute_vertex_normals(mesh, normals);
 	}
 	catch (...) {
 		return mesh;
