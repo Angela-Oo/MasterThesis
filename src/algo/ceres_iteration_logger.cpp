@@ -57,7 +57,19 @@ CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 }
 
 
-
+void CeresLogger::write(std::string text, bool log_time)
+{
+	std::stringstream ss;
+	ss << std::endl;
+	ss << text;
+	if (log_time) {		
+		ss << std::setprecision(4);
+		ss << " time: " << std::setw(10) << getDurationAsString(_start_time);
+	}
+	if (_logger)
+		_logger->write(ss.str());
+	std::cout << ss.str();
+}
 
 CeresIterationLoggerGuard CeresLogger::CreateCeresIterationLogger(const ceres::Solver::Summary& summary)
 {
@@ -76,11 +88,4 @@ CeresLogger::CeresLogger(std::shared_ptr<FileWriter> logger)
 
 CeresLogger::~CeresLogger()
 {
-	std::stringstream ss;
-	ss << std::setprecision(4);
-	ss << std::endl << "Total Time: " << std::setw(10) << getDurationAsString(_start_time);
-
-	if (_logger)
-		_logger->write(ss.str());
-	std::cout << ss.str();
 }

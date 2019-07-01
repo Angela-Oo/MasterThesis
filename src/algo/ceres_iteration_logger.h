@@ -27,6 +27,7 @@ class CeresLogger
 	size_t _iteration;
 	std::shared_ptr<FileWriter> _logger;
 public:
+	void write(std::string text, bool log_time = true);
 	CeresIterationLoggerGuard CreateCeresIterationLogger(const ceres::Solver::Summary& summary);
 public:
 	CeresLogger() {};

@@ -22,8 +22,10 @@ private:
 	bool _evaluate_residuals;
 	std::shared_ptr<FileWriter> _logger;
 	std::unique_ptr<CeresLogger> _ceres_logger;
+	bool _finished;
 public:
 	bool solve();
+	void nextFrame();
 	bool finished();
 	size_t getCurrent();
 	SurfaceMesh getMesh(size_t frame);
