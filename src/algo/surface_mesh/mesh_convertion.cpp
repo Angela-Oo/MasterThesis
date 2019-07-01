@@ -8,7 +8,7 @@ SurfaceMesh convertToCGALMesh(const Mesh& triMesh) {
 
 	std::vector<SurfaceMesh::Vertex_index> vertex_handles;
 	vertex_handles.reserve(triMesh.getVertices().size());
-	auto normals = mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 1.)).first;
+	auto normals = mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
 	auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.)).first;
 	auto edge_colors = mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.)).first;
 

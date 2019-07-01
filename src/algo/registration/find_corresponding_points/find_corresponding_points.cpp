@@ -4,7 +4,9 @@
 
 double angle_between_to_vectors_in_rad(Vector vector_a, Vector vector_b)
 {
-	auto dot_product = CGAL::scalar_product(vector_a, vector_b);
+	Vector normalized_vector_a = vector_a / std::sqrt(vector_a.squared_length());
+	Vector normalized_vector_b = vector_b / std::sqrt(vector_b.squared_length());
+	auto dot_product = CGAL::scalar_product(normalized_vector_a, normalized_vector_b);
 	auto angle = acos(dot_product);
 	return angle;
 }
@@ -37,19 +39,22 @@ std::pair<bool, vertex_descriptor> FindCorrespondingPoints::correspondingPoint(P
 		auto distance = std::sqrt(it->second);
 		auto v = it->first;
 
-		//auto vertex = _mesh.point(v);
 		auto angle = angle_between_to_vectors_in_rad(normal, vertex_normals[v]);
 
 		//if (distance < 100. * median()) {
 		_median_distance = (_median_distance * 10000. + distance) / 10001.;
 		//}
-		double k_median = 5. * median();
+		double k_median = 10. * median();
 		bool valid_angle = angle < _max_normal_angle_deviation;
 		bool valid_distance = distance < k_median;
 
 		if (valid_angle && valid_distance) {
 			valid_point_with_angle_and_distance.push_back(std::make_pair(v, std::make_pair(angle, distance)));
 		}
+		//else if(!valid_angle){
+		//	std::cout << normal.x() << " " << normal.y() << " " << normal.z() << std::endl;
+		//	std::cout << vertex_normals[v].x() << " " << vertex_normals[v].y() << " " << vertex_normals[v].z() << std::endl << std::endl;
+		//}
 	}
 
 	if (valid_point_with_angle_and_distance.empty()) {

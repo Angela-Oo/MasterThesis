@@ -13,6 +13,27 @@ struct Edge
 };
 
 
+struct RegistrationOptions
+{
+	double smooth;
+	double conf;
+	double fit;
+	double initial_max_correspondence_distance;
+	double max_correspondence_angle;
+	unsigned int max_iterations;
+	bool ignore_deformation_graph_border_vertices;
+	
+	RegistrationOptions()
+		: smooth(5.)
+		, conf(0.02)
+		, fit(20.)
+		, initial_max_correspondence_distance(0.1)
+		, max_correspondence_angle(45.)
+		, max_iterations(25)
+		, ignore_deformation_graph_border_vertices(false)
+	{}
+};
+
 class IRegistration
 {
 public:
