@@ -33,6 +33,7 @@ bool SequenceRegistration::solve()
 				_registration.reset();				
 			}
 			else {
+				_ceres_logger->write("finished registration");
 				_ceres_logger.reset();
 				_finished = true;
 			}

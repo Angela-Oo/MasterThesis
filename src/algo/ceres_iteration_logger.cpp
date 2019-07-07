@@ -60,12 +60,12 @@ CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 void CeresLogger::write(std::string text, bool log_time)
 {
 	std::stringstream ss;
-	ss << std::endl;
-	ss << text;
+	ss << std::endl;	
 	if (log_time) {		
 		ss << std::setprecision(4);
-		ss << " time: " << std::setw(10) << getDurationAsString(_start_time);
+		ss << "time: " << std::setw(10) << getDurationAsString(_start_time) << "   -   ";
 	}
+	ss << text;
 	if (_logger)
 		_logger->write(ss.str());
 	std::cout << ss.str();
