@@ -338,10 +338,11 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 {
 	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
-	auto reduced_mesh = createReducedMesh(src, deformation_graph_edge_length);
-	std::cout << "number of nodes " << reduced_mesh.num_vertices() << std::endl;
+	auto reduced_mesh = createReducedMesh(src, deformation_graph_edge_length);	
 	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
+	
+	std::cout << "number of nodes " << _deformation_graph._mesh.number_of_vertices() << std::endl;
 	printCeresOptions();
 }
 

@@ -144,10 +144,11 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 		else {
 			_reigistration_finished = sequence_registration->finished();
 			_mesh_renderer->insertMesh("target", sequence_registration->getMesh(current), ml::RGBColor::Green.toVec4f());
-			//_point_renderer->insertPoints("target", sequence_registration->getMesh(current), ml::RGBColor::Green, 0.002);
+			//_point_renderer->insertMesh("target", sequence_registration->getMesh(current), ml::RGBColor::Green, 0.002, true, true);
 
 			auto deformed_points = sequence_registration->getDeformedMesh(current);
 			_mesh_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan.toVec4f());
+			//_point_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan, 0.001, true, true);
 		}
 
 		// deformation graph
