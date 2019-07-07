@@ -50,7 +50,6 @@ private:
 	//double _k_mean_cost;
 	//void updateMeanCost();
 private:
-	double evaluateResidual(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_ids);
 	void evaluateResidual(ceres::Problem & problem,
 						  VertexResidualIds & fit_residual_block_ids,
 						  EdgeResidualIds & smoot_residual_block_ids,

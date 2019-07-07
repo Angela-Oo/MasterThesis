@@ -52,7 +52,6 @@ private:
 private:
 	void setParameters();
 	void printCeresOptions();
-	double evaluateResidual(ceres::Problem & problem, std::vector<ceres::ResidualBlockId> & residual_ids);
 	void evaluateResidual(ceres::Problem & problem,
 							std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
 							std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,

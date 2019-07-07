@@ -5,6 +5,7 @@
 #include "algo/ceres_iteration_logger.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
 #include "ed_deformation.h"
+#include "algo/registration/ceres_residual_evaluation.h"
 
 namespace ED {
 
@@ -250,42 +251,26 @@ bool EmbeddedDeformation::finished()
 	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
-
-
-
-double EmbeddedDeformation::evaluateResidual(ceres::Problem & problem,
-											 std::vector<ceres::ResidualBlockId> & residual_ids)
-{
-	ceres::Problem::EvaluateOptions evaluate_options;
-	evaluate_options.residual_blocks = residual_ids;
-	double total_cost = 0.0;
-	std::vector<double> residuals;
-	problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
-	return total_cost;
-}
-
 void EmbeddedDeformation::evaluateResidual(ceres::Problem & problem,
 										   VertexResidualIds & fit_residual_block_ids,
 										   EdgeResidualIds & smooth_residual_block_ids,
 										   VertexResidualIds & rotation_residual_block_ids,
 										   VertexResidualIds & conf_residual_block_ids)
 {
-	auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
-	for (auto & r : fit_residual_block_ids) {
-		fit_cost[r.first] = evaluateResidual(problem, r.second) * a_fit;
-	}
-	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
-	for (auto & r : smooth_residual_block_ids) {
-		smooth_cost[r.first] = evaluateResidual(problem, r.second) * a_smooth;
-	}
-	auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
-	for (auto & r : conf_residual_block_ids) {
-		conf_cost[r.first] = evaluateResidual(problem, r.second) * a_conf;
-	}
+	// smooth
+	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost");
+	if (smooth_cost.second)
+		evaluateResiduals(_deformation_graph._mesh, problem, smooth_residual_block_ids, smooth_cost.first, a_smooth);
 
-	//for (auto & r : rotation_residual_block_ids) {
-	//	nodes[r.first]._rotation_cost = evaluateResidual(problem, r.second);
-	//}
+	// fit
+	auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost");
+	if (fit_cost.second)
+		evaluateResiduals(_deformation_graph._mesh, problem, fit_residual_block_ids, fit_cost.first, a_fit);
+
+	// conf
+	auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost");
+	if (conf_cost.second)
+		evaluateResiduals(_deformation_graph._mesh, problem, conf_residual_block_ids, conf_cost.first, a_conf);
 }
 
 void EmbeddedDeformation::setParameters()

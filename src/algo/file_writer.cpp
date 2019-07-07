@@ -3,11 +3,17 @@
 #include <experimental/filesystem>
 
 void FileWriter::write(std::string text)
-{
-	std::ofstream file;
-	file.open(_file_path, std::ios_base::app);
-	file << text;
-	file.close();
+{	
+	try {
+		std::ofstream file;
+
+		file.open(_file_path, std::ios_base::app);
+		file << text;
+		file.close();
+	}
+	catch (...) {
+
+	}
 }
 
 FileWriter::FileWriter(std::string file_path)

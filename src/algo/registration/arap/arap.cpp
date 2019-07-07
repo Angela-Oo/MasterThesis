@@ -6,6 +6,7 @@
 #include "boost/graph/adjacency_list.hpp"
 #include "boost/graph/connected_components.hpp"
 #include "algo/mesh_simplification/mesh_simplification.h"
+#include "algo/registration/ceres_residual_evaluation.h"
 
 namespace ARAP
 {
@@ -248,34 +249,25 @@ bool AsRigidAsPossible::finished()
 	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
 }
 
-double AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
-										   std::vector<ceres::ResidualBlockId> & residual_ids)
-{
-	ceres::Problem::EvaluateOptions evaluate_options;
-	evaluate_options.residual_blocks = residual_ids;
-	double total_cost = 0.0;
-	std::vector<double> residuals;
-	problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
-	return total_cost;
-}
-
 void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 										 std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
 										 std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 										 std::map<vertex_descriptor, ResidualIds> & conf_residual_block_ids)
 {
-	auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
-	for (auto & r : fit_residual_block_ids) {
-		fit_cost[r.first] = evaluateResidual(problem, r.second) * a_fit;
-	}
-	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
-	for (auto & r : arap_residual_block_ids) {
-		smooth_cost[r.first] = evaluateResidual(problem, r.second) * a_smooth;
-	}
-	auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
-	for (auto & r : conf_residual_block_ids) {
-		conf_cost[r.first] = evaluateResidual(problem, r.second) * a_conf;
-	}
+	// smooth
+	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost");
+	if(smooth_cost.second)
+		evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, a_smooth);
+	
+	// fit
+	auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost");
+	if(fit_cost.second)
+		evaluateResiduals(_deformation_graph._mesh, problem, fit_residual_block_ids, fit_cost.first, a_fit);
+
+	// conf
+	auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost");
+	if (conf_cost.second)
+		evaluateResiduals(_deformation_graph._mesh, problem, conf_residual_block_ids, conf_cost.first, a_conf);
 }
 
 

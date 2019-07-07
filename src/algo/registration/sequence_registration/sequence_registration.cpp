@@ -92,7 +92,7 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 	, _current(1)
 	, _logger(logger)
 	, _registration_type(registration_type)
-	, _evaluate_residuals(false)
+	, _evaluate_residuals(true)
 	, _finished(false)
 {
 	_deformation_graphs.resize(_meshes.size());

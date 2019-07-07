@@ -629,6 +629,9 @@
     <ClInclude Include="src\visualize\render\render_deformation_graph.h">
       <Filter>visualize\render</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\ceres_residual_evaluation.h">
+      <Filter>algo\registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -761,6 +764,9 @@
     </ClCompile>
     <ClCompile Include="src\visualize\render\render_deformation_graph.cpp">
       <Filter>visualize\render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\ceres_residual_evaluation.cpp">
+      <Filter>algo\registration</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
