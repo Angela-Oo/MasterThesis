@@ -1,4 +1,5 @@
 #include "deformation_graph.h"
+#include "algo/registration/hsv_to_rgb.h"
 #include <cassert>
 
 
@@ -175,11 +176,13 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::
 	_mesh.add_property_map<vertex_descriptor, double>("v:conf_cost", 0.);
 	_mesh.add_property_map<vertex_descriptor, bool>("v:vertex_used", true);
 
+	auto vertex_color = errorToRGB(0.);
+	auto colors = _mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", vertex_color).first;
+
 	auto normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : _mesh.vertices()) {
-		//auto point = _mesh.point(v);
-		//auto normal = normals[v];// _mesh.normal[v];
 		nodes[v] = _create_node();
+		colors[v] = vertex_color;
 	}
 
 	initGlobalDeformation(_create_node());

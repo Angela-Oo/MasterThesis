@@ -33,8 +33,6 @@ SurfaceMesh RigidRegistration::getDeformationGraphMesh()
 {
 	RigidDeformedMesh deformed(_source, _deformation);
 	SurfaceMesh mesh = deformed.deformPoints();
-	double k_mean_fit_cost = DG::getMeanFitCost(mesh) * 10.;
-	DG::setVertexColorBasedOnFitCost(mesh, k_mean_fit_cost);
 	return mesh;
 };
 

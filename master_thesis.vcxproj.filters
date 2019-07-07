@@ -626,6 +626,9 @@
     <ClInclude Include="src\visualize\render\pointsRenderer.h">
       <Filter>visualize\render</Filter>
     </ClInclude>
+    <ClInclude Include="src\visualize\render\render_deformation_graph.h">
+      <Filter>visualize\render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -754,6 +757,9 @@
       <Filter>visualize\render</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\pointsRenderer.cpp">
+      <Filter>visualize\render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\render\render_deformation_graph.cpp">
       <Filter>visualize\render</Filter>
     </ClCompile>
   </ItemGroup>

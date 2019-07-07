@@ -271,6 +271,7 @@
     <ClInclude Include="src\visualize\i_showData.h" />
     <ClInclude Include="src\visualize\render\meshRenderer.h" />
     <ClInclude Include="src\visualize\render\pointsRenderer.h" />
+    <ClInclude Include="src\visualize\render\render_deformation_graph.h" />
     <ClInclude Include="src\visualize\render\render_registration.h" />
     <ClInclude Include="src\visualize\render\render_sequence_registration.h" />
     <ClInclude Include="src\visualize\showMesh.h" />
@@ -325,6 +326,7 @@
     </ClCompile>
     <ClCompile Include="src\visualize\render\meshRenderer.cpp" />
     <ClCompile Include="src\visualize\render\pointsRenderer.cpp" />
+    <ClCompile Include="src\visualize\render\render_deformation_graph.cpp" />
     <ClCompile Include="src\visualize\render\render_registration.cpp" />
     <ClCompile Include="src\visualize\render\render_sequence_registration.cpp" />
     <ClCompile Include="src\visualize\showMesh.cpp" />

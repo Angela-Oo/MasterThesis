@@ -6,11 +6,7 @@
 namespace DG
 {
 
-double getMeanFitCost(const SurfaceMesh & mesh);
-
-void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost);
-
-SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost);
+SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost, bool smooth_cost = true, bool fit_cost = false);
 
 class DeformedMesh
 {

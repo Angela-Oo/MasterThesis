@@ -48,7 +48,7 @@ void ShowMesh::nonRigidRegistration()
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
-		bool evaluate_residuals = false;
+		bool evaluate_residuals = true;
 
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
@@ -150,14 +150,16 @@ void ShowMesh::renderRegistration()
 
 void ShowMesh::render(ml::Cameraf& camera)
 {
-	if (_solve_registration && _register_sequence_of_frames) {
-		solveAllNonRigidRegistration();	
-		_current_frame = _register_sequence_of_frames->getCurrent();
+	if (_solve_registration) {
+		if (_register_sequence_of_frames) {
+			solveAllNonRigidRegistration();
+			_current_frame = _register_sequence_of_frames->getCurrent();
+		}
+		else if (_registration && _selected_frame_for_registration.size() == 2) {
+			nonRigidRegistration();
+		}
+		renderRegistration();
 	}
-	else if (_solve_registration && _registration && _selected_frame_for_registration.size() == 2) {
-		nonRigidRegistration();
-	}
-	renderRegistration();
 	_renderer->render(camera);
 	if (_image_name != "") {
 		_renderer->saveCurrentWindowAsImage(_save_images_folder, _image_name);
@@ -360,6 +362,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_renderer->_render_reference_mesh = false;
 		_calculate_error = false;
 		_renderer->_render_deformation_graph = true;
+		_data_name = "test";
 	}
 	renderRegistration();
 

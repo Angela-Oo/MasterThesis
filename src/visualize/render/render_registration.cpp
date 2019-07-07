@@ -1,6 +1,7 @@
 #include "render_registration.h"
 
 #include "algo/evaluate_registration.h"
+#include "render_deformation_graph.h"
 
 void RenderRegistration::render(ml::Cameraf& camera)
 {
@@ -76,20 +77,22 @@ void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reade
 
 void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> registration)
 {
-	if (registration)
+	if (registration)// && !registration->finished())
 	{
-		if (_render_points || _render_mesh != Render::NONE) {
-			auto deformed_points = registration->getDeformedPoints();
+		auto deformed_points = registration->getDeformedPoints();
 
-			// render point clouds
-			if (_render_mesh == Render::NONE) {
-				_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Cyan, 0.001f);
-				_point_renderer->insertPoints("frame_registered_B", registration->getTarget(), ml::RGBColor::Green, 0.001f, false);
-			}
-			else {
-				_point_renderer->removePoints("frame_registered_A");
-				_point_renderer->removePoints("frame_registered_B");
-			}
+		// render point clouds
+		if (_render_mesh == Render::NONE) {
+			_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Cyan, 0.001f);
+			_point_renderer->insertPoints("frame_registered_B", registration->getTarget(), ml::RGBColor::Green, 0.001f, false);
+
+			_mesh_renderer->removeMesh("mesh_a");
+			_mesh_renderer->removeMesh("mesh_b");
+		}
+		else {
+			_point_renderer->removePoints("frame_registered_A");
+			_point_renderer->removePoints("frame_registered_B");
+
 			// render mesh
 			if (_render_mesh == Render::DEFORMATION) {
 				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
@@ -105,6 +108,7 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 				_mesh_renderer->removeMesh("mesh_a");
 			}
 		}
+		
 
 		// fixed positions
 		std::vector<Point> render_fixed_positions = registration->getFixedPostions();
@@ -114,6 +118,7 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 		// deformation graph
 		if (_render_deformation_graph) {
 			auto render_dg = registration->getDeformationGraphMesh();
+			Visualize::setDeformationGraphColor(render_dg, true);
 			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, false);
 		}
 		else {
@@ -154,6 +159,7 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 		// deformation graph
 		if (_render_deformation_graph && !_reigistration_finished) {
 			auto render_dg = sequence_registration->getDeformationGraphMesh(sequence_registration->getCurrent());
+			Visualize::setDeformationGraphColor(render_dg, true);
 			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, false, true);
 		}
 		else {

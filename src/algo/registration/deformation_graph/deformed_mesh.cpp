@@ -5,101 +5,7 @@
 namespace DG {
 
 
-double getMeanFitCost(const SurfaceMesh & mesh)
-{
-	auto property_map_fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost");
-	if (property_map_fit_costs.second) {
-		auto fit_costs = property_map_fit_costs.first;
-		double mean_fit_cost = 0.;
-		for (auto v : mesh.vertices()) {
-			mean_fit_cost += fit_costs[v];
-		}
-		mean_fit_cost /= mesh.number_of_vertices();
-		return mean_fit_cost;
-	}
-	std::cout << " no fit property " << std::endl;
-	return 0.;
-}
-
-double getReferenceCost(const SurfaceMesh & mesh)
-{
-	if (mesh.number_of_vertices() > 0) {
-		auto fit_costs = mesh.property_map<vertex_descriptor, double>("v:fit_cost").first;
-		auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
-		auto conf_costs = mesh.property_map<vertex_descriptor, double>("v:conf_cost").first;
-
-		double mean_fit_cost = 0.;
-		double max_fit_cost = 0.0;
-		double max_conf_cost = 0.0;
-
-		for (auto v : mesh.vertices()) {
-			mean_fit_cost += fit_costs[v];
-			if (fit_costs[v] > max_fit_cost)
-				max_fit_cost = fit_costs[v];
-			if (conf_costs[v] > max_conf_cost)
-				max_conf_cost = conf_costs[v];
-		}
-		mean_fit_cost /= mesh.number_of_vertices();
-
-		double mean_smooth_cost = 0.;
-		double max_smooth_cost = 0.0;
-		for (auto e : mesh.edges()) {
-			mean_smooth_cost += smooth_costs[e];
-			if (smooth_costs[e] > max_smooth_cost)
-				max_smooth_cost = smooth_costs[e];
-		}
-		mean_smooth_cost /= mesh.number_of_edges();
-
-		auto k_mean_cost = std::max(mean_fit_cost, mean_smooth_cost);
-		k_mean_cost *= 10.;
-
-		std::cout << "max costs: fit " << max_fit_cost
-			<< " conf " << max_conf_cost
-			<< " smooth " << max_smooth_cost
-			<< " k mean visualize cost " << k_mean_cost << " ";
-
-		return k_mean_cost;
-	}
-	return 0.1;
-}
-
-void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
-{
-	auto property_fit = mesh.property_map<vertex_descriptor, double>("v:fit_cost");
-	if (property_fit.second)
-	{
-		auto fit_costs = property_fit.first;
-
-		// add color property if not already exists
-		auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-
-		// if vertex was used for optimization flag is set use it
-		auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used");
-
-		auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
-
-		for (auto & v : mesh.vertices())
-		{
-			double error = (reference_cost > 0.) ? (fit_costs[v] / reference_cost) : fit_costs[v];
-			error = std::min(1., error);
-			colors[v] = errorToRGB(error);
-
-			if (vertex_used.second) {
-				if (!vertex_used.first[v]) {
-					colors[v] = ml::RGBColor::Black.toVec4f();
-				}
-			}
-			if (deformations[v]->weight() < 0.5)
-				colors[v] = ml::RGBColor::White.toVec4f();
-		}
-	}
-	else {
-		std::cout << "no fit property" << std::endl;
-	}
-}
-
-
-SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost)
+SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost, bool smooth_cost, bool fit_cost)
 {
 	SurfaceMesh mesh = deformation_graph._mesh;
 	auto normals = mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
@@ -108,26 +14,8 @@ SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_g
 		mesh.point(v) = deformed._point;
 		normals[v] = deformed._normal;
 	}
-
-	// color
-	double reference_cost = 0.;
-	if (color_based_on_cost) {
-		reference_cost = getReferenceCost(mesh);		
-	}
-	setVertexColorBasedOnFitCost(mesh, reference_cost);
-
-	auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
-	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
-	for (auto & e : mesh.edges())
-	{
-		double error = (reference_cost > 0.) ? (smooth_costs[e] / reference_cost) : smooth_costs[e];
-		error = std::min(1., error);
-		edge_colors[e] = errorToRGB(error);
-	}
 	return mesh;
 }
-
-
 
 
 SurfaceMesh DeformedMesh::deformPoints()
