@@ -80,7 +80,7 @@ ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Prob
 	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal, n._point, global._point);
 	auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weighting * weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function,
-									global._deformation->r(), global._deformation->t(), n._deformation->r(), n._deformation->t(), n._deformation->w());
+									global._deformation->r(), global._deformation->t(), n._deformation->t(), n._deformation->w());
 }
 
 VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &problem)
@@ -287,7 +287,7 @@ void AsRigidAsPossible::setParameters()
 	_find_max_distance = 0.1;
 	_find_max_angle_deviation = 45.;
 	_max_iterations = 25;
-	_ignore_deformation_graph_border_vertices = false;
+	_ignore_deformation_graph_border_vertices = true;
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,

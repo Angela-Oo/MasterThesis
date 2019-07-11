@@ -115,11 +115,11 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create(const Point& target_position, const Vector & target_normal, const Point& node_g, const Point &global_g)
 	{
-		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneAngleAxisCostFunction, 1, 3, 3, 3, 3, 1>(new FitStarPointToPlaneAngleAxisCostFunction(target_position, target_normal, node_g, global_g)));
+		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneAngleAxisCostFunction, 1, 3, 3, 3, 1>(new FitStarPointToPlaneAngleAxisCostFunction(target_position, target_normal, node_g, global_g)));
 	}
 
 	template <typename T>
-	bool operator()(const T* const global_rotation, const T* const global_translation, const T* const rotation, const T* const translation, const T* const w, T* residuals) const
+	bool operator()(const T* const global_rotation, const T* const global_translation, const T* const translation, const T* const w, T* residuals) const
 	{
 		T node_g[3];
 		T global_g[3];
