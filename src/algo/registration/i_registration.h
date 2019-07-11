@@ -49,7 +49,7 @@ public:
 public:
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
 	virtual const DG::DeformationGraph & getDeformationGraph() { return DG::DeformationGraph();	}; // todo
-	virtual SurfaceMesh getDeformationGraphMesh() = 0;// { return SurfaceMesh(); };
+	virtual SurfaceMesh getDeformationGraphMesh() = 0;
 public:
 	virtual ~IRegistration() = default;
 };

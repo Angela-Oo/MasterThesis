@@ -566,9 +566,6 @@
     <ClInclude Include="src\algo\evaluate_registration.h">
       <Filter>algo\evaluate registration</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\mesh_knn.h">
-      <Filter>algo\evaluate registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\ceres_math.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
@@ -712,9 +709,6 @@
       <Filter>algo\helper</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\evaluate_registration.cpp">
-      <Filter>algo\evaluate registration</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\mesh_knn.cpp">
       <Filter>algo\evaluate registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\deformation_graph.cpp">

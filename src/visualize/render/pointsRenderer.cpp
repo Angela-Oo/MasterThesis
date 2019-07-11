@@ -212,7 +212,7 @@ void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, float
 		meshes.push_back(mesh);
 		std::vector<ml::vec3f> normals;
 		for (auto & p : points.getVertices()) {
-			meshes.push_back(ml::Shapesf::line(p.position, p.position + p.normal * 0.02, p.color, point_size * 0.2));
+			meshes.push_back(ml::Shapesf::line(p.position, p.position + p.normal * 0.02f, p.color, point_size * 0.2f));
 		}
 		_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 	}

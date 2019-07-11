@@ -33,7 +33,7 @@ std::vector<float> evaluate_distance_error(std::vector<std::pair<Point, Point>> 
 	std::vector<float> distances;
 	for (auto p : nearest_points) {
 		auto vector = p.first - p.second;
-		float distance = sqrt(vector.squared_length());
+		double distance = sqrt(vector.squared_length());
 		if (isnan(distance) || isinf(distance))
 			std::cout << "bad" << std::endl;
 		distances.push_back(distance);
@@ -43,16 +43,16 @@ std::vector<float> evaluate_distance_error(std::vector<std::pair<Point, Point>> 
 
 
 
-float area(Point point_a, Point point_b, Point point_c)
+double area(Point point_a, Point point_b, Point point_c)
 {
 	auto c = point_b - point_a;
 	auto b = point_c - point_a;
 	assert(c.squared_length() != 0.f && b.squared_length() != 0.f);
 
-	float angle = CGAL::scalar_product(c, b);
-	float b_length = sqrt(b.squared_length());
-	float hb = sin(angle) * b_length;
-	float area = (hb * b_length) / 2.f;
+	double angle = CGAL::scalar_product(c, b);
+	double b_length = sqrt(b.squared_length());
+	double hb = sin(angle) * b_length;
+	double area = (hb * b_length) / 2.f;
 	return area;
 }
 
@@ -64,9 +64,9 @@ Point ErrorEvaluation::barycentricCoordinates(Point point_a, Point point_b, Poin
 	auto area_face = area(point_a, point_b, point_c);
 
 	assert(area_face != 0.);
-	float u = area_u / area_face;
-	float v = area_v / area_face;
-	float w = area_w / area_face;
+	double u = area_u / area_face;
+	double v = area_v / area_face;
+	double w = area_w / area_face;
 	return Point(u, v, w);
 }
 
