@@ -156,8 +156,6 @@ bool RigidRegistration::solveIteration()
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
-
-		_total_time_in_ms += logger.get_time_in_ms();
 	}
 	return finished();
 }

@@ -29,7 +29,6 @@ private:
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 100;
-	long long _total_time_in_ms = 0;
 private:
 	void evaluateResidual(ceres::Problem & problem,
 						  std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids);

@@ -193,7 +193,6 @@ bool AsRigidAsPossible::solveIteration()
 		_solve_iteration++;
 		ceres::Solver::Summary summary;
 		auto logger = _ceres_logger.CreateCeresIterationLogger(summary);
-		//CeresIterationLoggerGuard logger(summary, _total_time_in_ms, _solve_iteration, _logger);
 
 		ceres::Problem problem;
 

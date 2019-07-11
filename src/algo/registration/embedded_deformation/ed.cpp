@@ -225,7 +225,6 @@ bool EmbeddedDeformation::solveIteration()
 			std::cout << "scale factor: smooth " << a_smooth << " rigid: " << a_rigid << std::endl;
 		}
 
-		_total_time_in_ms += logger.get_time_in_ms();
 	}
 	return finished();
 }

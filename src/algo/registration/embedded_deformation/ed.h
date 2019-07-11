@@ -37,7 +37,6 @@ private:
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 100;
-	long long _total_time_in_ms = 0;
 	bool _evaluate_residuals;
 public:
 	double a_rigid;

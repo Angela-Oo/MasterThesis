@@ -45,15 +45,6 @@ CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 	if(_logger)
 		_logger->write(ss.str());
 	std::cout << ss.str();
-	//std::cout << std::setprecision(4);
-	//std::cout << std::endl << "Iteration: " << std::setw(3) << _iteration << "  steps: " << std::setw(3) << _summary.iterations.size();	
-	////std::cout << " duration " << time_to_string(elapse);
-	//std::cout << "  time: " << std::setw(10) << time_to_string(_total_time_in_ms);
-	////std::cout << "Initial cost: " << _summary.initial_cost;
-	//std::cout << "  error: " << std::setw(6) << _summary.final_cost;
-	////if (_summary.termination_type != 1)
-	//std::cout << "  term: " << _summary.termination_type;
-	//std::cout << "  ";
 }
 
 
@@ -71,9 +62,9 @@ void CeresLogger::write(std::string text, bool log_time)
 	std::cout << ss.str();
 }
 
-CeresIterationLoggerGuard CeresLogger::CreateCeresIterationLogger(const ceres::Solver::Summary& summary)
+std::unique_ptr<CeresIterationLoggerGuard> CeresLogger::CreateCeresIterationLogger(const ceres::Solver::Summary& summary)
 {
-	auto iteration_logger = CeresIterationLoggerGuard(summary, _start_time, _iteration, _logger);
+	auto iteration_logger = std::make_unique<CeresIterationLoggerGuard>(summary, _start_time, _iteration, _logger);
 	_iteration++;
 	return iteration_logger;
 }
