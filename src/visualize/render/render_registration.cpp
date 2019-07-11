@@ -17,6 +17,8 @@ Render RenderRegistration::nextRenderMeshMode()
 		_render_mesh = Render::TARGET;
 	else if (_render_mesh == Render::TARGET)
 		_render_mesh = Render::ALL;
+	else if (_render_mesh == Render::ALL)
+		_render_mesh = Render::ONLY_DEFORMATION_GRAPH;
 	else
 		_render_mesh = Render::NONE;
 	return _render_mesh;
@@ -77,6 +79,7 @@ void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reade
 
 void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> registration)
 {
+	bool debug_normals = true;
 	if (registration)// && !registration->finished())
 	{
 		auto deformed_points = registration->getDeformedPoints();
@@ -88,6 +91,10 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 
 			_mesh_renderer->removeMesh("mesh_a");
 			_mesh_renderer->removeMesh("mesh_b");
+			if (debug_normals) {
+				_point_renderer->removePoints("mesh_a");
+				_point_renderer->removePoints("mesh_b");
+			}
 		}
 		else {
 			_point_renderer->removePoints("frame_registered_A");
@@ -95,17 +102,40 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 
 			// render mesh
 			if (_render_mesh == Render::DEFORMATION) {
-				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
-				_mesh_renderer->removeMesh("mesh_b");
+				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());				
+				_mesh_renderer->removeMesh("mesh_b");				
 				_point_renderer->insertPoints("frame_registered_B", registration->getTarget(), ml::RGBColor::Green, 0.001f, false);
+
+				if (debug_normals) {
+					_point_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan, 0.001f, true);
+					_point_renderer->removePoints("mesh_b");
+				}
 			}
 			else if (_render_mesh == Render::ALL) {
 				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
 				_mesh_renderer->insertMesh("mesh_b", registration->getTarget(), ml::RGBColor::Green.toVec4f(), false);
+
+				if (debug_normals) {
+					_point_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan, 0.001f, true);
+					_point_renderer->insertMesh("mesh_b", registration->getTarget(), ml::RGBColor::Green, 0.001f, true);
+				}
 			}
 			else if (_render_mesh == Render::TARGET) {
 				_mesh_renderer->insertMesh("mesh_b", registration->getTarget(), ml::RGBColor::Green.toVec4f(), false);
 				_mesh_renderer->removeMesh("mesh_a");
+
+				if (debug_normals) {
+					_point_renderer->insertMesh("mesh_b", registration->getTarget(), ml::RGBColor::Green, 0.001f, true);
+					_point_renderer->removePoints("mesh_a");
+				}
+			}
+			else if (_render_mesh == Render::ONLY_DEFORMATION_GRAPH) {
+				_mesh_renderer->removeMesh("mesh_a");
+				_mesh_renderer->removeMesh("mesh_b");
+				if (debug_normals) {
+					_point_renderer->removePoints("mesh_a");
+					_point_renderer->removePoints("mesh_b");
+				}
 			}
 		}
 		
@@ -119,7 +149,7 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 		if (_render_deformation_graph) {
 			auto render_dg = registration->getDeformationGraphMesh();
 			Visualize::setDeformationGraphColor(render_dg, true);
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, false);
+			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, debug_normals);
 		}
 		else {
 			_point_renderer->removePoints("deformation_graph");
