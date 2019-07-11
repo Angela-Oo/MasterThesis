@@ -55,6 +55,7 @@ void ShowMesh::nonRigidRegistration()
 
 		_registration = createRegistration(source, target, _registration_type, option, evaluate_residuals, _logger, _deformation_graph_edge_length, _input_mesh->getFixedPositions(frame_b));
 		renderRegistration();
+		_image_name = "frame_" + std::to_string(_registration->currentIteration());
 	}
 	else {
 		bool finished = _registration->finished();
@@ -317,6 +318,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
 	bool test = false;
+	bool register_on_reference_mesh = true;
 	if (!test) {
 		// puppet
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
@@ -334,6 +336,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
 		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
 		_deformation_graph_edge_length = 0.07;
+		//_deformation_graph_edge_length = 0.1;
 		_data_name = "head";
 	
 		// hand
@@ -343,12 +346,18 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		input_mesh->processAllFrames();
 		reference_registration_mesh->processAllFrames();
-		//for (int i = 0; i < 20; i++) {
+		//for (int i = 0; i < 10; i++) {
 		//	input_mesh->processFrame();
 		//	reference_registration_mesh->processFrame();
 		//}
-		_input_mesh = std::move(input_mesh);
-		_reference_registration_mesh = std::move(reference_registration_mesh);
+		if (register_on_reference_mesh) {
+			_input_mesh = std::move(reference_registration_mesh);
+			_reference_registration_mesh = std::move(input_mesh);
+		}
+		else {
+			_input_mesh = std::move(input_mesh);
+			_reference_registration_mesh = std::move(reference_registration_mesh);
+		}
 		//_logger = std::make_shared<FileWriter>(_data_name + "_log.txt");
 	}
 	else {
@@ -357,7 +366,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		_input_mesh = std::make_shared<DeformationMeshFrames>();
 		_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
-
+		_deformation_graph_edge_length = 0.07;
 		//_logger = std::make_shared<FileWriter>("test.txt");
 		_renderer->_render_reference_mesh = false;
 		_calculate_error = false;

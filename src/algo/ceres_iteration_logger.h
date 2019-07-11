@@ -7,6 +7,8 @@
 
 std::string getDurationAsString(std::chrono::time_point<std::chrono::system_clock> start_time);
 
+std::string getDurationAsString_min_s_ms(std::chrono::time_point<std::chrono::system_clock> start_time);
+
 class CeresIterationLoggerGuard
 {
 	std::chrono::time_point<std::chrono::system_clock> _start_time;

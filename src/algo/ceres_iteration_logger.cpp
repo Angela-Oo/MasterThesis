@@ -8,11 +8,27 @@ std::string getDurationAsString(std::chrono::time_point<std::chrono::system_cloc
 	auto duration_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
 
 	double s = floor(static_cast<double>(duration_in_ms) / 1000.);
-	double ms = duration_in_ms - (s * 1000);
+	double ms = duration_in_ms % 1000;
+
 	std::stringstream ss;
-	ss << std::setw(4) << s << " s " << std::setw(3) << ms << " ms";
+	ss << "(s:ms) " << std::setfill('0') << s << ":" << std::setw(3) << ms;
 	return ss.str();
 }
+
+std::string getDurationAsString_min_s_ms(std::chrono::time_point<std::chrono::system_clock> start_time)
+{
+	auto end_time = std::chrono::system_clock::now();
+	auto duration_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+	double min = floor(static_cast<double>(duration_in_ms) / 60000.);
+	double s = floor(static_cast<double>(duration_in_ms % 60000) / 1000.);	
+	double ms = duration_in_ms % 1000;
+
+	std::stringstream ss;
+	ss << "(min:s:ms) " << std::setfill('0') << min << ":" << std::setw(2) << s << ":" << std::setw(3) << ms;
+	return ss.str();
+}
+
 
 long long CeresIterationLoggerGuard::get_time_in_ms()
 {
@@ -54,7 +70,7 @@ void CeresLogger::write(std::string text, bool log_time)
 	ss << std::endl;	
 	if (log_time) {		
 		ss << std::setprecision(4);
-		ss << "time: " << std::setw(10) << getDurationAsString(_start_time) << "   -   ";
+		ss << "time: " << std::setw(10) << getDurationAsString_min_s_ms(_start_time) << "   -   ";
 	}
 	ss << text;
 	if (_logger)

@@ -79,8 +79,9 @@ void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reade
 
 void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> registration)
 {
-	bool debug_normals = true;
-	if (registration)// && !registration->finished())
+	bool debug_normals = false;
+	bool debug_deformation_graph_normals = true;
+	if (registration)
 	{
 		auto deformed_points = registration->getDeformedPoints();
 
@@ -149,7 +150,7 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 		if (_render_deformation_graph) {
 			auto render_dg = registration->getDeformationGraphMesh();
 			Visualize::setDeformationGraphColor(render_dg, true);
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, debug_normals);
+			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, debug_deformation_graph_normals);
 		}
 		else {
 			_point_renderer->removePoints("deformation_graph");
