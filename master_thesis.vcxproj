@@ -224,7 +224,10 @@
     <ClInclude Include="src\algo\ceres_math.h" />
     <ClInclude Include="src\algo\evaluate_registration.h" />
     <ClInclude Include="src\algo\file_writer.h" />
+    <ClInclude Include="src\algo\mesh_simplification\isotropic_remeshing.h" />
+    <ClInclude Include="src\algo\mesh_simplification\make_mesh_3_remeshing.h" />
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h" />
+    <ClInclude Include="src\algo\mesh_simplification\poison_surface_remeshing.h" />
     <ClInclude Include="src\algo\registration\arap\arap.h" />
     <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h" />
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h" />
@@ -284,7 +287,10 @@
     <ClCompile Include="src\algo\ceres_iteration_logger.cpp" />
     <ClCompile Include="src\algo\evaluate_registration.cpp" />
     <ClCompile Include="src\algo\file_writer.cpp" />
+    <ClCompile Include="src\algo\mesh_simplification\isotropic_remeshing.cpp" />
+    <ClCompile Include="src\algo\mesh_simplification\make_mesh_3_remeshing.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp" />
+    <ClCompile Include="src\algo\mesh_simplification\poison_surface_remeshing.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp" />
     <ClCompile Include="src\algo\registration\ceres_option.cpp" />

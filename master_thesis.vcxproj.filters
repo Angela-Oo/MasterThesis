@@ -629,6 +629,15 @@
     <ClInclude Include="src\algo\registration\ceres_residual_evaluation.h">
       <Filter>algo\registration</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\mesh_simplification\isotropic_remeshing.h">
+      <Filter>algo\mesh simplification</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\mesh_simplification\make_mesh_3_remeshing.h">
+      <Filter>algo\mesh simplification</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\mesh_simplification\poison_surface_remeshing.h">
+      <Filter>algo\mesh simplification</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -761,6 +770,15 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\ceres_residual_evaluation.cpp">
       <Filter>algo\registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\mesh_simplification\isotropic_remeshing.cpp">
+      <Filter>algo\mesh simplification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\mesh_simplification\make_mesh_3_remeshing.cpp">
+      <Filter>algo\mesh simplification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\mesh_simplification\poison_surface_remeshing.cpp">
+      <Filter>algo\mesh simplification</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
