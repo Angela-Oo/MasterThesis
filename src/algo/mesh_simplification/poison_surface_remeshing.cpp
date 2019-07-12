@@ -11,7 +11,8 @@ typedef CGAL::Exact_predicates_inexact_constructions_kernel ExactInexactKernel;
 
 SurfaceMesh poisonSurfaceRemeshing(const SurfaceMesh & mesh, double target_edge_length)
 {
-	assert(surface_mesh.property_map<vertex_descriptor, Vector>("v:normal").second == true);
+	bool normals_exists = mesh.property_map<vertex_descriptor, Vector>("v:normal").second;
+	assert(normals_exists);
 	auto normals = mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 
 	typedef CGAL::Exact_predicates_inexact_constructions_kernel PoisonRemeshKernel;

@@ -93,8 +93,8 @@ SurfaceMesh::Point ErrorEvaluation::getNearestPointOnSurface(Point & point)
 				}
 				if (face_points.size() == 3) {
 					auto barycentric_coordinates = barycentricCoordinates(face_points[0], face_points[1], face_points[2], point_on_plane);
-					float relative_area = barycentric_coordinates.x() + barycentric_coordinates.y() + barycentric_coordinates.z();
-					if (relative_area <= 1) {
+					double relative_area = barycentric_coordinates.x() + barycentric_coordinates.y() + barycentric_coordinates.z();
+					if (relative_area <= 1.) {
 						return point_on_plane;
 					}
 				}
