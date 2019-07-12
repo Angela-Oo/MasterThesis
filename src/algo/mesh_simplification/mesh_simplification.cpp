@@ -23,7 +23,7 @@ enum class ReduceMeshStrategy{
 
 SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_length)
 {
-	ReduceMeshStrategy strategy = ReduceMeshStrategy::MAKEMESH3;
+	ReduceMeshStrategy strategy = ReduceMeshStrategy::ISOTROPIC;
 	try {
 		if(strategy == ReduceMeshStrategy::ISOTROPIC)
 			return isotropicRemeshing(mesh, target_edge_length);

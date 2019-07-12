@@ -88,15 +88,15 @@ ml::SensorData CalibrateSensorDataWrapper::getSensorData()
 {
 	ml::SensorData data;
 
-	for (int frame = 0; frame < _sensor_data.m_ColorNumFrames; frame++) {
+	for (unsigned int frame = 0; frame < _sensor_data.m_ColorNumFrames; frame++) {
 		ml::vec4uc* sensor_color = _sensor_data.m_ColorImages[frame];
 		ml::vec3uc* color = new ml::vec3uc[_sensor_data.m_ColorImageWidth * _sensor_data.m_ColorImageHeight];
-		for (int i = 0; i < _sensor_data.m_ColorImageWidth * _sensor_data.m_ColorImageHeight; i++)
+		for (unsigned int i = 0; i < _sensor_data.m_ColorImageWidth * _sensor_data.m_ColorImageHeight; i++)
 			color[i] = ml::vec3uc(sensor_color[i][0], sensor_color[i][1], sensor_color[i][2]);
 
 		float *sensor_depth = _sensor_data.m_DepthImages[frame];
 		unsigned short *depth = new unsigned short[_sensor_data.m_DepthImageWidth * _sensor_data.m_DepthImageHeight];
-		for (int i = 0; i < _sensor_data.m_DepthImageWidth * _sensor_data.m_DepthImageHeight; i++)
+		for (unsigned int i = 0; i < _sensor_data.m_DepthImageWidth * _sensor_data.m_DepthImageHeight; i++)
 			depth[i] = static_cast<unsigned short>(sensor_depth[i] * 1000.);
 
 		data.addFrame(color, depth);
