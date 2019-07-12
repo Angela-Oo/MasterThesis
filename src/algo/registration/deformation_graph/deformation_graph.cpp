@@ -116,6 +116,28 @@ Point DeformationGraph::deformPoint(const Point & point, const NearestNodes & ne
 	return global_deformed_point;
 }
 
+Vector DeformationGraph::deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const
+{
+	Vector deformed_normal(0., 0., 0.);
+
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	assert(property_map_nodes.second);
+	auto & nodes = property_map_nodes.first;
+
+	for (size_t i = 0; i < nearest_nodes.nodes.size() - 1; ++i)
+	{
+		auto vertex_index = nearest_nodes.nodes[i];
+		double w = nearest_nodes.weights[i];
+
+		auto node = getNode(vertex_index);
+		Vector transformed_normal = node.deformNormal(normal);
+		transformed_normal *= w;
+		deformed_normal += transformed_normal;
+	}
+	Vector global_deformed_normal = _global.deformNormal(deformed_normal);
+	return global_deformed_normal;
+}
+
 PositionAndDeformation DeformationGraph::getNode(vertex_descriptor node_index) const
 {
 	PositionAndDeformation node;

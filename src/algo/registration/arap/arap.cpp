@@ -53,34 +53,44 @@ std::vector<Point> AsRigidAsPossible::getFixedPostions()
 	return positions;
 }
 
-ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point)
+ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor v, const Point & target_point)
 {
+	ResidualIds residual_ids;
 	float point_to_point_weighting = 0.1f;
 	double weight = a_fit * point_to_point_weighting;
 
 	auto & global = _deformation_graph._global;
-	auto n = _deformation_graph.getNode(node);
+	auto nodes = _deformed_mesh->nearestNodes(v);	
+	for (auto n : nodes.nodes) {
+		auto d = _deformation_graph.getNode(n);
 
-	auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, n._point, global._point);
-	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function, global._deformation->r(), global._deformation->t(), n._deformation->t(), n._deformation->w());
+		auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global._point);
+		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
+		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function, global._deformation->r(), global._deformation->t(), d._deformation->t(), d._deformation->w()));
+	}
+	return residual_ids;
 }
 
-ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &problem,
-																	 vertex_descriptor node,
-																	 const Point & target_point, 
-																	 const Vector & target_normal)
+ResidualIds AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &problem,
+														  vertex_descriptor v,
+														  const Point & target_point, 
+														  const Vector & target_normal)
 {
+	ResidualIds residual_ids;
 	float point_to_plane_weighting = 0.9f;
 	double weight = a_fit * point_to_plane_weighting;
-	auto & g = _deformation_graph._mesh;
-	auto & global = _deformation_graph._global;
-	auto n = _deformation_graph.getNode(node);
 
-	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal, n._point, global._point);
-	auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weighting * weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function,
-									global._deformation->r(), global._deformation->t(), n._deformation->t(), n._deformation->w());
+	auto & global = _deformation_graph._global;
+	auto nodes = _deformed_mesh->nearestNodes(v);
+	for (auto n : nodes.nodes) {
+		auto d = _deformation_graph.getNode(n);
+
+		auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal, _deformed_mesh->point(v), global._point);
+		auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weighting * weight, ceres::TAKE_OWNERSHIP);
+		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
+														global._deformation->r(), global._deformation->t(), d._deformation->t(), d._deformation->w()));
+	}
+	return residual_ids;
 }
 
 VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &problem)
@@ -96,8 +106,10 @@ VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &proble
 		auto vertex = _deformation_graph.deformNode(v);
 		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), v) != _fixed_positions.end()))
 		{
-			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _dst.point(v)));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v), target_normals[v]));
+			ResidualIds point_to_point = addPointToPointCostForNode(problem, v, _dst.point(v));
+			residual_ids[v].insert(residual_ids[v].end(), point_to_point.begin(), point_to_point.end());
+			ResidualIds point_to_plane = addPointToPlaneCostForNode(problem, v, _dst.point(v), target_normals[v]);
+			residual_ids[v].insert(residual_ids[v].end(), point_to_plane.begin(), point_to_plane.end());
 		}
 	}
 	//	std::cout << "used nodes " << i << " / " << mesh.number_of_vertices();
@@ -112,40 +124,45 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
 
-	auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used").first;
+	//auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used").first;
 	int i = 0;
-	for (auto & v : mesh.vertices())
+	for (auto & v : _deformed_mesh->vertices())
 	{
-		vertex_used[v] = false;
+		//vertex_used[v] = false;
 		
 		bool use_vertex = true;
 		if (_ignore_deformation_graph_border_vertices)
-			use_vertex = !mesh.is_border(v, true);
+			use_vertex = !_src.is_border(v, true);
 
 		if(use_vertex) {
-			auto vertex = _deformation_graph.deformNode(v);
-			auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal);
+			auto point = _deformed_mesh->point(v);
+			auto normal = _deformed_mesh->normal(v);
+
+			auto correspondent_point = _find_correspondence_point->correspondingPoint(point, normal);
 
 			if (correspondent_point.first) {		
 				vertex_descriptor target_vertex = correspondent_point.second;
 				auto target_point = _find_correspondence_point->getPoint(target_vertex);
 				auto target_normal = _find_correspondence_point->getNormal(target_vertex);
-				residual_ids[v].push_back(addPointToPointCostForNode(problem, v, target_point));
 
+				ResidualIds point_to_point = addPointToPointCostForNode(problem, v, target_point);
+				residual_ids[v].insert(residual_ids[v].end(), point_to_point.begin(), point_to_point.end());
+				
 				if (target_normal.squared_length() > 0.) {
-					residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, target_point, target_normal));
+					ResidualIds point_to_plane = addPointToPlaneCostForNode(problem, v, target_point, target_normal);
+					residual_ids[v].insert(residual_ids[v].end(), point_to_plane.begin(), point_to_plane.end());
 				}
 				else {
 					std::cout << "normal is degenerated" << std::endl;
 				}
 
 				i++;
-				vertex_used[v] = true;
+				//vertex_used[v] = true;
 			}
 		}
 	}
 	
-	std::cout << "used nodes " << i << " / " << mesh.number_of_vertices() << " ";
+	std::cout << "used corresponding vertices " << i << " / " << _deformed_mesh->number_of_vertices() << " ";
 	std::cout << " allowed distance " <<  _find_correspondence_point->median() << " ";
 	return residual_ids;
 }
@@ -259,14 +276,14 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 		evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, a_smooth);
 	
 	// fit
-	auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost");
-	if(fit_cost.second)
-		evaluateResiduals(_deformation_graph._mesh, problem, fit_residual_block_ids, fit_cost.first, a_fit);
+	//auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost");
+	//if(fit_cost.second)
+	//	evaluateResiduals(_deformation_graph._mesh, problem, fit_residual_block_ids, fit_cost.first, a_fit);
 
-	// conf
-	auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost");
-	if (conf_cost.second)
-		evaluateResiduals(_deformation_graph._mesh, problem, conf_residual_block_ids, conf_cost.first, a_conf);
+	//// conf
+	//auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost");
+	//if (conf_cost.second)
+	//	evaluateResiduals(_deformation_graph._mesh, problem, conf_residual_block_ids, conf_cost.first, a_conf);
 }
 
 
@@ -280,8 +297,8 @@ void AsRigidAsPossible::printCeresOptions()
 
 void AsRigidAsPossible::setParameters()
 {
-	a_smooth = 5.; //0.1;
-	a_conf = 0.02;// 1.;// 10.;
+	a_smooth = 1.; //0.1;
+	a_conf = 10.;// 0.02;// 1.;
 	a_fit = 20.; // 100.;
 	_find_max_distance = 0.1;
 	_find_max_angle_deviation = 45.;

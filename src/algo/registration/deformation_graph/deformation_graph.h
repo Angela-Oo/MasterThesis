@@ -27,6 +27,7 @@ public:
 	std::vector<double> weights(const Point & point, std::vector<vertex_descriptor>& nearest_nodes_indices) const;
 	std::vector<vertex_descriptor> nearestNodes(const Point & point) const;
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
+	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
 	PositionAndDeformation getNode(vertex_descriptor node_index) const;
 	PositionAndDeformation deformNode(vertex_descriptor node_index) const;

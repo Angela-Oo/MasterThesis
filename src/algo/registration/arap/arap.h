@@ -56,8 +56,8 @@ private:
 							std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 							std::map<vertex_descriptor, ResidualIds> & conf_residual_block_ids);
 private:
-	ceres::ResidualBlockId addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point);
-	ceres::ResidualBlockId addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal);
+	ResidualIds addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point);
+	ResidualIds addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal);
 	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem);
 	std::map<vertex_descriptor, ResidualIds> addFitCostWithoutICP(ceres::Problem &problem);
 	std::map<edge_descriptor, ResidualIds> addAsRigidAsPossibleCost(ceres::Problem &problem);

@@ -17,6 +17,35 @@ SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_g
 	return mesh;
 }
 
+CGAL::Iterator_range<SurfaceMesh::Vertex_iterator> DeformedMesh::vertices() const
+{
+	return _mesh.vertices();
+}
+
+uint32_t DeformedMesh::number_of_vertices() const
+{
+	return _mesh.number_of_vertices();
+}
+
+Point DeformedMesh::point(SurfaceMesh::Vertex_index v) const
+{
+	Point p = _deformation_graph.deformPoint(_mesh.point(v), nearestNodes(v));
+	return p;
+}
+
+Vector DeformedMesh::normal(SurfaceMesh::Vertex_index v) const
+{
+	auto normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
+	Vector n = _deformation_graph.deformNormal(normals[v], nearestNodes(v));
+	return n;
+}
+
+NearestNodes DeformedMesh::nearestNodes(SurfaceMesh::Vertex_index v) const
+{
+	auto nearest_nodes = _mesh.property_map<vertex_descriptor, NearestNodes>("v:nearest_nodes");
+	assert(nearest_nodes.second);	
+	return nearest_nodes.first[v];
+}
 
 SurfaceMesh DeformedMesh::deformPoints()
 {
