@@ -80,7 +80,7 @@ void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reade
 void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> registration)
 {
 	bool debug_normals = false;
-	bool debug_deformation_graph_normals = true;
+	bool debug_deformation_graph_normals = false;
 	if (registration)
 	{
 		auto deformed_points = registration->getDeformedPoints();
@@ -217,7 +217,7 @@ void RenderRegistration::renderError(std::vector<std::pair<Point, Point>> error_
 			e.cost /= max_cost;
 			edges.push_back(e);
 		}
-		_point_renderer->insertLine("error", edges, 0.0005);
+		_point_renderer->insertLine("error", edges, 0.0005f);
 	}
 	else {
 		_point_renderer->removePoints("error");

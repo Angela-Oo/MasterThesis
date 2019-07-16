@@ -132,7 +132,7 @@ void PointsRenderer::insertMesh(std::string id,
 		meshes.push_back(createLineTriMesh(mesh, color, point_size));
 		// draw normals
 		if (draw_normals) {
-			meshes.push_back(createNormalTriMesh(mesh, point_size));
+			meshes.push_back(createNormalTriMesh(mesh, color, point_size));
 		}
 		_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 	}
