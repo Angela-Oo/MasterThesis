@@ -17,7 +17,8 @@ Vector PositionAndDeformation::getDeformedNormal() const
 
 Point PositionAndDeformation::deformPosition(Point point) const
 {
-	Vector rotated_point = _deformation->rotation()(point - _point);
+	auto edge = point - _point;
+	Vector rotated_point = _deformation->rotation()(edge);
 	Vector moved_position = (_point - CGAL::ORIGIN) + _deformation->translation();
 	return CGAL::ORIGIN + moved_position + rotated_point;
 }

@@ -29,22 +29,43 @@ uint32_t DeformedMesh::number_of_vertices() const
 
 Point DeformedMesh::point(SurfaceMesh::Vertex_index v) const
 {
+	return _mesh.point(v);
+}
+
+Vector DeformedMesh::normal(SurfaceMesh::Vertex_index v) const
+{
+	auto normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
+	return normals[v];
+}
+
+Point DeformedMesh::deformed_point(SurfaceMesh::Vertex_index v) const
+{
 	Point p = _deformation_graph.deformPoint(_mesh.point(v), nearestNodes(v));
 	return p;
 }
 
-Vector DeformedMesh::normal(SurfaceMesh::Vertex_index v) const
+Vector DeformedMesh::deformed_normal(SurfaceMesh::Vertex_index v) const
 {
 	auto normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	Vector n = _deformation_graph.deformNormal(normals[v], nearestNodes(v));
 	return n;
 }
 
-NearestNodes DeformedMesh::nearestNodes(SurfaceMesh::Vertex_index v) const
+NearestNodes & DeformedMesh::nearestNodes(SurfaceMesh::Vertex_index v) const
 {
 	auto nearest_nodes = _mesh.property_map<vertex_descriptor, NearestNodes>("v:nearest_nodes");
-	assert(nearest_nodes.second);	
+	assert(nearest_nodes.second);
 	return nearest_nodes.first[v];
+}
+
+std::vector<DG::PositionAndDeformation> DeformedMesh::deformations(SurfaceMesh::Vertex_index v) const
+{
+	std::vector<DG::PositionAndDeformation> d;
+	auto & nodes = nearestNodes(v);
+	for (auto n : nodes.nodes) {
+		d.emplace_back(_deformation_graph.getNode(n));
+	}
+	return d;
 }
 
 SurfaceMesh DeformedMesh::deformPoints()

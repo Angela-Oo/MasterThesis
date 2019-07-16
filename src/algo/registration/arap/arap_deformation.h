@@ -7,12 +7,14 @@ namespace ARAP {
 class Deformation : public IDeformation
 {
 private:
-	ml::vec3d _r; // rotation matrix
-	ml::vec3d _t; // translation vector	
+	ml::vec6d _d; // rotation (3d) and translation (3d)
+	//ml::vec3d _r; // rotation matrix
+	//ml::vec3d _t; // translation vector	
 	double _w; // weight
 public:
-	double * r() override { return (&_r)->getData(); }
-	double * t() override { return (&_t)->getData(); }
+	double * d() override { return (&_d)->getData(); }
+	double * r() override { return (&_d)->getData(); }
+	double * t() override { return &((&_d)->getData())[3]; }
 	double * w() override { return &_w; }
 public:
 	Matrix rotation() const override;
@@ -21,6 +23,7 @@ public:
 	std::shared_ptr<IDeformation> invertDeformation() const override;
 public:
 	Deformation(const ml::vec3d & r, const ml::vec3d & t, double w = 1.);
+	Deformation(const ml::vec6d & d, double w = 1.);
 	Deformation();
 	Deformation(const Deformation& node, bool inverse);
 };

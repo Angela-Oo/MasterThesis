@@ -60,14 +60,26 @@ ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &proble
 	double weight = a_fit * point_to_point_weighting;
 
 	auto & global = _deformation_graph._global;
-	auto nodes = _deformed_mesh->nearestNodes(v);	
-	for (auto n : nodes.nodes) {
-		auto d = _deformation_graph.getNode(n);
 
-		auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global._point);
-		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function, global._deformation->r(), global._deformation->t(), d._deformation->t(), d._deformation->w()));
-	}
+	auto nodes = _deformed_mesh->nearestNodes(v);
+	
+	auto d1 = _deformation_graph.getNode(nodes.nodes[0]);
+	auto d2 = _deformation_graph.getNode(nodes.nodes[1]);
+	auto d3 = _deformation_graph.getNode(nodes.nodes[2]);
+	auto d4 = _deformation_graph.getNode(nodes.nodes[3]);
+
+	auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global._point, 
+																		  d1._point, d2._point, d3._point, d4._point,
+																		  nodes.weights[0], nodes.weights[1], nodes.weights[2], nodes.weights[3]);
+
+	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
+	residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function, 
+													global._deformation->d(), 
+													_deformation_graph.getNode(nodes.nodes[0])._deformation->d(),
+													_deformation_graph.getNode(nodes.nodes[1])._deformation->d(),
+													_deformation_graph.getNode(nodes.nodes[2])._deformation->d(), 
+													_deformation_graph.getNode(nodes.nodes[3])._deformation->d()));
+
 	return residual_ids;
 }
 
@@ -81,15 +93,25 @@ ResidualIds AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &proble
 	double weight = a_fit * point_to_plane_weighting;
 
 	auto & global = _deformation_graph._global;
-	auto nodes = _deformed_mesh->nearestNodes(v);
-	for (auto n : nodes.nodes) {
-		auto d = _deformation_graph.getNode(n);
 
-		auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal, _deformed_mesh->point(v), global._point);
-		auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weighting * weight, ceres::TAKE_OWNERSHIP);
-		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
-														global._deformation->r(), global._deformation->t(), d._deformation->t(), d._deformation->w()));
-	}
+	auto nodes = _deformed_mesh->nearestNodes(v);
+	auto d1 = _deformation_graph.getNode(nodes.nodes[0]);
+	auto d2 = _deformation_graph.getNode(nodes.nodes[1]);
+	auto d3 = _deformation_graph.getNode(nodes.nodes[2]);
+	auto d4 = _deformation_graph.getNode(nodes.nodes[3]);
+	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal, 
+																		  _deformed_mesh->point(v), global._point,
+																		  d1._point, d2._point, d3._point, d4._point,
+																		  nodes.weights[0], nodes.weights[1], nodes.weights[2], nodes.weights[3]);
+
+	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
+	residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
+													global._deformation->d(),
+													_deformation_graph.getNode(nodes.nodes[0])._deformation->d(),
+													_deformation_graph.getNode(nodes.nodes[1])._deformation->d(),
+													_deformation_graph.getNode(nodes.nodes[2])._deformation->d(),
+													_deformation_graph.getNode(nodes.nodes[3])._deformation->d()));
+
 	return residual_ids;
 }
 
@@ -135,10 +157,10 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 			use_vertex = !_src.is_border(v, true);
 
 		if(use_vertex) {
-			auto point = _deformed_mesh->point(v);
-			auto normal = _deformed_mesh->normal(v);
+			auto deformed_point = _deformed_mesh->deformed_point(v);
+			auto deformed_normal = _deformed_mesh->deformed_normal(v);
 
-			auto correspondent_point = _find_correspondence_point->correspondingPoint(point, normal);
+			auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
 
 			if (correspondent_point.first) {		
 				vertex_descriptor target_vertex = correspondent_point.second;
@@ -180,7 +202,7 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 		ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(mesh.point(source), mesh.point(target));
 		auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 		auto residual_id = problem.AddResidualBlock(cost_function, loss_function, 
-													deformations[source]->r(), deformations[source]->t(), deformations[target]->t());
+													deformations[source]->d(), deformations[target]->d());
 
 		auto edge = _deformation_graph._mesh.edge(e);
 		residual_ids[edge].push_back(residual_id);

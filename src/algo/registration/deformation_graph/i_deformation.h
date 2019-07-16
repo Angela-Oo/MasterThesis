@@ -8,6 +8,7 @@
 class IDeformation
 {
 public:
+	virtual double * d() = 0;
 	virtual double * r() = 0;
 	virtual double * t() = 0;
 	virtual double * w() = 0;

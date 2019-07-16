@@ -11,6 +11,7 @@ private:
 	ml::vec3d _t; // translation vector	
 	double _w; // weight
 public:
+	double * d() override { return (&_r)->getData(); } // todo
 	double * r() override { return (&_r)->getData(); }
 	double * t() override { return (&_t)->getData(); }
 	double * w() override { return &_w; }
