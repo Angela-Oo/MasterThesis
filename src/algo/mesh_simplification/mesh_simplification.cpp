@@ -16,6 +16,7 @@ Mesh createReducedMesh(const Mesh & mesh, double target_edge_length)
 }
 
 enum class ReduceMeshStrategy{
+	NONE,
 	ISOTROPIC,
 	POISON,
 	MAKEMESH3
@@ -24,15 +25,13 @@ enum class ReduceMeshStrategy{
 SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_length)
 {
 	ReduceMeshStrategy strategy = ReduceMeshStrategy::ISOTROPIC;
-	try {
-		if(strategy == ReduceMeshStrategy::ISOTROPIC)
-			return isotropicRemeshing(mesh, target_edge_length);
-		else if (strategy == ReduceMeshStrategy::POISON)
-			return poisonSurfaceRemeshing(mesh, target_edge_length);
-		else if (strategy == ReduceMeshStrategy::MAKEMESH3)
-			return makeMesh3Remeshing(mesh, target_edge_length);
-	}
-	catch (...) {
-	}
+	if(strategy == ReduceMeshStrategy::ISOTROPIC)
+		return isotropicRemeshing(mesh, target_edge_length);
+	else if (strategy == ReduceMeshStrategy::POISON)
+		return poisonSurfaceRemeshing(mesh, target_edge_length);
+	else if (strategy == ReduceMeshStrategy::MAKEMESH3)
+		return makeMesh3Remeshing(mesh, target_edge_length);
+	else if (strategy == ReduceMeshStrategy::NONE)
+		return mesh;
 	return mesh;
 }
