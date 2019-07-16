@@ -3,7 +3,7 @@
 #include "mesh_convertion.h"
 #include <CGAL/Polygon_mesh_processing/compute_normal.h>
 
-SurfaceMesh convertToCGALMesh(const Mesh& triMesh) {
+SurfaceMesh convertToCGALMesh(const Mesh& triMesh, bool calculate_normals) {
 	SurfaceMesh mesh;
 
 	std::vector<SurfaceMesh::Vertex_index> vertex_handles;
@@ -12,7 +12,6 @@ SurfaceMesh convertToCGALMesh(const Mesh& triMesh) {
 	auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.)).first;
 	auto edge_colors = mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.)).first;
 
-	bool calculate_normals = false;
 	for (const auto& v : triMesh.getVertices()) {
 		auto vertex_handle = mesh.add_vertex(SurfaceMesh::Point(v.position.x, v.position.y, v.position.z));
 		normals[vertex_handle] = Vector(v.normal.x, v.normal.y, v.normal.z);

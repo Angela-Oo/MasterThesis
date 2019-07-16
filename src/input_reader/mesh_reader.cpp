@@ -119,13 +119,13 @@ unsigned int DeformationMesh::frame()
 
 DeformationMesh::DeformationMesh()
 {
-	auto mesh_1 = ml::Shapes<float>::cylinder(0.1, 1., _cylinder_height_points, _cylinder_width_points);
+	auto mesh_1 = ml::Shapes<float>::cylinder(0.1f, 1.f, _cylinder_height_points, _cylinder_width_points);
 	_meshes.push_back(convertToCGALMesh(mesh_1));
 
 	auto mesh_2 = mesh_1;
 
-	auto rotation = ml::mat4f::rotationZ(ml::math::degreesToRadians(0.));
-	auto translation = ml::mat4f::translation({ 0.4, 0., -0.4 });
+	auto rotation = ml::mat4f::rotationZ(ml::math::degreesToRadians(0.f));
+	auto translation = ml::mat4f::translation({ 0.4f, 0.f, -0.4f });
 
 	size_t num_vertices = mesh_2.m_vertices.size();
 	for (int i = num_vertices - 1; i > num_vertices - _cylinder_width_points - 1; --i) {
@@ -154,28 +154,28 @@ unsigned int DeformationMeshFrames::frame()
 
 DeformationMeshFrames::DeformationMeshFrames()
 {
-	auto mesh_1 = ml::Shapes<float>::cylinder(0.1, 1., _cylinder_height_points, _cylinder_width_points);
-	_meshes.push_back(convertToCGALMesh(mesh_1));
+	auto mesh_1 = ml::Shapes<float>::cylinder(0.1f, 1.f, _cylinder_height_points, _cylinder_width_points);
+	_meshes.push_back(convertToCGALMesh(mesh_1, true));
 		
 	auto rotation = ml::mat4f::rotationX(15.);
-	auto translation = ml::mat4f::translation({ -0.1, 0., 0.01 });
+	auto translation = ml::mat4f::translation({ -0.1f, 0.f, 0.01f });
 	auto transformation = translation * rotation;
 
 	auto mesh_2 = mesh_1;	
 	for (int i = 0; i < mesh_2.m_vertices.size(); ++i) {
 		mesh_2.m_vertices[i].position = transformation * mesh_2.m_vertices[i].position;
 	}
-	_meshes.push_back(convertToCGALMesh(mesh_2));
+	_meshes.push_back(convertToCGALMesh(mesh_2, true));
 
 	auto mesh_3 = mesh_2;
 	for (int i = 0; i < mesh_3.m_vertices.size(); ++i) {
 		mesh_3.m_vertices[i].position = transformation * mesh_3.m_vertices[i].position;
 	}
-	_meshes.push_back(convertToCGALMesh(mesh_3));
+	_meshes.push_back(convertToCGALMesh(mesh_3, true));
 
 	auto mesh_4 = mesh_3;
 	for (int i = 0; i < mesh_4.m_vertices.size(); ++i) {
 		mesh_4.m_vertices[i].position = transformation * mesh_4.m_vertices[i].position;
 	}
-	_meshes.push_back(convertToCGALMesh(mesh_4));
+	_meshes.push_back(convertToCGALMesh(mesh_4, true));
 }
