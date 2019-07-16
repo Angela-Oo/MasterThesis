@@ -7,10 +7,17 @@
 #include "boost/graph/connected_components.hpp"
 #include "algo/mesh_simplification/mesh_simplification.h"
 #include "algo/registration/ceres_residual_evaluation.h"
+#include <random>
 
 namespace ARAP
 {
 
+
+bool AsRigidAsPossible::random_bool_with_prob(double prob)  // probability between 0.0 and 1.0
+{
+	std::bernoulli_distribution d(prob);
+	return d(_rand_engine);
+}
 
 const SurfaceMesh & AsRigidAsPossible::getSource()
 {
@@ -41,7 +48,7 @@ const DG::DeformationGraph & AsRigidAsPossible::getDeformationGraph()
 
 SurfaceMesh AsRigidAsPossible::getDeformationGraphMesh()
 {
-	return deformationGraphToSurfaceMesh(_deformation_graph, _evaluate_residuals);
+	return deformationGraphToSurfaceMesh(_deformation_graph, _registration_options.evaluate_residuals);
 }
 
 std::vector<Point> AsRigidAsPossible::getFixedPostions()
@@ -57,7 +64,7 @@ ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &proble
 {
 	ResidualIds residual_ids;
 	float point_to_point_weighting = 0.1f;
-	double weight = a_fit * point_to_point_weighting;
+	double weight = _registration_options.fit * point_to_point_weighting;
 
 	auto & global = _deformation_graph._global;
 
@@ -90,7 +97,7 @@ ResidualIds AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &proble
 {
 	ResidualIds residual_ids;
 	float point_to_plane_weighting = 0.9f;
-	double weight = a_fit * point_to_plane_weighting;
+	double weight = _registration_options.fit * point_to_plane_weighting;
 
 	auto & global = _deformation_graph._global;
 
@@ -153,8 +160,13 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 		//vertex_used[v] = false;
 		
 		bool use_vertex = true;
-		if (_ignore_deformation_graph_border_vertices)
+
+		if (_registration_options.ignore_deformation_graph_border_vertices)
 			use_vertex = !_src.is_border(v, true);
+
+		use_vertex = random_bool_with_prob(0.5);// todo
+
+
 
 		if(use_vertex) {
 			auto deformed_point = _deformed_mesh->deformed_point(v);
@@ -200,7 +212,7 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 		auto source = mesh.source(e);
 
 		ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(mesh.point(source), mesh.point(target));
-		auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
+		auto loss_function = new ceres::ScaledLoss(NULL, _registration_options.smooth, ceres::TAKE_OWNERSHIP);
 		auto residual_id = problem.AddResidualBlock(cost_function, loss_function, 
 													deformations[source]->d(), deformations[target]->d());
 
@@ -219,7 +231,7 @@ VertexResidualIds AsRigidAsPossible::addConfCost(ceres::Problem &problem)
 	{
 		auto& deformation = deformations[v];
 		ceres::CostFunction* cost_function = ConfCostFunction::Create();
-		auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
+		auto loss_function = new ceres::ScaledLoss(NULL, _registration_options.conf, ceres::TAKE_OWNERSHIP);
 		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformation->w()));
 	}
 	return residual_ids;
@@ -246,7 +258,7 @@ bool AsRigidAsPossible::solveIteration()
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate
-		if (_evaluate_residuals) {
+		if (_registration_options.evaluate_residuals) {
 			evaluateResidual(problem, fit_residual_ids, arap_residual_ids, conf_residual_ids);
 		}
 
@@ -255,11 +267,11 @@ bool AsRigidAsPossible::solveIteration()
 
 		auto scale_factor_tol = 0.0001;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-			(a_smooth > 0.005))// && a_conf > 0.05))
+			(_registration_options.smooth > 0.005))// && a_conf > 0.05))
 		{
-			a_smooth /= 2.;
-			a_conf /= 2.;
-			std::cout << std::endl << "scale factor: smooth " << a_smooth << " conf " << a_conf << std::endl;
+			_registration_options.smooth /= 2.;
+			_registration_options.conf /= 2.;
+			std::cout << std::endl << "scale factor: smooth " << _registration_options.smooth << " conf " << _registration_options.conf << std::endl;
 		}
 	}
 	return finished();
@@ -284,7 +296,7 @@ bool AsRigidAsPossible::finished()
 
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
-	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
+	return (_solve_iteration >= _registration_options.max_iterations) || (solved && _solve_iteration > 2);
 }
 
 void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
@@ -295,7 +307,7 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 	// smooth
 	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost");
 	if(smooth_cost.second)
-		evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, a_smooth);
+		evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, _registration_options.smooth);
 	
 	// fit
 	//auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost");
@@ -319,20 +331,20 @@ void AsRigidAsPossible::printCeresOptions()
 
 void AsRigidAsPossible::setParameters()
 {
-	a_smooth = 1.; //0.1;
-	a_conf = 10.;// 0.02;// 1.;
-	a_fit = 20.; // 100.;
-	_find_max_distance = 0.1;
-	_find_max_angle_deviation = 45.;
-	_max_iterations = 25;
-	_ignore_deformation_graph_border_vertices = true;
+	_registration_options.smooth = 10.; //0.1;
+	_registration_options.conf = 10.;// 0.02;// 1.;
+	_registration_options.fit = 10.; // 100.;
+	_registration_options.correspondence_max_distance = 0.1;
+	_registration_options.correspondence_max_angle_deviation = 45.;
+	_registration_options.max_iterations = 25;
+	_registration_options.ignore_deformation_graph_border_vertices = true;
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 std::vector<vertex_descriptor> fixed_positions,
 									 ceres::Solver::Options option,
-									 bool evaluate_residuals,
+									 RegistrationOptions registration_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
@@ -340,14 +352,14 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
 	, _fixed_positions(fixed_positions)
 	, _ceres_logger(logger)
-	, _evaluate_residuals(evaluate_residuals)
+	, _registration_options(registration_options)
 	, _with_icp(false)
 
 {
 	setParameters();
-	a_smooth = 10.;
-	a_fit = 100.;
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
+	_registration_options.smooth = 10.;
+	_registration_options.fit = 100.;
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }
@@ -356,20 +368,19 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 ceres::Solver::Options option,
-									 double deformation_graph_edge_length,
-									 bool evaluate_residuals,
+									 RegistrationOptions registration_options,								 
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _ceres_logger(logger)
-	, _evaluate_residuals(evaluate_residuals)
-	, _ignore_deformation_graph_border_vertices(false)
+	, _registration_options(registration_options)
 {
 	setParameters();
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
-	auto reduced_mesh = createReducedMesh(src, deformation_graph_edge_length);	
-	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
+	_registration_options.ignore_deformation_graph_border_vertices = false;
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
+	auto reduced_mesh = createReducedMesh(src, _registration_options.dg_options.edge_length);
+	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); }, _registration_options.dg_options.number_of_interpolation_neighbors);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	
 	std::cout << "number of nodes " << _deformation_graph._mesh.number_of_vertices() << std::endl;
@@ -380,18 +391,18 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 const DG::DeformationGraph & deformation_graph,
 									 ceres::Solver::Options option,
-									 bool evaluate_residuals,
+									 RegistrationOptions registration_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
 	, _ceres_logger(logger)
-	, _evaluate_residuals(evaluate_residuals)
-	, _ignore_deformation_graph_border_vertices(false)
+	, _registration_options(registration_options)
 {
 	setParameters();
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
+	_registration_options.ignore_deformation_graph_border_vertices = false;
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
 
 	//_deformation_graph = transformDeformationGraph(deformation_graph);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);

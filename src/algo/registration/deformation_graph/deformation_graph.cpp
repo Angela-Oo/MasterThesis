@@ -31,13 +31,16 @@ std::vector<double> DeformationGraph::weights(const Point & point, std::vector<v
 	vertex_descriptor last_node_descriptor = nearest_nodes[nearest_nodes.size() - 1];
 	Point last_node = _mesh.point(last_node_descriptor);
 	double d_max = sqrt(CGAL::squared_distance(point, last_node));
+	//double d_max = CGAL::squared_distance(point, last_node);
 
 	std::vector<double> weights;
 	for (size_t i = 0; i < nearest_nodes.size() - 1; ++i)
 	{
 		Point node_point = _mesh.point(nearest_nodes[i]);
-		double normed_distance = sqrt(CGAL::squared_distance(point, node_point));
-		double weight = std::pow(1. - (normed_distance / d_max), 2);
+		double distance = std::sqrt(CGAL::squared_distance(point, node_point));
+		//double distance = CGAL::squared_distance(point, node_point);
+		double weight = std::pow(1. - (distance / d_max), 2);
+		//double weight = 1. - (distance / d_max);
 		weights.push_back(weight);
 	}
 	double sum = std::accumulate(weights.begin(), weights.end(), 0.0);
@@ -184,9 +187,10 @@ void DeformationGraph::initGlobalDeformation(std::shared_ptr<IDeformation> globa
 	_global._deformation = global_deformation;
 }
 
-DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node)
+DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node, unsigned int number_of_interpolation_neighbors)
 	: _mesh(mesh)
 	, _create_node(create_node)
+	, _k(number_of_interpolation_neighbors)
 {
 
 	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> nodes;
@@ -213,9 +217,13 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::
 }
 
 
-DeformationGraph::DeformationGraph(const SurfaceMesh & graph, const std::shared_ptr<IDeformation> & global_deformation, std::function<std::shared_ptr<IDeformation>()> create_node)
+DeformationGraph::DeformationGraph(const SurfaceMesh & graph, 
+								   const std::shared_ptr<IDeformation> & global_deformation, 
+								   std::function<std::shared_ptr<IDeformation>()> create_node,
+								   unsigned int number_of_interpolation_neighbors)
 	: _mesh(graph)
 	, _create_node(create_node)
+	, _k(number_of_interpolation_neighbors)
 {
 	initGlobalDeformation(global_deformation);
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
@@ -238,6 +246,7 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 	_global = other._global;
 	_mesh = other._mesh;
 	_create_node = other._create_node;
+	_k = other._k;
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
 }

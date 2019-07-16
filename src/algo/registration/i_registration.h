@@ -13,24 +13,38 @@ struct Edge
 };
 
 
+struct DeformationGraphOptions
+{
+	double  edge_length;
+	unsigned int number_of_interpolation_neighbors;
+
+	DeformationGraphOptions()
+		: edge_length(0.05)
+		, number_of_interpolation_neighbors(4)
+	{}
+};
+
 struct RegistrationOptions
 {
 	double smooth;
 	double conf;
 	double fit;
-	double initial_max_correspondence_distance;
-	double max_correspondence_angle;
+	double correspondence_max_distance;
+	double correspondence_max_angle_deviation;
 	unsigned int max_iterations;
 	bool ignore_deformation_graph_border_vertices;
+	bool evaluate_residuals;
+	DeformationGraphOptions dg_options;
 	
 	RegistrationOptions()
-		: smooth(5.)
-		, conf(0.02)
-		, fit(20.)
-		, initial_max_correspondence_distance(0.1)
-		, max_correspondence_angle(45.)
+		: smooth(10.)
+		, conf(10.)
+		, fit(10.)
+		, correspondence_max_distance(0.1)
+		, correspondence_max_angle_deviation(45.)
 		, max_iterations(25)
-		, ignore_deformation_graph_border_vertices(false)
+		, ignore_deformation_graph_border_vertices(true)
+		, evaluate_residuals(true)
 	{}
 };
 
