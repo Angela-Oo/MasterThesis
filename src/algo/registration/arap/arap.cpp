@@ -437,7 +437,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
 {
-	auto reduced_mesh = createReducedMesh(_src, _registration_options.dg_options.edge_length);
+	auto reduced_mesh = createReducedMesh(_src, _registration_options.dg_options.edge_length, _registration_options.mesh_reduce_strategy);
 	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
 
 	init();

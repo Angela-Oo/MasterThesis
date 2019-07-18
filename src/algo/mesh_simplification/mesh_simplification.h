@@ -36,9 +36,15 @@ private:
 }
 }
 
+enum class ReduceMeshStrategy {
+	NONE,
+	ISOTROPIC,
+	POISON,
+	MAKEMESH3
+};
 
 typedef ml::TriMeshf Mesh;
 
-Mesh createReducedMesh(const Mesh & mesh, double target_edge_length = 0.05);
+Mesh createReducedMesh(const Mesh & mesh, double target_edge_length = 0.05, ReduceMeshStrategy strategy = ReduceMeshStrategy::ISOTROPIC);
 
-SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_length = 0.05);
+SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_length = 0.05, ReduceMeshStrategy strategy = ReduceMeshStrategy::ISOTROPIC);

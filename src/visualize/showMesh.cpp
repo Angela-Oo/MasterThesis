@@ -377,10 +377,14 @@ void ShowMesh::init(ml::ApplicationData &app)
 	}
 	else {
 		_registration_options.evaluate_residuals = true;
-		_registration_options.dg_options.edge_length = 0.1;
+		_registration_options.dg_options.edge_length = 0.05;
 		_registration_options.ignore_deformation_graph_border_vertices = false;
 		_registration_options.dg_options.number_of_interpolation_neighbors = 4;
 		_registration_options.use_vertex_random_probability = 1.;
+		_registration_options.max_iterations = 50;
+		_registration_options.smooth = 20.;
+		_registration_options.fit = 10.;
+		
 
 		_input_mesh = std::make_shared<DeformationMeshFrames>();
 		_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();

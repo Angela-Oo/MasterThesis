@@ -4,6 +4,7 @@
 //#include "graph_node_type.h"
 
 #include "algo/registration/deformation_graph/deformation_graph.h"
+#include "algo/mesh_simplification/mesh_simplification.h"
 
 struct Edge
 {
@@ -36,6 +37,7 @@ struct RegistrationOptions
 	bool evaluate_residuals;
 	double use_vertex_random_probability; // value between 0. and 1.
 	DeformationGraphOptions dg_options;
+	ReduceMeshStrategy mesh_reduce_strategy;
 	
 	RegistrationOptions()
 		: smooth(10.)
@@ -47,6 +49,7 @@ struct RegistrationOptions
 		, ignore_deformation_graph_border_vertices(true)
 		, evaluate_residuals(true)
 		, use_vertex_random_probability(0.5)
+		, mesh_reduce_strategy(ReduceMeshStrategy::ISOTROPIC)
 	{}
 };
 
