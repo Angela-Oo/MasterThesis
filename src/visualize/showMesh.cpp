@@ -314,11 +314,13 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
 
 	_registration_options.evaluate_residuals = true;
-	_registration_options.dg_options.edge_length = 0.1;
+	_registration_options.dg_options.edge_length = 0.2;
 	_registration_options.ignore_deformation_graph_border_vertices = false;
 	_registration_options.dg_options.number_of_interpolation_neighbors = 4;
-	_registration_options.use_vertex_random_probability = 1.0;
+	_registration_options.use_vertex_random_probability = 0.4;
 	_registration_options.max_iterations = 25;
+	_registration_options.smooth = 1.;
+	_registration_options.fit = 10.;
 	
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
@@ -345,7 +347,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
 		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
 		//_deformation_graph_edge_length = 0.07;
-		_registration_options.dg_options.edge_length = 0.15;
+		//_registration_options.dg_options.edge_length = 0.15;
 		_data_name = "head";
 	
 		// hand

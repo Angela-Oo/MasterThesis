@@ -73,13 +73,12 @@ ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &proble
 	if (_registration_options.dg_options.number_of_interpolation_neighbors == 4) {
 		if (n_w_vector.size() < 4)
 			std::cout << "help nearest node is smaller than expected" << std::endl;
-		auto d1 = _deformation_graph.getNode(n_w_vector[0].first);
-		auto d2 = _deformation_graph.getNode(n_w_vector[1].first);
-		auto d3 = _deformation_graph.getNode(n_w_vector[2].first);
-		auto d4 = _deformation_graph.getNode(n_w_vector[3].first);
 
 		auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global._point,
-																			  d1._point, d2._point, d3._point, d4._point,
+																			  _deformation_graph.getNodePosition(n_w_vector[0].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[1].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[2].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[3].first),
 																			  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
@@ -91,12 +90,10 @@ ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &proble
 														_deformation_graph.getNode(n_w_vector[3].first)._deformation->d()));
 	}
 	else if (_registration_options.dg_options.number_of_interpolation_neighbors == 3) {
-		auto d1 = _deformation_graph.getNode(n_w_vector[0].first);
-		auto d2 = _deformation_graph.getNode(n_w_vector[1].first);
-		auto d3 = _deformation_graph.getNode(n_w_vector[2].first);
-
 		auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global._point,
-																			  d1._point, d2._point, d3._point,
+																			  _deformation_graph.getNodePosition(n_w_vector[0].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[1].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[2].first),
 																			  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second);
 
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
@@ -120,18 +117,15 @@ ResidualIds AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &proble
 	double weight = _registration_options.fit * point_to_plane_weighting;
 
 	auto & global = _deformation_graph._global;
-
 	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
 	if (_registration_options.dg_options.number_of_interpolation_neighbors == 4) {
-		auto d1 = _deformation_graph.getNode(n_w_vector[0].first);
-		auto d2 = _deformation_graph.getNode(n_w_vector[1].first);
-		auto d3 = _deformation_graph.getNode(n_w_vector[2].first);
-		auto d4 = _deformation_graph.getNode(n_w_vector[3].first);
-
 		auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
 																			  _deformed_mesh->point(v), global._point,
-																			  d1._point, d2._point, d3._point, d4._point,
+																			  _deformation_graph.getNodePosition(n_w_vector[0].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[1].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[2].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[3].first),
 																			  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
@@ -143,13 +137,11 @@ ResidualIds AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &proble
 														_deformation_graph.getNode(n_w_vector[3].first)._deformation->d()));
 	}
 	else if (_registration_options.dg_options.number_of_interpolation_neighbors == 3) {
-		auto d1 = _deformation_graph.getNode(n_w_vector[0].first);
-		auto d2 = _deformation_graph.getNode(n_w_vector[1].first);
-		auto d3 = _deformation_graph.getNode(n_w_vector[2].first);
-
 		auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
 																			  _deformed_mesh->point(v), global._point,
-																			  d1._point, d2._point, d3._point,
+																			  _deformation_graph.getNodePosition(n_w_vector[0].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[1].first),
+																			  _deformation_graph.getNodePosition(n_w_vector[2].first),
 																			  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second);
 
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
@@ -187,6 +179,44 @@ VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &proble
 }
 
 
+bool AsRigidAsPossible::useVertex(vertex_descriptor & v)
+{	
+	bool use_vertex = true;
+	if (_registration_options.ignore_deformation_graph_border_vertices)
+		use_vertex = !_src.is_border(v, true);
+
+	if (_set_of_vertices_to_use.empty() &&
+		_registration_options.use_vertex_random_probability < 1.) {
+		use_vertex = random_bool_with_prob(_registration_options.use_vertex_random_probability);
+	}
+	return use_vertex;
+}
+
+bool AsRigidAsPossible::addFitCostVertex(ceres::Problem & problem, vertex_descriptor & v, VertexResidualIds &residual_ids)
+{	
+	auto deformed_point = _deformed_mesh->deformed_point(v);
+	auto deformed_normal = _deformed_mesh->deformed_normal(v);
+	auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
+
+	if (correspondent_point.first) 
+	{
+		vertex_descriptor target_vertex = correspondent_point.second;
+		auto target_point = _find_correspondence_point->getPoint(target_vertex);
+		auto target_normal = _find_correspondence_point->getNormal(target_vertex);
+
+		ResidualIds point_to_point = addPointToPointCostForNode(problem, v, target_point);
+		residual_ids[v].insert(residual_ids[v].end(), point_to_point.begin(), point_to_point.end());
+
+		assert(target_normal.squared_length() > 0.);
+		
+		ResidualIds point_to_plane = addPointToPlaneCostForNode(problem, v, target_point, target_normal);
+		residual_ids[v].insert(residual_ids[v].end(), point_to_plane.begin(), point_to_plane.end());
+		
+		return true;		
+	}
+	return false;
+}
+
 VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
@@ -196,50 +226,33 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 
 	//auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used").first;
 	int i = 0;
-	for (auto & v : _deformed_mesh->vertices())
-	{
-		//vertex_used[v] = false;
-		
-		bool use_vertex = true;
 
-		if (_registration_options.ignore_deformation_graph_border_vertices)
-			use_vertex = !_src.is_border(v, true);
-
-		if(_registration_options.use_vertex_random_probability < 1.)
-			use_vertex = random_bool_with_prob(_registration_options.use_vertex_random_probability);
-
-		if(use_vertex) {
-			auto deformed_point = _deformed_mesh->deformed_point(v);
-			auto deformed_normal = _deformed_mesh->deformed_normal(v);
-
-			auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
-
-			if (correspondent_point.first) {		
-				vertex_descriptor target_vertex = correspondent_point.second;
-				auto target_point = _find_correspondence_point->getPoint(target_vertex);
-				auto target_normal = _find_correspondence_point->getNormal(target_vertex);
-
-				ResidualIds point_to_point = addPointToPointCostForNode(problem, v, target_point);
-				residual_ids[v].insert(residual_ids[v].end(), point_to_point.begin(), point_to_point.end());
-				
-				if (target_normal.squared_length() > 0.) {
-					ResidualIds point_to_plane = addPointToPlaneCostForNode(problem, v, target_point, target_normal);
-					residual_ids[v].insert(residual_ids[v].end(), point_to_plane.begin(), point_to_plane.end());
+	// random at each iteration
+	if (_set_of_vertices_to_use.empty()) {
+		for (auto & v : _deformed_mesh->vertices())
+		{
+			if (useVertex(v)) {
+				if (addFitCostVertex(problem, v, residual_ids)) {
+					++i;
 				}
-				else {
-					std::cout << "normal is degenerated" << std::endl;
+			}
+		}
+	} // use fixed subset of vertices
+	else {
+		for (auto & v : _set_of_vertices_to_use)
+		{
+			if (useVertex(v)) {
+				if (addFitCostVertex(problem, v, residual_ids)) {
+					++i;
 				}
-
-				i++;
-				//vertex_used[v] = true;
 			}
 		}
 	}
-	
 	std::cout << "used corresponding vertices " << i << " / " << _deformed_mesh->number_of_vertices() << " ";
 	std::cout << " allowed distance " <<  _find_correspondence_point->median() << " ";
 	return residual_ids;
 }
+
 
 EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &problem)
 {
@@ -293,13 +306,13 @@ bool AsRigidAsPossible::solveIteration()
 		else
 			fit_residual_ids = addFitCostWithoutICP(problem);
 		EdgeResidualIds arap_residual_ids = addAsRigidAsPossibleCost(problem);
-		VertexResidualIds conf_residual_ids = addConfCost(problem);
+		//VertexResidualIds conf_residual_ids = addConfCost(problem);
 
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate
 		if (_registration_options.evaluate_residuals) {
-			evaluateResidual(problem, fit_residual_ids, arap_residual_ids, conf_residual_ids);
+			evaluateResidual(problem, fit_residual_ids, arap_residual_ids);
 		}
 
 		_last_cost = _current_cost;
@@ -341,8 +354,7 @@ bool AsRigidAsPossible::finished()
 
 void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 										 std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
-										 std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
-										 std::map<vertex_descriptor, ResidualIds> & conf_residual_block_ids)
+										 std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids)
 {
 	// smooth
 	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost");
@@ -369,11 +381,36 @@ void AsRigidAsPossible::printCeresOptions()
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
 }
 
+void AsRigidAsPossible::init()
+{
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_dst,
+																		   _registration_options.correspondence_max_distance,
+																		   _registration_options.correspondence_max_angle_deviation);
+
+	//_deformation_graph = transformDeformationGraph(deformation_graph);
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
+
+	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
+	printCeresOptions();
+
+	// comment out for random at in each iteration step
+	if (_registration_options.use_vertex_random_probability < 1.) {
+		for (auto & v : _deformed_mesh->vertices())
+		{
+			bool use_vertex = random_bool_with_prob(_registration_options.use_vertex_random_probability);
+			if (use_vertex) {
+				_set_of_vertices_to_use.push_back(v);
+			}
+		}
+		_ceres_logger.write("subset of vertices to use " + std::to_string(_set_of_vertices_to_use.size()) + " / " + std::to_string(_deformed_mesh->number_of_vertices()), false);
+	}
+}
+
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 std::vector<vertex_descriptor> fixed_positions,
 									 ceres::Solver::Options option,
-									 RegistrationOptions registration_options,
+									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
@@ -383,18 +420,16 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
 	, _with_icp(false)
-
 {
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
-	printCeresOptions();
+	init();
 }
+
 
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 ceres::Solver::Options option,
-									 RegistrationOptions registration_options,								 
+									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
@@ -402,20 +437,17 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
 {
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
-	auto reduced_mesh = createReducedMesh(src, _registration_options.dg_options.edge_length);
+	auto reduced_mesh = createReducedMesh(_src, _registration_options.dg_options.edge_length);
 	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
-	
-	_ceres_logger.write("number of deformation graph nodes " + _deformation_graph._mesh.number_of_vertices(), false);
-	printCeresOptions();
+
+	init();
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 const DG::DeformationGraph & deformation_graph,
 									 ceres::Solver::Options option,
-									 RegistrationOptions registration_options,
+									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
@@ -424,11 +456,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
 {
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
-
-	//_deformation_graph = transformDeformationGraph(deformation_graph);
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, registration_options.dg_options.number_of_interpolation_neighbors);
-	printCeresOptions();
+	init();
 }
 
 

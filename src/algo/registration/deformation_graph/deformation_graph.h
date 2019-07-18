@@ -27,6 +27,7 @@ public:
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
+	Point getNodePosition(vertex_descriptor node_index) const;
 	PositionAndDeformation getNode(vertex_descriptor node_index) const;
 	PositionAndDeformation deformNode(vertex_descriptor node_index) const;
 	PositionAndDeformation invertNode(vertex_descriptor node_index) const;

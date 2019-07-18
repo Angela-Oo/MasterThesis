@@ -109,6 +109,11 @@ Vector DeformationGraph::deformNormal(const Vector & normal, const NearestNodes 
 	return global_deformed_normal;
 }
 
+Point DeformationGraph::getNodePosition(vertex_descriptor node_index) const
+{
+	return _mesh.point(node_index);
+}
+
 PositionAndDeformation DeformationGraph::getNode(vertex_descriptor node_index) const
 {
 	PositionAndDeformation node;
