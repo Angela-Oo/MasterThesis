@@ -37,7 +37,7 @@ SurfaceMesh AsRigidAsPossible::getDeformedPoints()
 SurfaceMesh AsRigidAsPossible::getInverseDeformedPoints()
 {
 	auto inverse_deformation = invertDeformationGraph(_deformation_graph);
-	DG::DeformedMesh deformed(_dst, inverse_deformation);
+	DG::DeformedMesh deformed(_dst, inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 
@@ -68,43 +68,43 @@ ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &proble
 
 	auto & global = _deformation_graph._global;
 
-	auto nodes = _deformed_mesh->nearestNodes(v);
+	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
 	if (_registration_options.dg_options.number_of_interpolation_neighbors == 4) {
-		if (nodes.nodes.size() < 4)
+		if (n_w_vector.size() < 4)
 			std::cout << "help nearest node is smaller than expected" << std::endl;
-		auto d1 = _deformation_graph.getNode(nodes.nodes[0]);
-		auto d2 = _deformation_graph.getNode(nodes.nodes[1]);
-		auto d3 = _deformation_graph.getNode(nodes.nodes[2]);
-		auto d4 = _deformation_graph.getNode(nodes.nodes[3]);
+		auto d1 = _deformation_graph.getNode(n_w_vector[0].first);
+		auto d2 = _deformation_graph.getNode(n_w_vector[1].first);
+		auto d3 = _deformation_graph.getNode(n_w_vector[2].first);
+		auto d4 = _deformation_graph.getNode(n_w_vector[3].first);
 
 		auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global._point,
 																			  d1._point, d2._point, d3._point, d4._point,
-																			  nodes.weights[0], nodes.weights[1], nodes.weights[2], nodes.weights[3]);
+																			  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
 														global._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[0])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[1])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[2])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[3])._deformation->d()));
+														_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[2].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[3].first)._deformation->d()));
 	}
 	else if (_registration_options.dg_options.number_of_interpolation_neighbors == 3) {
-		auto d1 = _deformation_graph.getNode(nodes.nodes[0]);
-		auto d2 = _deformation_graph.getNode(nodes.nodes[1]);
-		auto d3 = _deformation_graph.getNode(nodes.nodes[2]);
+		auto d1 = _deformation_graph.getNode(n_w_vector[0].first);
+		auto d2 = _deformation_graph.getNode(n_w_vector[1].first);
+		auto d3 = _deformation_graph.getNode(n_w_vector[2].first);
 
 		auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global._point,
 																			  d1._point, d2._point, d3._point,
-																			  nodes.weights[0], nodes.weights[1], nodes.weights[2]);
+																			  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second);
 
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
 														global._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[0])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[1])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[2])._deformation->d()));
+														_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[2].first)._deformation->d()));
 	}
 
 	return residual_ids;
@@ -121,43 +121,43 @@ ResidualIds AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &proble
 
 	auto & global = _deformation_graph._global;
 
-	auto nodes = _deformed_mesh->nearestNodes(v);
+	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
 	if (_registration_options.dg_options.number_of_interpolation_neighbors == 4) {
-		auto d1 = _deformation_graph.getNode(nodes.nodes[0]);
-		auto d2 = _deformation_graph.getNode(nodes.nodes[1]);
-		auto d3 = _deformation_graph.getNode(nodes.nodes[2]);
-		auto d4 = _deformation_graph.getNode(nodes.nodes[3]);
+		auto d1 = _deformation_graph.getNode(n_w_vector[0].first);
+		auto d2 = _deformation_graph.getNode(n_w_vector[1].first);
+		auto d3 = _deformation_graph.getNode(n_w_vector[2].first);
+		auto d4 = _deformation_graph.getNode(n_w_vector[3].first);
 
 		auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
 																			  _deformed_mesh->point(v), global._point,
 																			  d1._point, d2._point, d3._point, d4._point,
-																			  nodes.weights[0], nodes.weights[1], nodes.weights[2], nodes.weights[3]);
+																			  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
 														global._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[0])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[1])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[2])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[3])._deformation->d()));
+														_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[2].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[3].first)._deformation->d()));
 	}
 	else if (_registration_options.dg_options.number_of_interpolation_neighbors == 3) {
-		auto d1 = _deformation_graph.getNode(nodes.nodes[0]);
-		auto d2 = _deformation_graph.getNode(nodes.nodes[1]);
-		auto d3 = _deformation_graph.getNode(nodes.nodes[2]);
+		auto d1 = _deformation_graph.getNode(n_w_vector[0].first);
+		auto d2 = _deformation_graph.getNode(n_w_vector[1].first);
+		auto d3 = _deformation_graph.getNode(n_w_vector[2].first);
 
 		auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
 																			  _deformed_mesh->point(v), global._point,
 																			  d1._point, d2._point, d3._point,
-																			  nodes.weights[0], nodes.weights[1], nodes.weights[2]);
+																			  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second);
 
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
 														global._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[0])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[1])._deformation->d(),
-														_deformation_graph.getNode(nodes.nodes[2])._deformation->d()));
+														_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
+														_deformation_graph.getNode(n_w_vector[2].first)._deformation->d()));
 	}
 
 	return residual_ids;
@@ -378,7 +378,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); }, registration_options.dg_options.number_of_interpolation_neighbors)
+	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
 	, _fixed_positions(fixed_positions)
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
@@ -386,7 +386,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 
 {
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
 	printCeresOptions();
 }
 
@@ -404,8 +404,8 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 {
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, _registration_options.dg_options.edge_length);
-	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); }, _registration_options.dg_options.number_of_interpolation_neighbors);
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
+	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
 	
 	std::cout << "number of nodes " << _deformation_graph._mesh.number_of_vertices() << std::endl;
 	printCeresOptions();
@@ -427,7 +427,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
 
 	//_deformation_graph = transformDeformationGraph(deformation_graph);
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, registration_options.dg_options.number_of_interpolation_neighbors);
 	printCeresOptions();
 }
 

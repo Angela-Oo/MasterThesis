@@ -26,28 +26,7 @@ std::vector<double> nodeDistanceWeighting(const ml::vec3f & point, const std::ve
 }
 
 
-std::vector<double> DeformationGraph::weights(const Point & point, std::vector<vertex_descriptor>& nearest_nodes) const
-{
-	vertex_descriptor last_node_descriptor = nearest_nodes[nearest_nodes.size() - 1];
-	Point last_node = _mesh.point(last_node_descriptor);
-	double d_max = std::sqrt(CGAL::squared_distance(point, last_node));
-	//double d_max = CGAL::squared_distance(point, last_node);
-
-	std::vector<double> weights;
-	for (size_t i = 0; i < nearest_nodes.size() - 1; ++i)
-	{
-		Point node_point = _mesh.point(nearest_nodes[i]);
-		double distance = std::sqrt(CGAL::squared_distance(point, node_point));
-		double weight = std::pow(1. - (distance / d_max), 2);
-		weights.push_back(weight);
-	}
-	double sum = std::accumulate(weights.begin(), weights.end(), 0.0);
-	std::for_each(weights.begin(), weights.end(), [sum](double & w) { w = w / sum; });
-	return weights;
-}
-
-
-std::vector<vertex_descriptor> DeformationGraph::nearestNodes(const Point & point) const
+std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const
 {
 	Neighbor_search search = _knn_search->search(point);
 	vertex_descriptor nearest_node_index = search.begin()->first;
@@ -60,9 +39,9 @@ std::vector<vertex_descriptor> DeformationGraph::nearestNodes(const Point & poin
 		return CGAL::squared_distance(point, _mesh.point(vertex_index));
 	};
 
-	auto getNodeDistancesAroundVertex = [&](vertex_descriptor vertex_index, std::map<vertex_descriptor, double> & node_distances) {		
+	auto getNodeDistancesAroundVertex = [&](vertex_descriptor vertex_index, std::map<vertex_descriptor, double> & node_distances) {
 		for (auto & v : _mesh.vertices_around_target(_mesh.halfedge(vertex_index))) {
-			if(node_distances.find(v) == node_distances.end())
+			if (node_distances.find(v) == node_distances.end())
 				node_distances[v] = getNodeDistance(v);
 		}
 	};
@@ -70,7 +49,7 @@ std::vector<vertex_descriptor> DeformationGraph::nearestNodes(const Point & poin
 	std::map<vertex_descriptor, double> node_distance;
 	node_distance[nearest_node_index] = getNodeDistance(nearest_node_index);
 	getNodeDistancesAroundVertex(nearest_node_index, node_distance);
-	if (node_distance.size() < _k + 1) {
+	if (node_distance.size() < k) {
 		for (auto & n : node_distance) {
 			getNodeDistancesAroundVertex(n.first, node_distance);
 		}
@@ -83,9 +62,11 @@ std::vector<vertex_descriptor> DeformationGraph::nearestNodes(const Point & poin
 	std::sort(sorted_node_distance.begin(), sorted_node_distance.end(),
 			  [](const std::pair<vertex_descriptor, double> & rhs, const std::pair<vertex_descriptor, double> & lhs) { return rhs.second < lhs.second; });
 
-	assert(sorted_node_distance.size() >= _k + 1);
+	assert(sorted_node_distance.size() >= k);
+	if (sorted_node_distance.size() < k)
+		std::cout << "help not enouth nodes found" << std::endl;
 	std::vector<vertex_descriptor> indices;
-	for (int i = 0; i < _k + 1 && i < sorted_node_distance.size(); ++i)
+	for (int i = 0; i < k && i < sorted_node_distance.size(); ++i)
 		indices.push_back(sorted_node_distance[i].first);
 	return indices;
 }
@@ -99,12 +80,10 @@ Point DeformationGraph::deformPoint(const Point & point, const NearestNodes & ne
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
-	for (size_t i = 0; i < nearest_nodes.nodes.size() - 1; ++i)
+	for (auto n_w : nearest_nodes.node_weight_vector)
 	{
-		auto vertex_index = nearest_nodes.nodes[i];
-		double w = nearest_nodes.weights[i];
-
-		auto node = getNode(vertex_index);
+		double w = n_w.second;
+		auto node = getNode(n_w.first);
 		Vector transformed_point = node.deformPosition(point) - CGAL::ORIGIN;
 		transformed_point *= w;
 		deformed_point += transformed_point;
@@ -122,12 +101,10 @@ Vector DeformationGraph::deformNormal(const Vector & normal, const NearestNodes 
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
-	for (size_t i = 0; i < nearest_nodes.nodes.size() - 1; ++i)
+	for (auto n_w : nearest_nodes.node_weight_vector)
 	{
-		auto vertex_index = nearest_nodes.nodes[i];
-		double w = nearest_nodes.weights[i];
-
-		auto node = getNode(vertex_index);
+		double w = n_w.second;
+		auto node = getNode(n_w.first);
 		Vector transformed_normal = node.deformNormal(normal);
 		transformed_normal *= w;
 		deformed_normal += transformed_normal;
@@ -139,7 +116,9 @@ Vector DeformationGraph::deformNormal(const Vector & normal, const NearestNodes 
 PositionAndDeformation DeformationGraph::getNode(vertex_descriptor node_index) const
 {
 	PositionAndDeformation node;
-	std::shared_ptr<IDeformation> n = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first[node_index];
+	auto deformation_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	assert(deformation_nodes.second);
+	std::shared_ptr<IDeformation> n = deformation_nodes.first[node_index];
 	node._deformation = n;
 	node._point = _mesh.point(node_index);
 	node._normal = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first[node_index];
@@ -183,11 +162,9 @@ void DeformationGraph::initGlobalDeformation(std::shared_ptr<IDeformation> globa
 }
 
 DeformationGraph::DeformationGraph(const SurfaceMesh & mesh,
-								   std::function<std::shared_ptr<IDeformation>()> create_node, 
-								   unsigned int number_of_interpolation_neighbors)
+								   std::function<std::shared_ptr<IDeformation>()> create_node)
 	: _mesh(mesh)
 	, _create_node(create_node)
-	, _k(number_of_interpolation_neighbors)
 {
 
 	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> nodes;
@@ -207,7 +184,6 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh,
 		nodes[v] = _create_node();
 		colors[v] = vertex_color;
 	}
-
 	initGlobalDeformation(_create_node());
 
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
@@ -216,11 +192,9 @@ DeformationGraph::DeformationGraph(const SurfaceMesh & mesh,
 
 DeformationGraph::DeformationGraph(const SurfaceMesh & graph, 
 								   const std::shared_ptr<IDeformation> & global_deformation, 
-								   std::function<std::shared_ptr<IDeformation>()> create_node,
-								   unsigned int number_of_interpolation_neighbors)
+								   std::function<std::shared_ptr<IDeformation>()> create_node)
 	: _mesh(graph)
 	, _create_node(create_node)
-	, _k(number_of_interpolation_neighbors)
 {
 	initGlobalDeformation(global_deformation);
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
@@ -243,7 +217,6 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 	_global = other._global;
 	_mesh = other._mesh;
 	_create_node = other._create_node;
-	_k = other._k;
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
 }

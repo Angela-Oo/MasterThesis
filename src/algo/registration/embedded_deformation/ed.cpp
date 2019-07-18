@@ -27,7 +27,7 @@ SurfaceMesh EmbeddedDeformation::getDeformedPoints()
 SurfaceMesh EmbeddedDeformation::getInverseDeformedPoints()
 {
 	auto inverse_deformation = invertDeformationGraph(_deformation_graph);
-	DG::DeformedMesh deformed(_dst, inverse_deformation);
+	DG::DeformedMesh deformed(_dst, inverse_deformation, 4); // todo
 	return deformed.deformPoints();
 }
 
@@ -299,7 +299,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); }, 4)
+	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
 	, _fixed_positions(fixed_positions)
 	, _evaluate_residuals(evaluate_residuals)
 	, _ceres_logger(logger)
@@ -309,7 +309,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	a_smooth = 10.;
 	a_fit = 10.;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, 4); // todo
 	printCeresOptions();
 }
 
@@ -332,8 +332,8 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, deformation_graph_edge_length);
 	std::cout << "number of nodes " << reduced_mesh.num_vertices() << std::endl;
-	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); }, 4);
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
+	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, 4); // todo
 	printCeresOptions();
 }
 
@@ -353,7 +353,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 {
 	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
-	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
+	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, 4); // todo
 	printCeresOptions();
 }
 

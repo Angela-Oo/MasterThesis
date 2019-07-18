@@ -62,8 +62,8 @@ std::vector<DG::PositionAndDeformation> DeformedMesh::deformations(SurfaceMesh::
 {
 	std::vector<DG::PositionAndDeformation> d;
 	auto & nodes = nearestNodes(v);
-	for (auto n : nodes.nodes) {
-		d.emplace_back(_deformation_graph.getNode(n));
+	for (auto n : nodes.node_weight_vector) {
+		d.emplace_back(_deformation_graph.getNode(n.first));
 	}
 	return d;
 }
@@ -81,21 +81,52 @@ SurfaceMesh DeformedMesh::deformPoints()
 	return deformed_points;
 }
 
+NearestNodes DeformedMesh::createNearestNodes(vertex_descriptor v) const
+{
+	auto point = _mesh.point(v);
 
-DeformedMesh::DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph)
+	std::vector<vertex_descriptor> nearest_deformation_nodes = _deformation_graph.getKNearestNodes(point, _k + 1);
+
+	// calculate weights
+
+	// max distance
+	vertex_descriptor last_node_descriptor = nearest_deformation_nodes[nearest_deformation_nodes.size() - 1];
+	Point last_node = _deformation_graph.getNode(last_node_descriptor)._point;
+	double d_max = std::sqrt(CGAL::squared_distance(point, last_node));
+
+	// calculate weight per deformation node
+	std::vector<std::pair<vertex_descriptor, double>> vertex_weight_vector;
+	double sum = 0.;
+	for (size_t i = 0; i < nearest_deformation_nodes.size() - 1; ++i)
+	{
+		vertex_descriptor v = nearest_deformation_nodes[i];
+		Point node_point = _deformation_graph.getNode(v)._point;
+		double distance = std::sqrt(CGAL::squared_distance(point, node_point));
+		double weight = std::pow(1. - (distance / d_max), 2);
+		vertex_weight_vector.push_back(std::make_pair(v, weight));
+		sum += weight;
+	}
+	// divide by sum
+	std::for_each(vertex_weight_vector.begin(), vertex_weight_vector.end(), [sum](std::pair<vertex_descriptor, double> & v_w) { v_w.second = v_w.second / sum; });
+	
+	return NearestNodes(point, vertex_weight_vector);
+}
+
+
+
+
+DeformedMesh::DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph, unsigned int number_of_interpolation_neighbors)
 	: _mesh(mesh)
 	, _deformation_graph(deformation_graph)
+	, _k(number_of_interpolation_neighbors)
 {
 	SurfaceMesh::Property_map<vertex_descriptor, NearestNodes> nearest_nodes;
 	bool created;
 	boost::tie(nearest_nodes, created) = _mesh.add_property_map<vertex_descriptor, NearestNodes>("v:nearest_nodes", NearestNodes());
-	assert(created);
+	//assert(created);
 
 	for (auto & v : _mesh.vertices()) {
-		auto point = _mesh.point(v);
-		std::vector<vertex_descriptor> knn_nodes_indices = _deformation_graph.nearestNodes(point);
-		std::vector<double> weights = _deformation_graph.weights(point, knn_nodes_indices);
-		nearest_nodes[v] = NearestNodes(point, knn_nodes_indices, weights);
+		nearest_nodes[v] = createNearestNodes(v);
 	}
 }
 

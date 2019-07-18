@@ -16,7 +16,6 @@ namespace DG
 class DeformationGraph
 {
 public:
-	unsigned int _k;
 	SurfaceMesh _mesh;
 	PositionAndDeformation _global;
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
@@ -24,8 +23,7 @@ public:
 private:
 	void initGlobalDeformation(std::shared_ptr<IDeformation> global_deformation);
 public:
-	std::vector<double> weights(const Point & point, std::vector<vertex_descriptor>& nearest_nodes_indices) const;
-	std::vector<vertex_descriptor> nearestNodes(const Point & point) const;
+	std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const;
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
@@ -35,8 +33,8 @@ public:
 public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
-	DeformationGraph(const SurfaceMesh & nodes, std::function<std::shared_ptr<IDeformation>()> create_node, unsigned int number_of_interpolation_neighbors);
-	DeformationGraph(const SurfaceMesh & mesh, const std::shared_ptr<IDeformation> & global_deformation, std::function<std::shared_ptr<IDeformation>()> create_node, unsigned int number_of_interpolation_neighbors);
+	DeformationGraph(const SurfaceMesh & nodes, std::function<std::shared_ptr<IDeformation>()> create_node);
+	DeformationGraph(const SurfaceMesh & mesh, const std::shared_ptr<IDeformation> & global_deformation, std::function<std::shared_ptr<IDeformation>()> create_node);
 	DeformationGraph(const DeformationGraph & deformation_graph);
 	DeformationGraph & operator=(DeformationGraph other);
 };
