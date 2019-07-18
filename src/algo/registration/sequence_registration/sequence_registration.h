@@ -30,6 +30,7 @@ public:
 	size_t getCurrent();
 	SurfaceMesh getMesh(size_t frame);
 	SurfaceMesh getDeformedMesh(size_t frame);
+	SurfaceMesh getInverseDeformedMesh(size_t frame);
 	SurfaceMesh getDeformationGraphMesh(size_t frame);
 public:
 	SequenceRegistration();

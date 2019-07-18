@@ -34,13 +34,13 @@ void RenderRegistration::renderMesh(std::string id, SurfaceMesh & mesh, ml::RGBC
 	_mesh_renderer->insertMesh(id, mesh, color);
 }
 
-void RenderRegistration::renderCurrentFrame(std::shared_ptr<IMeshReader> mesh_reader, unsigned int current_frame, bool visible)
+void RenderRegistration::renderCurrentFrame(std::shared_ptr<IMeshReader> mesh_reader, bool visible)
 {
 	if (visible)
 	{
-		bool override_mesh = _current_frame != current_frame;
-		_mesh_renderer->insertMesh("mesh", mesh_reader->getMesh(current_frame), ml::RGBColor::White.toVec4f(), override_mesh);
-		_current_frame = current_frame;
+		bool override_mesh = _last_rendered_current_frame != _current_frame;
+		_mesh_renderer->insertMesh("mesh", mesh_reader->getMesh(_current_frame), ml::RGBColor::White.toVec4f(), override_mesh);
+		_last_rendered_current_frame = _current_frame;
 	}
 	else {
 		_mesh_renderer->removeMesh("mesh");
@@ -64,18 +64,87 @@ void RenderRegistration::renderSelectedFrames(std::shared_ptr<IMeshReader> mesh_
 	}
 }
 
-void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reader, unsigned int current_frame)
+void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reader)
 {
 	// reference
-	if (mesh_reader->frame() > current_frame) {
+	if (mesh_reader->frame() > _current_frame) {
 		if (_render_reference_mesh) {
-			bool override_mesh = (current_frame != _current_reference_frame);
-			_mesh_renderer->insertMesh("reference", mesh_reader->getMesh(current_frame), ml::RGBColor::White.toVec4f(), override_mesh);
-			_current_reference_frame = current_frame;
+			bool override_mesh = (_current_frame != _last_rendered_reference_frame);
+			_mesh_renderer->insertMesh("reference", mesh_reader->getMesh(_current_frame), ml::RGBColor::White.toVec4f(), override_mesh);
+			_last_rendered_reference_frame = _current_frame;
 		}
 		else {
 			_mesh_renderer->removeMesh("reference");
 		}
+	}
+}
+
+
+void RenderRegistration::renderDeformedSourceMesh(const SurfaceMesh & deformed_points, bool override, bool debug_normals)
+{
+	// render point clouds
+	std::string deformed_points_id = "deformed_points_id";
+	std::string deformed_mesh_id = "deformed_mesh_id";
+
+	if (_render_mesh == Render::NONE) { // only render deformed mesh as points 
+		_point_renderer->insertPoints(deformed_points_id, deformed_points, ml::RGBColor::Cyan, 0.001f, override);
+		_mesh_renderer->removeMesh(deformed_mesh_id);
+	}
+	else if (_render_mesh == Render::DEFORMATION || _render_mesh == Render::ALL) { // render deformed mesh
+		_point_renderer->removePoints(deformed_points_id);
+		_mesh_renderer->insertMesh(deformed_mesh_id, deformed_points, ml::RGBColor::Cyan.toVec4f(), override);		
+	}
+	else if (_render_mesh == Render::TARGET || _render_mesh == Render::ONLY_DEFORMATION_GRAPH, override) { // no deformed mesh
+		_mesh_renderer->removeMesh(deformed_mesh_id);
+		_point_renderer->removePoints(deformed_points_id);
+	}
+
+	// debug normals
+	std::string deformed_normals_id = "deformed_normals_id";
+	if (debug_normals && (_render_mesh == Render::DEFORMATION || _render_mesh == Render::ALL)) {
+		_point_renderer->insertMesh(deformed_normals_id, deformed_points, ml::RGBColor::Cyan, 0.001f, true);
+	}
+	else {
+		_point_renderer->removePoints(deformed_normals_id);
+	}
+}
+
+void RenderRegistration::renderTargetMesh(const SurfaceMesh & target, bool override, bool debug_normals)
+{
+	std::string target_points_id = "target_points_id";
+	std::string target_mesh_id = "target_mesh_id";
+
+	if (_render_mesh == Render::NONE || _render_mesh == Render::DEFORMATION) { // only render target as points
+		_point_renderer->insertPoints(target_points_id, target, ml::RGBColor::Green, 0.001f, override);
+		_mesh_renderer->removeMesh(target_mesh_id);
+	}
+	else if (_render_mesh == Render::ALL || _render_mesh == Render::TARGET) { // render target mesh
+		_mesh_renderer->insertMesh(target_mesh_id, target, ml::RGBColor::Green.toVec4f(), override);
+		_point_renderer->removePoints(target_points_id);
+	}
+	else if (_render_mesh == Render::ONLY_DEFORMATION_GRAPH) { // no target
+		_mesh_renderer->removeMesh(target_mesh_id);
+		_point_renderer->removePoints(target_points_id);
+	}
+
+	// debug normals
+	std::string target_normals_id = "target_normals_id";
+	if (debug_normals && (_render_mesh == Render::TARGET || _render_mesh == Render::ALL)) {
+		_point_renderer->insertMesh(target_normals_id, target, ml::RGBColor::Green, 0.001f, true);
+	}
+	else {
+		_point_renderer->removePoints(target_normals_id);
+	}
+}
+
+void RenderRegistration::renderDeformationGraph(SurfaceMesh & deformation_graph, bool debug_normals)
+{
+	if (_render_deformation_graph) {
+		Visualize::setDeformationGraphColor(deformation_graph, true);
+		_point_renderer->insertMesh("deformation_graph", deformation_graph, 0.001f, debug_normals);
+	}
+	else {
+		_point_renderer->removePoints("deformation_graph");
 	}
 }
 
@@ -87,61 +156,8 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 	{
 		auto deformed_points = registration->getDeformedPoints();
 
-		// render point clouds
-		if (_render_mesh == Render::NONE) {
-			_point_renderer->insertPoints("frame_registered_A", deformed_points, ml::RGBColor::Cyan, 0.001f);
-			_point_renderer->insertPoints("frame_registered_B", registration->getTarget(), ml::RGBColor::Green, 0.001f, false);
-
-			_mesh_renderer->removeMesh("mesh_a");
-			_mesh_renderer->removeMesh("mesh_b");
-			if (debug_normals) {
-				_point_renderer->removePoints("mesh_a");
-				_point_renderer->removePoints("mesh_b");
-			}
-		}
-		else {
-			_point_renderer->removePoints("frame_registered_A");
-			_point_renderer->removePoints("frame_registered_B");
-
-			// render mesh
-			if (_render_mesh == Render::DEFORMATION) {
-				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());				
-				_mesh_renderer->removeMesh("mesh_b");				
-				_point_renderer->insertPoints("frame_registered_B", registration->getTarget(), ml::RGBColor::Green, 0.001f, false);
-
-				if (debug_normals) {
-					_point_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan, 0.001f, true);
-					_point_renderer->removePoints("mesh_b");
-				}
-			}
-			else if (_render_mesh == Render::ALL) {
-				_mesh_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan.toVec4f());
-				_mesh_renderer->insertMesh("mesh_b", registration->getTarget(), ml::RGBColor::Green.toVec4f(), false);
-
-				if (debug_normals) {
-					_point_renderer->insertMesh("mesh_a", deformed_points, ml::RGBColor::Cyan, 0.001f, true);
-					_point_renderer->insertMesh("mesh_b", registration->getTarget(), ml::RGBColor::Green, 0.001f, true);
-				}
-			}
-			else if (_render_mesh == Render::TARGET) {
-				_mesh_renderer->insertMesh("mesh_b", registration->getTarget(), ml::RGBColor::Green.toVec4f(), false);
-				_mesh_renderer->removeMesh("mesh_a");
-
-				if (debug_normals) {
-					_point_renderer->insertMesh("mesh_b", registration->getTarget(), ml::RGBColor::Green, 0.001f, true);
-					_point_renderer->removePoints("mesh_a");
-				}
-			}
-			else if (_render_mesh == Render::ONLY_DEFORMATION_GRAPH) {
-				_mesh_renderer->removeMesh("mesh_a");
-				_mesh_renderer->removeMesh("mesh_b");
-				if (debug_normals) {
-					_point_renderer->removePoints("mesh_a");
-					_point_renderer->removePoints("mesh_b");
-				}
-			}
-		}
-		
+		renderDeformedSourceMesh(deformed_points, false, debug_normals);
+		renderTargetMesh(registration->getTarget(), false, debug_normals);
 
 		// fixed positions
 		std::vector<Point> render_fixed_positions = registration->getFixedPostions();
@@ -149,14 +165,8 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 			_point_renderer->insertPoints("frame_fixed_positions", render_fixed_positions, ml::RGBColor::Red, 0.005f);
 
 		// deformation graph
-		if (_render_deformation_graph) {
-			auto render_dg = registration->getDeformationGraphMesh();
-			Visualize::setDeformationGraphColor(render_dg, true);
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, debug_deformation_graph_normals);
-		}
-		else {
-			_point_renderer->removePoints("deformation_graph");
-		}
+		auto render_dg = registration->getDeformationGraphMesh();
+		renderDeformationGraph(render_dg, debug_deformation_graph_normals);
 	}
 }
 
@@ -169,34 +179,43 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 		if (_reigistration_finished) {
 			_mesh_renderer->removeMesh("target");
 			_mesh_renderer->removeMesh("deformed");
-			//_point_renderer->removePoints("deformed");
 
-			for (int i = 0; i < current; ++i) {
-				std::string key = "mesh_" + std::to_string(i);
-				if (!_mesh_renderer->keyExists(key)) {
-					auto deformed_points = sequence_registration->getDeformedMesh(i);
-					_mesh_renderer->insertMesh(key, deformed_points, ml::RGBColor::Cyan.toVec4f(), false);
+			if (_render_mesh == Render::NONE) {
+				for (int i = 0; i < current; ++i) {
+					std::string key = "mesh_" + std::to_string(i);
+					if (!_mesh_renderer->keyExists(key)) {
+						auto deformed_points = sequence_registration->getInverseDeformedMesh(i);
+						_mesh_renderer->insertMesh(key, deformed_points, ml::RGBColor::Cyan.toVec4f(), false);
+					}
 				}
+			}
+			else {
+				for (int i = 0; i < current; ++i) {
+					std::string key = "mesh_" + std::to_string(i);
+					_mesh_renderer->removeMesh(key);
+				}
+
+				auto deformed_points = sequence_registration->getDeformedMesh(_current_frame);
+				auto target = sequence_registration->getMesh(_current_frame);
+
+				renderDeformedSourceMesh(deformed_points, true);
+				renderTargetMesh(target, true);
+
+				// deformation graph
+				auto render_dg = sequence_registration->getDeformationGraphMesh(_current_frame);
+				renderDeformationGraph(render_dg);
 			}
 		}
 		else {
 			_reigistration_finished = sequence_registration->finished();
 			_mesh_renderer->insertMesh("target", sequence_registration->getMesh(current), ml::RGBColor::Green.toVec4f());
-			//_point_renderer->insertMesh("target", sequence_registration->getMesh(current), ml::RGBColor::Green, 0.002, true, true);
 
 			auto deformed_points = sequence_registration->getDeformedMesh(current);
 			_mesh_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan.toVec4f());
-			//_point_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan, 0.001, true, true);
-		}
 
-		// deformation graph
-		if (_render_deformation_graph && !_reigistration_finished) {
+			// deformation graph
 			auto render_dg = sequence_registration->getDeformationGraphMesh(sequence_registration->getCurrent());
-			Visualize::setDeformationGraphColor(render_dg, true);
-			_point_renderer->insertMesh("deformation_graph", render_dg, 0.001f, false, true);
-		}
-		else {
-			_point_renderer->removePoints("deformation_graph");
+			renderDeformationGraph(render_dg);
 		}
 	}
 }
@@ -236,6 +255,7 @@ RenderRegistration::RenderRegistration(ml::GraphicsDevice * graphics)
 	_render_error = false;
 	_render_deformation_graph = true;
 	_current_frame = 0;
-	_current_reference_frame = 0;
+	_last_rendered_current_frame = 0;
+	_last_rendered_reference_frame = 0;
 	_reigistration_finished = false;
 }

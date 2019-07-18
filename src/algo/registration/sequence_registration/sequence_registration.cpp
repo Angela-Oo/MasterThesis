@@ -10,9 +10,9 @@ void SequenceRegistration::nextFrame()
 	_current++;
 	auto & source = _meshes[0];
 	auto & target = _meshes[_current];
-	auto & deformation_graph = _deformation_graphs[_current - 1];
+	_deformation_graphs[_current] = _deformation_graphs[_current - 1];
 
-	_registration = createRegistration(source, target, _registration_type, deformation_graph, ceresOption(), _registration_options, _logger);
+	_registration = createRegistration(source, target, _registration_type, _deformation_graphs[_current], ceresOption(), _registration_options, _logger);
 }
 bool SequenceRegistration::solve()
 {
@@ -25,8 +25,8 @@ bool SequenceRegistration::solve()
 		auto frame_finished = _registration->finished();		
 		if (frame_finished)
 		{
-			_deformed_meshes[_current] = _registration->getInverseDeformedPoints(); // todo
-			//_deformed_meshes[_current] = _registration->getDeformedPoints();
+			//_deformed_meshes[_current] = _registration->getInverseDeformedPoints(); // todo
+			_deformed_meshes[_current] = _registration->getDeformedPoints();
 			_deformation_graphs[_current] = _registration->getDeformationGraph();
 			_ceres_logger->write("frame " + std::to_string(_current) + " solved");
 			if (_current < _meshes.size() - 1) {				
@@ -64,6 +64,13 @@ SurfaceMesh SequenceRegistration::getMesh(size_t frame)
 SurfaceMesh SequenceRegistration::getDeformedMesh(size_t frame)
 {
 	return _deformed_meshes[frame];
+}
+
+SurfaceMesh SequenceRegistration::getInverseDeformedMesh(size_t frame)
+{
+	auto inverse_deformation = DG::invertDeformationGraph(_deformation_graphs[frame]);
+	DG::DeformedMesh deformed(_meshes[frame], inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
+	return deformed.deformPoints();
 }
 
 size_t SequenceRegistration::getCurrent()

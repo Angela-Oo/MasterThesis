@@ -20,7 +20,6 @@ private:
 	std::unique_ptr<RenderRegistration> _renderer;
 	std::shared_ptr<IMeshReader> _input_mesh;
 	std::shared_ptr<IMeshReader> _reference_registration_mesh;
-	unsigned int _current_frame;
 	std::vector<unsigned int> _selected_frame_for_registration;
 	bool _solve_registration;
 	RegistrationType _registration_type;

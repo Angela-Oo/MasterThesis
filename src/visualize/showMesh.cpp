@@ -136,14 +136,14 @@ void ShowMesh::renderCurrentMesh()
 {
 	// current mesh	
 	bool render_current_frame = (!_registration && !_register_sequence_of_frames);
-	_renderer->renderCurrentFrame(_input_mesh, _current_frame, render_current_frame);
+	_renderer->renderCurrentFrame(_input_mesh, render_current_frame);
 
 	// selected frames
 	auto selected_frames = render_current_frame ? _selected_frame_for_registration : std::vector<unsigned int>();
 	_renderer->renderSelectedFrames(_input_mesh, selected_frames);	
 
 	// reference
-	_renderer->renderReference(_reference_registration_mesh, _current_frame);
+	_renderer->renderReference(_reference_registration_mesh);
 }
 
 void ShowMesh::renderRegistration()
@@ -159,7 +159,7 @@ void ShowMesh::render(ml::Cameraf& camera)
 	if (_solve_registration) {
 		if (_register_sequence_of_frames) {
 			solveAllNonRigidRegistration();
-			_current_frame = _register_sequence_of_frames->getCurrent();
+			_renderer->_current_frame = _register_sequence_of_frames->getCurrent();
 		}
 		else if (_registration && _selected_frame_for_registration.size() == 2) {
 			nonRigidRegistration();
@@ -178,17 +178,17 @@ void ShowMesh::key(UINT key)
 {
 	if (key == KEY_2)
 	{
-		_current_frame++;
-		if (_current_frame >= _input_mesh->frame())
-			_current_frame = 0;
+		_renderer->_current_frame++;
+		if (_renderer->_current_frame >= _input_mesh->frame())
+			_renderer->_current_frame = 0;
 		renderRegistration();
 	}
 	else if (key == KEY_1)
 	{
-		if (_current_frame == 0)
-			_current_frame = _input_mesh->frame() - 1;
+		if (_renderer->_current_frame == 0)
+			_renderer->_current_frame = _input_mesh->frame() - 1;
 		else
-			_current_frame--;
+			_renderer->_current_frame--;
 		renderRegistration();
 	}
 	else if (key == KEY_I)
@@ -196,9 +196,9 @@ void ShowMesh::key(UINT key)
 		if (_selected_frame_for_registration.size() < 2) {
 			if (_selected_frame_for_registration.empty())
 				_registration.reset();
-			if (_selected_frame_for_registration.empty() || (_selected_frame_for_registration.size() == 1 && _selected_frame_for_registration[0] != _current_frame)) {
-				std::cout << "select frame " << _current_frame << " for registration" << std::endl;
-				_selected_frame_for_registration.push_back(_current_frame);
+			if (_selected_frame_for_registration.empty() || (_selected_frame_for_registration.size() == 1 && _selected_frame_for_registration[0] != _renderer->_current_frame)) {
+				std::cout << "select frame " << _renderer->_current_frame << " for registration" << std::endl;
+				_selected_frame_for_registration.push_back(_renderer->_current_frame);
 			}
 		}
 	}
@@ -237,7 +237,7 @@ void ShowMesh::key(UINT key)
 	{
 		std::cout << "register all frames as rigid as possible " << std::endl;
 		if (!_register_sequence_of_frames) {
-			_current_frame = 0;
+			_renderer->_current_frame = 0;
 			_registration_type = RegistrationType::ARAP_AllFrames;
 			solveAllNonRigidRegistration();			
 			_solve_registration = true;
@@ -247,7 +247,7 @@ void ShowMesh::key(UINT key)
 	{
 		std::cout << "register all frames embdedded deformation " << std::endl;
 		if (!_register_sequence_of_frames) {
-			_current_frame = 0;
+			_renderer->_current_frame = 0;
 			_registration_type = RegistrationType::ED_AllFrames;
 			solveAllNonRigidRegistration();
 			_solve_registration = true;
@@ -257,7 +257,7 @@ void ShowMesh::key(UINT key)
 	{		
 		if (!_registration) {
 			std::cout << "test registration " << std::endl;
-			_current_frame = 1;
+			_renderer->_current_frame = 1;
 			_selected_frame_for_registration.push_back(0);
 			_selected_frame_for_registration.push_back(1);
 
@@ -307,7 +307,6 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ARAP;
 	_calculate_error = false;
@@ -328,7 +327,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = false;
+	bool test = true;
 	bool register_on_reference_mesh = true;
 	if (!test) {
 		// puppet
