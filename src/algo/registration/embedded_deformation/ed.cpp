@@ -332,7 +332,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, deformation_graph_edge_length);
 	std::cout << "number of nodes " << reduced_mesh.num_vertices() << std::endl;
-	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
+	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); }, 4);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
 }

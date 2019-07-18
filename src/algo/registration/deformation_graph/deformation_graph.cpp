@@ -30,7 +30,7 @@ std::vector<double> DeformationGraph::weights(const Point & point, std::vector<v
 {
 	vertex_descriptor last_node_descriptor = nearest_nodes[nearest_nodes.size() - 1];
 	Point last_node = _mesh.point(last_node_descriptor);
-	double d_max = sqrt(CGAL::squared_distance(point, last_node));
+	double d_max = std::sqrt(CGAL::squared_distance(point, last_node));
 	//double d_max = CGAL::squared_distance(point, last_node);
 
 	std::vector<double> weights;
@@ -38,9 +38,7 @@ std::vector<double> DeformationGraph::weights(const Point & point, std::vector<v
 	{
 		Point node_point = _mesh.point(nearest_nodes[i]);
 		double distance = std::sqrt(CGAL::squared_distance(point, node_point));
-		//double distance = CGAL::squared_distance(point, node_point);
 		double weight = std::pow(1. - (distance / d_max), 2);
-		//double weight = 1. - (distance / d_max);
 		weights.push_back(weight);
 	}
 	double sum = std::accumulate(weights.begin(), weights.end(), 0.0);
@@ -58,22 +56,23 @@ std::vector<vertex_descriptor> DeformationGraph::nearestNodes(const Point & poin
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
-	auto getNodeDistances = [&](vertex_descriptor vertex_index) {
-		std::map<vertex_descriptor, double> node_distance;
-		node_distance[vertex_index] = CGAL::squared_distance(point, _mesh.point(vertex_index));
-		for (auto & v : _mesh.vertices_around_target(_mesh.halfedge(vertex_index)))
-		{
-			auto neighbor_point = _mesh.point(v);
-			node_distance[v] = CGAL::squared_distance(point, neighbor_point);
-		}
-		return node_distance;
+	auto getNodeDistance = [&](vertex_descriptor vertex_index) {
+		return CGAL::squared_distance(point, _mesh.point(vertex_index));
 	};
 
-	std::map<vertex_descriptor, double> node_distance = getNodeDistances(nearest_node_index);
-	if (node_distance.size() < _k) {
+	auto getNodeDistancesAroundVertex = [&](vertex_descriptor vertex_index, std::map<vertex_descriptor, double> & node_distances) {		
+		for (auto & v : _mesh.vertices_around_target(_mesh.halfedge(vertex_index))) {
+			if(node_distances.find(v) == node_distances.end())
+				node_distances[v] = getNodeDistance(v);
+		}
+	};
+
+	std::map<vertex_descriptor, double> node_distance;
+	node_distance[nearest_node_index] = getNodeDistance(nearest_node_index);
+	getNodeDistancesAroundVertex(nearest_node_index, node_distance);
+	if (node_distance.size() < _k + 1) {
 		for (auto & n : node_distance) {
-			auto more_distance = getNodeDistances(n.first);
-			node_distance.insert(more_distance.begin(), more_distance.end());
+			getNodeDistancesAroundVertex(n.first, node_distance);
 		}
 	}
 
@@ -81,16 +80,12 @@ std::vector<vertex_descriptor> DeformationGraph::nearestNodes(const Point & poin
 	for (auto & d : node_distance) {
 		sorted_node_distance.push_back(d);
 	}
-
 	std::sort(sorted_node_distance.begin(), sorted_node_distance.end(),
-			  [](const std::pair<vertex_descriptor, double> & rhs, const std::pair<vertex_descriptor, double> & lhs)
-	{
-		return rhs.second < lhs.second;
-	});
+			  [](const std::pair<vertex_descriptor, double> & rhs, const std::pair<vertex_descriptor, double> & lhs) { return rhs.second < lhs.second; });
 
+	assert(sorted_node_distance.size() >= _k + 1);
 	std::vector<vertex_descriptor> indices;
-	indices.push_back(nearest_node_index);
-	for (int i = 0; i < _k && i < sorted_node_distance.size(); ++i)
+	for (int i = 0; i < _k + 1 && i < sorted_node_distance.size(); ++i)
 		indices.push_back(sorted_node_distance[i].first);
 	return indices;
 }
@@ -187,7 +182,9 @@ void DeformationGraph::initGlobalDeformation(std::shared_ptr<IDeformation> globa
 	_global._deformation = global_deformation;
 }
 
-DeformationGraph::DeformationGraph(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node, unsigned int number_of_interpolation_neighbors)
+DeformationGraph::DeformationGraph(const SurfaceMesh & mesh,
+								   std::function<std::shared_ptr<IDeformation>()> create_node, 
+								   unsigned int number_of_interpolation_neighbors)
 	: _mesh(mesh)
 	, _create_node(create_node)
 	, _k(number_of_interpolation_neighbors)
