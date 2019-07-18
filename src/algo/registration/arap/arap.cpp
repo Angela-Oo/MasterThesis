@@ -369,17 +369,6 @@ void AsRigidAsPossible::printCeresOptions()
 	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
 }
 
-void AsRigidAsPossible::setParameters()
-{
-	//_registration_options.smooth = 10.; //0.1;
-	//_registration_options.conf = 10.;// 0.02;// 1.;
-	//_registration_options.fit = 10.; // 100.;
-	//_registration_options.correspondence_max_distance = 0.1;
-	//_registration_options.correspondence_max_angle_deviation = 45.;
-	//_registration_options.max_iterations = 25;
-	//_registration_options.ignore_deformation_graph_border_vertices = true;
-}
-
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 std::vector<vertex_descriptor> fixed_positions,
@@ -396,9 +385,6 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _with_icp(false)
 
 {
-	setParameters();
-	_registration_options.smooth = 10.;
-	_registration_options.fit = 100.;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph);
 	printCeresOptions();
@@ -416,9 +402,6 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
 {
-	setParameters();
-	_registration_options.ignore_deformation_graph_border_vertices = false;
-	_registration_options.dg_options.number_of_interpolation_neighbors = 3;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
 	auto reduced_mesh = createReducedMesh(src, _registration_options.dg_options.edge_length);
 	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); }, _registration_options.dg_options.number_of_interpolation_neighbors);
@@ -441,8 +424,6 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
 {
-	setParameters();
-	_registration_options.ignore_deformation_graph_border_vertices = false;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _registration_options.correspondence_max_distance, _registration_options.correspondence_max_angle_deviation);
 
 	//_deformation_graph = transformDeformationGraph(deformation_graph);

@@ -44,7 +44,6 @@ private:
 	std::knuth_b _rand_engine;
 private:
 	bool random_bool_with_prob(double prob);
-	void setParameters();
 	void printCeresOptions();
 	void evaluateResidual(ceres::Problem & problem,
 						  std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,

@@ -12,7 +12,7 @@ void SequenceRegistration::nextFrame()
 	auto & target = _meshes[_current];
 	auto & deformation_graph = _deformation_graphs[_current - 1];
 
-	_registration = createRegistration(source, target, _registration_type, deformation_graph, ceresOption(), _evaluate_residuals, _logger);
+	_registration = createRegistration(source, target, _registration_type, deformation_graph, ceresOption(), _registration_options, _logger);
 }
 bool SequenceRegistration::solve()
 {
@@ -76,7 +76,7 @@ SurfaceMesh SequenceRegistration::getDeformationGraphMesh(size_t frame)
 	//auto inverse_deformation = inverteDeformationGraph(_deformation_graphs[frame]);
 	//return inverse_deformation.getDeformationGraphEdges();	
 
-	return deformationGraphToSurfaceMesh(_deformation_graphs[frame], _evaluate_residuals);
+	return deformationGraphToSurfaceMesh(_deformation_graphs[frame], _registration_options.evaluate_residuals);
 }
 
 SequenceRegistration::SequenceRegistration()
@@ -86,13 +86,13 @@ SequenceRegistration::SequenceRegistration()
 
 SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & meshes, 
 										   RegistrationType registration_type, 
-										   std::shared_ptr<FileWriter> logger, 
-										   double deformation_graph_edge_length)
+										   std::shared_ptr<FileWriter> logger,
+										   RegistrationOptions registration_options)
 	: _meshes(meshes)
 	, _current(1)
 	, _logger(logger)
 	, _registration_type(registration_type)
-	, _evaluate_residuals(true)
+	, _registration_options(registration_options)
 	, _finished(false)
 {
 	_deformation_graphs.resize(_meshes.size());
@@ -102,7 +102,7 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 
 	auto & source = _meshes[0];
 	auto & target = _meshes[_current];
-	_registration = createRegistration(source, target, _registration_type, ceresOption(), _evaluate_residuals, _logger, deformation_graph_edge_length);
+	_registration = createRegistration(source, target, _registration_type, ceresOption(), _registration_options, _logger);
 
 	_deformation_graphs[0] = _registration->getDeformationGraph();
 	_deformed_meshes[0] = _meshes[0];

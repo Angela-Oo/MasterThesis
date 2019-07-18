@@ -48,12 +48,22 @@ void ShowMesh::nonRigidRegistration()
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
-		bool evaluate_residuals = true;
+
+		RegistrationOptions registration_options;
+		registration_options.evaluate_residuals = true;
+		registration_options.dg_options.edge_length = _deformation_graph_edge_length;
+		registration_options.ignore_deformation_graph_border_vertices = false;
+		registration_options.dg_options.number_of_interpolation_neighbors = 3;
+
+		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) {
+			registration_options.smooth = 10.;
+			registration_options.fit = 100.;
+		}
 
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
 
-		_registration = createRegistration(source, target, _registration_type, option, evaluate_residuals, _logger, _deformation_graph_edge_length, _input_mesh->getFixedPositions(frame_b));
+		_registration = createRegistration(source, target, _registration_type, option, registration_options,  _logger, _input_mesh->getFixedPositions(frame_b));
 		renderRegistration();
 		_image_name = "frame_" + std::to_string(_registration->currentIteration());
 	}
@@ -82,9 +92,15 @@ void ShowMesh::solveAllNonRigidRegistration()
 		}
 		RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
 
+		RegistrationOptions registration_options;
+		registration_options.evaluate_residuals = true;
+		registration_options.dg_options.edge_length = _deformation_graph_edge_length;
+		registration_options.ignore_deformation_graph_border_vertices = false;
+		registration_options.dg_options.number_of_interpolation_neighbors = 3;
+
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
-		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, type, _logger, _deformation_graph_edge_length);
+		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, type, _logger, registration_options);
 	}
 	else {
 		bool finished = _register_sequence_of_frames->finished();
@@ -335,21 +351,21 @@ void ShowMesh::init(ml::ApplicationData &app)
 		// head
 		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
 		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
-		_deformation_graph_edge_length = 0.07;
-		//_deformation_graph_edge_length = 0.1;
+		//_deformation_graph_edge_length = 0.07;
+		_deformation_graph_edge_length = 0.2;
 		_data_name = "head";
 	
 		// hand
-/*		auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
-		auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
-		_data_name = "hand";*/		
+		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
+		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
+		//_data_name = "hand";
 
-		input_mesh->processAllFrames();
-		reference_registration_mesh->processAllFrames();
-		//for (int i = 0; i < 10; i++) {
-		//	input_mesh->processFrame();
-		//	reference_registration_mesh->processFrame();
-		//}
+		//input_mesh->processAllFrames();
+		//reference_registration_mesh->processAllFrames();
+		for (int i = 0; i < 15; i++) {
+			input_mesh->processFrame();
+			reference_registration_mesh->processFrame();
+		}
 		if (register_on_reference_mesh) {
 			_input_mesh = std::move(reference_registration_mesh);
 			_reference_registration_mesh = std::move(input_mesh);
@@ -366,7 +382,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		_input_mesh = std::make_shared<DeformationMeshFrames>();
 		_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
-		_deformation_graph_edge_length = 0.07;
+		_deformation_graph_edge_length = 0.1;
 		//_logger = std::make_shared<FileWriter>("test.txt");
 		_renderer->_render_reference_mesh = false;
 		_calculate_error = false;

@@ -19,7 +19,7 @@ private:
 	std::vector<DG::DeformationGraph> _deformation_graphs;
 	size_t _current;
 	std::unique_ptr<IRegistration> _registration;
-	bool _evaluate_residuals;
+	RegistrationOptions _registration_options;
 	std::shared_ptr<FileWriter> _logger;
 	std::unique_ptr<CeresLogger> _ceres_logger;
 	bool _finished;
@@ -36,6 +36,6 @@ public:
 	SequenceRegistration(const std::vector<SurfaceMesh> & meshes,
 						 RegistrationType registration_type, 
 						 std::shared_ptr<FileWriter> logger, 
-						 double deformation_graph_edge_length = 0.05);
+						 RegistrationOptions registration_options);
 };
 
