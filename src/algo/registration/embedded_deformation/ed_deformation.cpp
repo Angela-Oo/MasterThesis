@@ -20,6 +20,10 @@ std::shared_ptr<IDeformation> Deformation::invertDeformation() const
 	return std::make_shared<Deformation>(_r.getInverse(), -_t, _w);
 }
 
+std::shared_ptr<IDeformation> Deformation::clone() const
+{
+	return std::make_shared<Deformation>(*this);
+}
 
 Deformation::Deformation(const ml::mat3d & r, const ml::vec3d & t, double w)
 	: _r(r)
@@ -31,14 +35,18 @@ Deformation::Deformation()
 	: Deformation(ml::mat3d::identity(), ml::vec3f::origin)
 {}
 
-Deformation::Deformation(const Deformation & node, bool inverse)
-	: _r(node._r)
-	, _t(node._t)
-	, _w(node._w)
+Deformation::Deformation(const Deformation & other)
+	: _r(other._r)
+	, _t(other._t)
+	, _w(other._w)
+{}
+
+Deformation::Deformation(const Deformation & deformation, bool inverse)
+	: Deformation(deformation)
 {
 	if (inverse) {
-		_r = node._r.getInverse();
-		_t = -node._t;
+		_r = deformation._r.getInverse();
+		_t = -deformation._t;
 	}
 }
 

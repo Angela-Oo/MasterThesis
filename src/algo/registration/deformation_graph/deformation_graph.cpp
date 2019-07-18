@@ -62,7 +62,7 @@ std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & 
 	if (sorted_node_distance.size() < k)
 		std::cout << "help not enouth nodes found" << std::endl;
 	std::vector<vertex_descriptor> indices;
-	for (int i = 0; i < k && i < sorted_node_distance.size(); ++i)
+	for (unsigned int i = 0; i < k && i < sorted_node_distance.size(); ++i)
 		indices.push_back(sorted_node_distance[i].first);
 	return indices;
 }
@@ -207,6 +207,14 @@ DeformationGraph::DeformationGraph(const DeformationGraph & deformation_graph)
 	, _mesh(deformation_graph._mesh)
 	, _create_node(deformation_graph._create_node)
 {
+	// deep copy of deformations
+	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	assert(nodes.second);
+	for (auto & v : _mesh.vertices()) {
+		nodes.first[v] = nodes.first[v]->clone();
+	}
+	_global._deformation = _global._deformation->clone();
+
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
 
@@ -215,9 +223,18 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 	if (&other == this)
 		return *this;
 
+	_create_node = other._create_node;
 	_global = other._global;
 	_mesh = other._mesh;
-	_create_node = other._create_node;
+
+	// deep copy of deformations
+	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	assert(nodes.second);
+	for (auto & v : _mesh.vertices()) {
+		nodes.first[v] = nodes.first[v]->clone();
+	}
+	_global._deformation = _global._deformation->clone();
+	
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
 }

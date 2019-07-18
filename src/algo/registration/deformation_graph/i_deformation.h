@@ -17,5 +17,6 @@ public:
 	virtual Vector translation() const = 0;
 	virtual double weight() const = 0;
 	virtual std::shared_ptr<IDeformation> invertDeformation() const = 0;
+	virtual std::shared_ptr<IDeformation> clone() const = 0;
 };
 
