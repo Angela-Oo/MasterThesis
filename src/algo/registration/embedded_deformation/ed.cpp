@@ -299,7 +299,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
+	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); }, 4)
 	, _fixed_positions(fixed_positions)
 	, _evaluate_residuals(evaluate_residuals)
 	, _ceres_logger(logger)

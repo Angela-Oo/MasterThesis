@@ -54,7 +54,7 @@ CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 	ss << std::setprecision(4);
 	ss << std::endl << "Iteration: " << std::setw(3) << _iteration << "  steps: " << std::setw(3) << _summary.iterations.size();
 	ss << "  time iteration step: " << std::setw(10) << getDurationAsString(_iteration_start_time);
-	ss << "  time: " << std::setw(10) << getDurationAsString(_start_time);
+	ss << "  time: " << std::setw(10) << getDurationAsString_min_s_ms(_start_time);
 	ss << "  error: " << std::setw(8) << _summary.final_cost;
 	ss << "  term: " << _summary.termination_type << "  ";
 

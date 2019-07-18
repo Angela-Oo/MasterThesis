@@ -71,7 +71,8 @@ ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &proble
 	auto nodes = _deformed_mesh->nearestNodes(v);
 
 	if (_registration_options.dg_options.number_of_interpolation_neighbors == 4) {
-
+		if (nodes.nodes.size() < 4)
+			std::cout << "help nearest node is smaller than expected" << std::endl;
 		auto d1 = _deformation_graph.getNode(nodes.nodes[0]);
 		auto d2 = _deformation_graph.getNode(nodes.nodes[1]);
 		auto d3 = _deformation_graph.getNode(nodes.nodes[2]);
@@ -204,9 +205,8 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 		if (_registration_options.ignore_deformation_graph_border_vertices)
 			use_vertex = !_src.is_border(v, true);
 
-		use_vertex = random_bool_with_prob(0.5);// todo
-
-
+		if(_registration_options.use_vertex_random_probability < 1.)
+			use_vertex = random_bool_with_prob(_registration_options.use_vertex_random_probability);
 
 		if(use_vertex) {
 			auto deformed_point = _deformed_mesh->deformed_point(v);
@@ -378,7 +378,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
+	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); }, registration_options.dg_options.number_of_interpolation_neighbors)
 	, _fixed_positions(fixed_positions)
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)

@@ -25,16 +25,16 @@ std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 												  const SurfaceMesh & target,
 												  RegistrationType registration_type,
 												  const ceres::Solver::Options & options,
-												  RegistrationOptions registration_options,
+												  const RegistrationOptions & registration_options,
 												  std::shared_ptr<FileWriter> logger,
 												  std::vector<vertex_descriptor> fixed_positions = std::vector<vertex_descriptor>());
 
 std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
 												  const SurfaceMesh & target,
 												  RegistrationType registration_type,
-												  DG::DeformationGraph deformation_graph,
+												  const DG::DeformationGraph & deformation_graph,
 												  const ceres::Solver::Options & options,
-												  RegistrationOptions registration_options,
+												  const RegistrationOptions & registration_options,
 												  std::shared_ptr<FileWriter> logger);
 
 

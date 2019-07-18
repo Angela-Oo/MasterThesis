@@ -35,8 +35,8 @@ public:
 public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
-	DeformationGraph(const SurfaceMesh & nodes, std::function<std::shared_ptr<IDeformation>()> create_node, unsigned int number_of_interpolation_neighbors = 4);
-	DeformationGraph(const SurfaceMesh & mesh, const std::shared_ptr<IDeformation> & global_deformation, std::function<std::shared_ptr<IDeformation>()> create_node, unsigned int number_of_interpolation_neighbors = 4);
+	DeformationGraph(const SurfaceMesh & nodes, std::function<std::shared_ptr<IDeformation>()> create_node, unsigned int number_of_interpolation_neighbors);
+	DeformationGraph(const SurfaceMesh & mesh, const std::shared_ptr<IDeformation> & global_deformation, std::function<std::shared_ptr<IDeformation>()> create_node, unsigned int number_of_interpolation_neighbors);
 	DeformationGraph(const DeformationGraph & deformation_graph);
 	DeformationGraph & operator=(DeformationGraph other);
 };

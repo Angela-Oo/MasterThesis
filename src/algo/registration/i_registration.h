@@ -29,11 +29,12 @@ struct RegistrationOptions
 	double smooth;
 	double conf;
 	double fit;
-	double correspondence_max_distance;
-	double correspondence_max_angle_deviation;
+	double correspondence_max_distance; // initial distance for corresponding finding 
+	double correspondence_max_angle_deviation; // 45 degree
 	unsigned int max_iterations;
 	bool ignore_deformation_graph_border_vertices;
 	bool evaluate_residuals;
+	double use_vertex_random_probability; // value between 0. and 1.
 	DeformationGraphOptions dg_options;
 	
 	RegistrationOptions()
@@ -45,6 +46,7 @@ struct RegistrationOptions
 		, max_iterations(25)
 		, ignore_deformation_graph_border_vertices(true)
 		, evaluate_residuals(true)
+		, use_vertex_random_probability(0.5)
 	{}
 };
 

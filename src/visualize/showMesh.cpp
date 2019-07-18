@@ -49,21 +49,15 @@ void ShowMesh::nonRigidRegistration()
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
 
-		RegistrationOptions registration_options;
-		registration_options.evaluate_residuals = true;
-		registration_options.dg_options.edge_length = _deformation_graph_edge_length;
-		registration_options.ignore_deformation_graph_border_vertices = false;
-		registration_options.dg_options.number_of_interpolation_neighbors = 3;
-
-		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) {
-			registration_options.smooth = 10.;
-			registration_options.fit = 100.;
+		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) { // todo
+			_registration_options.smooth = 10.;
+			_registration_options.fit = 100.;
 		}
 
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
 
-		_registration = createRegistration(source, target, _registration_type, option, registration_options,  _logger, _input_mesh->getFixedPositions(frame_b));
+		_registration = createRegistration(source, target, _registration_type, option, _registration_options,  _logger, _input_mesh->getFixedPositions(frame_b));
 		renderRegistration();
 		_image_name = "frame_" + std::to_string(_registration->currentIteration());
 	}
@@ -92,15 +86,9 @@ void ShowMesh::solveAllNonRigidRegistration()
 		}
 		RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
 
-		RegistrationOptions registration_options;
-		registration_options.evaluate_residuals = true;
-		registration_options.dg_options.edge_length = _deformation_graph_edge_length;
-		registration_options.ignore_deformation_graph_border_vertices = false;
-		registration_options.dg_options.number_of_interpolation_neighbors = 3;
-
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
-		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, type, _logger, registration_options);
+		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, type, _logger, _registration_options);
 	}
 	else {
 		bool finished = _register_sequence_of_frames->finished();
@@ -318,41 +306,44 @@ void ShowMesh::key(UINT key)
 
 void ShowMesh::init(ml::ApplicationData &app)
 {
-	//_number_of_nodes = 1500;
-	_deformation_graph_edge_length = 0.05;
 	_current_frame = 0;
 	_solve_registration = false;
 	_registration_type = RegistrationType::ARAP;
 	_calculate_error = false;
 	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
-	//_saved_image = 0;
 
+	_registration_options.evaluate_residuals = true;
+	_registration_options.dg_options.edge_length = 0.1;
+	_registration_options.ignore_deformation_graph_border_vertices = false;
+	_registration_options.dg_options.number_of_interpolation_neighbors = 4;
+	_registration_options.use_vertex_random_probability = 0.5;
+	
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
 	ml::mat4f transform = ml::mat4f::translation({ -0.5f, 3.5f, 1.5f });
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = false;
+	bool test = true;
 	bool register_on_reference_mesh = true;
 	if (!test) {
 		// puppet
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 1);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);
-		//_deformation_graph_edge_length = 0.07;
+		//_registration_options.dg_options.edge_length = 0.07;
 		//_data_name = "puppet";
 
 		// paperbag
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 1);
-		//_deformation_graph_edge_length = 0.1;
+		//_registration_options.dg_options.edge_length = 0.1;
 		//_data_name = "paperbag";
 
 		// head
 		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
 		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
 		//_deformation_graph_edge_length = 0.07;
-		_deformation_graph_edge_length = 0.2;
+		_registration_options.dg_options.edge_length = 0.15;
 		_data_name = "head";
 	
 		// hand
@@ -377,13 +368,14 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_logger = std::make_shared<FileWriter>(_data_name + "_log.txt");
 	}
 	else {
-		//_input_mesh = std::make_unique<DeformationMesh>();
-		//_reference_registration_mesh = std::make_unique<DeformationMesh>();
+		_registration_options.evaluate_residuals = true;
+		_registration_options.dg_options.edge_length = 0.1;
+		_registration_options.ignore_deformation_graph_border_vertices = false;
+		_registration_options.dg_options.number_of_interpolation_neighbors = 4;
+		_registration_options.use_vertex_random_probability = 1.;
 
 		_input_mesh = std::make_shared<DeformationMeshFrames>();
 		_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
-		_deformation_graph_edge_length = 0.1;
-		//_logger = std::make_shared<FileWriter>("test.txt");
 		_renderer->_render_reference_mesh = false;
 		_calculate_error = false;
 		_renderer->_render_deformation_graph = true;
