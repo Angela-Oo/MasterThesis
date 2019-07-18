@@ -141,7 +141,7 @@ void RenderRegistration::renderDeformationGraph(SurfaceMesh & deformation_graph,
 {
 	if (_render_deformation_graph) {
 		Visualize::setDeformationGraphColor(deformation_graph, true);
-		_point_renderer->insertMesh("deformation_graph", deformation_graph, 0.001f, debug_normals);
+		_point_renderer->insertMesh("deformation_graph", deformation_graph, 0.001f, debug_normals, true);
 	}
 	else {
 		_point_renderer->removePoints("deformation_graph");
@@ -188,6 +188,7 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 						_mesh_renderer->insertMesh(key, deformed_points, ml::RGBColor::Cyan.toVec4f(), false);
 					}
 				}
+				_point_renderer->removePoints("deformation_graph");
 			}
 			else {
 				for (int i = 0; i < current; ++i) {

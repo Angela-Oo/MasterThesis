@@ -117,7 +117,7 @@ Point DeformationGraph::getNodePosition(vertex_descriptor node_index) const
 PositionAndDeformation DeformationGraph::getNode(vertex_descriptor node_index) const
 {
 	PositionAndDeformation node;
-	auto deformation_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	auto deformation_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node"); // todo needs to be unique ptr (deep copy not possible)
 	assert(deformation_nodes.second);
 	std::shared_ptr<IDeformation> n = deformation_nodes.first[node_index];
 	node._deformation = n;

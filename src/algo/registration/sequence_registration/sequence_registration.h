@@ -16,6 +16,7 @@ private:
 	RegistrationType _registration_type;
 	std::vector<SurfaceMesh> _meshes;
 	std::vector<SurfaceMesh> _deformed_meshes;
+	std::vector<SurfaceMesh> _inverse_deformed_meshes; // todo remove as soon as the copy of the deformation graph is fixed
 	std::vector<DG::DeformationGraph> _deformation_graphs;
 	size_t _current;
 	std::unique_ptr<IRegistration> _registration;

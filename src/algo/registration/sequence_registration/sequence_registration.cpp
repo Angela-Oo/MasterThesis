@@ -25,7 +25,7 @@ bool SequenceRegistration::solve()
 		auto frame_finished = _registration->finished();		
 		if (frame_finished)
 		{
-			//_deformed_meshes[_current] = _registration->getInverseDeformedPoints(); // todo
+			_inverse_deformed_meshes[_current] = _registration->getInverseDeformedPoints(); // todo
 			_deformed_meshes[_current] = _registration->getDeformedPoints();
 			_deformation_graphs[_current] = _registration->getDeformationGraph();
 			_ceres_logger->write("frame " + std::to_string(_current) + " solved");
@@ -68,9 +68,10 @@ SurfaceMesh SequenceRegistration::getDeformedMesh(size_t frame)
 
 SurfaceMesh SequenceRegistration::getInverseDeformedMesh(size_t frame)
 {
-	auto inverse_deformation = DG::invertDeformationGraph(_deformation_graphs[frame]);
-	DG::DeformedMesh deformed(_meshes[frame], inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
-	return deformed.deformPoints();
+	return _inverse_deformed_meshes[frame]; // todo remove as soon as copy of deformation graph is fixed
+	//auto inverse_deformation = DG::invertDeformationGraph(_deformation_graphs[frame]);
+	//DG::DeformedMesh deformed(_meshes[frame], inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
+	//return deformed.deformPoints();
 }
 
 size_t SequenceRegistration::getCurrent()
@@ -80,9 +81,6 @@ size_t SequenceRegistration::getCurrent()
 
 SurfaceMesh SequenceRegistration::getDeformationGraphMesh(size_t frame)
 {
-	//auto inverse_deformation = inverteDeformationGraph(_deformation_graphs[frame]);
-	//return inverse_deformation.getDeformationGraphEdges();	
-
 	return deformationGraphToSurfaceMesh(_deformation_graphs[frame], _registration_options.evaluate_residuals);
 }
 
@@ -104,8 +102,7 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 {
 	_deformation_graphs.resize(_meshes.size());
 	_deformed_meshes.resize(_meshes.size());
-
-	//auto reduced_mesh = createReducedMesh(_meshes[0], deformation_graph_edge_length);
+	_inverse_deformed_meshes.resize(_meshes.size());
 
 	auto & source = _meshes[0];
 	auto & target = _meshes[_current];
@@ -113,6 +110,7 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 
 	_deformation_graphs[0] = _registration->getDeformationGraph();
 	_deformed_meshes[0] = _meshes[0];
+	_inverse_deformed_meshes[0] = _meshes[0];;
 	_ceres_logger = std::make_unique<CeresLogger>(_logger);
 	std::string algo = (_registration_type == RegistrationType::ARAP) ? "arap" : "ed";
 	_ceres_logger->write("Register all frames with " + algo);
