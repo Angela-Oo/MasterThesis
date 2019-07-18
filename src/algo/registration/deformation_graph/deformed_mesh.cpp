@@ -126,7 +126,7 @@ DeformedMesh::DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & de
 	//assert(created);
 
 	for (auto & v : _mesh.vertices()) {
-		nearest_nodes[v] = createNearestNodes(v);
+ 		nearest_nodes[v] = createNearestNodes(v);
 	}
 }
 

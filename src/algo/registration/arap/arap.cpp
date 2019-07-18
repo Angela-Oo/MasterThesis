@@ -407,7 +407,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
 	
-	std::cout << "number of nodes " << _deformation_graph._mesh.number_of_vertices() << std::endl;
+	_ceres_logger.write("number of deformation graph nodes " + _deformation_graph._mesh.number_of_vertices(), false);
 	printCeresOptions();
 }
 

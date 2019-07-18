@@ -31,10 +31,6 @@ std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & 
 	Neighbor_search search = _knn_search->search(point);
 	vertex_descriptor nearest_node_index = search.begin()->first;
 
-	auto property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
-	assert(property_map_nodes.second);
-	auto & nodes = property_map_nodes.first;
-
 	auto getNodeDistance = [&](vertex_descriptor vertex_index) {
 		return CGAL::squared_distance(point, _mesh.point(vertex_index));
 	};

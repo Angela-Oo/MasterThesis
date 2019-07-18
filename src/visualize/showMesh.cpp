@@ -19,7 +19,7 @@ std::string ShowMesh::getImageFolderName(RegistrationType type)
 {
 	auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
 	std::stringstream ss;
-	ss << std::put_time(std::localtime(&in_time_t), "%d-%m-%Y_%H-%M");
+	ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M");
 	std::string folder_name = "registration_";
 	if (type == RegistrationType::ARAP) {
 		folder_name = "ASAP_";
@@ -324,7 +324,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = true;
+	bool test = false;
 	bool register_on_reference_mesh = true;
 	if (!test) {
 		// puppet
@@ -351,12 +351,12 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
 		//_data_name = "hand";
 
-		//input_mesh->processAllFrames();
-		//reference_registration_mesh->processAllFrames();
-		for (int i = 0; i < 15; i++) {
-			input_mesh->processFrame();
-			reference_registration_mesh->processFrame();
-		}
+		input_mesh->processAllFrames();
+		reference_registration_mesh->processAllFrames();
+		//for (int i = 0; i < 15; i++) {
+		//	input_mesh->processFrame();
+		//	reference_registration_mesh->processFrame();
+		//}
 		if (register_on_reference_mesh) {
 			_input_mesh = std::move(reference_registration_mesh);
 			_reference_registration_mesh = std::move(input_mesh);
