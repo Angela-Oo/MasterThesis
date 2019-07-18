@@ -17,6 +17,8 @@ enum Render
 	ALL
 };
 
+std::string renderMeshModeToString(Render render_type);
+
 class RenderRegistration {
 	std::unique_ptr<PointsRenderer> _point_renderer;
 	std::unique_ptr<MeshRenderer> _mesh_renderer;

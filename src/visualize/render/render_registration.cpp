@@ -3,6 +3,23 @@
 #include "algo/evaluate_registration.h"
 #include "render_deformation_graph.h"
 
+std::string renderMeshModeToString(Render render_type)
+{
+	if (render_type == Render::ALL)
+		return "ALL";
+	else if (render_type == Render::DEFORMATION)
+		return "DEFORMATION";
+	else if (render_type == Render::TARGET)
+		return "TARGET";
+	else if (render_type == Render::ONLY_DEFORMATION_GRAPH)
+		return "ONLY_DEFORMATION_GRAPH";
+	else if(render_type == Render::NONE)
+		return "NONE";
+
+	return "";
+}
+
+
 void RenderRegistration::render(ml::Cameraf& camera)
 {
 	_mesh_renderer->render(camera);
@@ -11,16 +28,17 @@ void RenderRegistration::render(ml::Cameraf& camera)
 
 Render RenderRegistration::nextRenderMeshMode()
 {
-	if (_render_mesh == Render::NONE)
+	if (_render_mesh == Render::ALL)
 		_render_mesh = Render::DEFORMATION;
 	else if (_render_mesh == Render::DEFORMATION)
 		_render_mesh = Render::TARGET;
 	else if (_render_mesh == Render::TARGET)
-		_render_mesh = Render::ALL;
-	else if (_render_mesh == Render::ALL)
 		_render_mesh = Render::ONLY_DEFORMATION_GRAPH;
-	else
+	else if (_render_mesh == Render::ONLY_DEFORMATION_GRAPH)
 		_render_mesh = Render::NONE;
+	else
+		_render_mesh = Render::ALL;
+		
 	return _render_mesh;
 }
 
@@ -208,11 +226,17 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 			}
 		}
 		else {
-			_reigistration_finished = sequence_registration->finished();
-			_mesh_renderer->insertMesh("target", sequence_registration->getMesh(current), ml::RGBColor::Green.toVec4f());
+			//_reigistration_finished = sequence_registration->finished();
+			//_mesh_renderer->insertMesh("target", sequence_registration->getMesh(current), ml::RGBColor::Green.toVec4f());
+
+			//auto deformed_points = sequence_registration->getDeformedMesh(current);
+			//_mesh_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan.toVec4f());
 
 			auto deformed_points = sequence_registration->getDeformedMesh(current);
-			_mesh_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan.toVec4f());
+			auto target = sequence_registration->getMesh(current);
+
+			renderDeformedSourceMesh(deformed_points, true);
+			renderTargetMesh(target, true);
 
 			// deformation graph
 			auto render_dg = sequence_registration->getDeformationGraphMesh(sequence_registration->getCurrent());

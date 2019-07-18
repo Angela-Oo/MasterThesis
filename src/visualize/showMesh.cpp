@@ -154,16 +154,22 @@ void ShowMesh::renderRegistration()
 	renderError();
 }
 
+void ShowMesh::registration()
+{
+	if (_register_sequence_of_frames) {
+		solveAllNonRigidRegistration();
+		_renderer->_current_frame = _register_sequence_of_frames->getCurrent();
+	}
+	else if (_registration && _selected_frame_for_registration.size() == 2) {
+		nonRigidRegistration();
+	}
+}
+
+
 void ShowMesh::render(ml::Cameraf& camera)
 {
 	if (_solve_registration) {
-		if (_register_sequence_of_frames) {
-			solveAllNonRigidRegistration();
-			_renderer->_current_frame = _register_sequence_of_frames->getCurrent();
-		}
-		else if (_registration && _selected_frame_for_registration.size() == 2) {
-			nonRigidRegistration();
-		}
+		registration();
 		renderRegistration();
 	}
 	_renderer->render(camera);
@@ -277,8 +283,7 @@ void ShowMesh::key(UINT key)
 	else if (key == KEY_H)
 	{
 		auto mode = _renderer->nextRenderMeshMode();
-		std::string visible = (mode != Render::NONE) ? "show" : "hide";
-		std::cout << visible << " mesh" << std::endl;
+		std::cout << "render mesh mode: " << renderMeshModeToString(_renderer->_render_mesh) << std::endl;
 		//_mesh_renderer->clear();
 		renderRegistration();
 	}

@@ -42,5 +42,6 @@ private:
 public:
 	void init(ml::ApplicationData &app) override;
 	void render(ml::Cameraf& camera) override;
+	void registration();
 	void key(UINT key) override;
 };
