@@ -67,13 +67,15 @@ void RenderRegistration::renderSelectedFrames(std::shared_ptr<IMeshReader> mesh_
 void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reader, unsigned int current_frame)
 {
 	// reference
-	if (_render_reference_mesh) {
-		bool override_mesh = (current_frame != _current_reference_frame);
-		_mesh_renderer->insertMesh("reference", mesh_reader->getMesh(current_frame), ml::RGBColor::White.toVec4f(), override_mesh);
-		_current_reference_frame = current_frame;
-	}
-	else {
-		_mesh_renderer->removeMesh("reference");
+	if (mesh_reader->frame() > current_frame) {
+		if (_render_reference_mesh) {
+			bool override_mesh = (current_frame != _current_reference_frame);
+			_mesh_renderer->insertMesh("reference", mesh_reader->getMesh(current_frame), ml::RGBColor::White.toVec4f(), override_mesh);
+			_current_reference_frame = current_frame;
+		}
+		else {
+			_mesh_renderer->removeMesh("reference");
+		}
 	}
 }
 

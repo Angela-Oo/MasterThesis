@@ -109,7 +109,8 @@ void ShowMesh::renderError()
 {	
 	if (_registration && _calculate_error) {
 		if (!_error_evaluation) {
-			_error_evaluation = std::make_unique<ErrorEvaluation>(_reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
+			if(_reference_registration_mesh->frame() > _selected_frame_for_registration[1])
+				_error_evaluation = std::make_unique<ErrorEvaluation>(_reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
 		}
 
 		auto registered_points_a = _registration->getDeformedPoints();
@@ -316,7 +317,8 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_registration_options.dg_options.edge_length = 0.1;
 	_registration_options.ignore_deformation_graph_border_vertices = false;
 	_registration_options.dg_options.number_of_interpolation_neighbors = 4;
-	_registration_options.use_vertex_random_probability = 0.5;
+	_registration_options.use_vertex_random_probability = 1.0;
+	_registration_options.max_iterations = 25;
 	
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
@@ -351,12 +353,12 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
 		//_data_name = "hand";
 
-		input_mesh->processAllFrames();
-		reference_registration_mesh->processAllFrames();
-		//for (int i = 0; i < 15; i++) {
-		//	input_mesh->processFrame();
-		//	reference_registration_mesh->processFrame();
-		//}
+		//input_mesh->processAllFrames();
+		//reference_registration_mesh->processAllFrames();
+		for (int i = 0; i < 15; i++) {
+			//input_mesh->processFrame();
+			reference_registration_mesh->processFrame();
+		}
 		if (register_on_reference_mesh) {
 			_input_mesh = std::move(reference_registration_mesh);
 			_reference_registration_mesh = std::move(input_mesh);
