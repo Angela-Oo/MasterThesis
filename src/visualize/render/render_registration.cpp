@@ -174,7 +174,7 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 	{
 		auto deformed_points = registration->getDeformedPoints();
 
-		renderDeformedSourceMesh(deformed_points, false, debug_normals);
+		renderDeformedSourceMesh(deformed_points, true, debug_normals);
 		renderTargetMesh(registration->getTarget(), false, debug_normals);
 
 		// fixed positions

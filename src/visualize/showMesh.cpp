@@ -318,13 +318,13 @@ void ShowMesh::init(ml::ApplicationData &app)
 	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
 
 	_registration_options.evaluate_residuals = true;
-	_registration_options.dg_options.edge_length = 0.2;
+	_registration_options.dg_options.edge_length = 0.15;
 	_registration_options.ignore_deformation_graph_border_vertices = false;
 	_registration_options.dg_options.number_of_interpolation_neighbors = 4;
-	_registration_options.use_vertex_random_probability = 0.4;
+	_registration_options.use_vertex_random_probability = 1.0;
 	_registration_options.max_iterations = 25;
-	_registration_options.smooth = 1.;
-	_registration_options.fit = 10.;
+	_registration_options.smooth = 10.;
+	_registration_options.fit = 1.;
 	
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
@@ -332,7 +332,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = true;
+	bool test = false;
 	bool register_on_reference_mesh = true;
 	if (!test) {
 		// puppet
@@ -350,8 +350,6 @@ void ShowMesh::init(ml::ApplicationData &app)
 		// head
 		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
 		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
-		//_deformation_graph_edge_length = 0.07;
-		//_registration_options.dg_options.edge_length = 0.15;
 		_data_name = "head";
 	
 		// hand
@@ -361,7 +359,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		//input_mesh->processAllFrames();
 		//reference_registration_mesh->processAllFrames();
-		for (int i = 0; i < 15; i++) {
+		for (int i = 0; i < 50; i++) {
 			//input_mesh->processFrame();
 			reference_registration_mesh->processFrame();
 		}
