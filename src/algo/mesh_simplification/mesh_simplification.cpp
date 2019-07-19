@@ -6,7 +6,7 @@
 #include "poison_surface_remeshing.h"
 #include "make_mesh_3_remeshing.h"
 #include "isotropic_remeshing.h"
-
+#include <CGAL/Polygon_mesh_processing/repair.h>
 
 Mesh createReducedMesh(const Mesh & mesh, double target_edge_length, ReduceMeshStrategy strategy)
 {
@@ -19,13 +19,16 @@ Mesh createReducedMesh(const Mesh & mesh, double target_edge_length, ReduceMeshS
 
 SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_length, ReduceMeshStrategy strategy)
 {
+	SurfaceMesh reduced_mesh;
 	if(strategy == ReduceMeshStrategy::ISOTROPIC)
-		return isotropicRemeshing(mesh, target_edge_length);
+		reduced_mesh = isotropicRemeshing(mesh, target_edge_length);
 	else if (strategy == ReduceMeshStrategy::POISON)
-		return poisonSurfaceRemeshing(mesh, target_edge_length);
+		reduced_mesh = poisonSurfaceRemeshing(mesh, target_edge_length);
 	else if (strategy == ReduceMeshStrategy::MAKEMESH3)
-		return makeMesh3Remeshing(mesh, target_edge_length);
-	else if (strategy == ReduceMeshStrategy::NONE)
-		return mesh;
-	return mesh;
+		reduced_mesh = makeMesh3Remeshing(mesh, target_edge_length);
+	else // if (strategy == ReduceMeshStrategy::NONE)
+		reduced_mesh = mesh;
+	
+	CGAL::Polygon_mesh_processing::remove_isolated_vertices(reduced_mesh);
+	return reduced_mesh;
 }
