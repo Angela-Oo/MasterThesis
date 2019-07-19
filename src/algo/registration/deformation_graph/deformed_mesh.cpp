@@ -93,6 +93,10 @@ NearestNodes DeformedMesh::createNearestNodes(vertex_descriptor v) const
 	vertex_descriptor last_node_descriptor = nearest_deformation_nodes[nearest_deformation_nodes.size() - 1];
 	Point last_node = _deformation_graph.getNode(last_node_descriptor)._point;
 	double d_max = std::sqrt(CGAL::squared_distance(point, last_node));
+	if (nearest_deformation_nodes.size() < 2) {
+		d_max = 1.;
+		std::cout << "found only one nearest node" << std::endl;
+	}
 
 	// calculate weight per deformation node
 	std::vector<std::pair<vertex_descriptor, double>> vertex_weight_vector;
@@ -109,6 +113,9 @@ NearestNodes DeformedMesh::createNearestNodes(vertex_descriptor v) const
 	// divide by sum
 	std::for_each(vertex_weight_vector.begin(), vertex_weight_vector.end(), [sum](std::pair<vertex_descriptor, double> & v_w) { v_w.second = v_w.second / sum; });
 	
+	if (vertex_weight_vector.size() < _k) {
+		std::cout << "not enought nodes found" << std::endl;
+	}
 	return NearestNodes(point, vertex_weight_vector);
 }
 

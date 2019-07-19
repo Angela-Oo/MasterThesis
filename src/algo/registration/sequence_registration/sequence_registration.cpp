@@ -27,7 +27,7 @@ bool SequenceRegistration::solve()
 		{
 			_deformed_meshes[_current] = _registration->getDeformedPoints();
 			_deformation_graphs[_current] = _registration->getDeformationGraph();
-			_ceres_logger->write("frame " + std::to_string(_current) + " solved");
+			_ceres_logger->write("frame " + std::to_string(_current) + " solved \n");
 			if (_current < _meshes.size() - 1) {				
 				_registration.reset();				
 			}
