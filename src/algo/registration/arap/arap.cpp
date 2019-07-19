@@ -189,6 +189,9 @@ bool AsRigidAsPossible::useVertex(vertex_descriptor & v)
 		_registration_options.use_vertex_random_probability < 1.) {
 		use_vertex = random_bool_with_prob(_registration_options.use_vertex_random_probability);
 	}
+
+	if (_deformed_mesh->nearestNodes(v).node_weight_vector.size() < _registration_options.dg_options.number_of_interpolation_neighbors)
+		use_vertex = false;
 	return use_vertex;
 }
 
