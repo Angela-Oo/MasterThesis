@@ -30,4 +30,7 @@ class NearestNeighborSearch
 public:
 	Neighbor_search search(Point point, int K = 1);
 	NearestNeighborSearch(const SurfaceMesh & mesh);
+	NearestNeighborSearch(const SurfaceMesh & mesh,
+						  const std::vector<vertex_descriptor>::iterator vertices_begin,
+						  const std::vector<vertex_descriptor>::iterator vertices_end);
 };

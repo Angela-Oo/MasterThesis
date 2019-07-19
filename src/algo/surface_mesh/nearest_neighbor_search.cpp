@@ -20,3 +20,10 @@ NearestNeighborSearch::NearestNeighborSearch(const SurfaceMesh & mesh)
 	_tree = std::make_unique<Tree>(vertices(mesh).begin(), vertices(mesh).end(), Tree::Splitter(), Traits(_vertex_point_property_map));
 }
 
+NearestNeighborSearch::NearestNeighborSearch(const SurfaceMesh & mesh, 
+											 const std::vector<vertex_descriptor>::iterator vertices_begin,
+											 const std::vector<vertex_descriptor>::iterator vertices_end)
+{
+	_vertex_point_property_map = get(CGAL::vertex_point, mesh);
+	_tree = std::make_unique<Tree>(vertices_begin, vertices_end, Tree::Splitter(), Traits(_vertex_point_property_map));
+}

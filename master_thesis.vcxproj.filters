@@ -638,6 +638,9 @@
     <ClInclude Include="src\algo\mesh_simplification\poison_surface_remeshing.h">
       <Filter>algo\mesh simplification</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h">
+      <Filter>algo\registration\deformation graph</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -779,6 +782,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\poison_surface_remeshing.cpp">
       <Filter>algo\mesh simplification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp">
+      <Filter>algo\registration\deformation graph</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
