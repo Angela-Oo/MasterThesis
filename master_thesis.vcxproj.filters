@@ -88,6 +88,9 @@
     <Filter Include="algo\registration\sequence registration">
       <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="algo\registration\ridid before non rigid deformation">
+      <UniqueIdentifier>{4d5bfdda-b0a3-457b-85d9-1eb28279e6a1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -641,6 +644,9 @@
     <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h">
       <Filter>algo\registration\deformation graph</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.h">
+      <Filter>algo\registration\ridid before non rigid deformation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -785,6 +791,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp">
       <Filter>algo\registration\deformation graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.cpp">
+      <Filter>algo\registration\ridid before non rigid deformation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
