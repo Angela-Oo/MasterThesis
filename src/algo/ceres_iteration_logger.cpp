@@ -30,10 +30,10 @@ std::string getDurationAsString_min_s_ms(std::chrono::time_point<std::chrono::sy
 }
 
 
-long long CeresIterationLoggerGuard::get_time_in_ms()
+
+void CeresIterationLoggerGuard::write(std::string text, bool log_time)
 {
-	auto end_time = std::chrono::system_clock::now();
-	return std::chrono::duration_cast<std::chrono::milliseconds>(end_time - _start_time).count();
+	_log_info += " " + text;
 }
 
 CeresIterationLoggerGuard::CeresIterationLoggerGuard(const ceres::Solver::Summary& summary, 
@@ -56,8 +56,8 @@ CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 	ss << "  time iteration step: " << std::setw(10) << getDurationAsString(_iteration_start_time);
 	ss << "  time: " << std::setw(10) << getDurationAsString_min_s_ms(_start_time);
 	ss << "  error: " << std::setw(8) << _summary.final_cost;
-	ss << "  term: " << _summary.termination_type << "  ";
-
+	ss << "  term: " << _summary.termination_type;
+	ss << "  " << _log_info << std::endl;
 	if(_logger)
 		_logger->write(ss.str());
 	std::cout << ss.str();

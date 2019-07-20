@@ -64,7 +64,6 @@ private:
 	VertexResidualIds addConfCost(ceres::Problem &problem);
 private:
 	void setParameters();
-	void printCeresOptions();
 public:
 	bool finished();
 	bool solveIteration() override;

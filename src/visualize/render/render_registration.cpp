@@ -231,10 +231,6 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegi
 		}
 		else {
 			_reigistration_finished = sequence_registration->finished();
-			//_mesh_renderer->insertMesh("target", sequence_registration->getMesh(current), ml::RGBColor::Green.toVec4f());
-
-			//auto deformed_points = sequence_registration->getDeformedMesh(current);
-			//_mesh_renderer->insertMesh("deformed", deformed_points, ml::RGBColor::Cyan.toVec4f());
 
 			auto deformed_points = sequence_registration->getDeformedMesh(current);
 			auto target = sequence_registration->getMesh(current);

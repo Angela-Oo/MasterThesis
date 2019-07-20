@@ -3,7 +3,7 @@
 #include "rigid_deformation_cost_function.h"
 #include "algo/ceres_iteration_logger.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h" // set color todo
-
+#include "algo/registration/ceres_residual_evaluation.h"
 
 
 const SurfaceMesh & RigidRegistration::getSource()
@@ -63,7 +63,7 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Pr
 
 	int i = 0;
 	auto normal = _source.property_map<vertex_descriptor, Vector>("v:normal").first;
-	for (auto & v : _source.vertices())
+	for (auto & v : _set_of_vertices_to_use)//_source.vertices())
 	{
 		auto point = _source.point(v);
 		auto deformed_point = _deformation.deformPoint(point);
@@ -80,42 +80,6 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Pr
 	return residual_ids;
 }
 
-std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostSubSet(ceres::Problem &problem)
-{
-	VertexResidualIds residual_ids;
-
-	int i = 0;
-	auto normal = _source.property_map<vertex_descriptor, Vector>("v:normal").first;
-	
-	int _sub_set_size = 100;
-	// select random vertices
-	std::vector<vertex_descriptor> vertices;
-	for (auto & v : _source.vertices())
-	{
-		vertices.push_back(v);
-	}	
-	while (vertices.size() > _sub_set_size) {
-		int index = (rand() % vertices.size());
-		vertices.erase(vertices.begin() + index);
-	}
-
-	// cost function
-	for(auto v : vertices) {
-		auto point = _source.point(v);
-		auto deformed_point = _deformation.deformPoint(point);
-		auto deformed_normal = _deformation.deformNormal(normal[v]);
-		auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
-
-		if (correspondent_point.first) {
-			auto target_vertex = correspondent_point.second;
-			residual_ids[v].push_back(addPointToPointCost(problem, point, target_vertex));
-			residual_ids[v].push_back(addPointToPlaneCost(problem, point, target_vertex));
-			i++;
-		}
-	}
-	std::cout << "used nodes " << i << " / " << _source.number_of_vertices();
-	return residual_ids;
-}
 
 std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCostWithoutICP(ceres::Problem &problem)
 {
@@ -186,14 +150,11 @@ bool RigidRegistration::finished()
 void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 										 std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids)
 {
-	auto fit_cost = _source.add_property_map<vertex_descriptor, double>("v:fit_cost").first;
-	for (auto & r : fit_residual_block_ids) {
-		ceres::Problem::EvaluateOptions evaluate_options;
-		evaluate_options.residual_blocks = r.second;
-		double total_cost = 0.0;
-		std::vector<double> residuals;
-		problem.Evaluate(evaluate_options, &total_cost, &residuals, nullptr, nullptr);
-		fit_cost[r.first] = total_cost;
+	auto fit_cost = _source.add_property_map<vertex_descriptor, double>("v:fit_cost");
+
+	if (fit_cost.second) {
+		auto max_and_mean_cost = evaluateResiduals(_source, problem, fit_residual_block_ids, fit_cost.first, 1.);
+		std::cout << "max smooth costs: " << max_and_mean_cost.first << " reference smooth cost " << max_and_mean_cost.second * 10. << " ";
 	}
 }
 
@@ -202,14 +163,36 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
 									 ceres::Solver::Options option, 
+									 double use_vertex_random_probability,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
 	, _target(target)
 	, _options(option)
+	, _use_vertex_random_probability(use_vertex_random_probability)
 	, _ceres_logger(logger)
 {
 	_ceres_logger.write("start Rigid registration \n");
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45.);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
+
+	if (_use_vertex_random_probability < 1.) {
+
+		std::knuth_b _rand_engine;
+		std::bernoulli_distribution d(_use_vertex_random_probability);
+		for (auto & v : _source.vertices())
+		{
+			bool use_vertex = d(_rand_engine);
+			if (use_vertex) {
+				_set_of_vertices_to_use.push_back(v);
+			}
+		}
+		_ceres_logger.write("subset of vertices to use " + std::to_string(_set_of_vertices_to_use.size()) + " / " + std::to_string(_source.number_of_vertices()), false);
+	}
+	else {
+		for (auto & v : _source.vertices())
+		{
+			_set_of_vertices_to_use.push_back(v);
+		}
+	}
 }
 

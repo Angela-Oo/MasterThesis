@@ -16,8 +16,9 @@ class CeresIterationLoggerGuard
 	const ceres::Solver::Summary& _summary;
 	size_t _iteration;
 	std::shared_ptr<FileWriter> _logger;
+	std::string _log_info;
 public:
-	long long get_time_in_ms();
+	void write(std::string text, bool log_time = true);
 	CeresIterationLoggerGuard(const ceres::Solver::Summary& summary, std::chrono::time_point<std::chrono::system_clock> start_time, size_t iteration = 0, std::shared_ptr<FileWriter> logger = nullptr);
 	CeresIterationLoggerGuard(const CeresIterationLoggerGuard& mE) = delete;
 	CeresIterationLoggerGuard(CeresIterationLoggerGuard&& mE) = delete;

@@ -288,13 +288,6 @@ void EmbeddedDeformation::setParameters()
 	_find_max_angle_deviation = 45.;
 }
 
-void EmbeddedDeformation::printCeresOptions()
-{
-	std::cout << "\nCeres Solver" << std::endl;
-	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
-	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
-	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
-}
 
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 										 const SurfaceMesh& dst,
@@ -317,7 +310,6 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	a_fit = 10.;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, 4); // todo
-	printCeresOptions();
 }
 
 
@@ -339,7 +331,6 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, 4); // todo
-	printCeresOptions();
 }
 
 

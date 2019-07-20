@@ -220,7 +220,7 @@ bool AsRigidAsPossible::addFitCostVertex(ceres::Problem & problem, vertex_descri
 	return false;
 }
 
-VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
+VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem, std::unique_ptr<CeresIterationLoggerGuard>& logger)
 {
 	VertexResidualIds residual_ids;
 
@@ -251,7 +251,8 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 			}
 		}
 	}
-	std::cout << "used  " << i << " / " << _deformed_mesh->number_of_vertices() << " vertices ";
+
+	logger->write("used " + std::to_string(i) + " / " + std::to_string(_deformed_mesh->number_of_vertices()) + " vertices ");
 	//std::cout << " allowed distance " <<  _find_correspondence_point->median() << " ";
 	return residual_ids;
 }
@@ -307,7 +308,7 @@ bool AsRigidAsPossible::solveIteration()
 
 		VertexResidualIds fit_residual_ids;
 		if (_with_icp)
-			fit_residual_ids = addFitCost(problem);
+			fit_residual_ids = addFitCost(problem, logger);
 		else
 			fit_residual_ids = addFitCostWithoutICP(problem);
 		EdgeResidualIds arap_residual_ids = addAsRigidAsPossibleCost(problem);
@@ -383,14 +384,6 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 	//	evaluateResiduals(_deformation_graph._mesh, problem, conf_residual_block_ids, conf_cost.first, a_conf);
 }
 
-
-void AsRigidAsPossible::printCeresOptions()
-{
-	std::cout << "\nCeres Solver" << std::endl;
-	std::cout << "Ceres preconditioner type: " << _options.preconditioner_type << std::endl;
-	std::cout << "Ceres linear algebra type: " << _options.sparse_linear_algebra_library_type << std::endl;
-	std::cout << "Ceres linear solver type: " << _options.linear_solver_type << std::endl;
-}
 
 void AsRigidAsPossible::init()
 {

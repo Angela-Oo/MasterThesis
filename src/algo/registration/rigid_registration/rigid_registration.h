@@ -22,6 +22,8 @@ private:
 	CeresLogger _ceres_logger;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 	std::unique_ptr<RigidDeformedMesh> _rigid_deformed_mesh;
+	double _use_vertex_random_probability;
+	std::vector<vertex_descriptor> _set_of_vertices_to_use;
 private:
 	bool _with_icp = true;
 	double _current_cost = 1.;
@@ -35,7 +37,6 @@ private:
 	ceres::ResidualBlockId addPointToPointCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex);
 	ceres::ResidualBlockId addPointToPlaneCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex);
 	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem);
-	std::map<vertex_descriptor, ResidualIds> addFitCostSubSet(ceres::Problem &problem);
 	std::map<vertex_descriptor, ResidualIds> addFitCostWithoutICP(ceres::Problem &problem);
 public:
 	bool finished() override;
@@ -52,6 +53,7 @@ public:
 	RigidRegistration(const SurfaceMesh & points_a,
 					  const SurfaceMesh & points_b,
 					  ceres::Solver::Options option,
+					  double use_vertex_random_probability = 1.,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 };
 

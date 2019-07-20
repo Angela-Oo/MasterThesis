@@ -9,7 +9,7 @@ const SurfaceMesh & RigidBeforeNonRigidRegistration::getSource()
 
 const SurfaceMesh & RigidBeforeNonRigidRegistration::getTarget()
 {
-	return _rigid_registration->getSource();
+	return _rigid_registration->getTarget();
 }
 
 SurfaceMesh RigidBeforeNonRigidRegistration::getDeformedPoints()
