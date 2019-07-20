@@ -62,6 +62,8 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <AdditionalOptions>/Zm135  /bigobj %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>C:\Program Files\Microsoft SDKs\Kinect\v1.8\inc;$(ProjectDir)src;$(ProjectDir)mLibExternal\includes;C:\Program Files %28x86%29\Microsoft DirectX SDK %28June 2010%29\Include;$(ProjectDir)mLib\include;$(ProjectDir)ext\sophus;$(ProjectDir)mLibExternal\includes\OpenNI2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -85,6 +87,7 @@
       <OpenMPSupport>true</OpenMPSupport>
       <AdditionalOptions>/Zm135 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalIncludeDirectories>$(ProjectDir)ext\sophus;C:\Program Files\Microsoft SDKs\Kinect\v1.8\inc;$(ProjectDir)src;$(ProjectDir)mLibExternal\includes;$(ProjectDir)mLibExternal\includes\directXsdk;$(ProjectDir)mLib\include;$(ProjectDir)mLibExternal\includes\OpenNI2;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
