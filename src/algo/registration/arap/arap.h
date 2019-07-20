@@ -48,7 +48,8 @@ private:
 	bool random_bool_with_prob(double prob);
 	void evaluateResidual(ceres::Problem & problem,
 						  std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
-						  std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids);
+						  std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
+						  std::unique_ptr<CeresIterationLoggerGuard>& logger);
 private:
 	ResidualIds addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point);
 	ResidualIds addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal);

@@ -318,7 +318,7 @@ bool AsRigidAsPossible::solveIteration()
 
 		// evaluate
 		if (_registration_options.evaluate_residuals) {
-			evaluateResidual(problem, fit_residual_ids, arap_residual_ids);
+			evaluateResidual(problem, fit_residual_ids, arap_residual_ids, logger);
 		}
 
 		_last_cost = _current_cost;
@@ -364,13 +364,14 @@ bool AsRigidAsPossible::finished()
 
 void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 										 std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
-										 std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids)
+										 std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
+										 std::unique_ptr<CeresIterationLoggerGuard>& logger)
 {
 	// smooth
 	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost");
 	if (smooth_cost.second) {
 		auto max_and_mean_cost = evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, _registration_options.smooth);
-		std::cout << "max smooth costs: " << max_and_mean_cost.first << " reference smooth cost " << max_and_mean_cost.second * 10. << " ";
+		logger->write("max smooth costs: " + std::to_string(max_and_mean_cost.first) + " reference smooth cost " + std::to_string(max_and_mean_cost.second * 10.), false);
 	}
 	
 	// fit

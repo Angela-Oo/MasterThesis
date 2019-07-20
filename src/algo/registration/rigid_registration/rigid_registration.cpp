@@ -57,7 +57,7 @@ ceres::ResidualBlockId RigidRegistration::addPointToPlaneCost(ceres::Problem &pr
 }
 
 
-std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Problem &problem)
+std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Problem &problem, std::unique_ptr<CeresIterationLoggerGuard> & logger)
 {
 	VertexResidualIds residual_ids;
 
@@ -76,7 +76,7 @@ std::map<vertex_descriptor, ResidualIds> RigidRegistration::addFitCost(ceres::Pr
 			i++;
 		}
 	}
-	std::cout << "used nodes " << i << " / " << _source.number_of_vertices();
+	logger->write("used " + std::to_string(i) + " / " + std::to_string(_source.number_of_vertices()) + " vertices ");
 	return residual_ids;
 }
 
@@ -106,14 +106,14 @@ bool RigidRegistration::solveIteration()
 
 		VertexResidualIds fit_residual_ids;
 		if (_with_icp)
-			fit_residual_ids = addFitCost(problem);
+			fit_residual_ids = addFitCost(problem, logger);
 		else
 			fit_residual_ids = addFitCostWithoutICP(problem);
 
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate		
-		evaluateResidual(problem, fit_residual_ids);
+		evaluateResidual(problem, fit_residual_ids, logger);
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
@@ -148,17 +148,16 @@ bool RigidRegistration::finished()
 }
 
 void RigidRegistration::evaluateResidual(ceres::Problem & problem,
-										 std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids)
+										 std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
+										 std::unique_ptr<CeresIterationLoggerGuard>& logger)
 {
 	auto fit_cost = _source.add_property_map<vertex_descriptor, double>("v:fit_cost");
 
 	if (fit_cost.second) {
 		auto max_and_mean_cost = evaluateResiduals(_source, problem, fit_residual_block_ids, fit_cost.first, 1.);
-		std::cout << "max smooth costs: " << max_and_mean_cost.first << " reference smooth cost " << max_and_mean_cost.second * 10. << " ";
+		logger->write("max smooth costs: " + std::to_string(max_and_mean_cost.first) + " reference smooth cost " + std::to_string(max_and_mean_cost.second * 10.), false);
 	}
 }
-
-
 
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,

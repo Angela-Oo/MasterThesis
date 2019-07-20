@@ -29,6 +29,21 @@ std::string getDurationAsString_min_s_ms(std::chrono::time_point<std::chrono::sy
 	return ss.str();
 }
 
+std::string getDurationAsString_h_min_s_ms(std::chrono::time_point<std::chrono::system_clock> start_time)
+{
+	auto end_time = std::chrono::system_clock::now();
+	auto duration_in_ms = std::chrono::duration_cast<std::chrono::milliseconds>(end_time - start_time).count();
+
+	auto h = floor(static_cast<double>(duration_in_ms) / 3600000.);
+	auto min = floor(static_cast<double>(duration_in_ms % 3600000) / 60000.);
+	auto s = floor(static_cast<double>(duration_in_ms % 60000) / 1000.);
+	auto ms = duration_in_ms % 1000;
+
+	std::stringstream ss;
+	ss << "(h:min:s) " << std::setfill('0') << h << ":" << std::setw(2) << min << ":" << std::setw(2) << s;
+	return ss.str();
+}
+
 
 
 void CeresIterationLoggerGuard::write(std::string text, bool log_time)
@@ -53,11 +68,11 @@ CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 	std::stringstream ss;
 	ss << std::setprecision(4);
 	ss << std::endl << "Iteration: " << std::setw(3) << _iteration << "  steps: " << std::setw(3) << _summary.iterations.size();
-	ss << "  time iteration step: " << std::setw(10) << getDurationAsString(_iteration_start_time);
-	ss << "  time: " << std::setw(10) << getDurationAsString_min_s_ms(_start_time);
+	ss << "  time iteration step: " << std::setw(10) << getDurationAsString_min_s_ms(_iteration_start_time);
+	ss << "  time: " << std::setw(10) << getDurationAsString_h_min_s_ms(_start_time);
 	ss << "  error: " << std::setw(8) << _summary.final_cost;
 	ss << "  term: " << _summary.termination_type;
-	ss << "  " << _log_info << std::endl;
+	ss << "  " << _log_info << " ";
 	if(_logger)
 		_logger->write(ss.str());
 	std::cout << ss.str();
@@ -70,7 +85,7 @@ void CeresLogger::write(std::string text, bool log_time)
 	ss << std::endl;	
 	if (log_time) {		
 		ss << std::setprecision(4);
-		ss << "time: " << std::setw(10) << getDurationAsString_min_s_ms(_start_time) << "   -   ";
+		ss << "time: " << std::setw(10) << getDurationAsString_h_min_s_ms(_start_time) << "   -   ";
 	}
 	ss << text;
 	if (_logger)
