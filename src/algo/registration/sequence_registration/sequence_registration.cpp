@@ -10,9 +10,9 @@ void SequenceRegistration::nextFrame()
 	_current++;
 	auto & source = _meshes[0];
 	auto & target = _meshes[_current];
-	_deformation_graphs[_current] = _deformation_graphs[_current - 1];
-
-	_registration = _registration_factory.buildNonRigidRegistration(source, target, _deformation_graphs[_current]);
+	
+	_registration = _registration_factory.buildNonRigidRegistration(source, target, _deformation_graphs[_current - 1]);
+	_deformation_graphs[_current] = _registration->getDeformationGraph();
 }
 bool SequenceRegistration::solve()
 {
