@@ -3,7 +3,7 @@
 
 class RigidDeformation
 {
-private:
+public:
 	ml::vec3d _r; // rotation matrix in angle axis
 	ml::vec3d _t; // translation vector	
 public:

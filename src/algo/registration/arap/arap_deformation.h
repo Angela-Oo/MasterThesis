@@ -31,4 +31,6 @@ public:
 };
 
 
+std::shared_ptr<Deformation> createDeformation();
+
 }

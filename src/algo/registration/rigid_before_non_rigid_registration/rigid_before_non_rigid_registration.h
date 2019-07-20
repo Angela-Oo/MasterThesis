@@ -6,12 +6,11 @@
 
 namespace Registration {
 
-class RigidBeforeNonRigidRegistration : public IRegistration
+class RigidBeforeNonRigidRegistration : public INonRigidRegistration
 {
 private:	
-	std::unique_ptr<IRegistration> _rigid_registration;
-	std::unique_ptr<IRegistration> _non_rigid_registration;
-	std::function<std::unique_ptr<IRegistration>(const DG::DeformationGraph & deformation_graph)> _create_non_rigid_registration;
+	std::unique_ptr<IRigidRegistration> _rigid_registration;
+	std::unique_ptr<INonRigidRegistration> _non_rigid_registration;
 	bool _finished_rigid_registration;
 private:
 	RegistrationOptions _registration_options;
@@ -24,14 +23,15 @@ public:
 	const SurfaceMesh & getSource() override;
 	const SurfaceMesh & getTarget() override;
 	SurfaceMesh getDeformedPoints() override;
-	SurfaceMesh getInverseDeformedPoints() override;
-	SurfaceMesh getDeformationGraphMesh() override;
+	SurfaceMesh getInverseDeformedPoints() override;	
 public:
+	SurfaceMesh getDeformationGraphMesh() override;
 	const DG::DeformationGraph & getDeformationGraph() override;
+	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 public:
 	// without icp
-	RigidBeforeNonRigidRegistration(std::unique_ptr<IRegistration> _rigid_registration,
-									std::function<std::unique_ptr<IRegistration>(const DG::DeformationGraph &)> create_non_rigid_registration);
+	RigidBeforeNonRigidRegistration(std::unique_ptr<IRigidRegistration> rigid_registration,
+									std::unique_ptr<INonRigidRegistration> non_rigid_registration);
 };
 
 }

@@ -49,15 +49,23 @@ void ShowMesh::nonRigidRegistration()
 		auto & target = _input_mesh->getMesh(frame_b);
 		auto option = ceresOption();
 
-		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) { // todo
-			_registration_options.smooth = 10.;
-			_registration_options.fit = 100.;
-		}
-
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
 
-		_registration = createRegistration(source, target, _registration_type, option, _registration_options,  _logger, _input_mesh->getFixedPositions(frame_b));
+		RegistrationFactory factory;
+		factory.setRegistrationType(_registration_type);
+		factory.setCeresOption(option);
+		factory.setRegistrationOption(_registration_options);
+		factory.setLogger(_logger);	
+
+		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) { // todo
+			_registration_options.smooth = 10.;
+			_registration_options.fit = 100.;
+			factory.setFixedPositions(_input_mesh->getFixedPositions(frame_b));
+		}
+
+		factory.logConfiguration();
+		_registration = factory.buildRegistration(source, target);
 		renderRegistration();
 		_image_name = "frame_" + std::to_string(_registration->currentIteration());
 	}
@@ -324,7 +332,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = false;
+	bool test = true;
 	bool register_on_reference_mesh = false;
 	bool load_compare_mesh = false;
 	bool load_all_frames = true;

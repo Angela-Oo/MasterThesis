@@ -50,4 +50,10 @@ Deformation::Deformation(const Deformation & deformation, bool inverse)
 	}
 }
 
+
+std::shared_ptr<Deformation> createDeformation()
+{
+	return std::make_shared<Deformation>();
+}
+
 }

@@ -4,6 +4,7 @@
 //#include "graph_node_type.h"
 
 #include "algo/registration/deformation_graph/deformation_graph.h"
+#include "algo/registration/rigid_registration/rigid_deformation.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
 
 struct Edge
@@ -66,10 +67,27 @@ public:
 	virtual SurfaceMesh getDeformedPoints() = 0;
 	virtual SurfaceMesh getInverseDeformedPoints() = 0;
 public:
-	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
-	virtual const DG::DeformationGraph & getDeformationGraph() { return DG::DeformationGraph();	}; // todo
-	virtual SurfaceMesh getDeformationGraphMesh() = 0;
-public:
 	virtual ~IRegistration() = default;
 };
 
+
+
+class INonRigidRegistration : public IRegistration
+{
+public:
+	virtual void setRigidDeformation(const RigidDeformation & rigid_deformation) = 0;
+	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
+	virtual const DG::DeformationGraph & getDeformationGraph() = 0;
+	virtual SurfaceMesh getDeformationGraphMesh() = 0;
+public:
+	virtual ~INonRigidRegistration() = default;
+};
+
+
+class IRigidRegistration : public IRegistration
+{
+public:
+	virtual const RigidDeformation & getRigidDeformation() = 0;
+public:
+	virtual ~IRigidRegistration() = default;
+};

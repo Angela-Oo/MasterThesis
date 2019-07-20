@@ -44,7 +44,8 @@ void ShowTwoRigideRegisteredFrames::initRegistration()
 	for (auto & p : points_b)
 		mesh_b.m_vertices.push_back(p);
 
-	_registration = std::make_unique<ED::EmbeddedDeformation>(convertToCGALMesh(mesh_a), convertToCGALMesh(mesh_b), ceresOption());
+	RegistrationOptions options;
+	_registration = ED::createEmbeddedDeformation(convertToCGALMesh(mesh_a), convertToCGALMesh(mesh_b), ceresOption(), options);
 }
 
 void ShowTwoRigideRegisteredFrames::initReader()

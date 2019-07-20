@@ -13,14 +13,13 @@
 class SequenceRegistration
 {
 private:
-	RegistrationType _registration_type;
 	std::vector<SurfaceMesh> _meshes;
 	std::vector<SurfaceMesh> _deformed_meshes;
 	std::vector<DG::DeformationGraph> _deformation_graphs;
 	size_t _current;
-	std::unique_ptr<IRegistration> _registration;
+	std::unique_ptr<INonRigidRegistration> _registration;
+	RegistrationFactory _registration_factory;
 	RegistrationOptions _registration_options;
-	std::shared_ptr<FileWriter> _logger;
 	std::unique_ptr<CeresLogger> _ceres_logger;
 	bool _finished;
 public:

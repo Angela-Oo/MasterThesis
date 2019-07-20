@@ -52,44 +52,47 @@
     <Filter Include="mLibHeader\ext-cgal">
       <UniqueIdentifier>{a4c38909-b948-45db-909d-280e38bf0245}</UniqueIdentifier>
     </Filter>
-    <Filter Include="algo\mesh simplification">
-      <UniqueIdentifier>{5e66546d-06c8-463d-83c2-c372bdcaab7a}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\registration">
-      <UniqueIdentifier>{81ca46bf-dc3c-4097-ba7b-9ce561fcf050}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\registration\as rigid as possible">
-      <UniqueIdentifier>{e1b8d276-8a25-43e7-a286-224acf654f63}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\registration\embedded deformation">
-      <UniqueIdentifier>{3ef78849-9f16-4976-90ef-ea33cb87994c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\registration\rigid registration">
-      <UniqueIdentifier>{b9a48aea-592a-4152-bb5e-3beb74e50087}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\registration\deformation graph">
-      <UniqueIdentifier>{d971d056-c787-4641-b23b-e59871068af5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\registration\find correspondences">
-      <UniqueIdentifier>{e3268d0a-d09b-4b4c-8441-a59f423826a3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\surface mesh">
-      <UniqueIdentifier>{dcf7f109-b74a-493f-9039-3aa02c5a9434}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\helper">
-      <UniqueIdentifier>{4d1110bb-fba2-4758-9bba-fd1603def0af}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="algo\evaluate registration">
-      <UniqueIdentifier>{a6c1516d-ac45-4659-a6b9-82a24263f324}</UniqueIdentifier>
-    </Filter>
     <Filter Include="visualize\render">
       <UniqueIdentifier>{bfee125b-6f1b-4158-af15-6b56fc1354a8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="algo\registration\sequence registration">
+    <Filter Include="algo\0 surface mesh">
+      <UniqueIdentifier>{dcf7f109-b74a-493f-9039-3aa02c5a9434}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\1 mesh simplification">
+      <UniqueIdentifier>{5e66546d-06c8-463d-83c2-c372bdcaab7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\2 helper">
+      <UniqueIdentifier>{4d1110bb-fba2-4758-9bba-fd1603def0af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\3 registration">
+      <UniqueIdentifier>{81ca46bf-dc3c-4097-ba7b-9ce561fcf050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\3 registration\0 interface">
+      <UniqueIdentifier>{764dabaf-3bd7-4c59-aa23-9f094f9871d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\3 registration\1 deformation graph">
+      <UniqueIdentifier>{d971d056-c787-4641-b23b-e59871068af5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\3 registration\2 find correspondences">
+      <UniqueIdentifier>{e3268d0a-d09b-4b4c-8441-a59f423826a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\3 registration\3 rigid registration">
+      <UniqueIdentifier>{b9a48aea-592a-4152-bb5e-3beb74e50087}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\3 registration\4 as rigid as possible">
+      <UniqueIdentifier>{e1b8d276-8a25-43e7-a286-224acf654f63}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\3 registration\5 embedded deformation">
+      <UniqueIdentifier>{3ef78849-9f16-4976-90ef-ea33cb87994c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\3 registration\6 sequence registration">
       <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="algo\registration\ridid before non rigid deformation">
+    <Filter Include="algo\3 registration\7 ridid before non rigid deformation">
       <UniqueIdentifier>{4d5bfdda-b0a3-457b-85d9-1eb28279e6a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="algo\4 evaluate registration">
+      <UniqueIdentifier>{a6c1516d-ac45-4659-a6b9-82a24263f324}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -522,97 +525,97 @@
       <Filter>input_reader</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h">
-      <Filter>algo\mesh simplification</Filter>
+      <Filter>algo\1 mesh simplification</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\constantBuffer.h">
       <Filter>visualize</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\i_registration.h">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\registration.h">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\non_rigid_registration_all_frames.h">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\ceres_option.h">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\hsv_to_rgb.h">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\arap\arap.h">
-      <Filter>algo\registration\as rigid as possible</Filter>
+      <Filter>algo\3 registration\4 as rigid as possible</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\find_corresponding_points\find_corresponding_points.h">
-      <Filter>algo\registration\find correspondences</Filter>
+      <Filter>algo\3 registration\2 find correspondences</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\surface_mesh\mesh_definition.h">
-      <Filter>algo\surface mesh</Filter>
+      <Filter>algo\0 surface mesh</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h">
-      <Filter>algo\registration\as rigid as possible</Filter>
+      <Filter>algo\3 registration\4 as rigid as possible</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h">
-      <Filter>algo\registration\embedded deformation</Filter>
+      <Filter>algo\3 registration\5 embedded deformation</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h">
-      <Filter>algo\registration\embedded deformation</Filter>
+      <Filter>algo\3 registration\5 embedded deformation</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\file_writer.h">
-      <Filter>algo\helper</Filter>
+      <Filter>algo\2 helper</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\ceres_iteration_logger.h">
-      <Filter>algo\helper</Filter>
+      <Filter>algo\2 helper</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\evaluate_registration.h">
-      <Filter>algo\evaluate registration</Filter>
+      <Filter>algo\4 evaluate registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\ceres_math.h">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\surface_mesh\mesh_convertion.h">
-      <Filter>algo\surface mesh</Filter>
+      <Filter>algo\0 surface mesh</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\surface_mesh\nearest_neighbor_search.h">
-      <Filter>algo\surface mesh</Filter>
+      <Filter>algo\0 surface mesh</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\i_deformation.h">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h">
-      <Filter>algo\registration\embedded deformation</Filter>
+      <Filter>algo\3 registration\5 embedded deformation</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h">
-      <Filter>algo\registration\as rigid as possible</Filter>
+      <Filter>algo\3 registration\4 as rigid as possible</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformation.h">
-      <Filter>algo\registration\rigid registration</Filter>
+      <Filter>algo\3 registration\3 rigid registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformation_cost_function.h">
-      <Filter>algo\registration\rigid registration</Filter>
+      <Filter>algo\3 registration\3 rigid registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_registration.h">
-      <Filter>algo\registration\rigid registration</Filter>
+      <Filter>algo\3 registration\3 rigid registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.h">
-      <Filter>algo\registration\rigid registration</Filter>
+      <Filter>algo\3 registration\3 rigid registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\nearest_nodes.h">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\position_and_deformation.h">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\deformed_mesh.h">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h">
-      <Filter>algo\registration\sequence registration</Filter>
+      <Filter>algo\3 registration\6 sequence registration</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\render\render_registration.h">
       <Filter>visualize\render</Filter>
@@ -630,22 +633,22 @@
       <Filter>visualize\render</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\ceres_residual_evaluation.h">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\mesh_simplification\isotropic_remeshing.h">
-      <Filter>algo\mesh simplification</Filter>
+      <Filter>algo\1 mesh simplification</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\mesh_simplification\make_mesh_3_remeshing.h">
-      <Filter>algo\mesh simplification</Filter>
+      <Filter>algo\1 mesh simplification</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\mesh_simplification\poison_surface_remeshing.h">
-      <Filter>algo\mesh simplification</Filter>
+      <Filter>algo\1 mesh simplification</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.h">
-      <Filter>algo\registration\ridid before non rigid deformation</Filter>
+      <Filter>algo\3 registration\7 ridid before non rigid deformation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -700,67 +703,67 @@
       <Filter>input_reader</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp">
-      <Filter>algo\mesh simplification</Filter>
+      <Filter>algo\1 mesh simplification</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\registration.cpp">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\ceres_option.cpp">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\hsv_to_rgb.cpp">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap.cpp">
-      <Filter>algo\registration\as rigid as possible</Filter>
+      <Filter>algo\3 registration\4 as rigid as possible</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\find_corresponding_points\find_corresponding_points.cpp">
-      <Filter>algo\registration\find correspondences</Filter>
+      <Filter>algo\3 registration\2 find correspondences</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp">
-      <Filter>algo\registration\embedded deformation</Filter>
+      <Filter>algo\3 registration\5 embedded deformation</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\file_writer.cpp">
-      <Filter>algo\helper</Filter>
+      <Filter>algo\2 helper</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\ceres_iteration_logger.cpp">
-      <Filter>algo\helper</Filter>
+      <Filter>algo\2 helper</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\evaluate_registration.cpp">
-      <Filter>algo\evaluate registration</Filter>
+      <Filter>algo\4 evaluate registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\deformation_graph.cpp">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\surface_mesh\mesh_convertion.cpp">
-      <Filter>algo\surface mesh</Filter>
+      <Filter>algo\0 surface mesh</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\surface_mesh\nearest_neighbor_search.cpp">
-      <Filter>algo\surface mesh</Filter>
+      <Filter>algo\0 surface mesh</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp">
-      <Filter>algo\registration\embedded deformation</Filter>
+      <Filter>algo\3 registration\5 embedded deformation</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp">
-      <Filter>algo\registration\as rigid as possible</Filter>
+      <Filter>algo\3 registration\4 as rigid as possible</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformation.cpp">
-      <Filter>algo\registration\rigid registration</Filter>
+      <Filter>algo\3 registration\3 rigid registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_registration.cpp">
-      <Filter>algo\registration\rigid registration</Filter>
+      <Filter>algo\3 registration\3 rigid registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.cpp">
-      <Filter>algo\registration\rigid registration</Filter>
+      <Filter>algo\3 registration\3 rigid registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\position_and_deformation.cpp">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\deformed_mesh.cpp">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\sequence_registration\sequence_registration.cpp">
-      <Filter>algo\registration\sequence registration</Filter>
+      <Filter>algo\3 registration\6 sequence registration</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\render_registration.cpp">
       <Filter>visualize\render</Filter>
@@ -778,22 +781,22 @@
       <Filter>visualize\render</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\ceres_residual_evaluation.cpp">
-      <Filter>algo\registration</Filter>
+      <Filter>algo\3 registration</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\isotropic_remeshing.cpp">
-      <Filter>algo\mesh simplification</Filter>
+      <Filter>algo\1 mesh simplification</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\make_mesh_3_remeshing.cpp">
-      <Filter>algo\mesh simplification</Filter>
+      <Filter>algo\1 mesh simplification</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\poison_surface_remeshing.cpp">
-      <Filter>algo\mesh simplification</Filter>
+      <Filter>algo\1 mesh simplification</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp">
-      <Filter>algo\registration\deformation graph</Filter>
+      <Filter>algo\3 registration\1 deformation graph</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.cpp">
-      <Filter>algo\registration\ridid before non rigid deformation</Filter>
+      <Filter>algo\3 registration\7 ridid before non rigid deformation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

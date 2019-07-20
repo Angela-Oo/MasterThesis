@@ -28,6 +28,7 @@ public:
 			return *this;
 		point = other.point;
 		node_weight_vector = other.node_weight_vector;
+		return *this;
 	}
 };
 

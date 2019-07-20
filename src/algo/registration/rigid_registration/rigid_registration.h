@@ -12,10 +12,9 @@
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 
-class RigidRegistration : public IRegistration
+class RigidRegistration : public IRigidRegistration
 {
 private:
-	//std::unique_ptr<ICPNN> _icp_nn;
 	SurfaceMesh _source;
 	SurfaceMesh _target;
 	ceres::Solver::Options _options;
@@ -48,7 +47,7 @@ public:
 	const SurfaceMesh & getTarget() override;
 	SurfaceMesh getDeformedPoints() override;
 	SurfaceMesh getInverseDeformedPoints() override;
-	SurfaceMesh getDeformationGraphMesh() override;	
+	const RigidDeformation & getRigidDeformation() override;
 public:
 	RigidRegistration(const SurfaceMesh & points_a,
 					  const SurfaceMesh & points_b,

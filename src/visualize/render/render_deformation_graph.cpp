@@ -61,7 +61,7 @@ double getReferenceCost(const SurfaceMesh & mesh, bool use_only_smooth_cost)
 		if (valid) {
 			if (use_only_smooth_cost) {
 				double reference_cost = mean_smooth_cost * 10.;
-				std::cout << "max smooth costs: " << max_smooth_cost << " reference smooth cost " << reference_cost << " ";
+				//std::cout << "max smooth costs: " << max_smooth_cost << " reference smooth cost " << reference_cost << " ";
 				return reference_cost;
 			}
 			else {

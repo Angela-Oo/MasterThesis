@@ -12,7 +12,7 @@ void SequenceRegistration::nextFrame()
 	auto & target = _meshes[_current];
 	_deformation_graphs[_current] = _deformation_graphs[_current - 1];
 
-	_registration = createRegistration(source, target, _registration_type, _deformation_graphs[_current], ceresOption(), _registration_options, _logger);
+	_registration = _registration_factory.buildNonRigidRegistration(source, target, _deformation_graphs[_current]);
 }
 bool SequenceRegistration::solve()
 {
@@ -93,21 +93,26 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 										   RegistrationOptions registration_options)
 	: _meshes(meshes)
 	, _current(1)
-	, _logger(logger)
-	, _registration_type(registration_type)
 	, _registration_options(registration_options)
 	, _finished(false)
 {
+	_registration_factory.setRegistrationType(registration_type);
+	_registration_factory.setCeresOption(ceresOption());
+	_registration_factory.setRegistrationOption(registration_options);
+	_registration_factory.setLogger(logger);
+
 	_deformation_graphs.resize(_meshes.size());
 	_deformed_meshes.resize(_meshes.size());
 
 	auto & source = _meshes[0];
 	auto & target = _meshes[_current];
-	_registration = createRegistration(source, target, _registration_type, ceresOption(), _registration_options, _logger);
+	_registration = _registration_factory.buildNonRigidRegistration(source, target);
 
 	_deformation_graphs[0] = _registration->getDeformationGraph();
 	_deformed_meshes[0] = _meshes[0];
-	_ceres_logger = std::make_unique<CeresLogger>(_logger);
-	std::string algo = (_registration_type == RegistrationType::ARAP) ? "arap" : "ed";
+	_ceres_logger = std::make_unique<CeresLogger>(logger);
+	std::string algo = (registration_type == RegistrationType::ARAP) ? "arap" : "ed";
 	_ceres_logger->write("Register all frames with " + algo);
+
+	_registration_factory.logConfiguration();
 }

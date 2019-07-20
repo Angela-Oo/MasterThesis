@@ -130,55 +130,18 @@ PositionAndDeformation DeformationGraph::invertNode(vertex_descriptor node_index
 	return deformed_node;
 }
 
-void DeformationGraph::initGlobalDeformation(std::shared_ptr<IDeformation> global_deformation)
+void DeformationGraph::setRigidDeformation(const PositionAndDeformation & rigid_deformation)
 {
-	Vector global_position(0., 0., 0.);
-	for (auto & v : _mesh.vertices()) {
-		global_position += _mesh.point(v) - CGAL::ORIGIN;
-	}
-	global_position /= _mesh.number_of_vertices();
-
-	_global._point = CGAL::ORIGIN + global_position;
-	_global._normal = Vector(0., 0., 1.);
-	_global._deformation = global_deformation;
+	_global = rigid_deformation;
 }
-
-DeformationGraph::DeformationGraph(const SurfaceMesh & mesh,
-								   std::function<std::shared_ptr<IDeformation>()> create_node)
-	: _mesh(mesh)
-	, _create_node(create_node)
-{
-
-	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> nodes;
-	bool created;
-	boost::tie(nodes, created) = _mesh.add_property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node", create_node());
-	assert(created);
-	_mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
-	_mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
-	_mesh.add_property_map<vertex_descriptor, double>("v:conf_cost", 0.);
-	_mesh.add_property_map<vertex_descriptor, bool>("v:vertex_used", true);
-
-	auto vertex_color = errorToRGB(0.);
-	auto colors = _mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", vertex_color).first;
-
-	auto normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
-	for (auto & v : _mesh.vertices()) {
-		nodes[v] = _create_node();
-		colors[v] = vertex_color;
-	}
-	initGlobalDeformation(_create_node());
-
-	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
-}
-
 
 DeformationGraph::DeformationGraph(const SurfaceMesh & graph, 
-								   const std::shared_ptr<IDeformation> & global_deformation, 
+								   const PositionAndDeformation & global_deformation, 
 								   std::function<std::shared_ptr<IDeformation>()> create_node)
 	: _mesh(graph)
 	, _create_node(create_node)
+	, _global(global_deformation)
 {
-	initGlobalDeformation(global_deformation);
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
 
@@ -198,6 +161,9 @@ DeformationGraph::DeformationGraph(const DeformationGraph & deformation_graph)
 
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
+
+
+
 
 DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 {
@@ -223,6 +189,51 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 
 
 
+
+
+PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node)
+{
+	Vector global_position(0., 0., 0.);
+	for (auto & v : mesh.vertices()) {
+		global_position += mesh.point(v) - CGAL::ORIGIN;
+	}
+	global_position /= mesh.number_of_vertices();
+
+	PositionAndDeformation global;
+	global._point = CGAL::ORIGIN + global_position;
+	global._normal = Vector(0., 0., 1.);
+	global._deformation = create_node();
+	return global;
+}
+
+DeformationGraph createDeformationGraphFromMesh(SurfaceMesh mesh,
+												PositionAndDeformation global_deformation,
+												std::function<std::shared_ptr<IDeformation>()> create_node)
+{
+
+	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> nodes;
+	bool created;
+	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node", create_node());
+	assert(created);
+	mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
+	mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
+	mesh.add_property_map<vertex_descriptor, double>("v:conf_cost", 0.);
+	mesh.add_property_map<vertex_descriptor, bool>("v:vertex_used", true);
+
+	auto vertex_color = errorToRGB(0.);
+	auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", vertex_color).first;
+
+	auto normals = mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
+	for (auto & v : mesh.vertices()) {
+		nodes[v] = create_node();
+		colors[v] = vertex_color;
+	}
+
+	return DeformationGraph(mesh, global_deformation, create_node);
+}
+
+
+
 DeformationGraph invertDeformationGraph(const DeformationGraph & deformation_graph)
 {
 	SurfaceMesh mesh = deformation_graph._mesh;
@@ -242,8 +253,9 @@ DeformationGraph invertDeformationGraph(const DeformationGraph & deformation_gra
 		deformations[v] = deformed_node._deformation;
 	}
 
-	auto global_deformation = deformation_graph._global._deformation->invertDeformation();
-	return DeformationGraph(mesh, global_deformation, deformation_graph._create_node);
+	auto global = deformation_graph._global;
+	global._deformation = deformation_graph._global._deformation->invertDeformation();
+	return DeformationGraph(mesh, global, deformation_graph._create_node);
 }
 
 DeformationGraph transformDeformationGraph(const DeformationGraph & deformation_graph)
@@ -270,7 +282,7 @@ DeformationGraph transformDeformationGraph(const DeformationGraph & deformation_
 		deformations[v] = deformed_node._deformation;
 	}
 
-	return DeformationGraph(mesh, deformation_graph._create_node);
+	return DeformationGraph(mesh, deformation_graph._global, deformation_graph._create_node);
 }
 
 }

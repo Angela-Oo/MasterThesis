@@ -251,8 +251,8 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem)
 			}
 		}
 	}
-	std::cout << "used corresponding vertices " << i << " / " << _deformed_mesh->number_of_vertices() << " ";
-	std::cout << " allowed distance " <<  _find_correspondence_point->median() << " ";
+	std::cout << "used  " << i << " / " << _deformed_mesh->number_of_vertices() << " vertices ";
+	//std::cout << " allowed distance " <<  _find_correspondence_point->median() << " ";
 	return residual_ids;
 }
 
@@ -295,6 +295,8 @@ VertexResidualIds AsRigidAsPossible::addConfCost(ceres::Problem &problem)
 
 bool AsRigidAsPossible::solveIteration()
 {
+	if (_solve_iteration == 0)
+		_ceres_logger.write("start non rigid registration with arap\n");
 	if (!finished()) {
 		std::cout << std::endl;
 		_solve_iteration++;
@@ -330,7 +332,11 @@ bool AsRigidAsPossible::solveIteration()
 			std::cout << std::endl << "scale factor: smooth " << _registration_options.smooth << " conf " << _registration_options.conf << std::endl;
 		}
 	}
-	return finished();
+	bool finished_registration = finished();
+	if (finished_registration) {
+		_ceres_logger.write("finished Rigid registration ");
+	}
+	return finished_registration;
 }
 
 size_t AsRigidAsPossible::currentIteration()
@@ -361,8 +367,10 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 {
 	// smooth
 	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost");
-	if(smooth_cost.second)
-		evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, _registration_options.smooth);
+	if (smooth_cost.second) {
+		auto max_and_mean_cost = evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, _registration_options.smooth);
+		std::cout << "max smooth costs: " << max_and_mean_cost.first << " reference smooth cost " << max_and_mean_cost.second * 10. << " ";
+	}
 	
 	// fit
 	//auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost");
@@ -390,11 +398,9 @@ void AsRigidAsPossible::init()
 																		   _registration_options.correspondence_max_distance,
 																		   _registration_options.correspondence_max_angle_deviation);
 
-	//_deformation_graph = transformDeformationGraph(deformation_graph);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
 
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
-	printCeresOptions();
 
 	// comment out for random at in each iteration step
 	if (_registration_options.use_vertex_random_probability < 1.) {
@@ -409,40 +415,27 @@ void AsRigidAsPossible::init()
 	}
 }
 
+void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)
+{
+	_deformation_graph.setRigidDeformation(createGlobalDeformationFromRigidDeformation(rigid_deformation));
+}
+
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 std::vector<vertex_descriptor> fixed_positions,
+									 const DG::DeformationGraph & deformation_graph,
 									 ceres::Solver::Options option,
 									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _src(src)
 	, _dst(dst)
 	, _options(option)
-	, _deformation_graph(src, []() { return std::make_shared<Deformation>(); })
+	, _deformation_graph(deformation_graph)
 	, _fixed_positions(fixed_positions)
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
 	, _with_icp(false)
 {
-	init();
-}
-
-
-
-AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
-									 const SurfaceMesh& dst,
-									 ceres::Solver::Options option,
-									 const RegistrationOptions & registration_options,
-									 std::shared_ptr<FileWriter> logger)
-	: _src(src)
-	, _dst(dst)
-	, _options(option)
-	, _ceres_logger(logger)
-	, _registration_options(registration_options)
-{
-	auto reduced_mesh = createReducedMesh(_src, _registration_options.dg_options.edge_length, _registration_options.mesh_reduce_strategy);
-	_deformation_graph = DG::DeformationGraph(reduced_mesh, []() { return std::make_shared<Deformation>(); });
-
 	init();
 }
 
@@ -461,6 +454,73 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 {
 	init();
 }
+
+
+//-----------------------------------------------------------------------------
+
+DG::PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
+{
+	DG::PositionAndDeformation global;
+	global._point = CGAL::ORIGIN;
+	global._normal = Vector(0., 0., 1.);
+	global._deformation = std::make_shared<Deformation>(rigid_deformation._r, rigid_deformation._t);
+	return global;
+}
+
+
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
+										                   const SurfaceMesh& dst,
+										                   std::vector<vertex_descriptor> fixed_positions,
+										                   ceres::Solver::Options option,
+										                   const RegistrationOptions & registration_options,
+										                   std::shared_ptr<FileWriter> logger)
+{
+	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
+	auto global = DG::createGlobalDeformation(reduced_mesh, createDeformation);
+	auto deformation_graph = DG::createDeformationGraphFromMesh(reduced_mesh, global, createDeformation);
+	return std::make_unique<AsRigidAsPossible>(src, dst, fixed_positions, deformation_graph, option, registration_options, logger);
+}
+
+
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
+										                   const SurfaceMesh& dst,
+										                   ceres::Solver::Options option,
+										                   const RegistrationOptions & registration_options,
+										                   std::shared_ptr<FileWriter> logger)
+{	
+	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
+	auto global = DG::createGlobalDeformation(reduced_mesh, createDeformation);
+	auto deformation_graph = DG::createDeformationGraphFromMesh(reduced_mesh, global, createDeformation);
+	return std::make_unique<AsRigidAsPossible>(src, dst, deformation_graph, option, registration_options, logger);
+}
+
+
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
+										                   const SurfaceMesh& dst,
+										                   const RigidDeformation & rigid_deformation,
+										                   ceres::Solver::Options option,
+										                   const RegistrationOptions & registration_options,
+										                   std::shared_ptr<FileWriter> logger)	
+{
+	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
+	auto deformation_graph = DG::createDeformationGraphFromMesh(reduced_mesh, createGlobalDeformationFromRigidDeformation(rigid_deformation), createDeformation);
+	return std::make_unique<AsRigidAsPossible>(src, dst, deformation_graph, option, registration_options, logger);
+}
+
+
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
+										                   const SurfaceMesh& dst,
+										                   const RigidDeformation & rigid_deformation,
+										                   const DG::DeformationGraph & deformation_graph,
+										                   ceres::Solver::Options option,
+										                   const RegistrationOptions & registration_options,
+										                   std::shared_ptr<FileWriter> logger)
+{
+	auto new_deformation_graph = DG::createDeformationGraphFromMesh(deformation_graph._mesh, createGlobalDeformationFromRigidDeformation(rigid_deformation), deformation_graph._create_node);
+	return std::make_unique<AsRigidAsPossible>(src, dst, new_deformation_graph, option, registration_options, logger);
+}
+
+
 
 
 

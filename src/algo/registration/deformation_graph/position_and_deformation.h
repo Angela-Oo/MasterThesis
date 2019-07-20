@@ -19,6 +19,10 @@ public:
 
 	Point deformPosition(Point point) const;
 	Vector deformNormal(Vector normal) const;
+	PositionAndDeformation()
+		: _point(CGAL::ORIGIN)
+		, _normal(0., 0., 0.)
+	{}
 };
 
 }

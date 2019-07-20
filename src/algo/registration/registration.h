@@ -13,45 +13,55 @@ typedef ml::TriMeshf Mesh;
 enum class RegistrationType
 {
 	ARAP,
+	ARAP_Without_RIGID,
 	ARAP_WithoutICP,
 	ED,
+	ED_Without_RIGID,
 	ED_WithoutICP,
 	Rigid,
 	ARAP_AllFrames,
 	ED_AllFrames
 };
 
-std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
-												  const SurfaceMesh & target,
-												  RegistrationType registration_type,
-												  const ceres::Solver::Options & options,
-												  const RegistrationOptions & registration_options,
-												  std::shared_ptr<FileWriter> logger,
-												  std::vector<vertex_descriptor> fixed_positions = std::vector<vertex_descriptor>());
 
-std::unique_ptr<IRegistration> createRegistration(const SurfaceMesh & source,
-												  const SurfaceMesh & target,
-												  RegistrationType registration_type,
-												  const DG::DeformationGraph & deformation_graph,
-												  const ceres::Solver::Options & options,
-												  const RegistrationOptions & registration_options,
-												  std::shared_ptr<FileWriter> logger);
-
-
-//class Registration
-//{
-//	std::unique_ptr<IRegistration> _registration;
-//	const int _number_of_deformation_graph_nodes = 2000;
-//	std::shared_ptr<FileWriter> _logger;
-//public:
-//	const Mesh & getSource();
-//	const Mesh & getTarget();
-//	Mesh getDeformedPoints();
-//	Mesh getInverseDeformedPoints();
-//	Registration(RegistrationType type,
-//				 std::shared_ptr<IMeshReader> mesh_reader, 
-//				 int source_frame, int target_frame,
-//				 std::shared_ptr<FileWriter> logger = nullptr);
-//	bool solve();
-//};
+class RegistrationFactory
+{
+	RegistrationType _registration_type;
+	ceres::Solver::Options _ceres_options;
+	RegistrationOptions _options;
+	std::shared_ptr<FileWriter> _logger;
+	std::vector<vertex_descriptor> _fixed_positions;
+private:
+	std::unique_ptr<INonRigidRegistration> buildWithoutICP(const SurfaceMesh & source,
+														   const SurfaceMesh & target);
+	std::unique_ptr<INonRigidRegistration> buildWithoutRigid(const SurfaceMesh & source,
+															 const SurfaceMesh & target);
+	std::unique_ptr<INonRigidRegistration> buildWithoutRigid(const SurfaceMesh & source,
+															 const SurfaceMesh & target,
+															 const DG::DeformationGraph & deformation_graph);
+	std::unique_ptr<INonRigidRegistration> buildWithRigid(const SurfaceMesh & source,
+														  const SurfaceMesh & target);
+	std::unique_ptr<INonRigidRegistration> buildWithRigid(const SurfaceMesh & source,
+														  const SurfaceMesh & target,
+														  const DG::DeformationGraph & deformation_graph);
+public:
+	void setRegistrationType(RegistrationType type);
+	void setCeresOption(const ceres::Solver::Options options);
+	void setRegistrationOption(const RegistrationOptions & options);
+	void setLogger(std::shared_ptr<FileWriter> logger);
+	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
+public:
+	std::unique_ptr<INonRigidRegistration> buildNonRigidRegistration(const SurfaceMesh & source,
+																	 const SurfaceMesh & target);
+	std::unique_ptr<INonRigidRegistration> buildNonRigidRegistration(const SurfaceMesh & source,
+																	 const SurfaceMesh & target,
+																	 const DG::DeformationGraph & deformation_graph);
+	std::unique_ptr<IRigidRegistration> buildRigidRegistration(const SurfaceMesh & source,
+															   const SurfaceMesh & target);
+	std::unique_ptr<IRegistration> buildRegistration(const SurfaceMesh & source,
+													 const SurfaceMesh & target);
+	void logConfiguration();
+public:
+	RegistrationFactory();
+};
 

@@ -29,13 +29,10 @@ SurfaceMesh RigidRegistration::getInverseDeformedPoints()
 	return deformed.deformPoints();
 }
 
-SurfaceMesh RigidRegistration::getDeformationGraphMesh()
+const RigidDeformation & RigidRegistration::getRigidDeformation()
 {
-	RigidDeformedMesh deformed(_source, _deformation);
-	SurfaceMesh mesh = deformed.deformPoints();
-	return mesh;
-};
-
+	return _deformation;
+}
 
 ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex)
 {
@@ -157,7 +154,11 @@ bool RigidRegistration::solveIteration()
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 	}
-	return finished();
+	bool finished_registration = finished();
+	if (finished_registration) {
+		_ceres_logger.write("finished Rigid registration \n");
+	}
+	return finished_registration;
 }
 
 size_t RigidRegistration::currentIteration()
@@ -197,14 +198,6 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 }
 
 
-//Mesh RigidRegistration::getInverseDeformedPoints()
-//{
-//	auto transformed_points = _points_a;
-//	auto inverse_transformation = _transformation.getInverse();
-//	std::for_each(transformed_points.m_vertices.begin(), transformed_points.m_vertices.end(), [&](Mesh::Vertex & p) { p.position = inverse_transformation * p.position; });
-//	return transformed_points;
-//}
-
 
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
@@ -215,6 +208,7 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 	, _options(option)
 	, _ceres_logger(logger)
 {
+	_ceres_logger.write("start Rigid registration \n");
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45.);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
 }

@@ -28,5 +28,6 @@ public:
 	Deformation(const Deformation& node, bool inverse);
 };
 
+std::shared_ptr<Deformation> createDeformation();
 
 }

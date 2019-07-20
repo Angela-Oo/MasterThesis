@@ -21,7 +21,7 @@ typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 
-class AsRigidAsPossible : public IRegistration
+class AsRigidAsPossible : public INonRigidRegistration
 {
 public:
 
@@ -71,6 +71,7 @@ public:
 	SurfaceMesh getInverseDeformedPoints() override;
 	SurfaceMesh getDeformationGraphMesh() override;
 public:
+	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	const DG::DeformationGraph & getDeformationGraph() override;
 	std::vector<Point> getFixedPostions() override;
 public:
@@ -78,22 +79,57 @@ public:
 	AsRigidAsPossible(const SurfaceMesh& src,
 					  const SurfaceMesh& dst,
 					  std::vector<vertex_descriptor> fixed_positions,
+					  const DG::DeformationGraph & deformation_graph,
 					  ceres::Solver::Options option,
 					  const RegistrationOptions & registration_options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
+
 	// with icp
-	AsRigidAsPossible(const SurfaceMesh& src,
-					  const SurfaceMesh& dst,
-					  ceres::Solver::Options option,
-					  const RegistrationOptions & registration_options,
-					  std::shared_ptr<FileWriter> logger = nullptr);
-	// with icp but init with passed deformation graph
 	AsRigidAsPossible(const SurfaceMesh& src,
 					  const SurfaceMesh& dst,
 					  const DG::DeformationGraph & deformation_graph,
 					  ceres::Solver::Options option,
 					  const RegistrationOptions & registration_options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
-};	
+};
+
+
+//-----------------------------------------------------------------------------
+
+
+DG::PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
+
+
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
+										  const SurfaceMesh& dst,
+										  std::vector<vertex_descriptor> fixed_positions,
+										  ceres::Solver::Options option,
+										  const RegistrationOptions & registration_options,
+										  std::shared_ptr<FileWriter> logger);
+
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
+										  const SurfaceMesh& dst,
+										  ceres::Solver::Options option,
+										  const RegistrationOptions & registration_options,
+										  std::shared_ptr<FileWriter> logger);
+
+
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
+										  const SurfaceMesh& dst,
+										  const RigidDeformation & rigid_deformation,
+										  ceres::Solver::Options option,
+										  const RegistrationOptions & registration_options,
+										  std::shared_ptr<FileWriter> logger);
+
+
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
+										  const SurfaceMesh& dst,
+										  const RigidDeformation & rigid_deformation,
+										  const DG::DeformationGraph & deformation_graph,
+										  ceres::Solver::Options option,
+										  const RegistrationOptions & registration_options,
+										  std::shared_ptr<FileWriter> logger);
+
+
 
 }

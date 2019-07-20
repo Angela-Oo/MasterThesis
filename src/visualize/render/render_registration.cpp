@@ -177,14 +177,18 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 		renderDeformedSourceMesh(deformed_points, true, debug_normals);
 		renderTargetMesh(registration->getTarget(), false, debug_normals);
 
-		// fixed positions
-		std::vector<Point> render_fixed_positions = registration->getFixedPostions();
-		if (!render_fixed_positions.empty())
-			_point_renderer->insertPoints("frame_fixed_positions", render_fixed_positions, ml::RGBColor::Red, 0.005f);
+		auto non_rigid_registration = dynamic_cast<INonRigidRegistration*>(registration.get()); // todo .... maybe external polymorthis
 
-		// deformation graph
-		auto render_dg = registration->getDeformationGraphMesh();
-		renderDeformationGraph(render_dg, debug_deformation_graph_normals);
+		if (non_rigid_registration) {
+			// fixed positions
+			std::vector<Point> render_fixed_positions = non_rigid_registration->getFixedPostions();
+			if (!render_fixed_positions.empty())
+				_point_renderer->insertPoints("frame_fixed_positions", render_fixed_positions, ml::RGBColor::Red, 0.005f);
+
+			// deformation graph
+			auto render_dg = non_rigid_registration->getDeformationGraphMesh();
+			renderDeformationGraph(render_dg, debug_deformation_graph_normals);
+		}
 	}
 }
 
