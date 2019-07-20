@@ -44,7 +44,30 @@ struct halfedge2edge
 	std::vector<edge_descriptor>& m_edges;
 };
 
+std::vector<halfedge_descriptor> allBorderHalfedgesAroundVertex(vertex_descriptor v, const SurfaceMesh & mesh)
+{
+	std::vector<halfedge_descriptor> border_halfedges_around_v;
+	for (auto he : mesh.halfedges_around_target(mesh.halfedge(v)))
+	{
+		if (mesh.is_border(he))
+			border_halfedges_around_v.push_back(he);
+	}
+	return border_halfedges_around_v;
+}
 
+std::vector<halfedge_descriptor> connectingEdgesOnBorder(vertex_descriptor v0, vertex_descriptor v1, SurfaceMesh & mesh)
+{
+	std::vector<halfedge_descriptor> connecting_edges;
+	std::vector<halfedge_descriptor> border_halfedges_around_v0 = allBorderHalfedgesAroundVertex(v0, mesh);
+	for (auto he : border_halfedges_around_v0)
+	{
+		if (mesh.source(he) == v1)
+		{
+			connecting_edges.push_back(he);
+		}
+	}
+	return connecting_edges;
+}
 
 SurfaceMesh connectTwoMeshesAtBorder(SurfaceMesh & mesh_a, const SurfaceMesh & mesh_b, double merge_if_distance_to_vertex_is_smaller_than)
 {
@@ -61,17 +84,29 @@ SurfaceMesh connectTwoMeshesAtBorder(SurfaceMesh & mesh_a, const SurfaceMesh & m
 													boost::make_function_output_iterator(halfedge2edge(mesh_b, border_mesh_b)));
 
 	std::vector<vertex_descriptor> border_vertices_mesh_b;
-	//for (auto & e : border_mesh_b) {
-	//	border_vertices_mesh_b.push_back(combined_mesh.vertex(e, 0));
-	//	if(CGAL::is_border(combined_mesh.vertex(e, 1)))
-	//}
+	for (auto & e : border_mesh_b) {
+		border_vertices_mesh_b.push_back(combined_mesh.vertex(e, 0));
+	}
 
 	auto knn_search = NearestNeighborSearch(mesh_b, border_vertices_mesh_b.begin(), border_vertices_mesh_b.end());
+	
+	std::map<vertex_descriptor, vertex_descriptor> corresponding_border_vertices;
 	for (auto & e : border_merged_mesh) {
-		auto p0 = combined_mesh.point(combined_mesh.vertex(e, 0));
-		auto p1 = combined_mesh.point(combined_mesh.vertex(e, 1));
-		auto x = knn_search.search(p0, 0);
-		x.begin()->first;
+		auto vertex = combined_mesh.vertex(e, 0);
+		auto p0 = combined_mesh.point(vertex);
+		auto corresponding_vertex = knn_search.search(p0, 0).begin()->first;
+		corresponding_border_vertices[vertex] = corresponding_vertex;
+	}
+
+	// border edge collaps
+	for (auto & e : border_merged_mesh) {
+		auto v0 = combined_mesh.vertex(e, 0);
+		auto cv0 = corresponding_border_vertices[v0];
+
+		auto v1 = combined_mesh.vertex(e, 1);
+		auto cv1 = corresponding_border_vertices[v1];
+
+
 	}
 }
 
