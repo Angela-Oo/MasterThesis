@@ -96,7 +96,7 @@ void RigidBeforeNonRigidRegistration::setRigidDeformation(const RigidDeformation
 
 bool RigidBeforeNonRigidRegistration::shouldBeSavedAsImage()
 {
-	bool rigid_registration_finished = (_rigid_registration->finished() && _non_rigid_registration->currentIteration() == 0);
+	bool rigid_registration_finished = (_rigid_registration->finished() && !_finished_rigid_registration && _non_rigid_registration->currentIteration() == 0);
 	bool non_rigid_finished = finished();
 	return rigid_registration_finished || non_rigid_finished;
 }

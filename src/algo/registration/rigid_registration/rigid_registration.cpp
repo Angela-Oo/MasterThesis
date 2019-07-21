@@ -140,7 +140,7 @@ bool RigidRegistration::solve()
 
 bool RigidRegistration::finished()
 {
-	auto tol = _options.function_tolerance * 0.1;
+	auto tol = _options.function_tolerance;
 
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
