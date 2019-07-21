@@ -394,7 +394,8 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 										                       std::shared_ptr<FileWriter> logger)
 {
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	auto deformation_graph = DG::createDeformationGraphFromMesh(reduced_mesh, createGlobalDeformationFromRigidDeformation(rigid_deformation), createDeformation);
+	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
+	auto deformation_graph = DG::createDeformationGraphFromMesh(reduced_mesh, global, createDeformation);
 	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options.evaluate_residuals, logger);
 }
 
@@ -407,7 +408,8 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 										                       const RegistrationOptions & registration_options,
 										                       std::shared_ptr<FileWriter> logger)
 {
-	auto new_deformation_graph = DG::createDeformationGraphFromMesh(deformation_graph._mesh, createGlobalDeformationFromRigidDeformation(rigid_deformation), deformation_graph._create_node);
+	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
+	auto new_deformation_graph = DG::createDeformationGraphFromMesh(deformation_graph._mesh, global, deformation_graph._create_node);
 	return std::make_unique<EmbeddedDeformation>(src, dst, new_deformation_graph, option, registration_options.evaluate_residuals, logger);
 }
 
