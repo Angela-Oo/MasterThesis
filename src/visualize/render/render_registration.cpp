@@ -85,7 +85,7 @@ void RenderRegistration::renderSelectedFrames(std::shared_ptr<IMeshReader> mesh_
 void RenderRegistration::renderReference(std::shared_ptr<IMeshReader> mesh_reader)
 {
 	// reference
-	if (mesh_reader->frame() > _current_frame) {
+	if (mesh_reader->size() > _current_frame) {
 		if (_render_reference_mesh) {
 			bool override_mesh = (_current_frame != _last_rendered_reference_frame);
 			_mesh_renderer->insertMesh("reference", mesh_reader->getMesh(_current_frame), ml::RGBColor::White.toVec4f(), override_mesh);

@@ -16,14 +16,13 @@ private:
 	ml::mat4f _transformation;
 	unsigned int _start_number;
 private:
-	std::string getFileName(unsigned int index);
+	std::string getFileName(size_t index);
 public:
-	SurfaceMesh& getMesh(unsigned int frame) override;
-	std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) override {
+	const SurfaceMesh & getMesh(size_t frame) override;
+	std::vector<vertex_descriptor> getFixedPositions(size_t frame) override {
 		return std::vector<vertex_descriptor>();
 	};
 	bool processFrame();
-	unsigned int frame() override;
 	size_t size() override;
 	bool processAllFrames();
 public:
@@ -40,9 +39,8 @@ class DeformationMesh : public IMeshReader
 	const int _cylinder_width_points = 20;
 	const int _cylinder_height_points = 30;
 public:
-	SurfaceMesh& getMesh(unsigned int frame) override;
-	std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) override;
-	unsigned int frame() override;
+	const SurfaceMesh & getMesh(size_t frame) override;
+	std::vector<vertex_descriptor> getFixedPositions(size_t frame) override;
 	size_t size() override;
 public:
 	DeformationMesh();
@@ -54,9 +52,8 @@ class DeformationMeshFrames : public IMeshReader
 	const int _cylinder_width_points = 20;
 	const int _cylinder_height_points = 50;
 public:
-	SurfaceMesh& getMesh(unsigned int frame) override;
-	std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) override;
-	unsigned int frame() override;
+	const SurfaceMesh & getMesh(size_t frame) override;
+	std::vector<vertex_descriptor> getFixedPositions(size_t frame) override;
 	size_t size() override;
 public:
 	DeformationMeshFrames();

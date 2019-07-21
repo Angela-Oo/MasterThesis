@@ -8,17 +8,17 @@
 
 #include "algo/surface_mesh/mesh_convertion.h"
 
-std::string MeshReader::getFileName(unsigned int index)
+std::string MeshReader::getFileName(size_t index)
 {
-	auto frame_number = [](unsigned int idx) {
+	auto frame_number = [](size_t idx) {
 		char frameNumber_c[10];
-		sprintf_s(frameNumber_c, "%06d", idx);
+		sprintf_s(frameNumber_c, "%06d", static_cast<int>(idx));
 		return std::string(frameNumber_c);
 	};
 	return _file_path + _file_name + frame_number(index) + ".obj";
 }
 
-SurfaceMesh& MeshReader::getMesh(unsigned int frame)
+const SurfaceMesh & MeshReader::getMesh(size_t frame)
 {
 	assert(frame < _meshes.size());
 	return _meshes[frame];
@@ -26,7 +26,7 @@ SurfaceMesh& MeshReader::getMesh(unsigned int frame)
 
 bool MeshReader::processFrame()
 {
-	std::string filename = getFileName(frame() + _start_number);
+	std::string filename = getFileName(size() + _start_number);
 
 	std::fstream file_stream;
 	file_stream.open(filename);
@@ -54,11 +54,6 @@ bool MeshReader::processAllFrames()
 		successfull = processFrame();
 	}
 	return true;
-}
-
-unsigned int MeshReader::frame()
-{
-	return _meshes.size();
 }
 
 size_t MeshReader::size()
@@ -98,12 +93,12 @@ MeshReader::MeshReader(std::string filepath, std::string filename, ml::mat4f tra
 
 
 
-SurfaceMesh& DeformationMesh::getMesh(unsigned int frame)
+const SurfaceMesh & DeformationMesh::getMesh(size_t frame)
 {
 	return _meshes[frame];
 }
 
-std::vector<vertex_descriptor> DeformationMesh::getFixedPositions(unsigned int frame)
+std::vector<vertex_descriptor> DeformationMesh::getFixedPositions(size_t frame)
 {
 	std::vector<vertex_descriptor> fixed_index;
 	for (int i = 0; i < _cylinder_width_points; ++i) {
@@ -115,11 +110,6 @@ std::vector<vertex_descriptor> DeformationMesh::getFixedPositions(unsigned int f
 		fixed_index.push_back(v);
 	}
 	return fixed_index;
-}
-
-unsigned int DeformationMesh::frame()
-{
-	return _meshes.size();
 }
 
 size_t DeformationMesh::size()
@@ -138,7 +128,7 @@ DeformationMesh::DeformationMesh()
 	auto translation = ml::mat4f::translation({ 0.4f, 0.f, -0.4f });
 
 	size_t num_vertices = mesh_2.m_vertices.size();
-	for (int i = num_vertices - 1; i > num_vertices - _cylinder_width_points - 1; --i) {
+	for (size_t i = num_vertices - 1; i > num_vertices - _cylinder_width_points - 1; --i) {
 		mesh_2.m_vertices[i].position = rotation * translation * mesh_2.m_vertices[i].position;
 	}
 	_meshes.push_back(convertToCGALMesh(mesh_2));
@@ -147,19 +137,14 @@ DeformationMesh::DeformationMesh()
 
 
 
-SurfaceMesh& DeformationMeshFrames::getMesh(unsigned int frame)
+const SurfaceMesh & DeformationMeshFrames::getMesh(size_t frame)
 {
 	return _meshes[frame];
 }
 
-std::vector<vertex_descriptor> DeformationMeshFrames::getFixedPositions(unsigned int frame)
+std::vector<vertex_descriptor> DeformationMeshFrames::getFixedPositions(size_t frame)
 {
 	return std::vector<vertex_descriptor>();
-}
-
-unsigned int DeformationMeshFrames::frame()
-{
-	return _meshes.size();
 }
 
 size_t DeformationMeshFrames::size()

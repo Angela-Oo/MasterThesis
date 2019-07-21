@@ -89,7 +89,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 {	
 	if (!_register_sequence_of_frames) {
 		std::vector<SurfaceMesh> meshes;
-		for (unsigned int i = 0; i < _input_mesh->frame(); ++i) {
+		for (unsigned int i = 0; i < _input_mesh->size(); ++i) {
 			meshes.push_back(_input_mesh->getMesh(i));
 		}
 		RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
@@ -119,7 +119,7 @@ void ShowMesh::renderError()
 {	
 	if (_registration && _calculate_error) {
 		if (!_error_evaluation) {
-			if(_reference_registration_mesh->frame() > _selected_frame_for_registration[1])
+			if(_reference_registration_mesh->size() > _selected_frame_for_registration[1])
 				_error_evaluation = std::make_unique<ErrorEvaluation>(_reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
 		}
 
@@ -195,14 +195,14 @@ void ShowMesh::key(UINT key)
 	if (key == KEY_2)
 	{
 		_renderer->_current_frame++;
-		if (_renderer->_current_frame >= _input_mesh->frame())
+		if (_renderer->_current_frame >= _input_mesh->size())
 			_renderer->_current_frame = 0;
 		renderRegistration();
 	}
 	else if (key == KEY_1)
 	{
 		if (_renderer->_current_frame == 0)
-			_renderer->_current_frame = _input_mesh->frame() - 1;
+			_renderer->_current_frame = _input_mesh->size() - 1;
 		else
 			_renderer->_current_frame--;
 		renderRegistration();

@@ -6,8 +6,8 @@
 class IMeshReader
 {
 public:
-	virtual SurfaceMesh& getMesh(unsigned int frame) = 0;
-	virtual std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) = 0;
-	virtual unsigned int frame() = 0;
+	virtual const SurfaceMesh & getMesh(size_t frame) = 0;
+	virtual std::vector<vertex_descriptor> getFixedPositions(size_t frame) = 0;
+	//virtual unsigned int frame() = 0;
 	virtual size_t size() = 0;
 };
