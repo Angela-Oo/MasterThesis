@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mesh/i_mesh_sequence.h"
 #include "algo/file_writer.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
@@ -13,7 +14,7 @@
 class SequenceRegistration
 {
 private:
-	std::vector<SurfaceMesh> _meshes;
+	std::shared_ptr<IMeshReader> _mesh_sequence;
 	std::vector<SurfaceMesh> _deformed_meshes;
 	std::vector<DG::DeformationGraph> _deformation_graphs;
 	size_t _current;
@@ -34,7 +35,7 @@ public:
 	SurfaceMesh getDeformationGraphMesh(size_t frame);
 public:
 	SequenceRegistration();
-	SequenceRegistration(const std::vector<SurfaceMesh> & meshes,
+	SequenceRegistration(std::shared_ptr<IMeshReader> mesh_sequence,
 						 RegistrationType registration_type, 
 						 std::shared_ptr<FileWriter> logger, 
 						 RegistrationOptions registration_options);

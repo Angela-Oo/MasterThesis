@@ -96,7 +96,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
-		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(meshes, type, _logger, _registration_options);
+		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(_input_mesh, type, _logger, _registration_options);
 	}
 	else {
 		bool finished = _register_sequence_of_frames->finished();

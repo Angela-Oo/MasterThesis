@@ -61,6 +61,11 @@ unsigned int MeshReader::frame()
 	return _meshes.size();
 }
 
+size_t MeshReader::size()
+{
+	return _meshes.size();
+}
+
 void MeshReader::load(std::string filename)
 {
 	std::cout << "load recorded frames from .obj file " << filename << std::endl;
@@ -117,6 +122,11 @@ unsigned int DeformationMesh::frame()
 	return _meshes.size();
 }
 
+size_t DeformationMesh::size()
+{
+	return _meshes.size();
+}
+
 DeformationMesh::DeformationMesh()
 {
 	auto mesh_1 = ml::Shapes<float>::cylinder(0.1f, 1.f, _cylinder_height_points, _cylinder_width_points);
@@ -148,6 +158,11 @@ std::vector<vertex_descriptor> DeformationMeshFrames::getFixedPositions(unsigned
 }
 
 unsigned int DeformationMeshFrames::frame()
+{
+	return _meshes.size();
+}
+
+size_t DeformationMeshFrames::size()
 {
 	return _meshes.size();
 }

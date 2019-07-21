@@ -5,15 +5,7 @@
 #include "kinect/SensorDataWrapper.h"
 
 #include "algo/mesh_simplification/mesh_simplification.h"
-
-class IMeshReader
-{
-public:
-	virtual SurfaceMesh& getMesh(unsigned int frame) = 0;
-	virtual std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) = 0;
-	virtual unsigned int frame() = 0;
-};
-
+#include "mesh/i_mesh_sequence.h"
 
 class MeshReader : public IMeshReader
 {
@@ -32,6 +24,7 @@ public:
 	};
 	bool processFrame();
 	unsigned int frame() override;
+	size_t size() override;
 	bool processAllFrames();
 public:
 	void load(std::string filename);
@@ -50,6 +43,7 @@ public:
 	SurfaceMesh& getMesh(unsigned int frame) override;
 	std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) override;
 	unsigned int frame() override;
+	size_t size() override;
 public:
 	DeformationMesh();
 };
@@ -63,6 +57,7 @@ public:
 	SurfaceMesh& getMesh(unsigned int frame) override;
 	std::vector<vertex_descriptor> getFixedPositions(unsigned int frame) override;
 	unsigned int frame() override;
+	size_t size() override;
 public:
 	DeformationMeshFrames();
 };

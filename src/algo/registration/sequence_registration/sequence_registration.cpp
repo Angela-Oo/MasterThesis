@@ -8,8 +8,8 @@
 void SequenceRegistration::nextFrame()
 {
 	_current++;
-	auto & source = _meshes[0];
-	auto & target = _meshes[_current];
+	auto & source = _mesh_sequence->getMesh(0);
+	auto & target = _mesh_sequence->getMesh(_current);
 	
 	_registration = _registration_factory.buildNonRigidRegistration(source, target, _deformation_graphs[_current - 1]);
 	_deformation_graphs[_current] = _registration->getDeformationGraph();
@@ -17,9 +17,9 @@ void SequenceRegistration::nextFrame()
 
 bool SequenceRegistration::solve()
 {
-	if (_current >= _meshes.size())
+	if (_current >= _mesh_sequence->size())
 		throw std::exception("not enougth meshes");
-	if (!_registration && _current < _meshes.size()) {
+	if (!_registration && _current < _mesh_sequence->size()) {
 		nextFrame();
 	}
 	if (_registration) {
@@ -29,7 +29,7 @@ bool SequenceRegistration::solve()
 			_deformed_meshes[_current] = _registration->getDeformedPoints();
 			_deformation_graphs[_current] = _registration->getDeformationGraph();
 			_ceres_logger->write("frame " + std::to_string(_current) + " solved \n");
-			if (_current < _meshes.size() - 1) {				
+			if (_current < _mesh_sequence->size() - 1) {
 				_registration.reset();				
 			}
 			else {
@@ -72,7 +72,7 @@ bool SequenceRegistration::finished()
 
 SurfaceMesh SequenceRegistration::getMesh(size_t frame)
 {
-	return _meshes[frame];
+	return _mesh_sequence->getMesh(frame);
 }
 
 SurfaceMesh SequenceRegistration::getDeformedMesh(size_t frame)
@@ -83,7 +83,7 @@ SurfaceMesh SequenceRegistration::getDeformedMesh(size_t frame)
 SurfaceMesh SequenceRegistration::getInverseDeformedMesh(size_t frame)
 {
 	auto inverse_deformation = DG::invertDeformationGraph(_deformation_graphs[frame]);
-	DG::DeformedMesh deformed(_meshes[frame], inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
+	DG::DeformedMesh deformed(_mesh_sequence->getMesh(frame), inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 
@@ -102,11 +102,11 @@ SequenceRegistration::SequenceRegistration()
 {
 }
 
-SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & meshes, 
+SequenceRegistration::SequenceRegistration(std::shared_ptr<IMeshReader> mesh_sequence,
 										   RegistrationType registration_type, 
 										   std::shared_ptr<FileWriter> logger,
 										   RegistrationOptions registration_options)
-	: _meshes(meshes)
+	: _mesh_sequence(mesh_sequence)
 	, _current(1)
 	, _registration_options(registration_options)
 	, _finished(false)
@@ -116,15 +116,15 @@ SequenceRegistration::SequenceRegistration(const std::vector<SurfaceMesh> & mesh
 	_registration_factory.setRegistrationOption(registration_options);
 	_registration_factory.setLogger(logger);
 
-	_deformation_graphs.resize(_meshes.size());
-	_deformed_meshes.resize(_meshes.size());
+	_deformation_graphs.resize(_mesh_sequence->size());
+	_deformed_meshes.resize(_mesh_sequence->size());
 
-	auto & source = _meshes[0];
-	auto & target = _meshes[_current];
+	auto & source = _mesh_sequence->getMesh(0);
+	auto & target = _mesh_sequence->getMesh(_current);
 	_registration = _registration_factory.buildNonRigidRegistration(source, target);
 
 	_deformation_graphs[0] = _registration->getDeformationGraph();
-	_deformed_meshes[0] = _meshes[0];
+	_deformed_meshes[0] = source;
 	_ceres_logger = std::make_unique<CeresLogger>(logger);
 	std::string algo = (registration_type == RegistrationType::ARAP) ? "arap" : "ed";
 	_ceres_logger->write("Register all frames with " + algo);

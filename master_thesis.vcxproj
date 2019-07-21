@@ -273,6 +273,7 @@
     <ClInclude Include="src\kinect\PrimeSenseSensor.h" />
     <ClInclude Include="src\kinect\SensorDataWrapper.h" />
     <ClInclude Include="src\main.h" />
+    <ClInclude Include="src\mesh\i_mesh_sequence.h" />
     <ClInclude Include="src\mLibInclude.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\visualize\constantBuffer.h" />
