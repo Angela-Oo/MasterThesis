@@ -6,7 +6,7 @@ ceres::Solver::Options ceresOption() {
 	options.minimizer_type = ceres::MinimizerType::TRUST_REGION;
 	options.trust_region_strategy_type = ceres::TrustRegionStrategyType::LEVENBERG_MARQUARDT;
 	options.line_search_direction_type = ceres::LineSearchDirectionType::LBFGS;
-	options.linear_solver_type = ceres::LinearSolverType::CGNR;
+	options.linear_solver_type = ceres::LinearSolverType::DENSE_SCHUR; //ceres::LinearSolverType::CGNR; // SPARSE_SCHUR // sparse normal cholesky is not threaded
 	options.preconditioner_type = ceres::PreconditionerType::JACOBI;// SCHUR_JACOBI;
 	options.max_num_iterations = 50;// 100;
 	options.logging_type = ceres::LoggingType::SILENT;
