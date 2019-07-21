@@ -61,7 +61,7 @@ bool RigidBeforeNonRigidRegistration::solveIteration()
 size_t RigidBeforeNonRigidRegistration::currentIteration()
 {
 	if (_finished_rigid_registration) {
-		return _non_rigid_registration->currentIteration();
+		return _rigid_registration->currentIteration() + _non_rigid_registration->currentIteration();
 	}
 	else {
 		return _rigid_registration->currentIteration();

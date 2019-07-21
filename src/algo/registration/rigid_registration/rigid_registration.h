@@ -19,6 +19,7 @@ private:
 	SurfaceMesh _target;
 	ceres::Solver::Options _options;
 	RigidDeformation _deformation;
+	Point _global_position;
 	CeresLogger _ceres_logger;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 	std::unique_ptr<RigidDeformedMesh> _rigid_deformed_mesh;
@@ -53,6 +54,13 @@ public:
 public:
 	RigidRegistration(const SurfaceMesh & points_a,
 					  const SurfaceMesh & points_b,
+					  ceres::Solver::Options option,
+					  double use_vertex_random_probability = 1.,
+					  std::shared_ptr<FileWriter> logger = nullptr);
+
+	RigidRegistration(const SurfaceMesh & points_a,
+					  const SurfaceMesh & points_b,
+					  RigidDeformation rigid_deformation,
 					  ceres::Solver::Options option,
 					  double use_vertex_random_probability = 1.,
 					  std::shared_ptr<FileWriter> logger = nullptr);

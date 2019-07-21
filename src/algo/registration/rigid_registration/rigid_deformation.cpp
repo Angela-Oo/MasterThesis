@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "rigid_deformation.h"
 #include "ceres/rotation.h"
+#include "algo/ceres_math.h"
+
 
 Matrix RigidDeformation::rotation() const
 {
@@ -18,9 +20,10 @@ Vector RigidDeformation::translation() const
 
 Point RigidDeformation::deformPoint(const Point & point) const
 {
-	Vector rotated_point = rotation()(point - CGAL::ORIGIN);
-	Vector moved_position = translation();
-	return CGAL::ORIGIN + rotated_point + moved_position;
+	auto edge = point - _g;
+	Vector rotated_point = rotation()(edge);
+	Vector moved_position = (_g - CGAL::ORIGIN) + translation();
+	return CGAL::ORIGIN + moved_position + rotated_point;
 }
 
 Vector RigidDeformation::deformNormal(const Vector & normal) const
@@ -34,7 +37,7 @@ Vector RigidDeformation::deformNormal(const Vector & normal) const
 
 RigidDeformation RigidDeformation::invertDeformation()
 {
-	return RigidDeformation(-_r, -_t);
+	return RigidDeformation(-_r, -_t, _g);
 }
 
 RigidDeformation::RigidDeformation()
@@ -42,7 +45,35 @@ RigidDeformation::RigidDeformation()
 	, _t(ml::vec3f::origin)
 {}
 
-RigidDeformation::RigidDeformation(ml::vec3d r, ml::vec3d t)
+RigidDeformation::RigidDeformation(ml::vec3d r, ml::vec3d t, Point g)
 	: _r(r)
 	, _t(t)
+	, _g(g)
 { }
+
+RigidDeformation::RigidDeformation(Matrix r, Vector t, Point g)
+	: _g(g)
+{ 
+	double rotation[3];
+	double rotation_matrix[9];
+	Matrix3x3_toT(r, rotation_matrix);
+	ceres::RotationMatrixToAngleAxis(rotation_matrix, rotation);
+	_r = T_to_vec3f(rotation);
+
+	_t = ml::vec3f(t.x(), t.y(), t.z());
+
+}
+
+
+
+
+
+Point calculateGlobalCenter(const SurfaceMesh & mesh)
+{
+	Vector global_position(0., 0., 0.);
+	for (auto & v : mesh.vertices()) {
+		global_position += mesh.point(v) - CGAL::ORIGIN;
+	}
+	global_position /= mesh.number_of_vertices();
+	return CGAL::ORIGIN + global_position;
+}

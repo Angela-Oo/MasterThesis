@@ -135,6 +135,13 @@ void DeformationGraph::setRigidDeformation(const PositionAndDeformation & rigid_
 	_global = rigid_deformation;
 }
 
+RigidDeformation DeformationGraph::getRigidDeformation() const
+{
+	return RigidDeformation(_global._deformation->rotation(),
+							_global._deformation->translation(),
+							_global._point);
+}
+
 DeformationGraph::DeformationGraph(const SurfaceMesh & graph, 
 								   const PositionAndDeformation & global_deformation, 
 								   std::function<std::shared_ptr<IDeformation>()> create_node)

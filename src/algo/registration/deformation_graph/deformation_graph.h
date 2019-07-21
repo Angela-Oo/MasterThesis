@@ -31,6 +31,7 @@ public:
 	PositionAndDeformation invertNode(vertex_descriptor node_index) const;
 public:
 	void setRigidDeformation(const PositionAndDeformation & rigid_deformation);
+	RigidDeformation getRigidDeformation() const;
 public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes

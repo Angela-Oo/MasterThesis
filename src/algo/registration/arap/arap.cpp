@@ -330,7 +330,7 @@ bool AsRigidAsPossible::solveIteration()
 		{
 			_registration_options.smooth /= 2.;
 			_registration_options.conf /= 2.;
-			std::cout << std::endl << "scale factor: smooth " << _registration_options.smooth << " conf " << _registration_options.conf << std::endl;
+			std::cout << std::endl << "scale factor: smooth " << _registration_options.smooth << " conf " << _registration_options.conf;
 		}
 	}
 	bool finished_registration = finished();
@@ -371,7 +371,7 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost");
 	if (smooth_cost.second) {
 		auto max_and_mean_cost = evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, _registration_options.smooth);
-		logger->write("max smooth costs: " + std::to_string(max_and_mean_cost.first) + " reference smooth cost " + std::to_string(max_and_mean_cost.second * 10.), false);
+		logger->write("max smooth: " + std::to_string(max_and_mean_cost.first) + " reference smooth " + std::to_string(max_and_mean_cost.second * 10.), false);
 	}
 	
 	// fit
@@ -455,7 +455,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 DG::PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
 {
 	DG::PositionAndDeformation global;
-	global._point = CGAL::ORIGIN;
+	global._point = rigid_deformation._g;
 	global._normal = Vector(0., 0., 1.);
 	global._deformation = std::make_shared<Deformation>(rigid_deformation._r, rigid_deformation._t);
 	return global;

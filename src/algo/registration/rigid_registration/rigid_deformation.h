@@ -4,6 +4,7 @@
 class RigidDeformation
 {
 public:
+	Point _g; // center position
 	ml::vec3d _r; // rotation matrix in angle axis
 	ml::vec3d _t; // translation vector	
 public:
@@ -19,6 +20,8 @@ public:
 	RigidDeformation invertDeformation();
 public:
 	RigidDeformation();
-	RigidDeformation(ml::vec3d r, ml::vec3d t);
+	RigidDeformation(ml::vec3d r, ml::vec3d t, Point g = CGAL::ORIGIN);
+	RigidDeformation(Matrix r, Vector t, Point g = CGAL::ORIGIN);
 };
 
+Point calculateGlobalCenter(const SurfaceMesh & mesh);

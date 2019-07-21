@@ -39,7 +39,7 @@ ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &pr
 	float point_to_point_weight = 0.1f;
 	auto target_point = _target.point(target_vertex);
 
-	auto cost_function = FitPointToPointAngleAxisCostFunction::Create(source_point, target_point);
+	auto cost_function = FitPointToPointAngleAxisCostFunction::Create(source_point, target_point, _deformation._g);
 	auto loss_function = new ceres::ScaledLoss(NULL, point_to_point_weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function, _deformation.r(), _deformation.t());
 }
@@ -51,7 +51,7 @@ ceres::ResidualBlockId RigidRegistration::addPointToPlaneCost(ceres::Problem &pr
 	auto target_point = _target.point(target_vertex);
 	auto target_normal = target_normals[target_vertex];
 
-	auto cost_function = FitPointToPlaneAngleAxisCostFunction::Create(source_point, target_point, target_normal);
+	auto cost_function = FitPointToPlaneAngleAxisCostFunction::Create(source_point, target_point, target_normal, _deformation._g);
 	auto loss_function = new ceres::ScaledLoss(NULL, point_to_plane_weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function, _deformation.r(), _deformation.t());
 }
@@ -159,6 +159,8 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 	}
 }
 
+
+
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
 									 ceres::Solver::Options option, 
@@ -170,6 +172,8 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 	, _use_vertex_random_probability(use_vertex_random_probability)
 	, _ceres_logger(logger)
 {
+	_deformation._g = calculateGlobalCenter(_source);
+
 	_ceres_logger.write("start Rigid registration \n");
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45.);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
@@ -193,5 +197,16 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 			_set_of_vertices_to_use.push_back(v);
 		}
 	}
+}
+
+RigidRegistration::RigidRegistration(const SurfaceMesh & source,
+									 const SurfaceMesh & target,
+									 RigidDeformation rigid_deformation,
+									 ceres::Solver::Options option,
+									 double use_vertex_random_probability,
+									 std::shared_ptr<FileWriter> logger)
+	: RigidRegistration(source, target, option, use_vertex_random_probability, logger)
+{
+	_deformation = rigid_deformation;
 }
 

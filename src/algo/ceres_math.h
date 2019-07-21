@@ -12,6 +12,16 @@ void vec3f_to_T(const ml::vec3f& v, T* vector)
 }
 
 template<typename T>
+ml::vec3f T_to_vec3f(const T * const vector)
+{
+	ml::vec3f v;
+	v[0] = vector[0];
+	v[1] = vector[1];
+	v[2] = vector[2];
+	return v;
+}
+
+template<typename T>
 void point_to_T(const Point& v, T* vector)
 {
 	vector[0] = T(v.x());
@@ -27,7 +37,6 @@ void point_to_T(const Vector& n, T* vector)
 	vector[2] = T(n.z());
 }
 
-
 template<typename T>
 void mat3d_to_T(const ml::mat3d& m, T* matrix)
 {
@@ -40,6 +49,20 @@ void mat3d_to_T(const ml::mat3d& m, T* matrix)
 	matrix[6] = T(m(0, 2));
 	matrix[7] = T(m(1, 2));
 	matrix[8] = T(m(2, 1));
+}
+
+template<typename T>
+void Matrix3x3_toT(const Matrix& m, T* matrix)
+{
+	matrix[0] = T(m.m(0, 0));
+	matrix[1] = T(m.m(1, 0));
+	matrix[2] = T(m.m(2, 0));
+	matrix[3] = T(m.m(0, 1));
+	matrix[4] = T(m.m(1, 1));
+	matrix[5] = T(m.m(2, 1));
+	matrix[6] = T(m.m(0, 2));
+	matrix[7] = T(m.m(1, 2));
+	matrix[8] = T(m.m(2, 1));
 }
 
 template<typename T>

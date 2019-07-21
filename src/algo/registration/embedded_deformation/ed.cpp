@@ -340,7 +340,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 DG::PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
 {
 	DG::PositionAndDeformation global;
-	global._point = CGAL::ORIGIN;
+	global._point = rigid_deformation._g;
 	global._normal = Vector(0., 0., 1.);
 	
 	auto r = rigid_deformation.rotation();
@@ -348,6 +348,7 @@ DG::PositionAndDeformation createGlobalDeformationFromRigidDeformation(const Rig
 	//double x = r.m(0,1);
 	ml::mat3d rotation(r.m(0, 0),r.m(0, 1), r.m(0, 2),r.m(1, 0), r.m(1, 1), r.m(1, 2), r.m(2, 0), r.m(2, 1), r.m(2, 2));
 	global._deformation = std::make_shared<Deformation>(rotation, rigid_deformation._t);
+
 	return global;
 }
 

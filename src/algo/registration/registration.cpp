@@ -140,14 +140,14 @@ std::unique_ptr<INonRigidRegistration> RegistrationFactory::buildWithRigid(const
 																		   const SurfaceMesh & target,
 																		   const DG::DeformationGraph & deformation_graph)
 {
-	if (_registration_type == RegistrationType::ED) {
-		return std::make_unique <Registration::RigidBeforeNonRigidRegistration>(
-			std::make_unique<RigidRegistration>(source, target, _ceres_options, _options.use_vertex_random_probability, _logger),
+	if (_registration_type == RegistrationType::ED) {		
+		return std::make_unique <Registration::RigidBeforeNonRigidRegistration>(			
+			std::make_unique<RigidRegistration>(source, target, deformation_graph.getRigidDeformation(), _ceres_options, _options.use_vertex_random_probability, _logger),
 			std::make_unique<ED::EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger));
 	}
 	if (_registration_type == RegistrationType::ARAP) {
 		return std::make_unique <Registration::RigidBeforeNonRigidRegistration>(
-			std::make_unique<RigidRegistration>(source, target, _ceres_options, _options.use_vertex_random_probability, _logger),
+			std::make_unique<RigidRegistration>(source, target, deformation_graph.getRigidDeformation(), _ceres_options, _options.use_vertex_random_probability, _logger),
 			std::make_unique<ARAP::AsRigidAsPossible>(source, target, deformation_graph, _ceres_options, _options, _logger));
 	}
 	else {
