@@ -108,6 +108,8 @@ SurfaceMesh connectTwoMeshesAtBorder(SurfaceMesh & mesh_a, const SurfaceMesh & m
 
 
 	}
+
+	return mesh_a;
 }
 
 SurfaceMesh mergeMeshIntoMesh(const SurfaceMesh & graph, const SurfaceMesh & mesh)
@@ -121,5 +123,6 @@ SurfaceMesh mergeMeshIntoMesh(const SurfaceMesh & graph, const SurfaceMesh & mes
 	cutAreaOutOfMesh(cliped_mesh, graph, covered_if_distance_to_vertex_is_smaller_than);
 
 
-	connectTwoMeshesAtBorder(merged_mesh, cliped_mesh, covered_if_distance_to_vertex_is_smaller_than);
+	auto connected_mesh = connectTwoMeshesAtBorder(merged_mesh, cliped_mesh, covered_if_distance_to_vertex_is_smaller_than);
+	return connected_mesh;
 }

@@ -14,6 +14,7 @@ void SequenceRegistration::nextFrame()
 	_registration = _registration_factory.buildNonRigidRegistration(source, target, _deformation_graphs[_current - 1]);
 	_deformation_graphs[_current] = _registration->getDeformationGraph();
 }
+
 bool SequenceRegistration::solve()
 {
 	if (_current >= _meshes.size())
@@ -48,7 +49,21 @@ bool SequenceRegistration::solve()
 	return true;
 }
 
-
+std::pair<bool, std::string> SequenceRegistration::saveCurrentFrameAsImage()
+{
+	bool save_as_image = false;
+	std::string image_index = "";
+	if (_registration) {
+		save_as_image = _registration->shouldBeSavedAsImage();		
+		if (save_as_image) {
+			image_index = std::to_string(getCurrent());
+			if (!_registration->finished()) {
+				image_index =  image_index + "_arigid_" + std::to_string(_registration->currentIteration());
+			}
+		}
+	}
+	return std::make_pair(save_as_image, image_index);
+}
 
 bool SequenceRegistration::finished()
 {
