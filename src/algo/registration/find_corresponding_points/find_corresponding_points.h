@@ -15,6 +15,7 @@ class FindCorrespondingPoints
 	double _median_distance;
 	int _k;
 	double _allowed_multiple_of_median_distance;
+	double _min_allowed_distance;
 public:
 	double median();
 	Point getPoint(vertex_descriptor);
@@ -23,5 +24,6 @@ public:
 	FindCorrespondingPoints(const SurfaceMesh & mesh,
 							double initial_max_allowed_distance = 0.1,							
 							double max_normal_angle_deviation = 45.,
-							double allowed_multiple_of_median_distance = 10.);
+							double allowed_multiple_of_median_distance = 10.,
+							double min_allowed_distance = 0.0001);
 };

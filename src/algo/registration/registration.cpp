@@ -69,13 +69,11 @@ std::unique_ptr<INonRigidRegistration> RegistrationFactory::buildWithoutICP(cons
 		if (_fixed_positions.empty())
 			std::cout << "ed without icp fixed position are not set" << std::endl;
 		return ED::createEmbeddedDeformation(source, target, _fixed_positions, _ceres_options, _options, _logger);
-											 //std::make_unique<ED::EmbeddedDeformation>(source, target, _fixed_positions, _ceres_options, _options.evaluate_residuals, _logger);
 	}
 	else if (_registration_type == RegistrationType::ARAP_WithoutICP) {
 		if (_fixed_positions.empty())
 			std::cout << "arap without icp fixed position are not set" << std::endl;
 		return ARAP::createAsRigidAsPossible(source, target, _fixed_positions, _ceres_options, _options, _logger);
-		//std::make_unique<ARAP::AsRigidAsPossible>(source, target, _fixed_positions, _ceres_options, _options, _logger);
 	}
 	else {
 		throw("Registration type is not non rigid without icp");
@@ -88,11 +86,9 @@ std::unique_ptr<INonRigidRegistration> RegistrationFactory::buildWithoutRigid(co
 {
 	if (_registration_type == RegistrationType::ED_Without_RIGID) {
 		return ED::createEmbeddedDeformation(source, target, _ceres_options, _options, _logger);
-			//std::make_unique<ED::EmbeddedDeformation>(source, target, _ceres_options, _options.dg_options.edge_length, _options.evaluate_residuals, _logger);
 	}
 	else if (_registration_type == RegistrationType::ARAP_Without_RIGID) {
-		return ARAP::createAsRigidAsPossible(source, target, _ceres_options, _options, _logger); 
-		//std::make_unique<ARAP::AsRigidAsPossible>(source, target, _ceres_options, _options, _logger);
+		return ARAP::createAsRigidAsPossible(source, target, _ceres_options, _options, _logger);
 	}
 	else {
 		throw("Registration type is not non rigid without rigid");
@@ -121,12 +117,12 @@ std::unique_ptr<INonRigidRegistration> RegistrationFactory::buildWithRigid(const
 {
 	if (_registration_type == RegistrationType::ED) {
 		return std::make_unique <Registration::RigidBeforeNonRigidRegistration>(
-			std::make_unique<RigidRegistration>(source, target, _ceres_options, _options.use_vertex_random_probability, _logger),
+			std::make_unique<RigidRegistration>(source, target, _ceres_options, _options, _logger),
 			ED::createEmbeddedDeformation(source, target, _ceres_options, _options, _logger));
 	}
 	if (_registration_type == RegistrationType::ARAP) {
 		return std::make_unique <Registration::RigidBeforeNonRigidRegistration>(
-			std::make_unique<RigidRegistration>(source, target, _ceres_options, _options.use_vertex_random_probability, _logger),
+			std::make_unique<RigidRegistration>(source, target, _ceres_options, _options, _logger),
 			ARAP::createAsRigidAsPossible(source, target, _ceres_options, _options, _logger));
 	}
 	else {
@@ -142,12 +138,12 @@ std::unique_ptr<INonRigidRegistration> RegistrationFactory::buildWithRigid(const
 {
 	if (_registration_type == RegistrationType::ED) {		
 		return std::make_unique <Registration::RigidBeforeNonRigidRegistration>(			
-			std::make_unique<RigidRegistration>(source, target, deformation_graph.getRigidDeformation(), _ceres_options, _options.use_vertex_random_probability, _logger),
+			std::make_unique<RigidRegistration>(source, target, deformation_graph.getRigidDeformation(), _ceres_options, _options, _logger),
 			std::make_unique<ED::EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger));
 	}
 	if (_registration_type == RegistrationType::ARAP) {
 		return std::make_unique <Registration::RigidBeforeNonRigidRegistration>(
-			std::make_unique<RigidRegistration>(source, target, deformation_graph.getRigidDeformation(), _ceres_options, _options.use_vertex_random_probability, _logger),
+			std::make_unique<RigidRegistration>(source, target, deformation_graph.getRigidDeformation(), _ceres_options, _options, _logger),
 			std::make_unique<ARAP::AsRigidAsPossible>(source, target, deformation_graph, _ceres_options, _options, _logger));
 	}
 	else {
@@ -194,7 +190,7 @@ std::unique_ptr<IRigidRegistration> RegistrationFactory::buildRigidRegistration(
 																				const SurfaceMesh & target)
 {
 	if (_registration_type == RegistrationType::Rigid) {
-		return std::make_unique<RigidRegistration>(source, target, _ceres_options, _options.use_vertex_random_probability, _logger);
+		return std::make_unique<RigidRegistration>(source, target, _ceres_options, _options, _logger);
 	}
 	else {
 		throw("Registration type is not rigid");

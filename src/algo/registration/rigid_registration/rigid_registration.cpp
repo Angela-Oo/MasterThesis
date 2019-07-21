@@ -110,7 +110,7 @@ bool RigidRegistration::solveIteration()
 		else
 			fit_residual_ids = addFitCostWithoutICP(problem);
 
-		ceres::Solve(_options, &problem, &summary);
+		ceres::Solve(_ceres_options, &problem, &summary);
 
 		// evaluate		
 		evaluateResidual(problem, fit_residual_ids, logger);
@@ -140,11 +140,11 @@ bool RigidRegistration::solve()
 
 bool RigidRegistration::finished()
 {
-	auto tol = _options.function_tolerance;
+	auto tol = _ceres_options.function_tolerance;
 
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
-	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
+	return (_solve_iteration >= _options.max_iterations) || (solved && _solve_iteration > 2);
 }
 
 void RigidRegistration::evaluateResidual(ceres::Problem & problem,
@@ -162,13 +162,13 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 void RigidRegistration::init()
 {
 	_ceres_logger.write("start Rigid registration \n");
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45., 20.);
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45., 20., 0.05);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
 
-	if (_use_vertex_random_probability < 1.) {
+	if (_options.use_vertex_random_probability < 1.) {
 
 		std::knuth_b _rand_engine;
-		std::bernoulli_distribution d(_use_vertex_random_probability);
+		std::bernoulli_distribution d(_options.use_vertex_random_probability);
 		for (auto & v : _source.vertices())
 		{
 			bool use_vertex = d(_rand_engine);
@@ -189,12 +189,12 @@ void RigidRegistration::init()
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
 									 ceres::Solver::Options option, 
-									 double use_vertex_random_probability,
+									 RegistrationOptions reg_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
 	, _target(target)
-	, _options(option)
-	, _use_vertex_random_probability(use_vertex_random_probability)
+	, _ceres_options(option)
+	, _options(reg_options)
 	, _ceres_logger(logger)
 {
 	_deformation._g = calculateGlobalCenter(_source);
@@ -205,13 +205,13 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
 									 RigidDeformation rigid_deformation,
 									 ceres::Solver::Options option,
-									 double use_vertex_random_probability,
+									 RegistrationOptions reg_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
 	, _target(target)
 	, _deformation(rigid_deformation)
-	, _options(option)	
-	, _use_vertex_random_probability(use_vertex_random_probability)
+	, _ceres_options(option)	
+	, _options(reg_options)
 	, _ceres_logger(logger)
 {
 	init();
