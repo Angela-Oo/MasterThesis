@@ -159,23 +159,10 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 	}
 }
 
-
-
-RigidRegistration::RigidRegistration(const SurfaceMesh & source,
-									 const SurfaceMesh & target,
-									 ceres::Solver::Options option, 
-									 double use_vertex_random_probability,
-									 std::shared_ptr<FileWriter> logger)
-	: _source(source)
-	, _target(target)
-	, _options(option)
-	, _use_vertex_random_probability(use_vertex_random_probability)
-	, _ceres_logger(logger)
+void RigidRegistration::init()
 {
-	_deformation._g = calculateGlobalCenter(_source);
-
 	_ceres_logger.write("start Rigid registration \n");
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45.);
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45., 20.);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
 
 	if (_use_vertex_random_probability < 1.) {
@@ -201,12 +188,31 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
+									 ceres::Solver::Options option, 
+									 double use_vertex_random_probability,
+									 std::shared_ptr<FileWriter> logger)
+	: _source(source)
+	, _target(target)
+	, _options(option)
+	, _use_vertex_random_probability(use_vertex_random_probability)
+	, _ceres_logger(logger)
+{
+	_deformation._g = calculateGlobalCenter(_source);
+	init();
+}
+
+RigidRegistration::RigidRegistration(const SurfaceMesh & source,
+									 const SurfaceMesh & target,
 									 RigidDeformation rigid_deformation,
 									 ceres::Solver::Options option,
 									 double use_vertex_random_probability,
 									 std::shared_ptr<FileWriter> logger)
-	: RigidRegistration(source, target, option, use_vertex_random_probability, logger)
+	: _source(source)
+	, _target(target)
+	, _deformation(rigid_deformation)
+	, _options(option)	
+	, _use_vertex_random_probability(use_vertex_random_probability)
+	, _ceres_logger(logger)
 {
-	_deformation = rigid_deformation;
+	init();
 }
-

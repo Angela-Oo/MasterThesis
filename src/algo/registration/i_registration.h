@@ -79,6 +79,7 @@ public:
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
 	virtual const DG::DeformationGraph & getDeformationGraph() = 0;
 	virtual SurfaceMesh getDeformationGraphMesh() = 0;
+	virtual bool shouldBeSavedAsImage() = 0;
 public:
 	virtual ~INonRigidRegistration() = default;
 };

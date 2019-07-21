@@ -49,10 +49,12 @@ bool RigidBeforeNonRigidRegistration::solveIteration()
 		return _non_rigid_registration->solveIteration();
 	}
 	else {
-		bool finished = _rigid_registration->solveIteration();
-		if (finished) {
+		_finished_rigid_registration = _rigid_registration->finished();
+		if (!_finished_rigid_registration) {
+			_rigid_registration->solveIteration();
+		}
+		else {
 			_non_rigid_registration->setRigidDeformation(_rigid_registration->getRigidDeformation());
-			_finished_rigid_registration = true;
 		}
 		return false;
 	}
@@ -70,17 +72,10 @@ size_t RigidBeforeNonRigidRegistration::currentIteration()
 
 bool RigidBeforeNonRigidRegistration::solve()
 {
-	if (_finished_rigid_registration) {
-		return _non_rigid_registration->solve();
+	while (!finished()) {
+		solveIteration();
 	}
-	else {
-		_rigid_registration->solve();
-		if (_rigid_registration->finished()) {
-			_non_rigid_registration->setRigidDeformation(_rigid_registration->getRigidDeformation());
-			_finished_rigid_registration = true;
-		}
-		return false;
-	}
+	return true;
 }
 
 bool RigidBeforeNonRigidRegistration::finished()
@@ -98,6 +93,13 @@ void RigidBeforeNonRigidRegistration::setRigidDeformation(const RigidDeformation
 	_non_rigid_registration->setRigidDeformation(rigid_deformations);
 }
 
+
+bool RigidBeforeNonRigidRegistration::shouldBeSavedAsImage()
+{
+	bool rigid_registration_finished = (_rigid_registration->finished() && _non_rigid_registration->currentIteration() == 0);
+	bool non_rigid_finished = finished();
+	return rigid_registration_finished || non_rigid_finished;
+}
 
 RigidBeforeNonRigidRegistration::RigidBeforeNonRigidRegistration(std::unique_ptr<IRigidRegistration> rigid_registration,
 																 std::unique_ptr<INonRigidRegistration> non_rigid_registration)

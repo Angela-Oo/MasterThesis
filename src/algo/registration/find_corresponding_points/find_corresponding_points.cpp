@@ -44,7 +44,7 @@ std::pair<bool, vertex_descriptor> FindCorrespondingPoints::correspondingPoint(P
 		//if (distance < 100. * median()) {
 		_median_distance = (_median_distance * 10000. + distance) / 10001.;
 		//}
-		double k_median = 10. * median();
+		double k_median = _allowed_multiple_of_median_distance * median();
 		bool valid_angle = angle < _max_normal_angle_deviation;
 		bool valid_distance = distance < k_median;
 
@@ -67,11 +67,15 @@ std::pair<bool, vertex_descriptor> FindCorrespondingPoints::correspondingPoint(P
 	}
 }
 
-FindCorrespondingPoints::FindCorrespondingPoints(const SurfaceMesh & mesh, double max_allowed_distance, double max_normal_angle_deviation)
+FindCorrespondingPoints::FindCorrespondingPoints(const SurfaceMesh & mesh,
+												 double initial_max_allowed_distance,												 
+												 double max_normal_angle_deviation,
+												 double allowed_multiple_of_median_distance)
 	: _mesh(mesh)
 	, _k(10)	
 	, _max_normal_angle_deviation(max_normal_angle_deviation)
-	, _median_distance(max_allowed_distance)
+	, _median_distance(initial_max_allowed_distance)
+	, _allowed_multiple_of_median_distance(allowed_multiple_of_median_distance)
 {
 	_nn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	std::cout << "allowed angle " << _max_normal_angle_deviation << " allowed distance " << _median_distance << std::endl;

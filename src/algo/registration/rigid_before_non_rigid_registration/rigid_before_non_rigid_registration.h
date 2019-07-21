@@ -28,6 +28,7 @@ public:
 	SurfaceMesh getDeformationGraphMesh() override;
 	const DG::DeformationGraph & getDeformationGraph() override;
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
+	bool shouldBeSavedAsImage() override;
 public:
 	// without icp
 	RigidBeforeNonRigidRegistration(std::unique_ptr<IRigidRegistration> rigid_registration,

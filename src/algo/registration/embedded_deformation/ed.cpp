@@ -278,6 +278,12 @@ void EmbeddedDeformation::setRigidDeformation(const RigidDeformation & rigid_def
 	_deformation_graph.setRigidDeformation(createGlobalDeformationFromRigidDeformation(rigid_deformation));
 }
 
+
+bool EmbeddedDeformation::shouldBeSavedAsImage()
+{
+	return finished();
+}
+
 void EmbeddedDeformation::setParameters()
 {
 	a_rigid = 100.;// 1.;// 1000;
@@ -308,7 +314,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	setParameters();
 	a_smooth = 10.;
 	a_fit = 10.;
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation, 10.);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, 4); // todo
 }
 
@@ -329,7 +335,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 	, _with_icp(true)
 {
 	setParameters();
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation);
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation, 10.);
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(src, _deformation_graph, 4); // todo
 }
 

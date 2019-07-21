@@ -390,7 +390,8 @@ void AsRigidAsPossible::init()
 {
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_dst,
 																		   _registration_options.correspondence_max_distance,
-																		   _registration_options.correspondence_max_angle_deviation);
+																		   _registration_options.correspondence_max_angle_deviation,
+																		   10.);
 
 	_deformed_mesh = std::make_unique<DG::DeformedMesh>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
 
@@ -412,6 +413,11 @@ void AsRigidAsPossible::init()
 void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)
 {
 	_deformation_graph.setRigidDeformation(createGlobalDeformationFromRigidDeformation(rigid_deformation));
+}
+
+bool AsRigidAsPossible::shouldBeSavedAsImage()
+{
+	return finished();
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
@@ -483,7 +489,7 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 										                   std::shared_ptr<FileWriter> logger)
 {	
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	auto global = DG::createGlobalDeformation(reduced_mesh, createDeformation);
+	auto global = DG::createGlobalDeformation(src, createDeformation);
 	auto deformation_graph = DG::createDeformationGraphFromMesh(reduced_mesh, global, createDeformation);
 	return std::make_unique<AsRigidAsPossible>(src, dst, deformation_graph, option, registration_options, logger);
 }

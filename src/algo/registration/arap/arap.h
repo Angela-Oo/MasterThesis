@@ -74,6 +74,7 @@ public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	const DG::DeformationGraph & getDeformationGraph() override;
 	std::vector<Point> getFixedPostions() override;
+	bool shouldBeSavedAsImage() override;
 public:
 	// without icp
 	AsRigidAsPossible(const SurfaceMesh& src,

@@ -14,10 +14,14 @@ class FindCorrespondingPoints
 	double _max_normal_angle_deviation;
 	double _median_distance;
 	int _k;
+	double _allowed_multiple_of_median_distance;
 public:
 	double median();
 	Point getPoint(vertex_descriptor);
 	Vector getNormal(vertex_descriptor);
 	std::pair<bool, vertex_descriptor> correspondingPoint(Point point, Vector normal);
-	FindCorrespondingPoints(const SurfaceMesh & mesh, double max_allowed_distance = 0.05, double max_normal_angle_deviation = 30.);
+	FindCorrespondingPoints(const SurfaceMesh & mesh,
+							double initial_max_allowed_distance = 0.1,							
+							double max_normal_angle_deviation = 45.,
+							double allowed_multiple_of_median_distance = 10.);
 };
