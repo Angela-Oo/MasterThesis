@@ -83,7 +83,7 @@ bool RigidBeforeNonRigidRegistration::finished()
 	return _non_rigid_registration->finished();
 }
 
-const DG::DeformationGraph & RigidBeforeNonRigidRegistration::getDeformationGraph()
+const DeformationGraph & RigidBeforeNonRigidRegistration::getDeformationGraph()
 {
 	return _non_rigid_registration->getDeformationGraph();
 }

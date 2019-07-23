@@ -2,6 +2,7 @@
 #include "mLibInclude.h"
 #include "algo/registration/deformation_graph/i_deformation.h"
 
+namespace Registration {
 namespace ED {
 
 class Deformation : public IDeformation
@@ -30,4 +31,5 @@ public:
 
 std::shared_ptr<Deformation> createDeformation();
 
+}
 }

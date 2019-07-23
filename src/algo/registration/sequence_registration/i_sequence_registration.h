@@ -2,6 +2,8 @@
 
 #include "algo/surface_mesh/mesh_definition.h"
 
+namespace Registration {
+
 class ISequenceRegistration
 {
 public:
@@ -16,3 +18,5 @@ public:
 	virtual bool solve() = 0;
 	virtual ~ISequenceRegistration() {}
 };
+
+}

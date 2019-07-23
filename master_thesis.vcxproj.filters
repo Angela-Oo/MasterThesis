@@ -542,9 +542,6 @@
     <ClInclude Include="src\algo\registration\registration.h">
       <Filter>1 algo\3 registration</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\non_rigid_registration_all_frames.h">
-      <Filter>1 algo\3 registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\ceres_option.h">
       <Filter>1 algo\3 registration</Filter>
     </ClInclude>
@@ -673,6 +670,12 @@
     </ClInclude>
     <ClInclude Include="src\algo\registration\helper\log_option.h">
       <Filter>1 algo\3 registration\0 helper</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_factory.h">
+      <Filter>1 algo\3 registration\5 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration_factory.h">
+      <Filter>1 algo\3 registration\7 ridid before non rigid deformation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -830,6 +833,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\helper\log_option.cpp">
       <Filter>1 algo\3 registration\0 helper</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_factory.cpp">
+      <Filter>1 algo\3 registration\5 embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration_factory.cpp">
+      <Filter>1 algo\3 registration\7 ridid before non rigid deformation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

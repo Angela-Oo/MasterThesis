@@ -9,7 +9,7 @@
 #include "nearest_nodes.h"
 #include "position_and_deformation.h"
 
-namespace DG
+namespace Registration
 {
 
 

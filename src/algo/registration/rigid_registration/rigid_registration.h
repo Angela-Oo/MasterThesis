@@ -9,6 +9,8 @@
 #include <ceres/ceres.h>
 #include "algo/ceres_iteration_logger.h"
 
+namespace Registration {
+
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 
@@ -71,3 +73,4 @@ public:
 					  std::shared_ptr<FileWriter> logger = nullptr);
 };
 
+}

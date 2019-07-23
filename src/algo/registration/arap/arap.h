@@ -13,9 +13,7 @@
 
 #include "algo/ceres_iteration_logger.h"
 
-namespace ARAP {
-
-
+namespace Registration {
 
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
@@ -24,13 +22,13 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 class AsRigidAsPossible : public INonRigidRegistration
 {
 public:
-	typedef typename DG::DeformationGraph AsRigidAsPossible::Deformation;
+	typedef typename DeformationGraph AsRigidAsPossible::Deformation;
 private:
 	SurfaceMesh _src;
 	SurfaceMesh _dst;
 	ceres::Solver::Options _options;
-	DG::DeformationGraph _deformation_graph;
-	std::unique_ptr<DG::DeformedMesh> _deformed_mesh;
+	DeformationGraph _deformation_graph;
+	std::unique_ptr<DeformedMesh> _deformed_mesh;
 	std::vector<vertex_descriptor> _set_of_vertices_to_use;
 	std::vector<vertex_descriptor> _fixed_positions;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
@@ -54,7 +52,7 @@ private:
 	ResidualIds addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point);
 	ResidualIds addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal);
 	bool useVertex(vertex_descriptor & v);
-	bool addFitCostVertex(ceres::Problem & problem, vertex_descriptor & v, ARAP::VertexResidualIds &residual_ids);
+	bool addFitCostVertex(ceres::Problem & problem, vertex_descriptor & v, VertexResidualIds &residual_ids);
 	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem, std::unique_ptr<CeresIterationLoggerGuard>& logger);
 	std::map<vertex_descriptor, ResidualIds> addFitCostWithoutICP(ceres::Problem &problem);
 	std::map<edge_descriptor, ResidualIds> addAsRigidAsPossibleCost(ceres::Problem &problem);
@@ -72,8 +70,8 @@ public:
 	SurfaceMesh getDeformationGraphMesh() override;
 public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
-	const DG::DeformationGraph & getDeformationGraph() override;
-	const DG::DeformationGraph & getDeformation();
+	const DeformationGraph & getDeformationGraph() override;
+	const DeformationGraph & getDeformation();
 	std::vector<Point> getFixedPostions() override;
 	bool shouldBeSavedAsImage() override;
 public:
@@ -81,7 +79,7 @@ public:
 	AsRigidAsPossible(const SurfaceMesh& src,
 					  const SurfaceMesh& dst,
 					  std::vector<vertex_descriptor> fixed_positions,
-					  const DG::DeformationGraph & deformation_graph,
+					  const DeformationGraph & deformation_graph,
 					  ceres::Solver::Options option,
 					  const RegistrationOptions & registration_options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
@@ -89,7 +87,7 @@ public:
 	// with icp
 	AsRigidAsPossible(const SurfaceMesh& src,
 					  const SurfaceMesh& dst,
-					  const DG::DeformationGraph & deformation_graph,
+					  const DeformationGraph & deformation_graph,
 					  ceres::Solver::Options option,
 					  const RegistrationOptions & registration_options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
@@ -99,7 +97,7 @@ public:
 //-----------------------------------------------------------------------------
 
 
-DG::PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
+PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
 
 
 std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
@@ -127,7 +125,7 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
 										  const SurfaceMesh& dst,
 										  const RigidDeformation & rigid_deformation,
-										  const DG::DeformationGraph & deformation_graph,
+										  const DeformationGraph & deformation_graph,
 										  ceres::Solver::Options option,
 										  const RegistrationOptions & registration_options,
 										  std::shared_ptr<FileWriter> logger);

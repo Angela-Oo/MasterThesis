@@ -3,7 +3,7 @@
 #include "mLibInclude.h"
 #include <vector>
 
-namespace DG
+namespace Registration
 {
 
 class NearestNodes

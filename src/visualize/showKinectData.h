@@ -9,6 +9,7 @@
 #include <chrono>
 #include "algo/registration/i_registration.h"
 
+
 class ShowKinectData : public IShowData
 {
 private:
@@ -23,7 +24,7 @@ public:
 private:
 	std::unique_ptr<IReader> _reader;
 	std::unique_ptr<PointsRenderer> _point_renderer;
-	std::unique_ptr<IRegistration> _registration;
+	std::unique_ptr<Registration::IRegistration> _registration;
 	unsigned int _current_frame = 0;
 	std::vector<unsigned int> _selected_frame_for_registration;
 	std::chrono::time_point<std::chrono::system_clock> _start_time;

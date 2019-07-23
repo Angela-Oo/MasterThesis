@@ -2,6 +2,7 @@
 #include "rigid_deformation.h"
 #include "algo/surface_mesh/mesh_definition.h"
 
+namespace Registration {
 
 class RigidDeformedMesh
 {
@@ -14,3 +15,4 @@ public:
 	RigidDeformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation_graph);
 };
 
+}

@@ -8,7 +8,7 @@
 #include "i_registration.h"
 
 typedef ml::TriMeshf Mesh;
-
+namespace Registration {
 
 enum class RegistrationType
 {
@@ -39,12 +39,12 @@ private:
 															 const SurfaceMesh & target);
 	std::unique_ptr<INonRigidRegistration> buildWithoutRigid(const SurfaceMesh & source,
 															 const SurfaceMesh & target,
-															 const DG::DeformationGraph & deformation_graph);
+															 const DeformationGraph & deformation_graph);
 	std::unique_ptr<INonRigidRegistration> buildWithRigid(const SurfaceMesh & source,
 														  const SurfaceMesh & target);
 	std::unique_ptr<INonRigidRegistration> buildWithRigid(const SurfaceMesh & source,
 														  const SurfaceMesh & target,
-														  const DG::DeformationGraph & deformation_graph);
+														  const DeformationGraph & deformation_graph);
 public:
 	void setRegistrationType(RegistrationType type);
 	void setCeresOption(const ceres::Solver::Options options);
@@ -56,7 +56,7 @@ public:
 																	 const SurfaceMesh & target);
 	std::unique_ptr<INonRigidRegistration> buildNonRigidRegistration(const SurfaceMesh & source,
 																	 const SurfaceMesh & target,
-																	 const DG::DeformationGraph & deformation_graph);
+																	 const DeformationGraph & deformation_graph);
 	std::unique_ptr<IRigidRegistration> buildRigidRegistration(const SurfaceMesh & source,
 															   const SurfaceMesh & target);
 	std::unique_ptr<IRegistration> buildRegistration(const SurfaceMesh & source,
@@ -66,3 +66,5 @@ public:
 	RegistrationFactory();
 };
 
+
+}

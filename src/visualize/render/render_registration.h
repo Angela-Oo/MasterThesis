@@ -9,6 +9,8 @@
 
 #include <memory>
 
+using namespace Registration;
+
 enum Render
 {
 	NONE,

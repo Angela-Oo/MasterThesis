@@ -2,7 +2,7 @@
 #include "deformed_mesh.h"
 #include "algo/registration/hsv_to_rgb.h"
 
-namespace DG {
+namespace Registration {
 
 
 SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost, bool smooth_cost, bool fit_cost)
@@ -58,9 +58,9 @@ NearestNodes & DeformedMesh::nearestNodes(SurfaceMesh::Vertex_index v) const
 	return nearest_nodes.first[v];
 }
 
-std::vector<DG::PositionAndDeformation> DeformedMesh::deformations(SurfaceMesh::Vertex_index v) const
+std::vector<PositionAndDeformation> DeformedMesh::deformations(SurfaceMesh::Vertex_index v) const
 {
-	std::vector<DG::PositionAndDeformation> d;
+	std::vector<PositionAndDeformation> d;
 	auto & nodes = nearestNodes(v);
 	for (auto n : nodes.node_weight_vector) {
 		d.emplace_back(_deformation_graph.getNode(n.first));

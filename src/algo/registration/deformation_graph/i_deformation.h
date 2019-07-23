@@ -4,6 +4,9 @@
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/registration/rigid_registration/rigid_deformation.h"
 
+
+namespace Registration {
+
 // mesh.add_property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node", nullptr);
 class IDeformation
 {
@@ -21,3 +24,4 @@ public:
 
 };
 
+}

@@ -4,13 +4,14 @@
 #include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 
+namespace Registration {
 
 void SequenceRegistration::nextFrame()
 {
 	_current++;
 	auto & source = _mesh_sequence->getMesh(0);
 	auto & target = _mesh_sequence->getMesh(_current);
-	
+
 	_registration = _registration_factory.buildNonRigidRegistration(source, target, _deformation_graphs[_current - 1]);
 	_deformation_graphs[_current] = _registration->getDeformationGraph();
 }
@@ -23,14 +24,14 @@ bool SequenceRegistration::solve()
 		nextFrame();
 	}
 	if (_registration) {
-		auto frame_finished = _registration->finished();		
+		auto frame_finished = _registration->finished();
 		if (frame_finished)
 		{
 			_deformed_meshes[_current] = _registration->getDeformedPoints();
 			_deformation_graphs[_current] = _registration->getDeformationGraph();
 			_ceres_logger->write("frame " + std::to_string(_current) + " solved \n");
 			if (_current < _mesh_sequence->size() - 1) {
-				_registration.reset();				
+				_registration.reset();
 			}
 			else {
 				_ceres_logger->write("finished registration");
@@ -54,11 +55,11 @@ std::pair<bool, std::string> SequenceRegistration::saveCurrentFrameAsImage()
 	bool save_as_image = false;
 	std::string image_index = "";
 	if (_registration) {
-		save_as_image = _registration->shouldBeSavedAsImage();		
+		save_as_image = _registration->shouldBeSavedAsImage();
 		if (save_as_image) {
 			image_index = std::to_string(getCurrent());
 			if (!_registration->finished()) {
-				image_index =  image_index + "_arigid_" + std::to_string(_registration->currentIteration());
+				image_index = image_index + "_arigid_" + std::to_string(_registration->currentIteration());
 			}
 		}
 	}
@@ -82,8 +83,8 @@ SurfaceMesh SequenceRegistration::getDeformedMesh(size_t frame)
 
 SurfaceMesh SequenceRegistration::getInverseDeformedMesh(size_t frame)
 {
-	auto inverse_deformation = DG::invertDeformationGraph(_deformation_graphs[frame]);
-	DG::DeformedMesh deformed(_mesh_sequence->getMesh(frame), inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
+	auto inverse_deformation = invertDeformationGraph(_deformation_graphs[frame]);
+	DeformedMesh deformed(_mesh_sequence->getMesh(frame), inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 
@@ -103,7 +104,7 @@ SequenceRegistration::SequenceRegistration()
 }
 
 SequenceRegistration::SequenceRegistration(std::shared_ptr<IMeshReader> mesh_sequence,
-										   RegistrationType registration_type, 
+										   RegistrationType registration_type,
 										   std::shared_ptr<FileWriter> logger,
 										   RegistrationOptions registration_options)
 	: _mesh_sequence(mesh_sequence)
@@ -130,4 +131,6 @@ SequenceRegistration::SequenceRegistration(std::shared_ptr<IMeshReader> mesh_seq
 	_ceres_logger->write("Register all frames with " + algo);
 
 	_registration_factory.logConfiguration();
+}
+
 }

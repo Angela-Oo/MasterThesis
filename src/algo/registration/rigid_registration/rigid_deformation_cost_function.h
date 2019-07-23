@@ -7,6 +7,8 @@
 #include "algo/ceres_math.h"
 #include "algo/surface_mesh/mesh_definition.h"
 
+namespace Registration {
+
 // deformation of vi at node j = (Rj(vi-gj) + gj + tj)
 template<typename T>
 void deform_point(const Point & point_, const Point const global_center_, const T * const rotation, const T * const translation, T* result)
@@ -43,7 +45,7 @@ struct FitPointToPointAngleAxisCostFunction {
 	}
 
 	template <typename T>
-	bool operator()(const T* const rotation, const T* const translation, T* residuals) const {		
+	bool operator()(const T* const rotation, const T* const translation, T* residuals) const {
 		T target[3];
 		point_to_T(_target, target);
 
@@ -93,3 +95,5 @@ struct FitPointToPlaneAngleAxisCostFunction {
 		return true;
 	}
 };
+
+}

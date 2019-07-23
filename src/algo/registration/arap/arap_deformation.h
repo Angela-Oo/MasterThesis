@@ -2,7 +2,7 @@
 #include "mLibInclude.h"
 #include "algo/registration/deformation_graph/i_deformation.h"
 
-namespace ARAP {
+namespace Registration {
 
 class Deformation : public IDeformation
 {

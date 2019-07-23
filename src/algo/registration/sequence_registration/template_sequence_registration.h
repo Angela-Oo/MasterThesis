@@ -7,6 +7,7 @@
 #include <memory>
 #include <vector>
 
+namespace Registration {
 
 template<typename Registration, typename RegistrationFactory>
 class SequenceRegistrationT : public ISequenceRegistration
@@ -167,4 +168,6 @@ SequenceRegistrationT<Registration, RegistrationFactory>::SequenceRegistrationT(
 	_ceres_logger->write("Register all frames with " + _registration_factory.registrationType());
 
 	_registration_factory.logConfiguration();
+}
+
 }

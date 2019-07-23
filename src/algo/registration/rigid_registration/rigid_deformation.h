@@ -2,6 +2,8 @@
 #include "mLibCore.h"
 #include "algo/surface_mesh/mesh_definition.h"
 
+namespace Registration {
+
 class RigidDeformation
 {
 public:
@@ -26,3 +28,5 @@ public:
 };
 
 Point calculateGlobalCenter(const SurfaceMesh & mesh);
+
+}

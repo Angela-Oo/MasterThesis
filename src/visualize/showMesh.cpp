@@ -94,12 +94,12 @@ void ShowMesh::solveAllNonRigidRegistration()
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
 
 		if (_registration_type == RegistrationType::ARAP_AllFrames) {
-			ARAP::ARAPFactory factory(_registration_options, ceresOption(), _logger);
-			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<ARAP::AsRigidAsPossible, ARAP::ARAPFactory>>(_input_mesh, factory, _logger);
+			ARAPFactory factory(_registration_options, ceresOption(), _logger);
+			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<AsRigidAsPossible, ARAPFactory>>(_input_mesh, factory, _logger);
 		}
 		else if (_registration_type == RegistrationType::Rigid_AllFrames) {
-			Registration::Rigid::RigidFactory factory(_registration_options, ceresOption(), _logger);
-			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<RigidRegistration, Registration::Rigid::RigidFactory>>(_input_mesh, factory, _logger);
+			Registration::RigidFactory factory(_registration_options, ceresOption(), _logger);
+			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<RigidRegistration, Registration::RigidFactory>>(_input_mesh, factory, _logger);
 		}
 		//RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
 		//_register_sequence_of_frames = std::make_unique<SequenceRegistration>(_input_mesh, type, _logger, _registration_options);
@@ -353,7 +353,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	bool register_on_reference_mesh = true;
 	bool load_compare_mesh = false;
 	bool load_all_frames = false;
-	unsigned int number_of_frames_to_load = 10;
+	unsigned int number_of_frames_to_load = 30;
 	if (!test) {
 		_registration_options.evaluate_residuals = true;
 		_registration_options.dg_options.edge_length = 0.3;// 0.15;

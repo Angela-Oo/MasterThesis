@@ -6,6 +6,7 @@
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
 
+namespace Registration {
 namespace ED
 {
 
@@ -224,4 +225,5 @@ struct ConfCostFunction {
 };
 
 
+}
 }

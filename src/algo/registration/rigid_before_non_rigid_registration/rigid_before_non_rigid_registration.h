@@ -26,7 +26,7 @@ public:
 	SurfaceMesh getInverseDeformedPoints() override;	
 public:
 	SurfaceMesh getDeformationGraphMesh() override;
-	const DG::DeformationGraph & getDeformationGraph() override;
+	const DeformationGraph & getDeformationGraph() override;
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	bool shouldBeSavedAsImage() override;
 public:

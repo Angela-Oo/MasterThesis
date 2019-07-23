@@ -1,9 +1,8 @@
 #include "render_deformation_graph.h"
 #include "algo/registration/hsv_to_rgb.h"
 
+using namespace Registration;
 namespace Visualize {
-
-using namespace DG;
 
 
 std::tuple<double, double> getMeanAndMaxVertexCost(const SurfaceMesh & mesh, std::string cost_name)

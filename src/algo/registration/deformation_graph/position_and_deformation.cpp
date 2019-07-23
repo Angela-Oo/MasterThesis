@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "position_and_deformation.h"
 
-namespace DG {
+namespace Registration {
 
 
 Point PositionAndDeformation::getDeformedPosition() const

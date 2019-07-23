@@ -7,6 +7,13 @@
 
 ml::vec3f PointToVec3f(const Point & p);
 
+struct Edge
+{
+	ml::vec3f source_point;
+	ml::vec3f target_point;
+	double cost = 0.;
+};
+
 class PointsRenderer
 {
 private:

@@ -11,12 +11,13 @@
 #include <ceres/ceres.h>
 #include <memory>
 
+namespace Registration {
 class SequenceRegistration
 {
 private:
 	std::shared_ptr<IMeshReader> _mesh_sequence;
 	std::vector<SurfaceMesh> _deformed_meshes;
-	std::vector<DG::DeformationGraph> _deformation_graphs;
+	std::vector<DeformationGraph> _deformation_graphs;
 	size_t _current;
 	std::unique_ptr<INonRigidRegistration> _registration;
 	RegistrationFactory _registration_factory;
@@ -36,8 +37,9 @@ public:
 public:
 	SequenceRegistration();
 	SequenceRegistration(std::shared_ptr<IMeshReader> mesh_sequence,
-						 RegistrationType registration_type, 
-						 std::shared_ptr<FileWriter> logger, 
+						 RegistrationType registration_type,
+						 std::shared_ptr<FileWriter> logger,
 						 RegistrationOptions registration_options);
 };
 
+}

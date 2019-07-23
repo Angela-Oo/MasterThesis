@@ -2,6 +2,7 @@
 
 #include "ed_deformation.h"
 
+namespace Registration {
 namespace ED {
 
 Matrix Deformation::rotation() const
@@ -16,7 +17,7 @@ Vector Deformation::translation() const
 }
 
 std::shared_ptr<IDeformation> Deformation::invertDeformation() const
-{	
+{
 	return std::make_shared<Deformation>(_r.getInverse(), -_t, _w);
 }
 
@@ -56,4 +57,5 @@ std::shared_ptr<Deformation> createDeformation()
 	return std::make_shared<Deformation>();
 }
 
+}
 }

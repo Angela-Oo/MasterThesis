@@ -5,6 +5,7 @@
 #include "algo/registration/deformation_graph/deformed_mesh.h" // set color todo
 #include "algo/registration/ceres_residual_evaluation.h"
 
+namespace Registration {
 
 const SurfaceMesh & RigidRegistration::getSource()
 {
@@ -25,7 +26,7 @@ SurfaceMesh RigidRegistration::getDeformedPoints()
 SurfaceMesh RigidRegistration::getInverseDeformedPoints()
 {
 	auto inverseDeformation = _deformation.invertDeformation();
-	RigidDeformedMesh deformed(getSource(), inverseDeformation);
+	RigidDeformedMesh deformed(getTarget(), inverseDeformation);
 	return deformed.deformPoints();
 }
 
@@ -171,8 +172,8 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 
 void RigidRegistration::init()
 {
-	_deformation._r = ml::vec3d::origin; // todo is this better
-	_deformation._t = ml::vec3d::origin;
+	//_deformation._r = ml::vec3d::origin; // todo is this better
+	//_deformation._t = ml::vec3d::origin;
 	_ceres_logger.write("start Rigid registration \n");
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45., 20., 0.01);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
@@ -200,7 +201,7 @@ void RigidRegistration::init()
 
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
-									 ceres::Solver::Options option, 
+									 ceres::Solver::Options option,
 									 RegistrationOptions reg_options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
@@ -222,9 +223,11 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 	: _source(source)
 	, _target(target)
 	, _deformation(rigid_deformation)
-	, _ceres_options(option)	
+	, _ceres_options(option)
 	, _options(reg_options)
 	, _ceres_logger(logger)
 {
 	init();
+}
+
 }

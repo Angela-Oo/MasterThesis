@@ -4,8 +4,7 @@
 #include "algo/surface_mesh/mesh_definition.h"
 #include "i_deformation.h"
 
-namespace DG
-{
+namespace Registration {
 
 class PositionAndDeformation
 {

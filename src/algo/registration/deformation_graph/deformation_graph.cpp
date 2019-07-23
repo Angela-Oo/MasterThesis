@@ -4,9 +4,7 @@
 
 
 
-namespace DG {
-
-
+namespace Registration {
 
 
 std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const

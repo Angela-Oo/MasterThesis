@@ -3,6 +3,7 @@
 #include "ceres/rotation.h"
 #include "algo/ceres_math.h"
 
+namespace Registration {
 
 Matrix RigidDeformation::rotation() const
 {
@@ -53,7 +54,7 @@ RigidDeformation::RigidDeformation(ml::vec3d r, ml::vec3d t, Point g)
 
 RigidDeformation::RigidDeformation(Matrix r, Vector t, Point g)
 	: _g(g)
-{ 
+{
 	double rotation[3];
 	double rotation_matrix[9];
 	Matrix3x3_toT(r, rotation_matrix);
@@ -76,4 +77,6 @@ Point calculateGlobalCenter(const SurfaceMesh & mesh)
 	}
 	global_position /= mesh.number_of_vertices();
 	return CGAL::ORIGIN + global_position;
+}
+
 }

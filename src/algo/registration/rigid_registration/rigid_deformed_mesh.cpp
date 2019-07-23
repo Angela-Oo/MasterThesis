@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "rigid_deformed_mesh.h"
 
+namespace Registration {
+
 SurfaceMesh RigidDeformedMesh::deformPoints()
 {
 	SurfaceMesh deformed_points = _mesh;
@@ -18,3 +20,4 @@ RigidDeformedMesh::RigidDeformedMesh(const SurfaceMesh & mesh, const RigidDeform
 
 }
 
+}

@@ -12,7 +12,7 @@ private:
 	std::unique_ptr<IReader> _reader;
 	std::unique_ptr<PointsRenderer> _point_renderer;
 	bool icp_active = false;
-	std::unique_ptr<IRegistration> _registration;
+	std::unique_ptr<Registration::IRegistration> _registration;
 private:
 	void renderPoints();
 	void initRegistration();

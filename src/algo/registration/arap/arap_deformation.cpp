@@ -4,7 +4,7 @@
 #include <ceres/rotation.h>
 
 
-namespace ARAP {
+namespace Registration {
 
 Matrix Deformation::rotation() const
 {

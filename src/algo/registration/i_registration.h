@@ -7,12 +7,9 @@
 #include "algo/registration/rigid_registration/rigid_deformation.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
 
-struct Edge
-{
-	ml::vec3f source_point;
-	ml::vec3f target_point;
-	double cost = 0.;
-};
+namespace Registration {
+
+
 
 
 struct DeformationGraphOptions
@@ -39,7 +36,7 @@ struct RegistrationOptions
 	double use_vertex_random_probability; // value between 0. and 1.
 	DeformationGraphOptions dg_options;
 	ReduceMeshStrategy mesh_reduce_strategy;
-	
+
 	RegistrationOptions()
 		: smooth(10.)
 		, conf(10.)
@@ -77,7 +74,7 @@ class INonRigidRegistration : public IRegistration
 public:
 	virtual void setRigidDeformation(const RigidDeformation & rigid_deformation) = 0;
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
-	virtual const DG::DeformationGraph & getDeformationGraph() = 0;
+	virtual const DeformationGraph & getDeformationGraph() = 0;
 	virtual SurfaceMesh getDeformationGraphMesh() = 0;
 	virtual bool shouldBeSavedAsImage() = 0;
 public:
@@ -92,3 +89,5 @@ public:
 public:
 	virtual ~IRigidRegistration() = default;
 };
+
+}

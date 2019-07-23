@@ -3,7 +3,7 @@
 #include "mLibInclude.h"
 #include "deformation_graph.h"
 
-namespace DG
+namespace Registration
 {
 
 SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost, bool smooth_cost = true, bool fit_cost = false);
@@ -24,7 +24,7 @@ public:
 	Point deformed_point(SurfaceMesh::Vertex_index v) const;
 	Vector deformed_normal(SurfaceMesh::Vertex_index v) const;
 	NearestNodes & nearestNodes(SurfaceMesh::Vertex_index v) const;
-	std::vector<DG::PositionAndDeformation> deformations(SurfaceMesh::Vertex_index v) const;
+	std::vector<PositionAndDeformation> deformations(SurfaceMesh::Vertex_index v) const;
 	SurfaceMesh deformPoints();
 public:
 	DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph, unsigned int number_of_interpolation_neighbors);
