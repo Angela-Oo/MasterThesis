@@ -19,7 +19,7 @@ public:
 	SurfaceMesh _mesh;
 	PositionAndDeformation _global;
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
-	std::function<std::shared_ptr<IDeformation>()> _create_node;
+	std::function<std::shared_ptr<IPositionDeformation>()> _create_node;
 public:
 	std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const;
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
@@ -38,23 +38,19 @@ public:
 	// all mesh vertices will be deformation nodes
 	DeformationGraph(const SurfaceMesh & graph, 
 					 const PositionAndDeformation & global_deformation, 
-					 std::function<std::shared_ptr<IDeformation>()> create_node);
+					 std::function<std::shared_ptr<IPositionDeformation>()> create_node);
 	DeformationGraph(const DeformationGraph & deformation_graph);
 	DeformationGraph & operator=(DeformationGraph other);
 };
 
 
 
-PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node);
+PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh, std::function<std::shared_ptr<IPositionDeformation>()> create_node);
 
 DeformationGraph createDeformationGraphFromMesh(SurfaceMesh mesh,
 												PositionAndDeformation global_deformation,
-												std::function<std::shared_ptr<IDeformation>()> create_node);
+												std::function<std::shared_ptr<IPositionDeformation>()> create_node);
 
 
-DeformationGraph invertDeformationGraph(const DeformationGraph & deformation_graph);
-
-// transform positions to current transformations and reset transformations
-DeformationGraph transformDeformationGraph(const DeformationGraph & deformation_graph);
 
 }

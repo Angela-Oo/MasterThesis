@@ -51,7 +51,7 @@ Point DeformationGraph::deformPoint(const Point & point, const NearestNodes & ne
 {
 	Vector deformed_point(0.,0.,0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
@@ -72,7 +72,7 @@ Vector DeformationGraph::deformNormal(const Vector & normal, const NearestNodes 
 {
 	Vector deformed_normal(0., 0., 0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
@@ -96,9 +96,9 @@ Point DeformationGraph::getNodePosition(vertex_descriptor node_index) const
 PositionAndDeformation DeformationGraph::getNode(vertex_descriptor node_index) const
 {
 	PositionAndDeformation node;
-	auto deformation_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node"); // todo needs to be unique ptr (deep copy not possible)
+	auto deformation_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node"); // todo needs to be unique ptr (deep copy not possible)
 	assert(deformation_nodes.second);
-	std::shared_ptr<IDeformation> n = deformation_nodes.first[node_index];
+	std::shared_ptr<IPositionDeformation> n = deformation_nodes.first[node_index];
 	node._deformation = n;
 	node._point = _mesh.point(node_index);
 	node._normal = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first[node_index];
@@ -144,7 +144,7 @@ DeformationGraph DeformationGraph::invertDeformation() const
 {
 	SurfaceMesh mesh = _mesh;
 
-	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
 	assert(property_deformations.second);
 	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
 	assert(property_normals.second);
@@ -166,7 +166,7 @@ DeformationGraph DeformationGraph::invertDeformation() const
 
 DeformationGraph::DeformationGraph(const SurfaceMesh & graph, 
 								   const PositionAndDeformation & global_deformation, 
-								   std::function<std::shared_ptr<IDeformation>()> create_node)
+								   std::function<std::shared_ptr<IPositionDeformation>()> create_node)
 	: _mesh(graph)
 	, _create_node(create_node)
 	, _global(global_deformation)
@@ -181,7 +181,7 @@ DeformationGraph::DeformationGraph(const DeformationGraph & deformation_graph)
 	, _create_node(deformation_graph._create_node)
 {
 	// deep copy of deformations
-	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
 	assert(nodes.second);
 	for (auto & v : _mesh.vertices()) {
 		nodes.first[v] = nodes.first[v]->clone();
@@ -204,7 +204,7 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 	_mesh = other._mesh;
 
 	// deep copy of deformations
-	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
 	assert(nodes.second);
 	for (auto & v : _mesh.vertices()) {
 		nodes.first[v] = nodes.first[v]->clone();
@@ -220,7 +220,7 @@ DeformationGraph & DeformationGraph::operator=(DeformationGraph other)
 
 
 
-PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh, std::function<std::shared_ptr<IDeformation>()> create_node)
+PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh, std::function<std::shared_ptr<IPositionDeformation>()> create_node)
 {
 	Vector global_position(0., 0., 0.);
 	for (auto & v : mesh.vertices()) {
@@ -237,12 +237,12 @@ PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh, std::fu
 
 DeformationGraph createDeformationGraphFromMesh(SurfaceMesh mesh,
 												PositionAndDeformation global_deformation,
-												std::function<std::shared_ptr<IDeformation>()> create_node)
+												std::function<std::shared_ptr<IPositionDeformation>()> create_node)
 {
 
-	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IDeformation>> nodes;
+	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>> nodes;
 	bool created;
-	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node", create_node());
+	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node", create_node());
 	assert(created);
 	mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
 	mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
@@ -267,7 +267,7 @@ DeformationGraph invertDeformationGraph(const DeformationGraph & deformation_gra
 {
 	SurfaceMesh mesh = deformation_graph._mesh;
 
-	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
 	assert(property_deformations.second);
 	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
 	assert(property_normals.second);
@@ -296,7 +296,7 @@ DeformationGraph transformDeformationGraph(const DeformationGraph & deformation_
 	//auto property_conf_cost = mesh.property_map<vertex_descriptor, double>("v:conf_cost");
 	//auto property_vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used");
 
-	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
 	assert(property_deformations.second);
 	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
 	assert(property_normals.second);

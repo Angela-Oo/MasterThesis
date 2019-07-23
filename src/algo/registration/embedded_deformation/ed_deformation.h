@@ -5,7 +5,7 @@
 namespace Registration {
 namespace ED {
 
-class Deformation : public IDeformation
+class Deformation : public IPositionDeformation
 {
 private:
 	ml::mat3d _r; // rotation matrix
@@ -20,8 +20,8 @@ public:
 	Matrix rotation() const override;
 	Vector translation() const override;
 	double weight() const override { return _w; };
-	std::shared_ptr<IDeformation> invertDeformation() const override;
-	std::shared_ptr<IDeformation> clone() const override;
+	std::shared_ptr<IPositionDeformation> invertDeformation() const override;
+	std::shared_ptr<IPositionDeformation> clone() const override;
 public:
 	Deformation(const ml::mat3d & r, const ml::vec3d & t, double w = 1.);
 	Deformation();

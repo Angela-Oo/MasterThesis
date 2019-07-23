@@ -9,7 +9,7 @@ namespace Registration {
 class PositionAndDeformation
 {
 public:
-	std::shared_ptr<IDeformation> _deformation;
+	std::shared_ptr<IPositionDeformation> _deformation;
 	Point _point;
 	Vector _normal;
 public:

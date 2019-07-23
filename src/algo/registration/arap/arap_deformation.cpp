@@ -20,12 +20,12 @@ Vector Deformation::translation() const
 	return Vector(_d[3], _d[4], _d[5]);
 }
 
-std::shared_ptr<IDeformation> Deformation::invertDeformation() const
+std::shared_ptr<IPositionDeformation> Deformation::invertDeformation() const
 {
 	return std::make_shared<Deformation>(-_d, _w);
 }
 
-std::shared_ptr<IDeformation> Deformation::clone() const
+std::shared_ptr<IPositionDeformation> Deformation::clone() const
 {
 	return std::make_shared<Deformation>(*this);
 }

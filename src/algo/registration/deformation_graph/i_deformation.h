@@ -8,7 +8,7 @@
 namespace Registration {
 
 // mesh.add_property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node", nullptr);
-class IDeformation
+class IPositionDeformation
 {
 public:
 	virtual double * d() = 0;
@@ -19,8 +19,8 @@ public:
 	virtual Matrix rotation() const = 0;
 	virtual Vector translation() const = 0;
 	virtual double weight() const = 0;
-	virtual std::shared_ptr<IDeformation> invertDeformation() const = 0;
-	virtual std::shared_ptr<IDeformation> clone() const = 0;
+	virtual std::shared_ptr<IPositionDeformation> invertDeformation() const = 0;
+	virtual std::shared_ptr<IPositionDeformation> clone() const = 0;
 
 };
 

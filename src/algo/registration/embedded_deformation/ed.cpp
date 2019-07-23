@@ -89,7 +89,7 @@ VertexResidualIds EmbeddedDeformation::addFitCostWithoutICP(ceres::Problem &prob
 	VertexResidualIds residual_ids;
 
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
 	
 	auto target_normals = _dst.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : mesh.vertices())
@@ -109,7 +109,7 @@ VertexResidualIds EmbeddedDeformation::addFitCost(ceres::Problem &problem)
 	VertexResidualIds residual_ids;
 
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
 
 	auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used").first;
 	int i = 0;
@@ -141,7 +141,7 @@ EdgeResidualIds EmbeddedDeformation::addSmoothCost(ceres::Problem &problem)
 {
 	EdgeResidualIds residual_ids;
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
 	for (auto e : mesh.halfedges())
 	{
 		auto target = mesh.target(e);
@@ -163,7 +163,7 @@ VertexResidualIds EmbeddedDeformation::addRotationCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
 
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
 	for (auto & v : _deformation_graph._mesh.vertices())
 	{
 		ceres::CostFunction* cost_function = RotationCostFunction::Create();
@@ -177,7 +177,7 @@ VertexResidualIds EmbeddedDeformation::addConfCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
 
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node").first;
+	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
 	for (auto & v : _deformation_graph._mesh.vertices())
 	{
 		ceres::CostFunction* cost_function = ConfCostFunction::Create();
