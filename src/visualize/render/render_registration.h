@@ -3,8 +3,9 @@
 #include "mLibInclude.h"
 #include "pointsRenderer.h"
 #include "meshRenderer.h"
+#include "mesh/i_mesh_sequence.h"
 #include "algo/registration/i_registration.h"
-#include "algo/registration/sequence_registration/sequence_registration.h"
+#include "algo/registration/sequence_registration/i_sequence_registration.h"
 
 #include <memory>
 
@@ -28,7 +29,6 @@ private:
 	bool _reigistration_finished;
 public:
 	unsigned int _current_frame;
-	RegistrationType _registration_type;
 	bool _render_points = true;
 	Render _render_mesh = Render::ALL;
 	bool _render_reference_mesh;
@@ -48,7 +48,7 @@ public:
 	void renderSelectedFrames(std::shared_ptr<IMeshReader> mesh_reader, std::vector<unsigned int> selected_frames);
 	void renderReference(std::shared_ptr<IMeshReader> mesh_reader);
 	void renderRegistration(std::shared_ptr<IRegistration> registration);
-	void renderRegistrationSequence(std::shared_ptr<SequenceRegistration> registration);
+	void renderRegistrationSequence(std::shared_ptr<ISequenceRegistration> registration);
 	void renderError(std::vector<std::pair<Point, Point>> error_points);
 public:
 	RenderRegistration(ml::GraphicsDevice * graphics);

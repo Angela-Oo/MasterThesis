@@ -24,7 +24,7 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 class AsRigidAsPossible : public INonRigidRegistration
 {
 public:
-
+	typedef typename DG::DeformationGraph AsRigidAsPossible::Deformation;
 private:
 	SurfaceMesh _src;
 	SurfaceMesh _dst;

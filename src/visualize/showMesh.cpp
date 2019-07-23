@@ -8,6 +8,7 @@
 
 #include "algo/registration/embedded_deformation/ed.h"
 #include "algo/registration/arap/arap.h"
+#include "algo/registration/arap/arap_factory.h"
 
 #include "algo/surface_mesh/mesh_convertion.h"
 
@@ -88,15 +89,15 @@ void ShowMesh::nonRigidRegistration()
 void ShowMesh::solveAllNonRigidRegistration()
 {	
 	if (!_register_sequence_of_frames) {
-		std::vector<SurfaceMesh> meshes;
-		for (unsigned int i = 0; i < _input_mesh->size(); ++i) {
-			meshes.push_back(_input_mesh->getMesh(i));
-		}
-		RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
-
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
-		_register_sequence_of_frames = std::make_unique<SequenceRegistration>(_input_mesh, type, _logger, _registration_options);
+
+		if (_registration_type == RegistrationType::ARAP_AllFrames) {
+			ARAP::ARAPFactory factory(_registration_options, ceresOption(), _logger);
+			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<ARAP::AsRigidAsPossible, ARAP::ARAPFactory>>(_input_mesh, factory, _logger);
+		}
+		//RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
+		//_register_sequence_of_frames = std::make_unique<SequenceRegistration>(_input_mesh, type, _logger, _registration_options);
 	}
 	else {
 		bool finished = _register_sequence_of_frames->finished();
@@ -333,44 +334,46 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = true;
+	bool test = false;
 	bool register_on_reference_mesh = true;
 	bool load_compare_mesh = false;
 	bool load_all_frames = false;
 	unsigned int number_of_frames_to_load = 10;
 	if (!test) {
 		_registration_options.evaluate_residuals = true;
-		_registration_options.dg_options.edge_length = 0.2;// 0.15;
+		_registration_options.dg_options.edge_length = 0.3;// 0.15;
 		_registration_options.ignore_deformation_graph_border_vertices = false;
 		_registration_options.dg_options.number_of_interpolation_neighbors = 4;
-		_registration_options.use_vertex_random_probability = 0.3;//0.5
+		_registration_options.use_vertex_random_probability = 0.5;
 		_registration_options.max_iterations = 25;
 		_registration_options.smooth = 10.;
 		_registration_options.fit = 10.;
 		// puppet
-		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 0);
-		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);
-		//_registration_options.dg_options.edge_length = 0.2;
-		//_registration_options.use_vertex_random_probability = 1.;
-		//_data_name = "puppet";
+		auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 0);
+		auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);
+		_registration_options.dg_options.edge_length = 0.2;
+		_registration_options.use_vertex_random_probability = 0.5;
+		_data_name = "puppet";
 
 		// paperbag
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 1);
-		//_registration_options.dg_options.edge_length = 0.1;
+		//_registration_options.dg_options.edge_length = 0.2;
 		//_data_name = "paperbag";
 
 		// head
-		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
-		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
-		_data_name = "head";
+		//auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
+		//auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
+		//_data_name = "head";
+		//_registration_options.use_vertex_random_probability = 0.3;
+		//_registration_options.dg_options.edge_length = 0.2;
 	
 		// hand
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
 		//_data_name = "hand";
-		//_registration_options.dg_options.edge_length = 0.1;
-		//_registration_options.use_vertex_random_probability = 1.;
+		//_registration_options.dg_options.edge_length = 0.15;
+		//_registration_options.use_vertex_random_probability = 0.5;
 
 		if (register_on_reference_mesh || load_compare_mesh) {
 			if (load_all_frames) {

@@ -28,7 +28,7 @@ public:
 	void nextFrame();
 	bool finished();
 	size_t getCurrent();
-	std::pair<bool, std::string> SequenceRegistration::saveCurrentFrameAsImage();
+	std::pair<bool, std::string> saveCurrentFrameAsImage();
 	SurfaceMesh getMesh(size_t frame);
 	SurfaceMesh getDeformedMesh(size_t frame);
 	SurfaceMesh getInverseDeformedMesh(size_t frame);

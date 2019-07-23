@@ -8,7 +8,8 @@
 #include "algo/file_writer.h"
 #include "algo/evaluate_registration.h"
 #include "algo/registration/registration.h"
-#include "algo/registration/sequence_registration/sequence_registration.h"
+//#include "algo/registration/sequence_registration/sequence_registration.h"
+#include "algo/registration/sequence_registration/template_sequence_registration.h"
 
 #include "algo/registration/arap/arap.h"
 
@@ -28,7 +29,7 @@ private:
 	std::string _data_name;
 	bool _calculate_error;
 	std::shared_ptr<IRegistration> _registration;
-	std::shared_ptr<SequenceRegistration> _register_sequence_of_frames;
+	std::shared_ptr<ISequenceRegistration> _register_sequence_of_frames;
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;	
 	RegistrationOptions _registration_options;
 private:

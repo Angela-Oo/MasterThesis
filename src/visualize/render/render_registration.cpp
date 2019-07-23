@@ -193,7 +193,7 @@ void RenderRegistration::renderRegistration(std::shared_ptr<IRegistration> regis
 }
 
 
-void RenderRegistration::renderRegistrationSequence(std::shared_ptr<SequenceRegistration> sequence_registration)
+void RenderRegistration::renderRegistrationSequence(std::shared_ptr<ISequenceRegistration> sequence_registration)
 {
 	if (sequence_registration) {
 		auto current = sequence_registration->getCurrent();

@@ -656,6 +656,15 @@
     <ClInclude Include="src\mesh\i_mesh_sequence.h">
       <Filter>0 mesh</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\sequence_registration\template_sequence_registration.h">
+      <Filter>1 algo\3 registration\6 sequence registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_factory.h">
+      <Filter>1 algo\3 registration\4 as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\sequence_registration\i_sequence_registration.h">
+      <Filter>1 algo\3 registration\6 sequence registration</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -803,6 +812,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.cpp">
       <Filter>1 algo\3 registration\7 ridid before non rigid deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\arap\arap_factory.cpp">
+      <Filter>1 algo\3 registration\4 as rigid as possible</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
