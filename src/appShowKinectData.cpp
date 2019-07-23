@@ -135,7 +135,7 @@ void AppShowKinectData::keyPressed(ml::ApplicationData& app, UINT key)
 	}
 
 	auto time_passed = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - last_time_key_was_pressed).count();
-	if (last_pressed_key != key || time_passed > 200) {
+	if (last_pressed_key != key || time_passed > 500) {
 		m_render_data->key(key);
 		last_pressed_key = key;
 		last_time_key_was_pressed = std::chrono::system_clock::now();

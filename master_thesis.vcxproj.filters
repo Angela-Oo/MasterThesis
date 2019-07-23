@@ -819,9 +819,6 @@
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp">
       <Filter>1 algo\3 registration\1 deformation graph</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.cpp">
-      <Filter>1 algo\3 registration\7 ridid before non rigid deformation</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap_factory.cpp">
       <Filter>1 algo\3 registration\4 as rigid as possible</Filter>
     </ClCompile>
@@ -833,9 +830,6 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_factory.cpp">
       <Filter>1 algo\3 registration\5 embedded deformation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deformation.cpp">
-      <Filter>1 algo\3 registration\7 ridid before non rigid deformation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

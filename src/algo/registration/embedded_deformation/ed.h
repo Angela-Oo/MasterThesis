@@ -24,7 +24,7 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 class EmbeddedDeformation : public INonRigidRegistration
 {
 public:
-	typedef typename DeformationGraph EmbeddedDeformation::Deformation;
+	using Deformation = DeformationGraph;
 private:
 	SurfaceMesh _src;
 	SurfaceMesh _dst;
@@ -33,7 +33,6 @@ private:
 	std::unique_ptr<DeformedMesh> _deformed_mesh;
 	std::vector<vertex_descriptor> _fixed_positions;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
-
 	CeresLogger _ceres_logger;
 private:
 	bool _with_icp = false;
@@ -49,9 +48,6 @@ public:
 	double a_fit;
 	double _find_max_distance = 0.5;
 	double _find_max_angle_deviation = 45.;
-private:
-	//double _k_mean_cost;
-	//void updateMeanCost();
 private:
 	void evaluateResidual(ceres::Problem & problem,
 						  VertexResidualIds & fit_residual_block_ids,
