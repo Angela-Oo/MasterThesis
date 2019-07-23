@@ -263,55 +263,6 @@ DeformationGraph createDeformationGraphFromMesh(SurfaceMesh mesh,
 
 
 
-DeformationGraph invertDeformationGraph(const DeformationGraph & deformation_graph)
-{
-	SurfaceMesh mesh = deformation_graph._mesh;
 
-	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
-	assert(property_deformations.second);
-	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
-	assert(property_normals.second);
-
-	auto normals = property_normals.first;
-	auto deformations = property_deformations.first;
-	for (auto v : mesh.vertices())
-	{
-		auto deformed_node = deformation_graph.invertNode(v);
-		mesh.point(v) = deformed_node._point;
-		normals[v] = deformed_node._normal;
-		deformations[v] = deformed_node._deformation;
-	}
-
-	auto global = deformation_graph._global;
-	global._deformation = deformation_graph._global._deformation->invertDeformation();
-	return DeformationGraph(mesh, global, deformation_graph._create_node);
-}
-
-DeformationGraph transformDeformationGraph(const DeformationGraph & deformation_graph)
-{
-	SurfaceMesh mesh = deformation_graph._mesh;
-	
-	//auto property_fit_cost = mesh.property_map<vertex_descriptor, double>("v:fit_cost");
-	//auto property_smooth_cost = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
-	//auto property_conf_cost = mesh.property_map<vertex_descriptor, double>("v:conf_cost");
-	//auto property_vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used");
-
-	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
-	assert(property_deformations.second);
-	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
-	assert(property_normals.second);
-
-	auto normals = property_normals.first;
-	auto deformations = property_deformations.first;
-	for (auto v : mesh.vertices())
-	{
-		auto deformed_node = deformation_graph.deformNode(v);
-		mesh.point(v) = deformed_node._point;
-		normals[v] = deformed_node._normal;
-		deformations[v] = deformed_node._deformation;
-	}
-
-	return DeformationGraph(mesh, deformation_graph._global, deformation_graph._create_node);
-}
 
 }

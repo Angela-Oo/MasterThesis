@@ -34,7 +34,7 @@ SurfaceMesh AsRigidAsPossible::getDeformedPoints()
 
 SurfaceMesh AsRigidAsPossible::getInverseDeformedPoints()
 {
-	auto inverse_deformation = invertDeformationGraph(_deformation_graph);
+	auto inverse_deformation = _deformation_graph.invertDeformation();
 	DeformedMesh deformed(_dst, inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }

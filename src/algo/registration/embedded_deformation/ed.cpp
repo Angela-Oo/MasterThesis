@@ -27,7 +27,7 @@ SurfaceMesh EmbeddedDeformation::getDeformedPoints()
 
 SurfaceMesh EmbeddedDeformation::getInverseDeformedPoints()
 {
-	auto inverse_deformation = invertDeformationGraph(_deformation_graph);
+	auto inverse_deformation = _deformation_graph.invertDeformation();
 	DeformedMesh deformed(_dst, inverse_deformation, 4); // todo
 	return deformed.deformPoints();
 }
