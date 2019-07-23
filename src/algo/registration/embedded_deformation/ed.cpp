@@ -46,6 +46,11 @@ const DeformationGraph & EmbeddedDeformation::getDeformationGraph()
 	return _deformation_graph;
 }
 
+const DeformationGraph & EmbeddedDeformation::getDeformation()
+{
+	return _deformation_graph;
+}
+
 SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
 {
 	return deformationGraphToSurfaceMesh(_deformation_graph, _evaluate_residuals);

@@ -21,9 +21,6 @@ private:
 	std::vector<SurfaceMesh> _deformed_meshes;	
 	size_t _current;	
 	bool _finished;
-	//std::function<std::unique_ptr<Registration>(const SurfaceMesh & source,
-	//											const SurfaceMesh & target,
-	//											Registration::Deformation deformation)> _registration_factory;
 	RegistrationFactory _registration_factory;
 	std::unique_ptr<CeresLogger> _ceres_logger;
 public:

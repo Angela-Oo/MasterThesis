@@ -23,6 +23,9 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 
 class EmbeddedDeformation : public INonRigidRegistration
 {
+public:
+	typedef typename DeformationGraph EmbeddedDeformation::Deformation;
+private:
 	SurfaceMesh _src;
 	SurfaceMesh _dst;
 	ceres::Solver::Options _options;
@@ -79,6 +82,7 @@ public:
 public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation);
 	const DeformationGraph & getDeformationGraph() override;
+	const DeformationGraph & getDeformation();
 	std::vector<Point> getFixedPostions() override;
 	bool shouldBeSavedAsImage() override;
 public:

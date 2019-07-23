@@ -101,16 +101,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
 
-		if (_registration_type == RegistrationType::ARAP_AllFrames) {
-			ARAPFactory factory(_registration_options, ceresOption(), _logger);
-			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<AsRigidAsPossible, ARAPFactory>>(_input_mesh, factory, _logger);
-		}
-		else if (_registration_type == RegistrationType::Rigid_AllFrames) {
-			Registration::RigidFactory factory(_registration_options, ceresOption(), _logger);
-			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<RigidRegistration, Registration::RigidFactory>>(_input_mesh, factory, _logger);
-		}
-		//RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
-		//_register_sequence_of_frames = std::make_unique<SequenceRegistration>(_input_mesh, type, _logger, _registration_options);
+		_register_sequence_of_frames = createSequenceRegistration(_registration_type, _registration_options, ceresOption(), _logger, _input_mesh);
 	}
 	else {
 		bool finished = _register_sequence_of_frames->finished();

@@ -19,6 +19,8 @@ public:
 
 class RigidBeforeNonRigidRegistration : public IRegistration
 {
+public:
+	typedef typename RigidBeforeNonRigidDeformation RigidBeforeNonRigidRegistration::Deformation;
 private:
 	RigidBeforeNonRigidDeformation _deformation;
 	std::unique_ptr<IRigidRegistration> _rigid_registration;

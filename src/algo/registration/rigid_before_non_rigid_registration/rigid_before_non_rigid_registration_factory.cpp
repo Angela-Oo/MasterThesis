@@ -27,13 +27,22 @@ void RigidBeforeNonRigidRegistrationFactory::setFixedPositions(std::vector<verte
 
 SurfaceMesh RigidBeforeNonRigidRegistrationFactory::deformationGraphMesh(const RigidBeforeNonRigidDeformation & deformation)
 {
-	return deformationGraphToSurfaceMesh(deformation.non_rigid_deformation, _options.evaluate_residuals);
+	if (deformation.is_rigid_deformation) {
+		return _arap_factory.deformationGraphMesh(deformation.non_rigid_deformation);
+	}
+	else {
+		return SurfaceMesh();
+	}
 }
 
 SurfaceMesh RigidBeforeNonRigidRegistrationFactory::deformedMesh(const SurfaceMesh & mesh, const RigidBeforeNonRigidDeformation & deformation)
 {
-	DeformedMesh deformed(mesh, deformation.non_rigid_deformation, _options.dg_options.number_of_interpolation_neighbors);
-	return deformed.deformPoints();
+	if (deformation.is_rigid_deformation) {
+		return _arap_factory.deformedMesh(mesh, deformation.non_rigid_deformation);
+	}
+	else {
+		return _rigid_factory.deformedMesh(mesh, deformation.rigid_deformation);
+	}
 }
 
 SurfaceMesh RigidBeforeNonRigidRegistrationFactory::inverseDeformedMesh(const SurfaceMesh & mesh, const RigidBeforeNonRigidDeformation & deformation)

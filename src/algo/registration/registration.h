@@ -6,6 +6,7 @@
 #include "input_reader/mesh_reader.h"
 
 #include "i_registration.h"
+#include "algo/registration/sequence_registration/i_sequence_registration.h"
 
 typedef ml::TriMeshf Mesh;
 namespace Registration {
@@ -25,7 +26,11 @@ enum class RegistrationType
 };
 
 
-
+std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationType type,
+																  RegistrationOptions & options,
+																  ceres::Solver::Options & ceres_options,
+																  std::shared_ptr<FileWriter> logger,
+																  std::shared_ptr<IMeshReader> mesh_sequence);
 
 std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 												  RegistrationOptions & options,

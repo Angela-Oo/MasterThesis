@@ -13,9 +13,34 @@
 #include "algo/registration/rigid_registration/rigid_factory.h"
 #include "algo/registration/rigid_before_non_rigid_registration/rigid_before_non_rigid_registration_factory.h"
 
+#include "algo/registration/sequence_registration/template_sequence_registration.h"
+
 namespace Registration {
 
-
+std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationType type,
+																  RegistrationOptions & options,
+																  ceres::Solver::Options & ceres_options,
+																  std::shared_ptr<FileWriter> logger,
+																  std::shared_ptr<IMeshReader> mesh_sequence)
+{
+	if (type == RegistrationType::ARAP_AllFrames) {
+		//ARAPFactory factory(options, ceres_options, logger);
+		RigidBeforeNonRigidRegistrationFactory factory(options, ceres_options, logger);
+		return std::make_unique<SequenceRegistrationT<RigidBeforeNonRigidRegistration, RigidBeforeNonRigidRegistrationFactory>>(mesh_sequence, factory, logger);
+	}
+	else if (type == RegistrationType::ED_AllFrames) {
+		EmbeddedDeformationFactory factory(options, ceres_options, logger);
+		return std::make_unique<SequenceRegistrationT<EmbeddedDeformation, Registration::EmbeddedDeformationFactory>>(mesh_sequence, factory, logger);
+	}
+	else if (type == RegistrationType::Rigid_AllFrames) {
+		Registration::RigidFactory factory(options, ceres_options, logger);
+		return std::make_unique<SequenceRegistrationT<RigidRegistration, Registration::RigidFactory>>(mesh_sequence, factory, logger);
+	}
+	else {
+		throw("Registration type makes no sense in this configuration");
+		return nullptr;
+	}
+}
 
 std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 												  RegistrationOptions & options,
