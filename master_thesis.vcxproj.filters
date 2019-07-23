@@ -786,9 +786,6 @@
     <ClCompile Include="src\algo\registration\deformation_graph\position_and_deformation.cpp">
       <Filter>1 algo\3 registration\1 deformation graph</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\deformation_graph\deformed_mesh.cpp">
-      <Filter>1 algo\3 registration\1 deformation graph</Filter>
-    </ClCompile>
     <ClCompile Include="src\visualize\render\render_registration.cpp">
       <Filter>6 visualize\render</Filter>
     </ClCompile>

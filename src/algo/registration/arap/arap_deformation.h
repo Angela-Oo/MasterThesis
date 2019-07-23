@@ -4,7 +4,7 @@
 
 namespace Registration {
 
-class Deformation : public IPositionDeformation
+class ARAPDeformation : public IPositionDeformation
 {
 private:
 	ml::vec6d _d; // rotation (3d) and translation (3d)
@@ -25,14 +25,14 @@ public:
 	std::shared_ptr<IPositionDeformation> invertDeformation() const override;
 	std::shared_ptr<IPositionDeformation> clone() const override;
 public:
-	Deformation(const ml::vec3d & r, const ml::vec3d & t, double w = 1.);
-	Deformation(const ml::vec6d & d, double w = 1.);
-	Deformation();
-	Deformation(const Deformation& other);
-	Deformation(const Deformation& deformation, bool inverse);
+	ARAPDeformation(const ml::vec3d & r, const ml::vec3d & t, double w = 1.);
+	ARAPDeformation(const ml::vec6d & d, double w = 1.);
+	ARAPDeformation();
+	ARAPDeformation(const ARAPDeformation& other);
+	ARAPDeformation(const ARAPDeformation& deformation, bool inverse);
 };
 
 
-std::shared_ptr<Deformation> createDeformation();
+std::shared_ptr<ARAPDeformation> createDeformation();
 
 }

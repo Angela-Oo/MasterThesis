@@ -6,7 +6,7 @@
 
 namespace Registration {
 
-Matrix Deformation::rotation() const
+Matrix ARAPDeformation::rotation() const
 {
 	ml::mat3d r;
 	ceres::AngleAxisToRotationMatrix(_d.array, r.getData());
@@ -15,27 +15,27 @@ Matrix Deformation::rotation() const
 	return m;
 }
 
-Vector Deformation::translation() const
+Vector ARAPDeformation::translation() const
 {
 	return Vector(_d[3], _d[4], _d[5]);
 }
 
-Point Deformation::position() const
+Point ARAPDeformation::position() const
 {
 	return _position;
 }
 
-std::shared_ptr<IPositionDeformation> Deformation::invertDeformation() const
+std::shared_ptr<IPositionDeformation> ARAPDeformation::invertDeformation() const
 {
-	return std::make_shared<Deformation>(-_d, _w);
+	return std::make_shared<ARAPDeformation>(-_d, _w);
 }
 
-std::shared_ptr<IPositionDeformation> Deformation::clone() const
+std::shared_ptr<IPositionDeformation> ARAPDeformation::clone() const
 {
-	return std::make_shared<Deformation>(*this);
+	return std::make_shared<ARAPDeformation>(*this);
 }
 
-Deformation::Deformation(const ml::vec3d & r, const ml::vec3d & t, double w)
+ARAPDeformation::ARAPDeformation(const ml::vec3d & r, const ml::vec3d & t, double w)
 	: _w(w)
 {
 	_d[0] = r[0];
@@ -46,31 +46,31 @@ Deformation::Deformation(const ml::vec3d & r, const ml::vec3d & t, double w)
 	_d[5] = t[2];
 }
 
-Deformation::Deformation(const ml::vec6d & d,  double w)
+ARAPDeformation::ARAPDeformation(const ml::vec6d & d,  double w)
 	: _d(d)
 	, _w(w)
 { }
 
-Deformation::Deformation()
-	: Deformation(ml::vec3f::origin, ml::vec3f::origin)
+ARAPDeformation::ARAPDeformation()
+	: ARAPDeformation(ml::vec3f::origin, ml::vec3f::origin)
 {}
 
-Deformation::Deformation(const Deformation & other)
+ARAPDeformation::ARAPDeformation(const ARAPDeformation & other)
 	: _d(other._d)
 	, _w(other._w)
 {}
 
-Deformation::Deformation(const Deformation & deformation, bool inverse)
-	: Deformation(deformation)
+ARAPDeformation::ARAPDeformation(const ARAPDeformation & deformation, bool inverse)
+	: ARAPDeformation(deformation)
 {
 	if (inverse) {
 		_d = -deformation._d;
 	}
 }
 
-std::shared_ptr<Deformation> createDeformation()
+std::shared_ptr<ARAPDeformation> createDeformation()
 {
-	return std::make_shared<Deformation>();
+	return std::make_shared<ARAPDeformation>();
 }
 
 }

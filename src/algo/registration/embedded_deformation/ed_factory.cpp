@@ -11,14 +11,14 @@ std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(cons
 {
 	auto reduced_mesh = createReducedMesh(source, _options.dg_options.edge_length, _options.mesh_reduce_strategy);
 	auto global = createGlobalDeformation(source, createDeformation);
-	auto deformation_graph = createDeformationGraphFromMesh(reduced_mesh, global, createDeformation);
+	auto deformation_graph = createDeformationGraphFromMesh<ED::Deformation>(reduced_mesh, global, createDeformation);
 
 	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger);
 }
 
 std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(const SurfaceMesh & source,
 																			const SurfaceMesh & target,
-																			const DeformationGraph & deformation_graph)
+																			const EmbeddedDeformation::Deformation & deformation_graph)
 {
 	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger);
 }
@@ -28,14 +28,14 @@ void EmbeddedDeformationFactory::setFixedPositions(std::vector<vertex_descriptor
 	_fixed_positions = fixed_positions;
 }
 
-SurfaceMesh EmbeddedDeformationFactory::deformationGraphMesh(const DeformationGraph & deformation)
+SurfaceMesh EmbeddedDeformationFactory::deformationGraphMesh(const EmbeddedDeformation::Deformation & deformation)
 {
 	return deformationGraphToSurfaceMesh(deformation, _options.evaluate_residuals);
 }
 
-SurfaceMesh EmbeddedDeformationFactory::deformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation)
+SurfaceMesh EmbeddedDeformationFactory::deformedMesh(const SurfaceMesh & mesh, const EmbeddedDeformation::Deformation & deformation)
 {
-	DeformedMesh deformed(mesh, deformation, _options.dg_options.number_of_interpolation_neighbors);
+	DeformedMesh<DeformationGraph<ED::Deformation>> deformed(mesh, deformation, _options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 

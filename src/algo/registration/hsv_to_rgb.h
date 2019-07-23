@@ -1,5 +1,7 @@
-#include <stdafx.h>
-#include "mLibInclude.h"
+#pragma once
+//#include <stdafx.h>
+//#include "mLibInclude.h"
+#include "mLibCore.h"
 
 typedef struct {
 	double r;       // a fraction between 0 and 1

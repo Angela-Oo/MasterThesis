@@ -35,16 +35,11 @@ SurfaceMesh AsRigidAsPossible::getDeformedPoints()
 SurfaceMesh AsRigidAsPossible::getInverseDeformedPoints()
 {
 	auto inverse_deformation = _deformation_graph.invertDeformation();
-	DeformedMesh deformed(_dst, inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
+	DeformedMesh<Deformation> deformed(_dst, inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 
-const DeformationGraph & AsRigidAsPossible::getDeformationGraph()
-{
-	return _deformation_graph;
-}
-
-const DeformationGraph & AsRigidAsPossible::getDeformation()
+const DeformationGraph<ARAPDeformation> & AsRigidAsPossible::getDeformation()
 {
 	return _deformation_graph;
 }
@@ -396,7 +391,7 @@ void AsRigidAsPossible::init()
 																		   _registration_options.correspondence_max_angle_deviation,
 																		   10.);
 
-	_deformed_mesh = std::make_unique<DeformedMesh>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
 
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
 
@@ -426,7 +421,7 @@ bool AsRigidAsPossible::shouldBeSavedAsImage()
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 std::vector<vertex_descriptor> fixed_positions,
-									 const DeformationGraph & deformation_graph,
+									 const Deformation & deformation_graph,
 									 ceres::Solver::Options option,
 									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
@@ -444,7 +439,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
-									 const DeformationGraph & deformation_graph,
+									 const Deformation & deformation_graph,
 									 ceres::Solver::Options option,
 									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
@@ -465,7 +460,7 @@ PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDe
 {
 	PositionAndDeformation global;
 	global._point = rigid_deformation._g;
-	global._deformation = std::make_shared<Deformation>(rigid_deformation._r, rigid_deformation._t);
+	global._deformation = std::make_shared<ARAPDeformation>(rigid_deformation._r, rigid_deformation._t);
 	return global;
 }
 
@@ -479,7 +474,7 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 {
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	auto global = createGlobalDeformation(reduced_mesh, createDeformation);
-	auto deformation_graph = createDeformationGraphFromMesh(reduced_mesh, global, createDeformation);
+	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, createDeformation);
 	return std::make_unique<AsRigidAsPossible>(src, dst, fixed_positions, deformation_graph, option, registration_options, logger);
 }
 
@@ -492,7 +487,7 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 {	
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	auto global = createGlobalDeformation(src, createDeformation);
-	auto deformation_graph = createDeformationGraphFromMesh(reduced_mesh, global, createDeformation);
+	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, createDeformation);
 	return std::make_unique<AsRigidAsPossible>(src, dst, deformation_graph, option, registration_options, logger);
 }
 
@@ -506,7 +501,7 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 {
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
-	auto deformation_graph = createDeformationGraphFromMesh(reduced_mesh, global, createDeformation);
+	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, createDeformation);
 	return std::make_unique<AsRigidAsPossible>(src, dst, deformation_graph, option, registration_options, logger);
 }
 
@@ -514,13 +509,13 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
 										                   const SurfaceMesh& dst,
 										                   const RigidDeformation & rigid_deformation,
-										                   const DeformationGraph & deformation_graph,
+										                   const DeformationGraph<ARAPDeformation> & deformation_graph,
 										                   ceres::Solver::Options option,
 										                   const RegistrationOptions & registration_options,
 										                   std::shared_ptr<FileWriter> logger)
 {
 	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
-	auto new_deformation_graph = createDeformationGraphFromMesh(deformation_graph._mesh, global, deformation_graph._create_node);
+	auto new_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(deformation_graph._mesh, global, deformation_graph._create_node);
 	return std::make_unique<AsRigidAsPossible>(src, dst, new_deformation_graph, option, registration_options, logger);
 }
 

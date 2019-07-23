@@ -74,7 +74,6 @@ class INonRigidRegistration : public IRegistration
 public:
 	virtual void setRigidDeformation(const RigidDeformation & rigid_deformation) = 0;
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
-	virtual const DeformationGraph & getDeformationGraph() = 0;
 	virtual SurfaceMesh getDeformationGraphMesh() = 0;
 	virtual bool shouldBeSavedAsImage() = 0;
 public:

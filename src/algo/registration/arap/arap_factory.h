@@ -19,9 +19,9 @@ public:
 												  const SurfaceMesh & target);
 	std::unique_ptr<AsRigidAsPossible> operator()(const SurfaceMesh & source,
 												  const SurfaceMesh & target,
-												  const DeformationGraph & deformation_graph);
-	SurfaceMesh deformationGraphMesh(const DeformationGraph & deformation_graph);
-	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph);
+												  const AsRigidAsPossible::Deformation & deformation_graph);
+	SurfaceMesh deformationGraphMesh(const AsRigidAsPossible::Deformation & deformation_graph);
+	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const AsRigidAsPossible::Deformation & deformation_graph);
 	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
 	std::string registrationType();
 	void logConfiguration();
