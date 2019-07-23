@@ -45,13 +45,6 @@ SurfaceMesh RigidBeforeNonRigidRegistrationFactory::deformedMesh(const SurfaceMe
 	}
 }
 
-SurfaceMesh RigidBeforeNonRigidRegistrationFactory::inverseDeformedMesh(const SurfaceMesh & mesh, const RigidBeforeNonRigidDeformation & deformation)
-{
-	auto inverse_deformation = invertDeformationGraph(deformation.non_rigid_deformation);
-	DeformedMesh deformed(mesh, inverse_deformation, _options.dg_options.number_of_interpolation_neighbors);
-	return deformed.deformPoints();
-}
-
 std::string RigidBeforeNonRigidRegistrationFactory::registrationType()
 {
 	return "rigid and non rigid registration";
@@ -71,9 +64,7 @@ RigidBeforeNonRigidRegistrationFactory::RigidBeforeNonRigidRegistrationFactory(c
 	, _logger(logger)
 	, _rigid_factory(options, ceres_options, logger)
 	, _arap_factory(options, ceres_options, logger)
-{
-
-}
+{ }
 
 
 }

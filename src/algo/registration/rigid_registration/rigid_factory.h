@@ -22,7 +22,6 @@ public:
 												  const RigidDeformation & deformation);
 	SurfaceMesh deformationGraphMesh(const RigidDeformation & deformation);
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation);
-	SurfaceMesh inverseDeformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation);
 	std::string registrationType();
 	void logConfiguration();
 public:

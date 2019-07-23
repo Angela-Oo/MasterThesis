@@ -39,12 +39,6 @@ SurfaceMesh EmbeddedDeformationFactory::deformedMesh(const SurfaceMesh & mesh, c
 	return deformed.deformPoints();
 }
 
-SurfaceMesh EmbeddedDeformationFactory::inverseDeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph)
-{
-	auto inverse_deformation = invertDeformationGraph(deformation_graph);
-	DeformedMesh deformed(mesh, inverse_deformation, _options.dg_options.number_of_interpolation_neighbors);
-	return deformed.deformPoints();
-}
 
 std::string EmbeddedDeformationFactory::registrationType()
 {

@@ -252,6 +252,7 @@
     <ClInclude Include="src\algo\registration\hsv_to_rgb.h" />
     <ClInclude Include="src\algo\registration\i_registration.h" />
     <ClInclude Include="src\algo\registration\registration.h" />
+    <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deformation.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration_factory.h" />
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformation.h" />
@@ -318,6 +319,7 @@
     <ClCompile Include="src\algo\registration\helper\log_option.cpp" />
     <ClCompile Include="src\algo\registration\hsv_to_rgb.cpp" />
     <ClCompile Include="src\algo\registration\registration.cpp" />
+    <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deformation.cpp" />
     <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.cpp" />
     <ClCompile Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration_factory.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformation.cpp" />

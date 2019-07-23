@@ -140,6 +140,30 @@ RigidDeformation DeformationGraph::getRigidDeformation() const
 							_global._point);
 }
 
+DeformationGraph DeformationGraph::invertDeformation() const
+{
+	SurfaceMesh mesh = _mesh;
+
+	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node");
+	assert(property_deformations.second);
+	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
+	assert(property_normals.second);
+
+	auto normals = property_normals.first;
+	auto deformations = property_deformations.first;
+	for (auto v : mesh.vertices())
+	{
+		auto deformed_node = invertNode(v);
+		mesh.point(v) = deformed_node._point;
+		normals[v] = deformed_node._normal;
+		deformations[v] = deformed_node._deformation;
+	}
+
+	auto global = _global;
+	global._deformation = _global._deformation->invertDeformation();
+	return DeformationGraph(mesh, global, _create_node);
+}
+
 DeformationGraph::DeformationGraph(const SurfaceMesh & graph, 
 								   const PositionAndDeformation & global_deformation, 
 								   std::function<std::shared_ptr<IDeformation>()> create_node)

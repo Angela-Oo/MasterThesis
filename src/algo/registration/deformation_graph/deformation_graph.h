@@ -30,6 +30,7 @@ public:
 	PositionAndDeformation deformNode(vertex_descriptor node_index) const;
 	PositionAndDeformation invertNode(vertex_descriptor node_index) const;
 public:
+	DeformationGraph invertDeformation() const;
 	void setRigidDeformation(const PositionAndDeformation & rigid_deformation);
 	RigidDeformation getRigidDeformation() const;
 public:

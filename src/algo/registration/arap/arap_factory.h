@@ -22,7 +22,6 @@ public:
 												  const DeformationGraph & deformation_graph);
 	SurfaceMesh deformationGraphMesh(const DeformationGraph & deformation_graph);
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph);
-	SurfaceMesh inverseDeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph);
 	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
 	std::string registrationType();
 	void logConfiguration();

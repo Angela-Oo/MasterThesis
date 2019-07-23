@@ -3,19 +3,10 @@
 #include "algo/registration/i_registration.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
+#include "rigid_before_non_rigid_deformation.h"
 
 namespace Registration {
 
-class RigidBeforeNonRigidDeformation
-{
-public:
-	RigidDeformation rigid_deformation;
-	DeformationGraph non_rigid_deformation;
-	bool is_rigid_deformation;
-	RigidBeforeNonRigidDeformation()
-		: is_rigid_deformation(true)
-	{}
-};
 
 class RigidBeforeNonRigidRegistration : public IRegistration
 {

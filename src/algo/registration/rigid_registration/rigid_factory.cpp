@@ -27,12 +27,7 @@ SurfaceMesh RigidFactory::deformedMesh(const SurfaceMesh & mesh, const RigidDefo
 	return deformed.deformPoints();
 }
 
-SurfaceMesh RigidFactory::inverseDeformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation)
-{
-	auto inverseDeformation = deformation.invertDeformation();
-	RigidDeformedMesh deformed(mesh, inverseDeformation);
-	return deformed.deformPoints();
-}
+
 
 std::string RigidFactory::registrationType()
 {
