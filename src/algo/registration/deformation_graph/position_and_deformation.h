@@ -11,16 +11,13 @@ class PositionAndDeformation
 public:
 	std::shared_ptr<IPositionDeformation> _deformation;
 	Point _point;
-	Vector _normal;
 public:
 	Point getDeformedPosition() const;
-	Vector getDeformedNormal() const;
 
 	Point deformPosition(Point point) const;
 	Vector deformNormal(Vector normal) const;
 	PositionAndDeformation()
 		: _point(CGAL::ORIGIN)
-		, _normal(0., 0., 0.)
 	{}
 };
 

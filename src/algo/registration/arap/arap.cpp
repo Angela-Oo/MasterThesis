@@ -465,7 +465,6 @@ PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDe
 {
 	PositionAndDeformation global;
 	global._point = rigid_deformation._g;
-	global._normal = Vector(0., 0., 1.);
 	global._deformation = std::make_shared<Deformation>(rigid_deformation._r, rigid_deformation._t);
 	return global;
 }

@@ -101,7 +101,6 @@ PositionAndDeformation DeformationGraph::getNode(vertex_descriptor node_index) c
 	std::shared_ptr<IPositionDeformation> n = deformation_nodes.first[node_index];
 	node._deformation = n;
 	node._point = _mesh.point(node_index);
-	node._normal = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first[node_index];
 	return node;
 }
 
@@ -111,7 +110,6 @@ PositionAndDeformation DeformationGraph::deformNode(vertex_descriptor node_index
 
 	PositionAndDeformation deformed_node;
 	deformed_node._point = _global.deformPosition(node.getDeformedPosition());
-	deformed_node._normal = _global.deformNormal(node.getDeformedNormal());
 	deformed_node._deformation = _create_node();
 	return deformed_node;
 }
@@ -123,7 +121,6 @@ PositionAndDeformation DeformationGraph::invertNode(vertex_descriptor node_index
 
 	PositionAndDeformation deformed_node;
 	deformed_node._point = _global.deformPosition(node.getDeformedPosition());
-	deformed_node._normal = _global.deformNormal(node.getDeformedNormal());
 	deformed_node._deformation = node._deformation->invertDeformation();
 	return deformed_node;
 }
@@ -146,16 +143,11 @@ DeformationGraph DeformationGraph::invertDeformation() const
 
 	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
 	assert(property_deformations.second);
-	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
-	assert(property_normals.second);
-
-	auto normals = property_normals.first;
 	auto deformations = property_deformations.first;
 	for (auto v : mesh.vertices())
 	{
 		auto deformed_node = invertNode(v);
 		mesh.point(v) = deformed_node._point;
-		normals[v] = deformed_node._normal;
 		deformations[v] = deformed_node._deformation;
 	}
 
@@ -230,7 +222,6 @@ PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh, std::fu
 
 	PositionAndDeformation global;
 	global._point = CGAL::ORIGIN + global_position;
-	global._normal = Vector(0., 0., 1.);
 	global._deformation = create_node();
 	return global;
 }

@@ -137,9 +137,10 @@ VertexResidualIds EmbeddedDeformation::addFitCost(ceres::Problem &problem)
 	{
 		vertex_used[v] = false;
 		
+		auto deformed_point = _deformed_mesh->deformed_point(v);
+		auto deformed_normal = _deformed_mesh->deformed_normal(v);
+		auto correspondent_point = _find_correspondence_point->correspondingPoint(deformed_point, deformed_normal);
 		//if (!mesh.is_border(v, true)) {
-		auto vertex = _deformation_graph.deformNode(v);
-		auto correspondent_point = _find_correspondence_point->correspondingPoint(vertex._point, vertex._normal);
 
 		if (correspondent_point.first) {				
 			vertex_descriptor target_vertex = correspondent_point.second;
@@ -373,7 +374,6 @@ PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDe
 {
 	PositionAndDeformation global;
 	global._point = rigid_deformation._g;
-	global._normal = Vector(0., 0., 1.);
 	
 	auto r = rigid_deformation.rotation();
 

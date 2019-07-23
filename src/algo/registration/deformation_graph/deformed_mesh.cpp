@@ -8,11 +8,9 @@ namespace Registration {
 SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost, bool smooth_cost, bool fit_cost)
 {
 	SurfaceMesh mesh = deformation_graph._mesh;
-	auto normals = mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : mesh.vertices()) {
 		auto deformed = deformation_graph.deformNode(v);
 		mesh.point(v) = deformed._point;
-		normals[v] = deformed._normal;
 	}
 	return mesh;
 }
