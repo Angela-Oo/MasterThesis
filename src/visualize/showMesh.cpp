@@ -54,20 +54,28 @@ void ShowMesh::nonRigidRegistration()
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
 
-		RegistrationFactory factory;
-		factory.setRegistrationType(_registration_type);
-		factory.setCeresOption(option);
-		factory.setRegistrationOption(_registration_options);
-		factory.setLogger(_logger);	
 
 		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) { // todo
 			_registration_options.smooth = 10.;
 			_registration_options.fit = 100.;
-			factory.setFixedPositions(_input_mesh->getFixedPositions(frame_b));
+			_registration = createRegistrationNoICP(_registration_type, 
+													_registration_options, 
+													option, 
+													_logger,
+													source, 
+													target,
+													_input_mesh->getFixedPositions(frame_b));
+		}
+		else {
+			_registration = createRegistration(_registration_type,
+											   _registration_options,
+											   option,
+											   _logger,
+											   source,
+											   target);
 		}
 
-		factory.logConfiguration();
-		_registration = factory.buildRegistration(source, target);
+		//factory.logConfiguration();
 		renderRegistration();
 		_image_name = "frame_" + std::to_string(_registration->currentIteration());
 	}

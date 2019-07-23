@@ -7,7 +7,7 @@
 #include "ed.h"
 
 namespace Registration {
-namespace ED {
+using namespace ED;
 
 class EmbeddedDeformationFactory
 {
@@ -33,5 +33,4 @@ public:
 							   std::shared_ptr<FileWriter> logger);
 };
 
-}
 }

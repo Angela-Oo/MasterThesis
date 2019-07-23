@@ -6,9 +6,21 @@
 
 namespace Registration {
 
-class RigidBeforeNonRigidRegistration : public INonRigidRegistration
+class RigidBeforeNonRigidDeformation
 {
-private:	
+public:
+	RigidDeformation rigid_deformation;
+	DeformationGraph non_rigid_deformation;
+	bool is_rigid_deformation;
+	RigidBeforeNonRigidDeformation()
+		: is_rigid_deformation(true)
+	{}
+};
+
+class RigidBeforeNonRigidRegistration : public IRegistration
+{
+private:
+	RigidBeforeNonRigidDeformation _deformation;
 	std::unique_ptr<IRigidRegistration> _rigid_registration;
 	std::unique_ptr<INonRigidRegistration> _non_rigid_registration;
 	bool _finished_rigid_registration;
@@ -25,10 +37,10 @@ public:
 	SurfaceMesh getDeformedPoints() override;
 	SurfaceMesh getInverseDeformedPoints() override;	
 public:
-	SurfaceMesh getDeformationGraphMesh() override;
-	const DeformationGraph & getDeformationGraph() override;
-	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
-	bool shouldBeSavedAsImage() override;
+	SurfaceMesh getDeformationGraphMesh();
+	const RigidBeforeNonRigidDeformation & getDeformation();
+	void setRigidDeformation(const RigidDeformation & rigid_deformation);
+	bool shouldBeSavedAsImage();
 public:
 	// without icp
 	RigidBeforeNonRigidRegistration(std::unique_ptr<IRigidRegistration> rigid_registration,

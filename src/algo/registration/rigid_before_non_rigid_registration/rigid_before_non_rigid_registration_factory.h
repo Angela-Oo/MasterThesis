@@ -23,10 +23,10 @@ public:
 																const SurfaceMesh & target);
 	std::unique_ptr<RigidBeforeNonRigidRegistration> operator()(const SurfaceMesh & source,
 																const SurfaceMesh & target,
-																const DeformationGraph & deformation_graph);
-	SurfaceMesh deformationGraphMesh(const DeformationGraph & deformation_graph);
-	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph);
-	SurfaceMesh inverseDeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph);
+																const RigidBeforeNonRigidDeformation & deformation_graph);
+	SurfaceMesh deformationGraphMesh(const RigidBeforeNonRigidDeformation & deformation_graph);
+	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const RigidBeforeNonRigidDeformation & deformation_graph);
+	SurfaceMesh inverseDeformedMesh(const SurfaceMesh & mesh, const RigidBeforeNonRigidDeformation & deformation_graph);
 	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
 	std::string registrationType();
 	void logConfiguration();

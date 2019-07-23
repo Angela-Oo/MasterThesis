@@ -14,10 +14,10 @@ RigidBeforeNonRigidRegistrationFactory::operator()(const SurfaceMesh & source, c
 std::unique_ptr<RigidBeforeNonRigidRegistration>
 RigidBeforeNonRigidRegistrationFactory::operator()(const SurfaceMesh & source,
 												   const SurfaceMesh & target,
-												   const DeformationGraph & deformation_graph)
+												   const RigidBeforeNonRigidDeformation & deformation)
 {
 	return std::make_unique<RigidBeforeNonRigidRegistration>(_rigid_factory(source, target),
-															 _arap_factory(source, target, deformation_graph));
+															 _arap_factory(source, target, deformation.non_rigid_deformation));
 }
 
 void RigidBeforeNonRigidRegistrationFactory::setFixedPositions(std::vector<vertex_descriptor> fixed_positions)
@@ -25,20 +25,20 @@ void RigidBeforeNonRigidRegistrationFactory::setFixedPositions(std::vector<verte
 	_fixed_positions = fixed_positions;
 }
 
-SurfaceMesh RigidBeforeNonRigidRegistrationFactory::deformationGraphMesh(const DeformationGraph & deformation)
+SurfaceMesh RigidBeforeNonRigidRegistrationFactory::deformationGraphMesh(const RigidBeforeNonRigidDeformation & deformation)
 {
-	return deformationGraphToSurfaceMesh(deformation, _options.evaluate_residuals);
+	return deformationGraphToSurfaceMesh(deformation.non_rigid_deformation, _options.evaluate_residuals);
 }
 
-SurfaceMesh RigidBeforeNonRigidRegistrationFactory::deformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation)
+SurfaceMesh RigidBeforeNonRigidRegistrationFactory::deformedMesh(const SurfaceMesh & mesh, const RigidBeforeNonRigidDeformation & deformation)
 {
-	DeformedMesh deformed(mesh, deformation, _options.dg_options.number_of_interpolation_neighbors);
+	DeformedMesh deformed(mesh, deformation.non_rigid_deformation, _options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 
-SurfaceMesh RigidBeforeNonRigidRegistrationFactory::inverseDeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph)
+SurfaceMesh RigidBeforeNonRigidRegistrationFactory::inverseDeformedMesh(const SurfaceMesh & mesh, const RigidBeforeNonRigidDeformation & deformation)
 {
-	auto inverse_deformation = invertDeformationGraph(deformation_graph);
+	auto inverse_deformation = invertDeformationGraph(deformation.non_rigid_deformation);
 	DeformedMesh deformed(mesh, inverse_deformation, _options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }

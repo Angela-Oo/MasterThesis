@@ -260,7 +260,6 @@
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_factory.h" />
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_registration.h" />
     <ClInclude Include="src\algo\registration\sequence_registration\i_sequence_registration.h" />
-    <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h" />
     <ClInclude Include="src\algo\registration\sequence_registration\template_sequence_registration.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_convertion.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_definition.h" />
@@ -325,7 +324,6 @@
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_factory.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_registration.cpp" />
-    <ClCompile Include="src\algo\registration\sequence_registration\sequence_registration.cpp" />
     <ClCompile Include="src\algo\surface_mesh\mesh_convertion.cpp" />
     <ClCompile Include="src\algo\surface_mesh\nearest_neighbor_search.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />

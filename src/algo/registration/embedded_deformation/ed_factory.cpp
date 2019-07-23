@@ -3,8 +3,8 @@
 #include "algo/registration/embedded_deformation/ed.h"
 
 namespace Registration {
-namespace ED {
 
+using namespace ED;
 
 std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(const SurfaceMesh & source,
 																			const SurfaceMesh & target)
@@ -66,5 +66,4 @@ EmbeddedDeformationFactory::EmbeddedDeformationFactory(const RegistrationOptions
 {}
 
 
-}
 }

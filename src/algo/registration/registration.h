@@ -25,46 +25,23 @@ enum class RegistrationType
 };
 
 
-class RegistrationFactory
-{
-	RegistrationType _registration_type;
-	ceres::Solver::Options _ceres_options;
-	RegistrationOptions _options;
-	std::shared_ptr<FileWriter> _logger;
-	std::vector<vertex_descriptor> _fixed_positions;
-private:
-	std::unique_ptr<INonRigidRegistration> buildWithoutICP(const SurfaceMesh & source,
-														   const SurfaceMesh & target);
-	std::unique_ptr<INonRigidRegistration> buildWithoutRigid(const SurfaceMesh & source,
-															 const SurfaceMesh & target);
-	std::unique_ptr<INonRigidRegistration> buildWithoutRigid(const SurfaceMesh & source,
-															 const SurfaceMesh & target,
-															 const DeformationGraph & deformation_graph);
-	std::unique_ptr<INonRigidRegistration> buildWithRigid(const SurfaceMesh & source,
-														  const SurfaceMesh & target);
-	std::unique_ptr<INonRigidRegistration> buildWithRigid(const SurfaceMesh & source,
-														  const SurfaceMesh & target,
-														  const DeformationGraph & deformation_graph);
-public:
-	void setRegistrationType(RegistrationType type);
-	void setCeresOption(const ceres::Solver::Options options);
-	void setRegistrationOption(const RegistrationOptions & options);
-	void setLogger(std::shared_ptr<FileWriter> logger);
-	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
-public:
-	std::unique_ptr<INonRigidRegistration> buildNonRigidRegistration(const SurfaceMesh & source,
-																	 const SurfaceMesh & target);
-	std::unique_ptr<INonRigidRegistration> buildNonRigidRegistration(const SurfaceMesh & source,
-																	 const SurfaceMesh & target,
-																	 const DeformationGraph & deformation_graph);
-	std::unique_ptr<IRigidRegistration> buildRigidRegistration(const SurfaceMesh & source,
-															   const SurfaceMesh & target);
-	std::unique_ptr<IRegistration> buildRegistration(const SurfaceMesh & source,
-													 const SurfaceMesh & target);
-	void logConfiguration();
-public:
-	RegistrationFactory();
-};
+
+
+std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
+												  RegistrationOptions & options,
+												  ceres::Solver::Options & ceres_options,
+												  std::shared_ptr<FileWriter> logger,
+												  const SurfaceMesh & source,
+												  const SurfaceMesh & target);
+
+
+std::unique_ptr<INonRigidRegistration> createRegistrationNoICP(RegistrationType type,
+															   RegistrationOptions & options,
+															   ceres::Solver::Options & ceres_options,
+															   std::shared_ptr<FileWriter> logger,
+															   const SurfaceMesh & source,
+															   const SurfaceMesh & target,
+															   std::vector<vertex_descriptor> fixed_positions);
 
 
 }

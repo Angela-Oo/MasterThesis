@@ -617,9 +617,6 @@
     <ClInclude Include="src\algo\registration\deformation_graph\deformed_mesh.h">
       <Filter>1 algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h">
-      <Filter>1 algo\3 registration\6 sequence registration</Filter>
-    </ClInclude>
     <ClInclude Include="src\visualize\render\render_registration.h">
       <Filter>6 visualize\render</Filter>
     </ClInclude>
@@ -788,9 +785,6 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\deformed_mesh.cpp">
       <Filter>1 algo\3 registration\1 deformation graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\sequence_registration\sequence_registration.cpp">
-      <Filter>1 algo\3 registration\6 sequence registration</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\render_registration.cpp">
       <Filter>6 visualize\render</Filter>
