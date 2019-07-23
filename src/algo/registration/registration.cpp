@@ -24,13 +24,14 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationTy
 																  std::shared_ptr<IMeshReader> mesh_sequence)
 {
 	if (type == RegistrationType::ARAP_AllFrames) {
-		//ARAPFactory factory(options, ceres_options, logger);
-		RigidBeforeNonRigidRegistrationFactory factory(options, ceres_options, logger);
-		return std::make_unique<SequenceRegistrationT<RigidBeforeNonRigidRegistration, RigidBeforeNonRigidRegistrationFactory>>(mesh_sequence, factory, logger);
+		using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<ARAPFactory>;
+		SequenceARAPFactory factory(options, ceres_options, logger);
+		return std::make_unique<SequenceRegistrationT<RigidBeforeNonRigidRegistration, SequenceARAPFactory>>(mesh_sequence, factory, logger);
 	}
 	else if (type == RegistrationType::ED_AllFrames) {
-		EmbeddedDeformationFactory factory(options, ceres_options, logger);
-		return std::make_unique<SequenceRegistrationT<EmbeddedDeformation, Registration::EmbeddedDeformationFactory>>(mesh_sequence, factory, logger);
+		using SequenceEDFactory = RigidBeforeNonRigidRegistrationFactory<EmbeddedDeformationFactory>;
+		SequenceEDFactory factory(options, ceres_options, logger);
+		return std::make_unique<SequenceRegistrationT<RigidBeforeNonRigidRegistration, SequenceEDFactory>>(mesh_sequence, factory, logger);
 	}
 	else if (type == RegistrationType::Rigid_AllFrames) {
 		Registration::RigidFactory factory(options, ceres_options, logger);
@@ -50,11 +51,11 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 												  const SurfaceMesh & target) {
 
 	if (type == RegistrationType::ARAP) {
-		RigidBeforeNonRigidRegistrationFactory factory(options, ceres_options, logger);
+		RigidBeforeNonRigidRegistrationFactory<ARAPFactory> factory(options, ceres_options, logger);
 		return factory(source, target);
 	}
 	else if (type == RegistrationType::ED) {
-		EmbeddedDeformationFactory factory(options, ceres_options, logger);
+		RigidBeforeNonRigidRegistrationFactory<EmbeddedDeformationFactory> factory(options, ceres_options, logger);
 		return factory(source, target);
 	}
 	else if (type == RegistrationType::ARAP_Without_RIGID) {
