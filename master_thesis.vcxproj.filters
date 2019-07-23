@@ -97,6 +97,9 @@
     <Filter Include="5 shaders">
       <UniqueIdentifier>{f1788b5b-0906-442e-b1f7-3760d1698a11}</UniqueIdentifier>
     </Filter>
+    <Filter Include="1 algo\3 registration\0 helper">
+      <UniqueIdentifier>{99e1ac34-093c-412c-b020-a378c2c29b27}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -665,6 +668,12 @@
     <ClInclude Include="src\algo\registration\sequence_registration\i_sequence_registration.h">
       <Filter>1 algo\3 registration\6 sequence registration</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_registration\rigid_factory.h">
+      <Filter>1 algo\3 registration\3 rigid registration</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\helper\log_option.h">
+      <Filter>1 algo\3 registration\0 helper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -815,6 +824,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap_factory.cpp">
       <Filter>1 algo\3 registration\4 as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\rigid_registration\rigid_factory.cpp">
+      <Filter>1 algo\3 registration\3 rigid registration</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\helper\log_option.cpp">
+      <Filter>1 algo\3 registration\0 helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

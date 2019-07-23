@@ -46,6 +46,11 @@ const DG::DeformationGraph & AsRigidAsPossible::getDeformationGraph()
 	return _deformation_graph;
 }
 
+const DG::DeformationGraph & AsRigidAsPossible::getDeformation()
+{
+	return _deformation_graph;
+}
+
 SurfaceMesh AsRigidAsPossible::getDeformationGraphMesh()
 {
 	return deformationGraphToSurfaceMesh(_deformation_graph, _registration_options.evaluate_residuals);

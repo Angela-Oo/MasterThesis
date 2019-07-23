@@ -73,6 +73,7 @@ public:
 public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	const DG::DeformationGraph & getDeformationGraph() override;
+	const DG::DeformationGraph & getDeformation();
 	std::vector<Point> getFixedPostions() override;
 	bool shouldBeSavedAsImage() override;
 public:

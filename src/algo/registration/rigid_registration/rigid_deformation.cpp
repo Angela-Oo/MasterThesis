@@ -35,7 +35,7 @@ Vector RigidDeformation::deformNormal(const Vector & normal) const
 	return rotated_normal;
 }
 
-RigidDeformation RigidDeformation::invertDeformation()
+RigidDeformation RigidDeformation::invertDeformation() const
 {
 	return RigidDeformation(-_r, -_t, _g);
 }

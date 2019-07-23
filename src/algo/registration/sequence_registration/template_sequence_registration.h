@@ -99,7 +99,7 @@ void SequenceRegistrationT<Registration, RegistrationFactory>::nextFrame()
 	auto & target = _mesh_sequence->getMesh(_current);
 
 	_registration = _registration_factory(source, target, _deformation[_current - 1]);
-	_deformation[_current] = _registration->getDeformationGraph();
+	_deformation[_current] = _registration->getDeformation();
 }
 
 template<typename Registration, typename RegistrationFactory>
@@ -121,7 +121,7 @@ bool SequenceRegistrationT<Registration, RegistrationFactory>::solve()
 		if (frame_finished)
 		{
 			_deformed_meshes[_current] = _registration->getDeformedPoints();
-			_deformation[_current] = _registration->getDeformationGraph();
+			_deformation[_current] = _registration->getDeformation();
 			_ceres_logger->write("frame " + std::to_string(_current) + " solved \n");
 			if (_current < _mesh_sequence->size() - 1) {
 				_registration.reset();
@@ -136,7 +136,7 @@ bool SequenceRegistrationT<Registration, RegistrationFactory>::solve()
 		else {
 			auto finished_iteration = _registration->solveIteration();
 			_deformed_meshes[_current] = _registration->getDeformedPoints();
-			_deformation[_current] = _registration->getDeformationGraph();
+			_deformation[_current] = _registration->getDeformation();
 			return finished_iteration;
 		}
 	}
@@ -160,7 +160,7 @@ SequenceRegistrationT<Registration, RegistrationFactory>::SequenceRegistrationT(
 	auto & target = _mesh_sequence->getMesh(_current);
 	_registration = _registration_factory(source, target);
 
-	_deformation[0] = _registration->getDeformationGraph();
+	_deformation[0] = _registration->getDeformation();
 	_deformed_meshes[0] = source;
 
 	//std::string algo = (registration_type == RegistrationType::ARAP) ? "arap" : "ed";

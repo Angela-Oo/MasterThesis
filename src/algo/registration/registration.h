@@ -20,7 +20,8 @@ enum class RegistrationType
 	ED_WithoutICP,
 	Rigid,
 	ARAP_AllFrames,
-	ED_AllFrames
+	ED_AllFrames,
+	Rigid_AllFrames
 };
 
 

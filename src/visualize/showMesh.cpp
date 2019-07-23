@@ -9,6 +9,7 @@
 #include "algo/registration/embedded_deformation/ed.h"
 #include "algo/registration/arap/arap.h"
 #include "algo/registration/arap/arap_factory.h"
+#include "algo/registration/rigid_registration/rigid_factory.h"
 
 #include "algo/surface_mesh/mesh_convertion.h"
 
@@ -95,6 +96,10 @@ void ShowMesh::solveAllNonRigidRegistration()
 		if (_registration_type == RegistrationType::ARAP_AllFrames) {
 			ARAP::ARAPFactory factory(_registration_options, ceresOption(), _logger);
 			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<ARAP::AsRigidAsPossible, ARAP::ARAPFactory>>(_input_mesh, factory, _logger);
+		}
+		else if (_registration_type == RegistrationType::Rigid_AllFrames) {
+			Registration::Rigid::RigidFactory factory(_registration_options, ceresOption(), _logger);
+			_register_sequence_of_frames = std::make_unique<SequenceRegistrationT<RigidRegistration, Registration::Rigid::RigidFactory>>(_input_mesh, factory, _logger);
 		}
 		//RegistrationType type = _registration_type == RegistrationType::ARAP_AllFrames ? RegistrationType::ARAP : RegistrationType::ED;
 		//_register_sequence_of_frames = std::make_unique<SequenceRegistration>(_input_mesh, type, _logger, _registration_options);
@@ -250,10 +255,20 @@ void ShowMesh::key(UINT key)
 			}
 		}
 	}
-	else if (key == KEY_U)
-	{
-		std::cout << "register all frames as rigid as possible " << std::endl;
+	else if (key == KEY_7)
+	{		
 		if (!_register_sequence_of_frames) {
+			std::cout << "register all frames with rigid registration " << std::endl;
+			_renderer->_current_frame = 0;
+			_registration_type = RegistrationType::Rigid_AllFrames;
+			solveAllNonRigidRegistration();
+			_solve_registration = true;
+		}
+	}
+	else if (key == KEY_U)
+	{		
+		if (!_register_sequence_of_frames) {
+			std::cout << "register all frames as rigid as possible " << std::endl;
 			_renderer->_current_frame = 0;
 			_registration_type = RegistrationType::ARAP_AllFrames;
 			solveAllNonRigidRegistration();			
@@ -261,9 +276,9 @@ void ShowMesh::key(UINT key)
 		}
 	}
 	else if (key == KEY_P)
-	{
-		std::cout << "register all frames embdedded deformation " << std::endl;
+	{	
 		if (!_register_sequence_of_frames) {
+			std::cout << "register all frames embdedded deformation " << std::endl;
 			_renderer->_current_frame = 0;
 			_registration_type = RegistrationType::ED_AllFrames;
 			solveAllNonRigidRegistration();
@@ -440,6 +455,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	std::cout << "    non rigid registration (ed without icp):       KEY_B" << std::endl;
 	std::cout << "    non rigid registration (arap):                 KEY_N" << std::endl;
 	std::cout << "    non rigid registration (arap without icp):     KEY_M" << std::endl;
+	std::cout << "    rigid registration all frames                  KEY_7" << std::endl;
 	std::cout << "    non rigid registration for all frames (arap):  KEY_U" << std::endl;
 	std::cout << "    non rigid registration for all frames (ed):    KEY_P" << std::endl;
 

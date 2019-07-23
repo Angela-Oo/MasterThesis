@@ -1,4 +1,5 @@
 #pragma once
+#include "mLibCore.h"
 #include "algo/surface_mesh/mesh_definition.h"
 
 class RigidDeformation
@@ -17,7 +18,7 @@ public:
 	Point deformPoint(const Point & point) const;
 	Vector deformNormal(const Vector & normal) const;
 public:
-	RigidDeformation invertDeformation();
+	RigidDeformation invertDeformation() const;
 public:
 	RigidDeformation();
 	RigidDeformation(ml::vec3d r, ml::vec3d t, Point g = CGAL::ORIGIN);

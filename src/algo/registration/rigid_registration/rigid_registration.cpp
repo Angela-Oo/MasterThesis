@@ -34,6 +34,11 @@ const RigidDeformation & RigidRegistration::getRigidDeformation()
 	return _deformation;
 }
 
+const RigidDeformation & RigidRegistration::getDeformation()
+{
+	return _deformation;
+}
+
 ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex)
 {
 	float point_to_point_weight = 0.1f;
@@ -144,7 +149,12 @@ bool RigidRegistration::finished()
 
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
-	return (_solve_iteration >= _options.max_iterations) || (solved && _solve_iteration > 2);
+	return (_solve_iteration >= (_options.max_iterations * 2)) || (solved && _solve_iteration > 2);
+}
+
+bool RigidRegistration::shouldBeSavedAsImage()
+{
+	return finished();
 }
 
 void RigidRegistration::evaluateResidual(ceres::Problem & problem,
@@ -161,8 +171,10 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 
 void RigidRegistration::init()
 {
+	_deformation._r = ml::vec3d::origin; // todo is this better
+	_deformation._t = ml::vec3d::origin;
 	_ceres_logger.write("start Rigid registration \n");
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45., 20., 0.05);
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45., 20., 0.01);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
 
 	if (_options.use_vertex_random_probability < 1.) {

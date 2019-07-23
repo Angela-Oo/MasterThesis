@@ -14,6 +14,8 @@ typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 
 class RigidRegistration : public IRigidRegistration
 {
+public:
+	typedef typename RigidDeformation RigidRegistration::Deformation;
 private:
 	SurfaceMesh _source;
 	SurfaceMesh _target;
@@ -50,6 +52,8 @@ public:
 	SurfaceMesh getDeformedPoints() override;
 	SurfaceMesh getInverseDeformedPoints() override;
 	const RigidDeformation & getRigidDeformation() override;
+	const RigidDeformation & getDeformation();
+	bool shouldBeSavedAsImage();
 private:
 	void init();
 public:
