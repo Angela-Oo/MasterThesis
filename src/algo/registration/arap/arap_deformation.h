@@ -11,6 +11,7 @@ private:
 	//ml::vec3d _r; // rotation matrix
 	//ml::vec3d _t; // translation vector	
 	double _w; // weight
+	Point _position;
 public:
 	double * d() override { return (&_d)->getData(); }
 	double * r() override { return (&_d)->getData(); }
@@ -19,6 +20,7 @@ public:
 public:
 	Matrix rotation() const override;
 	Vector translation() const override;
+	Point position() const override;
 	double weight() const override { return _w; };
 	std::shared_ptr<IPositionDeformation> invertDeformation() const override;
 	std::shared_ptr<IPositionDeformation> clone() const override;

@@ -56,31 +56,51 @@ SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
 	return deformationGraphToSurfaceMesh(_deformation_graph, _evaluate_residuals);
 }
 
-ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point)
+ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor v, const Point & target_point)
 {
 	float point_to_point_weighting = 0.1f;
 	double weight = a_fit * point_to_point_weighting;
 	
 	auto & global = _deformation_graph._global;
-	auto n = _deformation_graph.getNode(node);
+	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
-	auto cost_function = FitStarPointToPointCostFunction::Create(target_point, n._point, global._point);
+	auto cost_function = FitStarPointToPointCostFunction::Create(target_point, _deformed_mesh->point(v), global._point,
+																 _deformation_graph.getNodePosition(n_w_vector[0].first),
+																 _deformation_graph.getNodePosition(n_w_vector[1].first),
+																 _deformation_graph.getNodePosition(n_w_vector[2].first),
+																 _deformation_graph.getNodePosition(n_w_vector[3].first),
+																 n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function,
-									global._deformation->r(), global._deformation->t(), n._deformation->t(), n._deformation->w());
+									global._deformation->d(),
+									_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
+									_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
+									_deformation_graph.getNode(n_w_vector[2].first)._deformation->d(),
+									_deformation_graph.getNode(n_w_vector[3].first)._deformation->d());
 }
 
-ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal)
+ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal)
 {
 	float point_to_plane_weighting = 0.9f;
 	double weight = a_fit * point_to_plane_weighting;
 
 	auto & global = _deformation_graph._global;
-	auto n = _deformation_graph.getNode(node);
+	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
-	ceres::CostFunction* cost_function = FitStarPointToPlaneCostFunction::Create(target_point, target_normal, n._point, global._point);
+	ceres::CostFunction* cost_function = FitStarPointToPlaneCostFunction::Create(target_point, target_normal,
+																				 _deformed_mesh->point(v), global._point,
+																				 _deformation_graph.getNodePosition(n_w_vector[0].first),
+																				 _deformation_graph.getNodePosition(n_w_vector[1].first),
+																				 _deformation_graph.getNodePosition(n_w_vector[2].first),
+																				 _deformation_graph.getNodePosition(n_w_vector[3].first),
+																				 n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function, global._deformation->r(), global._deformation->t(), n._deformation->r(), n._deformation->t(), n._deformation->w());
+	return problem.AddResidualBlock(cost_function, loss_function,
+									global._deformation->d(),
+									_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
+									_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
+									_deformation_graph.getNode(n_w_vector[2].first)._deformation->d(),
+									_deformation_graph.getNode(n_w_vector[3].first)._deformation->d());
 }
 
 

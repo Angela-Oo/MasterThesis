@@ -16,6 +16,11 @@ Vector Deformation::translation() const
 	return Vector(_t[0], _t[1], _t[2]);
 }
 
+Point Deformation::position() const
+{
+	return _position;
+}
+
 std::shared_ptr<IPositionDeformation> Deformation::invertDeformation() const
 {
 	return std::make_shared<Deformation>(_r.getInverse(), -_t, _w);

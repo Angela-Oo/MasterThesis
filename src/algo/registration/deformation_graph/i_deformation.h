@@ -18,6 +18,7 @@ public:
 public:
 	virtual Matrix rotation() const = 0;
 	virtual Vector translation() const = 0;
+	virtual Point position() const = 0;
 	virtual double weight() const = 0;
 	virtual std::shared_ptr<IPositionDeformation> invertDeformation() const = 0;
 	virtual std::shared_ptr<IPositionDeformation> clone() const = 0;
