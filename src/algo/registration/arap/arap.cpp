@@ -460,7 +460,14 @@ PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDe
 {
 	PositionAndDeformation global;
 	global._point = rigid_deformation._g;
-	global._deformation = std::make_shared<ARAPDeformation>(rigid_deformation._r, rigid_deformation._t);
+	ml::vec6d deformation;
+	deformation[0] = rigid_deformation._r[0];
+	deformation[1] = rigid_deformation._r[1];
+	deformation[2] = rigid_deformation._r[2];
+	deformation[3] = rigid_deformation._t[0];
+	deformation[4] = rigid_deformation._t[1];
+	deformation[5] = rigid_deformation._t[2];
+	global._deformation = std::make_shared<ARAPDeformation>(rigid_deformation._g, deformation);
 	return global;
 }
 

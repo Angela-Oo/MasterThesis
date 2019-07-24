@@ -23,7 +23,7 @@ Point Deformation::position() const
 
 std::shared_ptr<IPositionDeformation> Deformation::invertDeformation() const
 {
-	return std::make_shared<Deformation>(_r.getInverse(), -_t, _w);
+	return std::make_shared<Deformation>(_position, _r.getInverse(), -_t, _w);
 }
 
 std::shared_ptr<IPositionDeformation> Deformation::clone() const
@@ -31,18 +31,24 @@ std::shared_ptr<IPositionDeformation> Deformation::clone() const
 	return std::make_shared<Deformation>(*this);
 }
 
-Deformation::Deformation(const ml::mat3d & r, const ml::vec3d & t, double w)
-	: _r(r)
+Deformation::Deformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w)
+	: _position(position)
+	, _r(r)
 	, _t(t)
 	, _w(w)
 {}
 
 Deformation::Deformation()
-	: Deformation(ml::mat3d::identity(), ml::vec3f::origin)
+	: Deformation(CGAL::ORIGIN, ml::mat3d::identity(), ml::vec3f::origin)
+{}
+
+Deformation::Deformation(const Point & position)
+	: Deformation(position, ml::mat3d::identity(), ml::vec3f::origin)
 {}
 
 Deformation::Deformation(const Deformation & other)
-	: _r(other._r)
+	: _position(other._position)
+	, _r(other._r)
 	, _t(other._t)
 	, _w(other._w)
 {}
@@ -56,11 +62,6 @@ Deformation::Deformation(const Deformation & deformation, bool inverse)
 	}
 }
 
-
-std::shared_ptr<Deformation> createDeformation()
-{
-	return std::make_shared<Deformation>();
-}
 
 }
 }

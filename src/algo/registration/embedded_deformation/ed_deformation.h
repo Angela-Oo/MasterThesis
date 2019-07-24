@@ -25,13 +25,13 @@ public:
 	std::shared_ptr<IPositionDeformation> invertDeformation() const override;
 	std::shared_ptr<IPositionDeformation> clone() const override;
 public:
-	Deformation(const ml::mat3d & r, const ml::vec3d & t, double w = 1.);
+	Deformation(const Point & position);
+	Deformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w = 1.);
 	Deformation();
 	Deformation(const Deformation& other);
 	Deformation(const Deformation& node, bool inverse);
 };
 
-std::shared_ptr<Deformation> createDeformation();
 
 }
 }

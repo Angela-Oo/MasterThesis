@@ -27,7 +27,7 @@ Point ARAPDeformation::position() const
 
 std::shared_ptr<IPositionDeformation> ARAPDeformation::invertDeformation() const
 {
-	return std::make_shared<ARAPDeformation>(-_d, _w);
+	return std::make_shared<ARAPDeformation>(_position, -_d, _w);
 }
 
 std::shared_ptr<IPositionDeformation> ARAPDeformation::clone() const
@@ -35,28 +35,23 @@ std::shared_ptr<IPositionDeformation> ARAPDeformation::clone() const
 	return std::make_shared<ARAPDeformation>(*this);
 }
 
-ARAPDeformation::ARAPDeformation(const ml::vec3d & r, const ml::vec3d & t, double w)
-	: _w(w)
-{
-	_d[0] = r[0];
-	_d[1] = r[1];
-	_d[2] = r[2];
-	_d[3] = t[0];
-	_d[4] = t[1];
-	_d[5] = t[2];
-}
-
-ARAPDeformation::ARAPDeformation(const ml::vec6d & d,  double w)
-	: _d(d)
+ARAPDeformation::ARAPDeformation(const Point & position, const ml::vec6d & d,  double w)
+	: _position(position)
+	, _d(d)
 	, _w(w)
 { }
 
+ARAPDeformation::ARAPDeformation(const Point & position)
+	: ARAPDeformation(position, ml::vec6d::origin)
+{ }
+
 ARAPDeformation::ARAPDeformation()
-	: ARAPDeformation(ml::vec3f::origin, ml::vec3f::origin)
+	: ARAPDeformation(CGAL::ORIGIN)
 {}
 
 ARAPDeformation::ARAPDeformation(const ARAPDeformation & other)
-	: _d(other._d)
+	: _position(other._position)
+	, _d(other._d)
 	, _w(other._w)
 {}
 
@@ -68,9 +63,5 @@ ARAPDeformation::ARAPDeformation(const ARAPDeformation & deformation, bool inver
 	}
 }
 
-std::shared_ptr<ARAPDeformation> createDeformation()
-{
-	return std::make_shared<ARAPDeformation>();
-}
 
 }

@@ -25,14 +25,15 @@ public:
 	std::shared_ptr<IPositionDeformation> invertDeformation() const override;
 	std::shared_ptr<IPositionDeformation> clone() const override;
 public:
-	ARAPDeformation(const ml::vec3d & r, const ml::vec3d & t, double w = 1.);
-	ARAPDeformation(const ml::vec6d & d, double w = 1.);
+	//ARAPDeformation(const Point & position, const ml::vec3d & r, const ml::vec3d & t, double w = 1.);
+	ARAPDeformation(const Point & position, const ml::vec6d & d, double w = 1.);
+	ARAPDeformation(const Point & position);
 	ARAPDeformation();
 	ARAPDeformation(const ARAPDeformation& other);
 	ARAPDeformation(const ARAPDeformation& deformation, bool inverse);
 };
 
 
-std::shared_ptr<ARAPDeformation> createDeformation();
+//std::shared_ptr<ARAPDeformation> createDeformation();
 
 }

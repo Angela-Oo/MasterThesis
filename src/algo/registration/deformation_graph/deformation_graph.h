@@ -148,10 +148,11 @@ template <typename PositionDeformation>
 PositionAndDeformation DeformationGraph<PositionDeformation>::deformNode(vertex_descriptor node_index) const
 {
 	PositionAndDeformation node = getNode(node_index);
+	auto deformed_point = _global.deformPosition(node.getDeformedPosition());
 
 	PositionAndDeformation deformed_node;
-	deformed_node._point = _global.deformPosition(node.getDeformedPosition());
-	deformed_node._deformation = std::make_shared<PositionDeformation>();
+	deformed_node._point = deformed_point;
+	deformed_node._deformation = std::make_shared<PositionDeformation>(deformed_point);
 	return deformed_node;
 }
 
@@ -265,7 +266,7 @@ PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh)
 
 	PositionAndDeformation global;
 	global._point = CGAL::ORIGIN + global_position;
-	global._deformation = std::make_shared<PositionDeformation>();
+	global._deformation = std::make_shared<PositionDeformation>(CGAL::ORIGIN + global_position);
 	return global;	
 }
 
@@ -275,7 +276,7 @@ DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh
 {
 	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>> nodes;
 	bool created;
-	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node", std::make_shared<PositionDeformation>());
+	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node", std::make_shared<PositionDeformation>(CGAL::ORIGIN));
 	assert(created);
 	//mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
 	mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
@@ -286,7 +287,7 @@ DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh
 	auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", vertex_color).first;
 
 	for (auto & v : mesh.vertices()) {
-		//nodes[v] = std::make_shared<PositionDeformation>(); // todo
+		nodes[v] = std::make_shared<PositionDeformation>(mesh.point(v)); // todo
 		colors[v] = vertex_color;
 	}
 
