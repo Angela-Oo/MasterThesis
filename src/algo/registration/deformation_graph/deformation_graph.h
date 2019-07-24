@@ -26,6 +26,7 @@ public:
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
 	Point getNodePosition(vertex_descriptor node_index) const;
+	std::shared_ptr<IPositionDeformation> getNodeDeformation(vertex_descriptor node_index) const;
 	PositionAndDeformation getNode(vertex_descriptor node_index) const;
 	PositionAndDeformation deformNode(vertex_descriptor node_index) const;
 	PositionAndDeformation invertNode(vertex_descriptor node_index) const;
@@ -130,6 +131,14 @@ template <typename PositionDeformation>
 Point DeformationGraph<PositionDeformation>::getNodePosition(vertex_descriptor node_index) const
 {
 	return _mesh.point(node_index);
+}
+
+template <typename PositionDeformation>
+std::shared_ptr<IPositionDeformation> DeformationGraph<PositionDeformation>::getNodeDeformation(vertex_descriptor node_index) const
+{
+	auto deformation_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node"); // todo needs to be unique ptr (deep copy not possible)
+	assert(deformation_nodes.second);
+	return deformation_nodes.first[node_index];
 }
 
 template <typename PositionDeformation>

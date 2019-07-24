@@ -35,7 +35,6 @@ public:
 	Point deformed_point(SurfaceMesh::Vertex_index v) const;
 	Vector deformed_normal(SurfaceMesh::Vertex_index v) const;
 	NearestNodes & nearestNodes(SurfaceMesh::Vertex_index v) const;
-	std::vector<PositionAndDeformation> deformations(SurfaceMesh::Vertex_index v) const;
 	SurfaceMesh deformPoints();
 public:
 	DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph, unsigned int number_of_interpolation_neighbors);
@@ -91,17 +90,6 @@ NearestNodes & DeformedMesh<DeformationGraph>::nearestNodes(SurfaceMesh::Vertex_
 }
 
 template <typename DeformationGraph>
-std::vector<PositionAndDeformation> DeformedMesh<DeformationGraph>::deformations(SurfaceMesh::Vertex_index v) const
-{
-	std::vector<PositionAndDeformation> d;
-	auto & nodes = nearestNodes(v);
-	for (auto n : nodes.node_weight_vector) {
-		d.emplace_back(_deformation_graph.getNode(n.first));
-	}
-	return d;
-}
-
-template <typename DeformationGraph>
 SurfaceMesh DeformedMesh<DeformationGraph>::deformPoints()
 {
 	SurfaceMesh::Property_map<vertex_descriptor, NearestNodes> nearest_nodes;
@@ -126,7 +114,7 @@ NearestNodes DeformedMesh<DeformationGraph>::createNearestNodes(vertex_descripto
 
 	// max distance
 	vertex_descriptor last_node_descriptor = nearest_deformation_nodes[nearest_deformation_nodes.size() - 1];
-	Point last_node = _deformation_graph.getNode(last_node_descriptor)._point;
+	Point last_node = _deformation_graph.getNodePosition(last_node_descriptor);
 	double d_max = std::sqrt(CGAL::squared_distance(point, last_node));
 	if (nearest_deformation_nodes.size() < 2) {
 		d_max = 1.;
@@ -139,7 +127,7 @@ NearestNodes DeformedMesh<DeformationGraph>::createNearestNodes(vertex_descripto
 	for (size_t i = 0; i < nearest_deformation_nodes.size() - 1; ++i)
 	{
 		vertex_descriptor v = nearest_deformation_nodes[i];
-		Point node_point = _deformation_graph.getNode(v)._point;
+		Point node_point = _deformation_graph.getNodePosition(v);
 		double distance = std::sqrt(CGAL::squared_distance(point, node_point));
 		double weight = std::pow(1. - (distance / d_max), 2);
 		vertex_weight_vector.push_back(std::make_pair(v, weight));

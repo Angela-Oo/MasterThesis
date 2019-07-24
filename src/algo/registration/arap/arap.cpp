@@ -82,10 +82,10 @@ ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &proble
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
 														global._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[2].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[3].first)._deformation->d()));
+														_deformation_graph.getNodeDeformation(n_w_vector[0].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[1].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[2].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[3].first)->d()));
 	}
 	else if (_registration_options.dg_options.number_of_interpolation_neighbors == 3) {
 		auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global._point,
@@ -97,9 +97,9 @@ ResidualIds AsRigidAsPossible::addPointToPointCostForNode(ceres::Problem &proble
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
 														global._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[2].first)._deformation->d()));
+														_deformation_graph.getNodeDeformation(n_w_vector[0].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[1].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[2].first)->d()));
 	}
 
 	return residual_ids;
@@ -129,10 +129,10 @@ ResidualIds AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &proble
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
 														global._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[2].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[3].first)._deformation->d()));
+														_deformation_graph.getNodeDeformation(n_w_vector[0].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[1].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[2].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[3].first)->d()));
 	}
 	else if (_registration_options.dg_options.number_of_interpolation_neighbors == 3) {
 		auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
@@ -145,9 +145,9 @@ ResidualIds AsRigidAsPossible::addPointToPlaneCostForNode(ceres::Problem &proble
 		auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 		residual_ids.push_back(problem.AddResidualBlock(cost_function, loss_function,
 														global._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[0].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[1].first)._deformation->d(),
-														_deformation_graph.getNode(n_w_vector[2].first)._deformation->d()));
+														_deformation_graph.getNodeDeformation(n_w_vector[0].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[1].first)->d(),
+														_deformation_graph.getNodeDeformation(n_w_vector[2].first)->d()));
 	}
 
 	return residual_ids;
