@@ -21,9 +21,28 @@ Point Deformation::position() const
 	return _position;
 }
 
-std::shared_ptr<IPositionDeformation> Deformation::invertDeformation() const
+Point Deformation::getDeformedPosition() const
 {
-	return std::make_shared<Deformation>(_position, _r.getInverse(), -_t, _w);
+	Vector v = _position - CGAL::ORIGIN;
+	return CGAL::ORIGIN + v + translation();
+}
+
+Point Deformation::deformPosition(const Point & point) const
+{
+	auto edge = point - _position;
+	Vector rotated_point = rotation()(edge);
+	Vector moved_position = (_position - CGAL::ORIGIN) + translation();
+	return CGAL::ORIGIN + moved_position + rotated_point;
+}
+
+Vector Deformation::deformNormal(const Vector & normal) const
+{
+	return rotation()(normal);
+}
+
+Deformation Deformation::invertDeformation() const
+{
+	return Deformation(_position, _r.getInverse(), -_t, _w);
 }
 
 std::shared_ptr<IPositionDeformation> Deformation::clone() const
@@ -45,6 +64,16 @@ Deformation::Deformation()
 Deformation::Deformation(const Point & position)
 	: Deformation(position, ml::mat3d::identity(), ml::vec3f::origin)
 {}
+
+Deformation::Deformation(const RigidDeformation & rigid_deformation)
+{
+	auto r = rigid_deformation.rotation();
+	//double x = r.m(0,1);
+	ml::mat3d rotation(r.m(0, 0), r.m(0, 1), r.m(0, 2), r.m(1, 0), r.m(1, 1), r.m(1, 2), r.m(2, 0), r.m(2, 1), r.m(2, 2));
+	_r = rotation;
+	_t = rigid_deformation._t;
+	_position = rigid_deformation._g;
+}
 
 Deformation::Deformation(const Deformation & other)
 	: _position(other._position)

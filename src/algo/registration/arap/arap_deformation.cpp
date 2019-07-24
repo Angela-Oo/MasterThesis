@@ -25,9 +25,28 @@ Point ARAPDeformation::position() const
 	return _position;
 }
 
-std::shared_ptr<IPositionDeformation> ARAPDeformation::invertDeformation() const
+Point ARAPDeformation::getDeformedPosition() const
 {
-	return std::make_shared<ARAPDeformation>(_position, -_d, _w);
+	Vector v = _position - CGAL::ORIGIN;
+	return CGAL::ORIGIN + v + translation();
+}
+
+Point ARAPDeformation::deformPosition(const Point & point) const
+{
+	auto edge = point - _position;
+	Vector rotated_point = rotation()(edge);
+	Vector moved_position = (_position - CGAL::ORIGIN) + translation();
+	return CGAL::ORIGIN + moved_position + rotated_point;
+}
+
+Vector ARAPDeformation::deformNormal(const Vector & normal) const
+{
+	return rotation()(normal);
+}
+
+ARAPDeformation ARAPDeformation::invertDeformation() const
+{
+	return ARAPDeformation(_position, -_d, _w);
 }
 
 std::shared_ptr<IPositionDeformation> ARAPDeformation::clone() const
@@ -44,6 +63,17 @@ ARAPDeformation::ARAPDeformation(const Point & position, const ml::vec6d & d,  d
 ARAPDeformation::ARAPDeformation(const Point & position)
 	: ARAPDeformation(position, ml::vec6d::origin)
 { }
+
+ARAPDeformation::ARAPDeformation(const RigidDeformation & rigid_deformation)
+{
+	_d[0] = rigid_deformation._r[0];
+	_d[1] = rigid_deformation._r[1];
+	_d[2] = rigid_deformation._r[2];
+	_d[3] = rigid_deformation._t[0];
+	_d[4] = rigid_deformation._t[1];
+	_d[5] = rigid_deformation._t[2];
+	_position = rigid_deformation._g;
+}
 
 ARAPDeformation::ARAPDeformation()
 	: ARAPDeformation(CGAL::ORIGIN)

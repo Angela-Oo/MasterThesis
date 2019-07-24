@@ -17,8 +17,10 @@ public:
 	Matrix rotation() const;
 	Vector translation() const;
 public:
-	Point deformPoint(const Point & point) const;
-	Vector deformNormal(const Vector & normal) const;
+	Point getDeformedPosition() const;
+	Point deformPosition(Point point) const;
+	Point deformPoint(const Point & point) const; // todo remove
+	Vector deformNormal(const Vector & normal) const;;
 public:
 	RigidDeformation invertDeformation() const;
 public:

@@ -18,7 +18,8 @@ class DeformationGraph
 {
 public:
 	SurfaceMesh _mesh;
-	PositionAndDeformation _global;
+	PositionDeformation _global;
+	//PositionAndDeformation _global;
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
 public:
 	std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const;
@@ -26,19 +27,17 @@ public:
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
 	Point getNodePosition(vertex_descriptor node_index) const;
-	std::shared_ptr<IPositionDeformation> getNodeDeformation(vertex_descriptor node_index) const;
-	PositionAndDeformation getNode(vertex_descriptor node_index) const;
-	PositionAndDeformation deformNode(vertex_descriptor node_index) const;
-	PositionAndDeformation invertNode(vertex_descriptor node_index) const;
+	PositionDeformation & getNodeDeformation(vertex_descriptor node_index) const;
+	PositionDeformation deformNode(vertex_descriptor node_index) const;
 public:
 	DeformationGraph invertDeformation() const;
-	void setRigidDeformation(const PositionAndDeformation & rigid_deformation);
+	void setRigidDeformation(const RigidDeformation & rigid_deformation);
 	RigidDeformation getRigidDeformation() const;
 public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
 	DeformationGraph(const SurfaceMesh & graph, 
-					 const PositionAndDeformation & global_deformation);
+					 const PositionDeformation & global_deformation);
 	DeformationGraph(const DeformationGraph<PositionDeformation> & deformation_graph);
 	DeformationGraph<PositionDeformation> & operator=(DeformationGraph<PositionDeformation> other);
 };
@@ -89,14 +88,14 @@ Point DeformationGraph<PositionDeformation>::deformPoint(const Point & point, co
 {
 	Vector deformed_point(0., 0., 0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
 	for (auto n_w : nearest_nodes.node_weight_vector)
 	{
 		double w = n_w.second;
-		auto node = getNode(n_w.first);
+		auto node = getNodeDeformation(n_w.first);
 		Vector transformed_point = node.deformPosition(point) - CGAL::ORIGIN;
 		transformed_point *= w;
 		deformed_point += transformed_point;
@@ -111,14 +110,14 @@ Vector DeformationGraph<PositionDeformation>::deformNormal(const Vector & normal
 {
 	Vector deformed_normal(0., 0., 0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
 	for (auto n_w : nearest_nodes.node_weight_vector)
 	{
 		double w = n_w.second;
-		auto node = getNode(n_w.first);
+		auto node = getNodeDeformation(n_w.first);
 		Vector transformed_normal = node.deformNormal(normal);
 		transformed_normal *= w;
 		deformed_normal += transformed_normal;
@@ -134,61 +133,33 @@ Point DeformationGraph<PositionDeformation>::getNodePosition(vertex_descriptor n
 }
 
 template <typename PositionDeformation>
-std::shared_ptr<IPositionDeformation> DeformationGraph<PositionDeformation>::getNodeDeformation(vertex_descriptor node_index) const
+PositionDeformation & DeformationGraph<PositionDeformation>::getNodeDeformation(vertex_descriptor node_index) const
 {
-	auto deformation_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node"); // todo needs to be unique ptr (deep copy not possible)
+	auto deformation_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node"); // todo needs to be unique ptr (deep copy not possible)
 	assert(deformation_nodes.second);
 	return deformation_nodes.first[node_index];
 }
 
 template <typename PositionDeformation>
-PositionAndDeformation DeformationGraph<PositionDeformation>::getNode(vertex_descriptor node_index) const
+PositionDeformation DeformationGraph<PositionDeformation>::deformNode(vertex_descriptor node_index) const
 {
-	PositionAndDeformation node;
-	auto deformation_nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node"); // todo needs to be unique ptr (deep copy not possible)
-	assert(deformation_nodes.second);
-	std::shared_ptr<IPositionDeformation> n = deformation_nodes.first[node_index];
-	node._deformation = n;
-	node._point = _mesh.point(node_index);
-	return node;
+	auto node = getNodeDeformation(node_index);
+	Point deformed_point = _global.deformPosition(node.getDeformedPosition());
+	return PositionDeformation(deformed_point);
 }
 
 template <typename PositionDeformation>
-PositionAndDeformation DeformationGraph<PositionDeformation>::deformNode(vertex_descriptor node_index) const
+void DeformationGraph<PositionDeformation>::setRigidDeformation(const RigidDeformation & rigid_deformation)
 {
-	PositionAndDeformation node = getNode(node_index);
-	auto deformed_point = _global.deformPosition(node.getDeformedPosition());
-
-	PositionAndDeformation deformed_node;
-	deformed_node._point = deformed_point;
-	deformed_node._deformation = std::make_shared<PositionDeformation>(deformed_point);
-	return deformed_node;
-}
-
-
-template <typename PositionDeformation>
-PositionAndDeformation DeformationGraph<PositionDeformation>::invertNode(vertex_descriptor node_index) const
-{
-	PositionAndDeformation node = getNode(node_index);
-
-	PositionAndDeformation deformed_node;
-	deformed_node._point = _global.deformPosition(node.getDeformedPosition());
-	deformed_node._deformation = node._deformation->invertDeformation();
-	return deformed_node;
-}
-
-template <typename PositionDeformation>
-void DeformationGraph<PositionDeformation>::setRigidDeformation(const PositionAndDeformation & rigid_deformation)
-{
-	_global = rigid_deformation;
+	_global = PositionDeformation(rigid_deformation);
 }
 
 template <typename PositionDeformation>
 RigidDeformation DeformationGraph<PositionDeformation>::getRigidDeformation() const
 {
-	return RigidDeformation(_global._deformation->rotation(),
-							_global._deformation->translation(),
-							_global._point);
+	return RigidDeformation(_global.rotation(),
+							_global.translation(),
+							_global.position());
 }
 
 template <typename PositionDeformation>
@@ -196,7 +167,7 @@ DeformationGraph<PositionDeformation> DeformationGraph<PositionDeformation>::inv
 {
 	SurfaceMesh mesh = _mesh;
 
-	auto property_deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
+	auto property_deformations = mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
 	assert(property_deformations.second);
 	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
 	assert(property_normals.second);
@@ -205,19 +176,22 @@ DeformationGraph<PositionDeformation> DeformationGraph<PositionDeformation>::inv
 	auto deformations = property_deformations.first;
 	for (auto v : mesh.vertices())
 	{
-		auto deformed_node = invertNode(v);
-		mesh.point(v) = deformed_node._point;
-		deformations[v] = deformed_node._deformation;
+		auto & node = getNodeDeformation(v);
+		auto deformed_position = _global.deformPosition(node.getDeformedPosition()); //??
+		auto invert_deformation = node.invertDeformation();	// TODO	
+
+		mesh.point(v) = deformed_position;// TODO TODO?? or better undeformed position
+		deformations[v] = invert_deformation;
 	}
 
 	auto global = _global;
-	global._deformation = _global._deformation->invertDeformation();
+	global = _global.invertDeformation();
 	return DeformationGraph(mesh, global);
 }
 
 template <typename PositionDeformation>
 DeformationGraph<PositionDeformation>::DeformationGraph(const SurfaceMesh & graph,
-														const PositionAndDeformation & global_deformation)
+														const PositionDeformation & global_deformation)
 	: _mesh(graph)
 	, _global(global_deformation)
 {
@@ -230,12 +204,12 @@ DeformationGraph<PositionDeformation>::DeformationGraph(const DeformationGraph<P
 	, _mesh(deformation_graph._mesh)
 {
 	// deep copy of deformations
-	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
-	assert(nodes.second);
-	for (auto & v : _mesh.vertices()) {
-		nodes.first[v] = nodes.first[v]->clone();
-	}
-	_global._deformation = _global._deformation->clone();
+	//auto nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
+	//assert(nodes.second);
+	//for (auto & v : _mesh.vertices()) {
+	//	nodes.first[v] = nodes.first[v]->clone();
+	//}
+	//_global = _global.clone(); // TODO??
 
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
@@ -252,12 +226,12 @@ DeformationGraph<PositionDeformation> & DeformationGraph<PositionDeformation>::o
 	_mesh = other._mesh;
 
 	// deep copy of deformations
-	auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
-	assert(nodes.second);
-	for (auto & v : _mesh.vertices()) {
-		nodes.first[v] = nodes.first[v]->clone();
-	}
-	_global._deformation = _global._deformation->clone();
+	//auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
+	//assert(nodes.second);
+	//for (auto & v : _mesh.vertices()) {
+	//	nodes.first[v] = nodes.first[v]->clone();
+	//}
+	//_global = _global.clone();
 
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
@@ -265,7 +239,7 @@ DeformationGraph<PositionDeformation> & DeformationGraph<PositionDeformation>::o
 
 
 template <typename PositionDeformation>
-PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh)
+PositionDeformation createGlobalDeformation(const SurfaceMesh & mesh)
 {
 	Vector global_position(0., 0., 0.);
 	for (auto & v : mesh.vertices()) {
@@ -273,19 +247,16 @@ PositionAndDeformation createGlobalDeformation(const SurfaceMesh & mesh)
 	}
 	global_position /= mesh.number_of_vertices();
 
-	PositionAndDeformation global;
-	global._point = CGAL::ORIGIN + global_position;
-	global._deformation = std::make_shared<PositionDeformation>(CGAL::ORIGIN + global_position);
-	return global;	
+	return PositionDeformation(CGAL::ORIGIN + global_position);
 }
 
 template <typename PositionDeformation>
 DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh mesh,
-																	 PositionAndDeformation global_deformation)
+																	 PositionDeformation global_deformation)
 {
-	SurfaceMesh::Property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>> nodes;
+	SurfaceMesh::Property_map<vertex_descriptor, PositionDeformation> nodes;
 	bool created;
-	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node", std::make_shared<PositionDeformation>(CGAL::ORIGIN));
+	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, PositionDeformation>("v:node", PositionDeformation(CGAL::ORIGIN));
 	assert(created);
 	//mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
 	mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
@@ -296,7 +267,7 @@ DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh
 	auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", vertex_color).first;
 
 	for (auto & v : mesh.vertices()) {
-		nodes[v] = std::make_shared<PositionDeformation>(mesh.point(v)); // todo
+		nodes[v] = PositionDeformation(mesh.point(v)); // todo
 		colors[v] = vertex_color;
 	}
 

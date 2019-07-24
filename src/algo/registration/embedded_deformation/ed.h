@@ -102,7 +102,7 @@ public:
 
 
 
-PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
+ED::Deformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
 
 
 std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,

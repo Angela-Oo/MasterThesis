@@ -22,11 +22,17 @@ public:
 	Vector translation() const override;
 	Point position() const override;
 	double weight() const override { return _w; };
-	std::shared_ptr<IPositionDeformation> invertDeformation() const override;
+public:
+	Point getDeformedPosition() const override;
+	Point deformPosition(const Point & point) const override;
+	Vector deformNormal(const Vector & normal) const override;
+public:
+	Deformation invertDeformation() const;
 	std::shared_ptr<IPositionDeformation> clone() const override;
 public:
 	Deformation(const Point & position);
 	Deformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w = 1.);
+	Deformation(const RigidDeformation & rigid_deformation);
 	Deformation();
 	Deformation(const Deformation& other);
 	Deformation(const Deformation& node, bool inverse);

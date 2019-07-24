@@ -12,7 +12,7 @@ SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_g
 	SurfaceMesh mesh = deformation_graph._mesh;
 	for (auto & v : mesh.vertices()) {
 		auto deformed = deformation_graph.deformNode(v);
-		mesh.point(v) = deformed._point;
+		mesh.point(v) = deformed.position();// ._point;
 	}
 	return mesh;
 }

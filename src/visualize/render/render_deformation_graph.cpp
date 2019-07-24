@@ -92,18 +92,18 @@ void setVertexColorOfUnusedVerticesToBlack(SurfaceMesh & mesh)
 	}
 }
 
-void setVertexColorWithSmallWeightsToWhite(SurfaceMesh & mesh)
-{	
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
-	if (deformations.second) {
-		auto colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-
-		for (auto & v : mesh.vertices()) {
-			if (deformations.first[v]->weight() < 0.5)
-				colors[v] = ml::RGBColor::White.toVec4f();
-		}
-	}
-}
+//void setVertexColorWithSmallWeightsToWhite(SurfaceMesh & mesh)
+//{	
+//	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
+//	if (deformations.second) {
+//		auto colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+//
+//		for (auto & v : mesh.vertices()) {
+//			if (deformations.first[v]->weight() < 0.5)
+//				colors[v] = ml::RGBColor::White.toVec4f();
+//		}
+//	}
+//}
 
 void setVertexColorBasedOnFitCost(SurfaceMesh & mesh, double reference_cost)
 {
@@ -139,7 +139,7 @@ void setVertexColor(SurfaceMesh & mesh, double reference_cost, bool use_only_smo
 	//}
 
 	setVertexColorOfUnusedVerticesToBlack(mesh);
-	setVertexColorWithSmallWeightsToWhite(mesh);
+	//setVertexColorWithSmallWeightsToWhite(mesh);
 }
 
 

@@ -96,7 +96,7 @@ public:
 //-----------------------------------------------------------------------------
 
 
-PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
+ARAPDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
 
 
 std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,

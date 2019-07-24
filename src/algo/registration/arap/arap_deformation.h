@@ -1,6 +1,7 @@
 #pragma once
 #include "mLibInclude.h"
 #include "algo/registration/deformation_graph/i_deformation.h"
+#include "algo/registration/rigid_registration/rigid_deformation.h"
 
 namespace Registration {
 
@@ -21,13 +22,19 @@ public:
 	Matrix rotation() const override;
 	Vector translation() const override;
 	Point position() const override;
+public:
+	Point getDeformedPosition() const override;
+	Point deformPosition(const Point & point) const override;
+	Vector deformNormal(const Vector & normal) const override;
+public:
 	double weight() const override { return _w; };
-	std::shared_ptr<IPositionDeformation> invertDeformation() const override;
+	ARAPDeformation invertDeformation() const;
 	std::shared_ptr<IPositionDeformation> clone() const override;
 public:
 	//ARAPDeformation(const Point & position, const ml::vec3d & r, const ml::vec3d & t, double w = 1.);
 	ARAPDeformation(const Point & position, const ml::vec6d & d, double w = 1.);
 	ARAPDeformation(const Point & position);
+	ARAPDeformation(const RigidDeformation & rigid_deformation);
 	ARAPDeformation();
 	ARAPDeformation(const ARAPDeformation& other);
 	ARAPDeformation(const ARAPDeformation& deformation, bool inverse);

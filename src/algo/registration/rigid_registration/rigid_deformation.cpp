@@ -19,12 +19,23 @@ Vector RigidDeformation::translation() const
 	return Vector(_t[0], _t[1], _t[2]);
 }
 
-Point RigidDeformation::deformPoint(const Point & point) const
+Point RigidDeformation::getDeformedPosition() const
+{
+	Vector v = _g - CGAL::ORIGIN;
+	return CGAL::ORIGIN + v + translation();
+}
+
+Point RigidDeformation::deformPosition(Point point) const
 {
 	auto edge = point - _g;
 	Vector rotated_point = rotation()(edge);
 	Vector moved_position = (_g - CGAL::ORIGIN) + translation();
 	return CGAL::ORIGIN + moved_position + rotated_point;
+}
+
+Point RigidDeformation::deformPoint(const Point & point) const
+{
+	return deformPosition(point);
 }
 
 Vector RigidDeformation::deformNormal(const Vector & normal) const

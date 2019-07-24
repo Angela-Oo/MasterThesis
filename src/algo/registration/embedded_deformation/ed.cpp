@@ -61,7 +61,7 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Pr
 	auto & global = _deformation_graph._global;
 	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
-	auto cost_function = FitStarPointToPointCostFunction::Create(target_point, _deformed_mesh->point(v), global._point,
+	auto cost_function = FitStarPointToPointCostFunction::Create(target_point, _deformed_mesh->point(v), global.position(),
 																 _deformation_graph.getNodePosition(n_w_vector[0].first),
 																 _deformation_graph.getNodePosition(n_w_vector[1].first),
 																 _deformation_graph.getNodePosition(n_w_vector[2].first),
@@ -69,11 +69,11 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Pr
 																 n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function,
-									global._deformation->d(),
-									_deformation_graph.getNodeDeformation(n_w_vector[0].first)->d(),
-									_deformation_graph.getNodeDeformation(n_w_vector[1].first)->d(),
-									_deformation_graph.getNodeDeformation(n_w_vector[2].first)->d(),
-									_deformation_graph.getNodeDeformation(n_w_vector[3].first)->d());
+									global.d(),
+									_deformation_graph.getNodeDeformation(n_w_vector[0].first).d(),
+									_deformation_graph.getNodeDeformation(n_w_vector[1].first).d(),
+									_deformation_graph.getNodeDeformation(n_w_vector[2].first).d(),
+									_deformation_graph.getNodeDeformation(n_w_vector[3].first).d());
 }
 
 ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal)
@@ -85,7 +85,7 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Pr
 	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
 	ceres::CostFunction* cost_function = FitStarPointToPlaneCostFunction::Create(target_point, target_normal,
-																				 _deformed_mesh->point(v), global._point,
+																				 _deformed_mesh->point(v), global.position(),
 																				 _deformation_graph.getNodePosition(n_w_vector[0].first),
 																				 _deformation_graph.getNodePosition(n_w_vector[1].first),
 																				 _deformation_graph.getNodePosition(n_w_vector[2].first),
@@ -93,20 +93,18 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Pr
 																				 n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function,
-									global._deformation->d(),
-									_deformation_graph.getNodeDeformation(n_w_vector[0].first)->d(),
-									_deformation_graph.getNodeDeformation(n_w_vector[1].first)->d(),
-									_deformation_graph.getNodeDeformation(n_w_vector[2].first)->d(),
-									_deformation_graph.getNodeDeformation(n_w_vector[3].first)->d());
+									global.d(),
+									_deformation_graph.getNodeDeformation(n_w_vector[0].first).d(),
+									_deformation_graph.getNodeDeformation(n_w_vector[1].first).d(),
+									_deformation_graph.getNodeDeformation(n_w_vector[2].first).d(),
+									_deformation_graph.getNodeDeformation(n_w_vector[3].first).d());
 }
 
 
 VertexResidualIds EmbeddedDeformation::addFitCostWithoutICP(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
-
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
 	
 	auto target_normals = _dst.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : mesh.vertices())
@@ -126,7 +124,6 @@ VertexResidualIds EmbeddedDeformation::addFitCost(ceres::Problem &problem)
 	VertexResidualIds residual_ids;
 
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
 
 	auto vertex_used = mesh.property_map<vertex_descriptor, bool>("v:vertex_used").first;
 	int i = 0;
@@ -159,7 +156,7 @@ EdgeResidualIds EmbeddedDeformation::addSmoothCost(ceres::Problem &problem)
 {
 	EdgeResidualIds residual_ids;
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, ED::Deformation>("v:node").first;
 	for (auto e : mesh.halfedges())
 	{
 		auto target = mesh.target(e);
@@ -168,7 +165,7 @@ EdgeResidualIds EmbeddedDeformation::addSmoothCost(ceres::Problem &problem)
 		ceres::CostFunction* cost_function = SmoothCostFunction::Create(mesh.point(source), mesh.point(target));
 		auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 		auto residual_id = problem.AddResidualBlock(cost_function, loss_function,
-													deformations[source]->r(), deformations[source]->t(), deformations[target]->t());
+													deformations[source].r(), deformations[source].t(), deformations[target].t());
 
 		auto edge = _deformation_graph._mesh.edge(e);
 		residual_ids[edge].push_back(residual_id);
@@ -181,12 +178,12 @@ VertexResidualIds EmbeddedDeformation::addRotationCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
 
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
+	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, ED::Deformation>("v:node").first;
 	for (auto & v : _deformation_graph._mesh.vertices())
 	{
 		ceres::CostFunction* cost_function = RotationCostFunction::Create();
 		auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), a_rigid, ceres::TAKE_OWNERSHIP);
-		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v]->r()));
+		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v].r()));
 	}
 	return residual_ids;
 }
@@ -195,12 +192,12 @@ VertexResidualIds EmbeddedDeformation::addConfCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
 
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node").first;
+	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, ED::Deformation>("v:node").first;
 	for (auto & v : _deformation_graph._mesh.vertices())
 	{
 		ceres::CostFunction* cost_function = ConfCostFunction::Create();
 		auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
-		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v]->w()));
+		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v].w()));
 	}
 	return residual_ids;
 }
@@ -228,7 +225,7 @@ bool EmbeddedDeformation::solveIteration()
 		// add global rotation cost
 		ceres::CostFunction* cost_function = RotationCostFunction::Create();
 		auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), a_rigid, ceres::TAKE_OWNERSHIP);
-		problem.AddResidualBlock(cost_function, loss_function, _deformation_graph._global._deformation->r());
+		problem.AddResidualBlock(cost_function, loss_function, _deformation_graph._global.r());
 
 
 		ceres::Solve(_options, &problem, &summary);
@@ -299,7 +296,7 @@ void EmbeddedDeformation::evaluateResidual(ceres::Problem & problem,
 
 void EmbeddedDeformation::setRigidDeformation(const RigidDeformation & rigid_deformation)
 {
-	_deformation_graph.setRigidDeformation(createGlobalDeformationFromRigidDeformation(rigid_deformation));
+	_deformation_graph.setRigidDeformation(rigid_deformation);// createGlobalDeformationFromRigidDeformation(rigid_deformation));
 }
 
 
@@ -367,18 +364,12 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 
 //-----------------------------------------------------------------------------
 
-PositionAndDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
-{
-	PositionAndDeformation global;
-	global._point = rigid_deformation._g;
-	
+ED::Deformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
+{	
 	auto r = rigid_deformation.rotation();
-
 	//double x = r.m(0,1);
 	ml::mat3d rotation(r.m(0, 0),r.m(0, 1), r.m(0, 2),r.m(1, 0), r.m(1, 1), r.m(1, 2), r.m(2, 0), r.m(2, 1), r.m(2, 2));
-	global._deformation = std::make_shared<Deformation>(rigid_deformation._g, rotation, rigid_deformation._t);
-
-	return global;
+	return Deformation(rigid_deformation._g, rotation, rigid_deformation._t);
 }
 
 
