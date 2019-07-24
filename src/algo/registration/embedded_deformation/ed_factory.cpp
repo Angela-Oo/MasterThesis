@@ -10,8 +10,8 @@ std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(cons
 																			const SurfaceMesh & target)
 {
 	auto reduced_mesh = createReducedMesh(source, _options.dg_options.edge_length, _options.mesh_reduce_strategy);
-	auto global = createGlobalDeformation(source, createDeformation);
-	auto deformation_graph = createDeformationGraphFromMesh<ED::Deformation>(reduced_mesh, global, createDeformation);
+	auto global = createGlobalDeformation<ED::Deformation>(source);
+	auto deformation_graph = createDeformationGraphFromMesh<ED::Deformation>(reduced_mesh, global);
 
 	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger);
 }

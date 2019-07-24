@@ -759,9 +759,6 @@
     <ClCompile Include="src\algo\evaluate_registration.cpp">
       <Filter>1 algo\4 evaluate registration</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\deformation_graph\deformation_graph.cpp">
-      <Filter>1 algo\3 registration\1 deformation graph</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\surface_mesh\mesh_convertion.cpp">
       <Filter>1 algo\0 surface mesh</Filter>
     </ClCompile>

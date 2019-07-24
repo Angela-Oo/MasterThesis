@@ -8,8 +8,8 @@ std::unique_ptr<AsRigidAsPossible> ARAPFactory::operator()(const SurfaceMesh & s
 														   const SurfaceMesh & target)
 {
 	auto reduced_mesh = createReducedMesh(source, _options.dg_options.edge_length, _options.mesh_reduce_strategy);
-	auto global = createGlobalDeformation(source, createDeformation);
-	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, createDeformation);
+	auto global = createGlobalDeformation<ARAPDeformation>(source);
+	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
 
 	return std::make_unique<AsRigidAsPossible>(source, target, deformation_graph, _ceres_options, _options, _logger);
 }
