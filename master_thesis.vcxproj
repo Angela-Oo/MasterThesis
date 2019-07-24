@@ -242,7 +242,6 @@
     <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\i_deformation.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\nearest_nodes.h" />
-    <ClInclude Include="src\algo\registration\deformation_graph\position_and_deformation.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h" />
@@ -309,7 +308,6 @@
     <ClCompile Include="src\algo\registration\ceres_option.cpp" />
     <ClCompile Include="src\algo\registration\ceres_residual_evaluation.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp" />
-    <ClCompile Include="src\algo\registration\deformation_graph\position_and_deformation.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_factory.cpp" />

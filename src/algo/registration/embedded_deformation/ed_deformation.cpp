@@ -45,11 +45,6 @@ Deformation Deformation::invertDeformation() const
 	return Deformation(_position, _r.getInverse(), -_t, _w);
 }
 
-std::shared_ptr<IPositionDeformation> Deformation::clone() const
-{
-	return std::make_shared<Deformation>(*this);
-}
-
 Deformation::Deformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w)
 	: _position(position)
 	, _r(r)

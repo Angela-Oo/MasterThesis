@@ -13,22 +13,21 @@ private:
 	double _w; // weight
 	Point _position;
 public:
-	double * d() override { return (&_r)->getData(); } // todo
-	double * r() override { return (&_r)->getData(); }
-	double * t() override { return (&_t)->getData(); }
-	double * w() override { return &_w; }
+	double * d() { return (&_r)->getData(); } // todo
+	double * r() { return (&_r)->getData(); }
+	double * t() { return (&_t)->getData(); }
+	double * w() { return &_w; }
 public:
 	Matrix rotation() const override;
 	Vector translation() const override;
 	Point position() const override;
-	double weight() const override { return _w; };
+	double weight() const { return _w; };
 public:
 	Point getDeformedPosition() const override;
 	Point deformPosition(const Point & point) const override;
 	Vector deformNormal(const Vector & normal) const override;
 public:
 	Deformation invertDeformation() const;
-	std::shared_ptr<IPositionDeformation> clone() const override;
 public:
 	Deformation(const Point & position);
 	Deformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w = 1.);

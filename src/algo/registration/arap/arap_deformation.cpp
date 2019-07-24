@@ -49,11 +49,6 @@ ARAPDeformation ARAPDeformation::invertDeformation() const
 	return ARAPDeformation(_position, -_d, _w);
 }
 
-std::shared_ptr<IPositionDeformation> ARAPDeformation::clone() const
-{
-	return std::make_shared<ARAPDeformation>(*this);
-}
-
 ARAPDeformation::ARAPDeformation(const Point & position, const ml::vec6d & d,  double w)
 	: _position(position)
 	, _d(d)

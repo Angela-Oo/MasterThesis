@@ -7,7 +7,6 @@
 #include "i_deformation.h"
 #include <CGAL/squared_distance_3.h> //for 3D functions
 #include "nearest_nodes.h"
-#include "position_and_deformation.h"
 #include "algo/registration/hsv_to_rgb.h"
 
 namespace Registration
@@ -19,7 +18,6 @@ class DeformationGraph
 public:
 	SurfaceMesh _mesh;
 	PositionDeformation _global;
-	//PositionAndDeformation _global;
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
 public:
 	std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const;
@@ -226,7 +224,7 @@ DeformationGraph<PositionDeformation> & DeformationGraph<PositionDeformation>::o
 	_mesh = other._mesh;
 
 	// deep copy of deformations
-	//auto nodes = _mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
+	//auto nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
 	//assert(nodes.second);
 	//for (auto & v : _mesh.vertices()) {
 	//	nodes.first[v] = nodes.first[v]->clone();

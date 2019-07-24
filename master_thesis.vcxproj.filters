@@ -611,9 +611,6 @@
     <ClInclude Include="src\algo\registration\deformation_graph\nearest_nodes.h">
       <Filter>1 algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph\position_and_deformation.h">
-      <Filter>1 algo\3 registration\1 deformation graph</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\deformed_mesh.h">
       <Filter>1 algo\3 registration\1 deformation graph</Filter>
     </ClInclude>
@@ -779,9 +776,6 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.cpp">
       <Filter>1 algo\3 registration\3 rigid registration</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\deformation_graph\position_and_deformation.cpp">
-      <Filter>1 algo\3 registration\1 deformation graph</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\render_registration.cpp">
       <Filter>6 visualize\render</Filter>

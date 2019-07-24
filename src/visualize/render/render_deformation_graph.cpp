@@ -94,7 +94,7 @@ void setVertexColorOfUnusedVerticesToBlack(SurfaceMesh & mesh)
 
 //void setVertexColorWithSmallWeightsToWhite(SurfaceMesh & mesh)
 //{	
-//	auto deformations = mesh.property_map<vertex_descriptor, std::shared_ptr<IPositionDeformation>>("v:node");
+//	auto deformations = mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
 //	if (deformations.second) {
 //		auto colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
 //

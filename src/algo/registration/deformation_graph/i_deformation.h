@@ -11,11 +11,6 @@ namespace Registration {
 class IPositionDeformation
 {
 public:
-	virtual double * d() = 0;
-	virtual double * r() = 0;
-	virtual double * t() = 0;
-	virtual double * w() = 0;
-public:
 	virtual Matrix rotation() const = 0;
 	virtual Vector translation() const = 0;
 	virtual Point position() const = 0;
@@ -23,10 +18,6 @@ public:
 	virtual Point getDeformedPosition() const = 0;
 	virtual Point deformPosition(const Point & point) const = 0;
 	virtual Vector deformNormal(const Vector & normal) const = 0;
-	virtual double weight() const = 0;
-	//virtual std::shared_ptr<IPositionDeformation> invertDeformation() const = 0;
-	virtual std::shared_ptr<IPositionDeformation> clone() const = 0;
-
 };
 
 }
