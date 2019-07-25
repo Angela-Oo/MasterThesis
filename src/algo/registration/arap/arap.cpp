@@ -329,7 +329,6 @@ bool AsRigidAsPossible::solveIteration()
 	if (_solve_iteration == 0)
 		_ceres_logger.write("start non rigid registration with arap\n");
 	if (!finished()) {
-		std::cout << std::endl;
 		_solve_iteration++;
 		ceres::Solver::Summary summary;
 		auto logger = _ceres_logger.CreateCeresIterationLogger(summary);
