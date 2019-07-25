@@ -41,7 +41,7 @@ Vector EDDeformation::deformNormal(const Vector & normal) const
 
 EDDeformation EDDeformation::invertDeformation() const
 {
-	return EDDeformation(_position, _r.getInverse(), -_t, _w);
+	return EDDeformation(getDeformedPosition(), _r.getInverse(), -_t, _w);
 }
 
 EDDeformation::EDDeformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w)

@@ -26,7 +26,6 @@ public:
 	double weight() const { return _w; };
 	ARAPDeformation invertDeformation() const;
 public:
-	//ARAPDeformation(const Point & position, const ml::vec3d & r, const ml::vec3d & t, double w = 1.);
 	ARAPDeformation(const Point & position, const ml::vec6d & d, double w = 1.);
 	ARAPDeformation(const Point & position);
 	ARAPDeformation(const RigidDeformation & rigid_deformation);

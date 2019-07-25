@@ -46,7 +46,7 @@ Vector ARAPDeformation::deformNormal(const Vector & normal) const
 
 ARAPDeformation ARAPDeformation::invertDeformation() const
 {
-	return ARAPDeformation(_position, -_d, _w);
+	return ARAPDeformation(getDeformedPosition(), -_d, _w);
 }
 
 ARAPDeformation::ARAPDeformation(const Point & position, const ml::vec6d & d,  double w)

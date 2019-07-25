@@ -9,7 +9,7 @@
 namespace Registration {
 
 template<typename NonRigidRegistration>
-class RigidBeforeNonRigidRegistration : public IRegistration
+class RigidBeforeNonRigidRegistration : public INonRigidRegistration
 {
 public:	
 	using Deformation = RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation>;
@@ -31,10 +31,10 @@ public:
 	SurfaceMesh getDeformedPoints() override;
 	SurfaceMesh getInverseDeformedPoints() override;	
 public:
-	SurfaceMesh getDeformationGraphMesh();
+	SurfaceMesh getDeformationGraphMesh() override;
 	const Deformation & getDeformation();
-	void setRigidDeformation(const RigidDeformation & rigid_deformation);
-	bool shouldBeSavedAsImage();
+	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
+	bool shouldBeSavedAsImage() override;
 public:
 	// without icp
 	RigidBeforeNonRigidRegistration(std::unique_ptr<RigidRegistration> rigid_registration,

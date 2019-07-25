@@ -127,7 +127,7 @@ Vector DeformationGraph<PositionDeformation>::deformNormal(const Vector & normal
 template <typename PositionDeformation>
 Point DeformationGraph<PositionDeformation>::getNodePosition(vertex_descriptor node_index) const
 {
-	return _mesh.point(node_index);
+	return getDeformation(node_index).position();
 }
 
 template <typename PositionDeformation>
@@ -164,7 +164,6 @@ template <typename PositionDeformation>
 DeformationGraph<PositionDeformation> DeformationGraph<PositionDeformation>::invertDeformation() const
 {
 	SurfaceMesh mesh = _mesh;
-
 	auto property_deformations = mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
 	assert(property_deformations.second);
 	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
@@ -175,15 +174,11 @@ DeformationGraph<PositionDeformation> DeformationGraph<PositionDeformation>::inv
 	for (auto v : mesh.vertices())
 	{
 		auto & node = getDeformation(v);
-		auto deformed_position = _global.deformPosition(node.getDeformedPosition()); //??
-		auto invert_deformation = node.invertDeformation();	// TODO	
-
-		mesh.point(v) = deformed_position;// TODO TODO?? or better undeformed position
-		deformations[v] = invert_deformation;
+		deformations[v] = node.invertDeformation();
+		mesh.point(v) = deformations[v].position();
 	}
 
-	auto global = _global;
-	global = _global.invertDeformation();
+	auto global = _global.invertDeformation();
 	return DeformationGraph(mesh, global);
 }
 
@@ -201,18 +196,8 @@ DeformationGraph<PositionDeformation>::DeformationGraph(const DeformationGraph<P
 	: _global(deformation_graph._global)
 	, _mesh(deformation_graph._mesh)
 {
-	// deep copy of deformations
-	//auto nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
-	//assert(nodes.second);
-	//for (auto & v : _mesh.vertices()) {
-	//	nodes.first[v] = nodes.first[v]->clone();
-	//}
-	//_global = _global.clone(); // TODO??
-
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
-
-
 
 template <typename PositionDeformation>
 DeformationGraph<PositionDeformation> & DeformationGraph<PositionDeformation>::operator=(DeformationGraph other)
@@ -223,18 +208,11 @@ DeformationGraph<PositionDeformation> & DeformationGraph<PositionDeformation>::o
 	_global = other._global;
 	_mesh = other._mesh;
 
-	// deep copy of deformations
-	//auto nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
-	//assert(nodes.second);
-	//for (auto & v : _mesh.vertices()) {
-	//	nodes.first[v] = nodes.first[v]->clone();
-	//}
-	//_global = _global.clone();
-
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
 }
 
+//-----------------------------------------------------------------------------
 
 template <typename PositionDeformation>
 PositionDeformation createGlobalDeformation(const SurfaceMesh & mesh)
@@ -244,7 +222,6 @@ PositionDeformation createGlobalDeformation(const SurfaceMesh & mesh)
 		global_position += mesh.point(v) - CGAL::ORIGIN;
 	}
 	global_position /= mesh.number_of_vertices();
-
 	return PositionDeformation(CGAL::ORIGIN + global_position);
 }
 
@@ -256,19 +233,14 @@ DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh
 	bool created;
 	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, PositionDeformation>("v:node_deformation", PositionDeformation(CGAL::ORIGIN));
 	assert(created);
-	//mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
 	mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
-	//mesh.add_property_map<vertex_descriptor, double>("v:conf_cost", 0.);
-	//mesh.add_property_map<vertex_descriptor, bool>("v:vertex_used", true);
 
 	auto vertex_color = errorToRGB(0.);
 	auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", vertex_color).first;
-
 	for (auto & v : mesh.vertices()) {
-		nodes[v] = PositionDeformation(mesh.point(v)); // todo
+		nodes[v] = PositionDeformation(mesh.point(v));
 		colors[v] = vertex_color;
 	}
-
 	return DeformationGraph<PositionDeformation>(mesh, global_deformation);
 }
 
