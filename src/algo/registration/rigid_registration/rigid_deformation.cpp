@@ -19,6 +19,11 @@ Vector RigidDeformation::translation() const
 	return Vector(_t[0], _t[1], _t[2]);
 }
 
+Point RigidDeformation::position() const
+{
+	return _g;
+}
+
 Point RigidDeformation::getDeformedPosition() const
 {
 	Vector v = _g - CGAL::ORIGIN;
@@ -52,10 +57,18 @@ RigidDeformation RigidDeformation::invertDeformation() const
 	return RigidDeformation(-_r, -_t, getDeformedPosition());
 }
 
+
+
 RigidDeformation::RigidDeformation()
+	: RigidDeformation(CGAL::ORIGIN)
+{}
+
+RigidDeformation::RigidDeformation(Point position)
 	: _r(ml::vec3f::origin)
 	, _t(ml::vec3f::origin)
-{}
+	, _g(position)
+{
+}
 
 RigidDeformation::RigidDeformation(ml::vec3d r, ml::vec3d t, Point g)
 	: _r(r)
@@ -77,7 +90,10 @@ RigidDeformation::RigidDeformation(Matrix r, Vector t, Point g)
 }
 
 
-
+RigidDeformation operator+(const RigidDeformation & lhs, const RigidDeformation & rhs)
+{
+	return RigidDeformation(lhs._r + rhs._r, lhs._t + rhs._t, lhs.position());
+}
 
 
 Point calculateGlobalCenter(const SurfaceMesh & mesh)

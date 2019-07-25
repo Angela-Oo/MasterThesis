@@ -32,12 +32,17 @@ SurfaceMesh RigidRegistration::getInverseDeformedPoints()
 
 const RigidDeformation & RigidRegistration::getRigidDeformation()
 {
-	return _deformation;
+	return getDeformation();
 }
 
 const RigidDeformation & RigidRegistration::getDeformation()
 {
-	return _deformation;
+	if (_previouse_deformation) {
+		return _previouse_deformation.get() + _deformation;
+	}
+	else {
+		return _deformation;
+	}
 }
 
 ceres::ResidualBlockId RigidRegistration::addPointToPointCost(ceres::Problem &problem, const Point & source_point, vertex_descriptor target_vertex)
@@ -172,8 +177,6 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 
 void RigidRegistration::init()
 {
-	//_deformation._r = ml::vec3d::origin; // todo is this better
-	//_deformation._t = ml::vec3d::origin;
 	_ceres_logger.write("start Rigid registration \n");
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45., 20., 0.01);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
@@ -201,13 +204,13 @@ void RigidRegistration::init()
 
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
-									 ceres::Solver::Options option,
-									 RegistrationOptions reg_options,
+									 ceres::Solver::Options ceres_option,
+									 RegistrationOptions options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
 	, _target(target)
-	, _ceres_options(option)
-	, _options(reg_options)
+	, _ceres_options(ceres_option)
+	, _options(options)
 	, _ceres_logger(logger)
 {
 	_deformation._g = calculateGlobalCenter(_source);
@@ -217,16 +220,34 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
 									 RigidDeformation rigid_deformation,
-									 ceres::Solver::Options option,
-									 RegistrationOptions reg_options,
+									 ceres::Solver::Options ceres_option,
+									 RegistrationOptions options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
 	, _target(target)
 	, _deformation(rigid_deformation)
-	, _ceres_options(option)
-	, _options(reg_options)
+	, _ceres_options(ceres_option)
+	, _options(options)
 	, _ceres_logger(logger)
 {
+	init();
+}
+
+RigidRegistration::RigidRegistration(const SurfaceMesh & source,
+									 const SurfaceMesh & target,
+									 const SurfaceMesh & previous_mesh,
+									 RigidDeformation rigid_deformation,
+									 ceres::Solver::Options ceres_option,
+									 RegistrationOptions options,
+									 std::shared_ptr<FileWriter> logger)
+	: _source(previous_mesh)
+	, _target(target)
+	, _previouse_deformation(boost::optional<RigidDeformation>(rigid_deformation))
+	, _ceres_options(ceres_option)
+	, _options(options)
+	, _ceres_logger(logger)
+{
+	_deformation = RigidDeformation(rigid_deformation.position());
 	init();
 }
 

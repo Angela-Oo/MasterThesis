@@ -8,6 +8,8 @@
 #include "algo/surface_mesh/mesh_definition.h"
 #include <ceres/ceres.h>
 #include "algo/ceres_iteration_logger.h"
+//#include <optional>
+#include "boost/optional.hpp"
 
 namespace Registration {
 
@@ -22,6 +24,7 @@ private:
 	SurfaceMesh _source;
 	SurfaceMesh _target;
 	ceres::Solver::Options _ceres_options;
+	boost::optional<RigidDeformation> _previouse_deformation;
 	RigidDeformation _deformation;
 	Point _global_position;
 	CeresLogger _ceres_logger;
@@ -59,14 +62,22 @@ public:
 private:
 	void init();
 public:
-	RigidRegistration(const SurfaceMesh & points_a,
-					  const SurfaceMesh & points_b,
+	RigidRegistration(const SurfaceMesh & source,
+					  const SurfaceMesh & target,
 					  ceres::Solver::Options ceres_option,
 					  RegistrationOptions options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 
-	RigidRegistration(const SurfaceMesh & points_a,
-					  const SurfaceMesh & points_b,
+	RigidRegistration(const SurfaceMesh & source,
+					  const SurfaceMesh & target,
+					  RigidDeformation rigid_deformation,
+					  ceres::Solver::Options ceres_option,
+					  RegistrationOptions options,
+					  std::shared_ptr<FileWriter> logger = nullptr);
+
+	RigidRegistration(const SurfaceMesh & source,
+					  const SurfaceMesh & target,
+					  const SurfaceMesh & previous_mesh,
 					  RigidDeformation rigid_deformation,
 					  ceres::Solver::Options ceres_option,
 					  RegistrationOptions options,
