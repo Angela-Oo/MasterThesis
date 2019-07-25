@@ -77,7 +77,7 @@ RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::operator(
 																				  const SurfaceMesh & previous_mesh,
 																				  const RigidBeforeNonRigidDeformation<Deformation> & deformation)
 {
-	return std::make_unique<RigidBeforeNonRigidRegistration<NonRigidRegistration>>(_rigid_factory(previous_mesh, target, deformation.rigid_deformation),
+	return std::make_unique<RigidBeforeNonRigidRegistration<NonRigidRegistration>>(_rigid_factory(source, target, previous_mesh, deformation.rigid_deformation),
 																				   _non_rigid_factory(source, target, deformation.non_rigid_deformation));
 }
 
