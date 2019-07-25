@@ -201,6 +201,8 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<ISequenceReg
 		if (_reigistration_finished) {
 			_mesh_renderer->removeMesh("target");
 			_mesh_renderer->removeMesh("deformed");
+			_mesh_renderer->removeMesh("inverse_mesh");
+			_mesh_renderer->removeMesh("mesh_source");
 
 			if (_render_mesh == Render::NONE) {
 				for (int i = 0; i <= current; ++i) {
@@ -228,11 +230,13 @@ void RenderRegistration::renderRegistrationSequence(std::shared_ptr<ISequenceReg
 				auto render_dg = sequence_registration->getDeformationGraphMesh(_current_frame);
 				renderDeformationGraph(render_dg);
 
-				auto inverse_deformed_points = sequence_registration->getInverseDeformedMesh(_current_frame);
-				_mesh_renderer->insertMesh("mesh_" + std::to_string(_current_frame), inverse_deformed_points, ml::RGBColor::Cyan.toVec4f(), false);
+				if (_render_mesh == Render::DEFORMATION) {
+					auto inverse_deformed_points = sequence_registration->getInverseDeformedMesh(_current_frame);
+					_mesh_renderer->insertMesh("inverse_mesh", inverse_deformed_points, ml::RGBColor::Cyan.toVec4f(), false);
 
-				auto source = sequence_registration->getMesh(0);
-				_mesh_renderer->insertMesh("mesh_source" + std::to_string(_current_frame), source, ml::RGBColor::Yellow.toVec4f(), false);
+					auto source = sequence_registration->getMesh(0);
+					_mesh_renderer->insertMesh("mesh_source", source, ml::RGBColor::Yellow.toVec4f(), false);
+				}
 			}
 		}
 		else {
