@@ -3,9 +3,8 @@
 #include "algo/registration/deformation_graph/i_deformation.h"
 
 namespace Registration {
-namespace ED {
 
-class Deformation : public IPositionDeformation
+class EDDeformation
 {
 private:
 	ml::mat3d _r; // rotation matrix
@@ -18,25 +17,24 @@ public:
 	double * t() { return (&_t)->getData(); }
 	double * w() { return &_w; }
 public:
-	Matrix rotation() const override;
-	Vector translation() const override;
-	Point position() const override;
+	Matrix rotation() const;
+	Vector translation() const;
+	Point position() const;
 	double weight() const { return _w; };
 public:
-	Point getDeformedPosition() const override;
-	Point deformPosition(const Point & point) const override;
-	Vector deformNormal(const Vector & normal) const override;
+	Point getDeformedPosition() const;
+	Point deformPosition(const Point & point) const;
+	Vector deformNormal(const Vector & normal) const;
 public:
-	Deformation invertDeformation() const;
+	EDDeformation invertDeformation() const;
 public:
-	Deformation(const Point & position);
-	Deformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w = 1.);
-	Deformation(const RigidDeformation & rigid_deformation);
-	Deformation();
-	Deformation(const Deformation& other);
-	Deformation(const Deformation& node, bool inverse);
+	EDDeformation(const Point & position);
+	EDDeformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w = 1.);
+	EDDeformation(const RigidDeformation & rigid_deformation);
+	EDDeformation();
+	EDDeformation(const EDDeformation& other);
+	EDDeformation(const EDDeformation& node, bool inverse);
 };
 
 
-}
 }

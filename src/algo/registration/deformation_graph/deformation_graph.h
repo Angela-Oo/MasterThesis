@@ -86,7 +86,7 @@ Point DeformationGraph<PositionDeformation>::deformPoint(const Point & point, co
 {
 	Vector deformed_point(0., 0., 0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
@@ -108,7 +108,7 @@ Vector DeformationGraph<PositionDeformation>::deformNormal(const Vector & normal
 {
 	Vector deformed_normal(0., 0., 0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
+	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
 	assert(property_map_nodes.second);
 	auto & nodes = property_map_nodes.first;
 
@@ -133,7 +133,7 @@ Point DeformationGraph<PositionDeformation>::getNodePosition(vertex_descriptor n
 template <typename PositionDeformation>
 PositionDeformation & DeformationGraph<PositionDeformation>::getNodeDeformation(vertex_descriptor node_index) const
 {
-	auto deformation_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node"); // todo needs to be unique ptr (deep copy not possible)
+	auto deformation_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation"); // todo needs to be unique ptr (deep copy not possible)
 	assert(deformation_nodes.second);
 	return deformation_nodes.first[node_index];
 }
@@ -165,7 +165,7 @@ DeformationGraph<PositionDeformation> DeformationGraph<PositionDeformation>::inv
 {
 	SurfaceMesh mesh = _mesh;
 
-	auto property_deformations = mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
+	auto property_deformations = mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
 	assert(property_deformations.second);
 	auto property_normals = mesh.property_map<vertex_descriptor, Vector>("v:normal");
 	assert(property_normals.second);
@@ -202,7 +202,7 @@ DeformationGraph<PositionDeformation>::DeformationGraph(const DeformationGraph<P
 	, _mesh(deformation_graph._mesh)
 {
 	// deep copy of deformations
-	//auto nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
+	//auto nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
 	//assert(nodes.second);
 	//for (auto & v : _mesh.vertices()) {
 	//	nodes.first[v] = nodes.first[v]->clone();
@@ -224,7 +224,7 @@ DeformationGraph<PositionDeformation> & DeformationGraph<PositionDeformation>::o
 	_mesh = other._mesh;
 
 	// deep copy of deformations
-	//auto nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node");
+	//auto nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
 	//assert(nodes.second);
 	//for (auto & v : _mesh.vertices()) {
 	//	nodes.first[v] = nodes.first[v]->clone();
@@ -254,7 +254,7 @@ DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh
 {
 	SurfaceMesh::Property_map<vertex_descriptor, PositionDeformation> nodes;
 	bool created;
-	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, PositionDeformation>("v:node", PositionDeformation(CGAL::ORIGIN));
+	boost::tie(nodes, created) = mesh.add_property_map<vertex_descriptor, PositionDeformation>("v:node_deformation", PositionDeformation(CGAL::ORIGIN));
 	assert(created);
 	//mesh.add_property_map<vertex_descriptor, double>("v:fit_cost", 0.);
 	mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);

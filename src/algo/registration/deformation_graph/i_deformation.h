@@ -7,7 +7,6 @@
 
 namespace Registration {
 
-// mesh.add_property_map<vertex_descriptor, std::shared_ptr<IDeformation>>("v:node", nullptr);
 class IPositionDeformation
 {
 public:

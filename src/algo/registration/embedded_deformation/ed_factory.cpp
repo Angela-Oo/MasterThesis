@@ -10,8 +10,8 @@ std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(cons
 																			const SurfaceMesh & target)
 {
 	auto reduced_mesh = createReducedMesh(source, _options.dg_options.edge_length, _options.mesh_reduce_strategy);
-	auto global = createGlobalDeformation<ED::Deformation>(source);
-	auto deformation_graph = createDeformationGraphFromMesh<ED::Deformation>(reduced_mesh, global);
+	auto global = createGlobalDeformation<EDDeformation>(source);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
 
 	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger);
 }
@@ -35,7 +35,7 @@ SurfaceMesh EmbeddedDeformationFactory::deformationGraphMesh(const EmbeddedDefor
 
 SurfaceMesh EmbeddedDeformationFactory::deformedMesh(const SurfaceMesh & mesh, const EmbeddedDeformation::Deformation & deformation)
 {
-	DeformedMesh<DeformationGraph<ED::Deformation>> deformed(mesh, deformation, _options.dg_options.number_of_interpolation_neighbors);
+	DeformedMesh<DeformationGraph<EDDeformation>> deformed(mesh, deformation, _options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 

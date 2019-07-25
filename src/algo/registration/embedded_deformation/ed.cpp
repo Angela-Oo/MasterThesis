@@ -43,7 +43,7 @@ std::vector<Point> EmbeddedDeformation::getFixedPostions()
 
 
 
-const DeformationGraph<ED::Deformation> & EmbeddedDeformation::getDeformation()
+const DeformationGraph<EDDeformation> & EmbeddedDeformation::getDeformation()
 {
 	return _deformation_graph;
 }
@@ -156,7 +156,7 @@ EdgeResidualIds EmbeddedDeformation::addSmoothCost(ceres::Problem &problem)
 {
 	EdgeResidualIds residual_ids;
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, ED::Deformation>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, EDDeformation>("v:node_deformation").first;
 	for (auto e : mesh.halfedges())
 	{
 		auto target = mesh.target(e);
@@ -178,7 +178,7 @@ VertexResidualIds EmbeddedDeformation::addRotationCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
 
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, ED::Deformation>("v:node").first;
+	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, EDDeformation>("v:node_deformation").first;
 	for (auto & v : _deformation_graph._mesh.vertices())
 	{
 		ceres::CostFunction* cost_function = RotationCostFunction::Create();
@@ -192,7 +192,7 @@ VertexResidualIds EmbeddedDeformation::addConfCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
 
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, ED::Deformation>("v:node").first;
+	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, EDDeformation>("v:node_deformation").first;
 	for (auto & v : _deformation_graph._mesh.vertices())
 	{
 		ceres::CostFunction* cost_function = ConfCostFunction::Create();
@@ -319,7 +319,7 @@ void EmbeddedDeformation::setParameters()
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 										 const SurfaceMesh& dst,
 										 std::vector<vertex_descriptor> fixed_positions,
-										 const DeformationGraph<ED::Deformation> & deformation_graph,
+										 const DeformationGraph<EDDeformation> & deformation_graph,
 										 ceres::Solver::Options option,
 										 bool evaluate_residuals,
 										 std::shared_ptr<FileWriter> logger)
@@ -343,7 +343,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 										 const SurfaceMesh& dst,
-										 const DeformationGraph<ED::Deformation> & deformation_graph,
+										 const DeformationGraph<EDDeformation> & deformation_graph,
 										 ceres::Solver::Options option,
 										 bool evaluate_residuals,
 										 std::shared_ptr<FileWriter> logger)
@@ -364,12 +364,12 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
 
 //-----------------------------------------------------------------------------
 
-ED::Deformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
+EDDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
 {	
 	auto r = rigid_deformation.rotation();
 	//double x = r.m(0,1);
 	ml::mat3d rotation(r.m(0, 0),r.m(0, 1), r.m(0, 2),r.m(1, 0), r.m(1, 1), r.m(1, 2), r.m(2, 0), r.m(2, 1), r.m(2, 2));
-	return Deformation(rigid_deformation._g, rotation, rigid_deformation._t);
+	return EDDeformation(rigid_deformation._g, rotation, rigid_deformation._t);
 }
 
 
@@ -381,8 +381,8 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 															   std::shared_ptr<FileWriter> logger)
 {
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	auto global = createGlobalDeformation<ED::Deformation>(reduced_mesh);
-	auto deformation_graph = createDeformationGraphFromMesh<ED::Deformation>(reduced_mesh, global);
+	auto global = createGlobalDeformation<EDDeformation>(reduced_mesh);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
 	return std::make_unique<EmbeddedDeformation>(src, dst, fixed_positions, deformation_graph, option, registration_options.evaluate_residuals, logger);
 }
 
@@ -394,8 +394,8 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 															   std::shared_ptr<FileWriter> logger)
 {
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	auto global = createGlobalDeformation<ED::Deformation>(reduced_mesh);
-	auto deformation_graph = createDeformationGraphFromMesh<ED::Deformation>(reduced_mesh, global);
+	auto global = createGlobalDeformation<EDDeformation>(reduced_mesh);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
 	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options.evaluate_residuals, logger);
 }
 
@@ -409,7 +409,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 {
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
-	auto deformation_graph = createDeformationGraphFromMesh<ED::Deformation>(reduced_mesh, global);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
 	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options.evaluate_residuals, logger);
 }
 
@@ -417,13 +417,13 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
 										                       const SurfaceMesh& dst,
 										                       const RigidDeformation & rigid_deformation,
-										                       const DeformationGraph<ED::Deformation> & deformation_graph,
+										                       const DeformationGraph<EDDeformation> & deformation_graph,
 										                       ceres::Solver::Options option,
 										                       const RegistrationOptions & registration_options,
 										                       std::shared_ptr<FileWriter> logger)
 {
 	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
-	auto new_deformation_graph = createDeformationGraphFromMesh<ED::Deformation>(deformation_graph._mesh, global);
+	auto new_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(deformation_graph._mesh, global);
 	return std::make_unique<EmbeddedDeformation>(src, dst, new_deformation_graph, option, registration_options.evaluate_residuals, logger);
 }
 

@@ -3,31 +3,30 @@
 #include "ed_deformation.h"
 
 namespace Registration {
-namespace ED {
 
-Matrix Deformation::rotation() const
+Matrix EDDeformation::rotation() const
 {
 	Matrix m(_r(0, 0), _r(0, 1), _r(0, 2), _r(1, 0), _r(1, 1), _r(1, 2), _r(2, 0), _r(2, 1), _r(2, 2));
 	return m;
 }
 
-Vector Deformation::translation() const
+Vector EDDeformation::translation() const
 {
 	return Vector(_t[0], _t[1], _t[2]);
 }
 
-Point Deformation::position() const
+Point EDDeformation::position() const
 {
 	return _position;
 }
 
-Point Deformation::getDeformedPosition() const
+Point EDDeformation::getDeformedPosition() const
 {
 	Vector v = _position - CGAL::ORIGIN;
 	return CGAL::ORIGIN + v + translation();
 }
 
-Point Deformation::deformPosition(const Point & point) const
+Point EDDeformation::deformPosition(const Point & point) const
 {
 	auto edge = point - _position;
 	Vector rotated_point = rotation()(edge);
@@ -35,32 +34,32 @@ Point Deformation::deformPosition(const Point & point) const
 	return CGAL::ORIGIN + moved_position + rotated_point;
 }
 
-Vector Deformation::deformNormal(const Vector & normal) const
+Vector EDDeformation::deformNormal(const Vector & normal) const
 {
 	return rotation()(normal);
 }
 
-Deformation Deformation::invertDeformation() const
+EDDeformation EDDeformation::invertDeformation() const
 {
-	return Deformation(_position, _r.getInverse(), -_t, _w);
+	return EDDeformation(_position, _r.getInverse(), -_t, _w);
 }
 
-Deformation::Deformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w)
+EDDeformation::EDDeformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w)
 	: _position(position)
 	, _r(r)
 	, _t(t)
 	, _w(w)
 {}
 
-Deformation::Deformation()
-	: Deformation(CGAL::ORIGIN, ml::mat3d::identity(), ml::vec3f::origin)
+EDDeformation::EDDeformation()
+	: EDDeformation(CGAL::ORIGIN, ml::mat3d::identity(), ml::vec3f::origin)
 {}
 
-Deformation::Deformation(const Point & position)
-	: Deformation(position, ml::mat3d::identity(), ml::vec3f::origin)
+EDDeformation::EDDeformation(const Point & position)
+	: EDDeformation(position, ml::mat3d::identity(), ml::vec3f::origin)
 {}
 
-Deformation::Deformation(const RigidDeformation & rigid_deformation)
+EDDeformation::EDDeformation(const RigidDeformation & rigid_deformation)
 {
 	auto r = rigid_deformation.rotation();
 	//double x = r.m(0,1);
@@ -70,15 +69,15 @@ Deformation::Deformation(const RigidDeformation & rigid_deformation)
 	_position = rigid_deformation._g;
 }
 
-Deformation::Deformation(const Deformation & other)
+EDDeformation::EDDeformation(const EDDeformation & other)
 	: _position(other._position)
 	, _r(other._r)
 	, _t(other._t)
 	, _w(other._w)
 {}
 
-Deformation::Deformation(const Deformation & deformation, bool inverse)
-	: Deformation(deformation)
+EDDeformation::EDDeformation(const EDDeformation & deformation, bool inverse)
+	: EDDeformation(deformation)
 {
 	if (inverse) {
 		_r = deformation._r.getInverse();
@@ -87,5 +86,4 @@ Deformation::Deformation(const Deformation & deformation, bool inverse)
 }
 
 
-}
 }

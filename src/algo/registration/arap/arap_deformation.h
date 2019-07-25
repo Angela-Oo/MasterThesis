@@ -5,7 +5,7 @@
 
 namespace Registration {
 
-class ARAPDeformation : public IPositionDeformation
+class ARAPDeformation
 {
 private:
 	ml::vec6d _d; // rotation (3d) and translation (3d)
@@ -15,13 +15,13 @@ public:
 	double * d() { return (&_d)->getData(); }
 	double * w() { return &_w; }
 public:
-	Matrix rotation() const override;
-	Vector translation() const override;
-	Point position() const override;
+	Matrix rotation() const;
+	Vector translation() const;
+	Point position() const;
 public:
-	Point getDeformedPosition() const override;
-	Point deformPosition(const Point & point) const override;
-	Vector deformNormal(const Vector & normal) const override;
+	Point getDeformedPosition() const;
+	Point deformPosition(const Point & point) const;
+	Vector deformNormal(const Vector & normal) const;
 public:
 	double weight() const { return _w; };
 	ARAPDeformation invertDeformation() const;

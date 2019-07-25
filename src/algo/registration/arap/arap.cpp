@@ -254,7 +254,7 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 {
 	EdgeResidualIds residual_ids;
 	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node").first;
+	auto deformations = mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
 	for (auto e : mesh.halfedges())
 	{		
 		auto target = mesh.target(e);
@@ -275,7 +275,7 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 VertexResidualIds AsRigidAsPossible::addConfCost(ceres::Problem &problem)
 {
 	VertexResidualIds residual_ids;
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node").first;
+	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
 	for(auto & v : _deformation_graph._mesh.vertices())
 	{
 		ceres::CostFunction* cost_function = ConfCostFunction::Create();
