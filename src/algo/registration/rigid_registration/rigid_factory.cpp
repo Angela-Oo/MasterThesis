@@ -16,6 +16,15 @@ std::unique_ptr<RigidRegistration> RigidFactory::operator()(const SurfaceMesh & 
 	return std::make_unique<RigidRegistration>(source, target, deformation_graph, _ceres_options, _options, _logger);
 }
 
+std::unique_ptr<RigidRegistration> RigidFactory::operator()(const SurfaceMesh & source,
+															const SurfaceMesh & target,
+															const SurfaceMesh & previous_mesh,
+															const RigidDeformation & deformation_graph)
+{
+	return operator()(previous_mesh, target, deformation_graph);
+}
+
+
 SurfaceMesh RigidFactory::deformationGraphMesh(const RigidDeformation & deformation)
 {
 	return SurfaceMesh();

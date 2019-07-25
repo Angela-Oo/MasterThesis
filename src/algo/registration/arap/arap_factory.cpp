@@ -21,6 +21,14 @@ std::unique_ptr<AsRigidAsPossible> ARAPFactory::operator()(const SurfaceMesh & s
 	return std::make_unique<AsRigidAsPossible>(source, target, deformation_graph, _ceres_options, _options, _logger);
 }
 
+std::unique_ptr<AsRigidAsPossible> ARAPFactory::operator()(const SurfaceMesh & source,
+														   const SurfaceMesh & target,
+														   const SurfaceMesh & previous_mesh, // used for non rigid registration
+														   const AsRigidAsPossible::Deformation & deformation_graph)
+{
+	return operator()(source, target, deformation_graph);
+}
+
 void ARAPFactory::setFixedPositions(std::vector<vertex_descriptor> fixed_positions)
 {
 	_fixed_positions = fixed_positions;

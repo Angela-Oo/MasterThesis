@@ -97,7 +97,14 @@ void SequenceRegistrationT<Registration, RegistrationFactory>::nextFrame()
 	auto & source = _mesh_sequence->getMesh(0);
 	auto & target = _mesh_sequence->getMesh(_current);
 
-	_registration = _registration_factory(source, target, _deformation[_current - 1]);
+	bool use_previouse_frame_for_rigid_registration = true;
+	if (use_previouse_frame_for_rigid_registration) {
+		auto & prev_mesh = _mesh_sequence->getMesh(_current - 1);
+		_registration = _registration_factory(source, target, prev_mesh, _deformation[_current - 1]);
+	}
+	else {
+		_registration = _registration_factory(source, target, _deformation[_current - 1]);
+	}
 	_deformation[_current] = _registration->getDeformation();
 }
 

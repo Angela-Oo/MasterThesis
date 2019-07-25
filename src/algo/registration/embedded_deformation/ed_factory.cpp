@@ -23,6 +23,14 @@ std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(cons
 	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger);
 }
 
+std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(const SurfaceMesh & source,
+												                            const SurfaceMesh & target,
+												                            const SurfaceMesh & previous_mesh, // used for non rigid registration
+												                            const EmbeddedDeformation::Deformation & deformation_graph)
+{
+	return operator()(source, target, deformation_graph);
+}
+
 void EmbeddedDeformationFactory::setFixedPositions(std::vector<vertex_descriptor> fixed_positions)
 {
 	_fixed_positions = fixed_positions;

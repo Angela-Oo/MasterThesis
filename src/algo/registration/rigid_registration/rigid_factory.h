@@ -20,6 +20,10 @@ public:
 	std::unique_ptr<RigidRegistration> operator()(const SurfaceMesh & source,
 												  const SurfaceMesh & target,
 												  const RigidDeformation & deformation);
+	std::unique_ptr<RigidRegistration> operator()(const SurfaceMesh & source,
+												  const SurfaceMesh & target,
+												  const SurfaceMesh & previous_mesh, // used for non rigid registration
+												  const RigidDeformation & deformation);
 	SurfaceMesh deformationGraphMesh(const RigidDeformation & deformation);
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation);
 	std::string registrationType();

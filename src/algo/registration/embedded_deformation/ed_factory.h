@@ -21,6 +21,10 @@ public:
 	std::unique_ptr<EmbeddedDeformation> operator()(const SurfaceMesh & source,
 													const SurfaceMesh & target,
 													const EmbeddedDeformation::Deformation & deformation_graph);
+	std::unique_ptr<EmbeddedDeformation> operator()(const SurfaceMesh & source,
+													const SurfaceMesh & target,
+													const SurfaceMesh & previous_mesh, // used for non rigid registration
+													const EmbeddedDeformation::Deformation & deformation_graph);
 	SurfaceMesh deformationGraphMesh(const EmbeddedDeformation::Deformation & deformation_graph);
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const EmbeddedDeformation::Deformation & deformation_graph);
 	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
