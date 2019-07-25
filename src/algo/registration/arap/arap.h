@@ -49,8 +49,12 @@ private:
 						  std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 						  std::unique_ptr<CeresIterationLoggerGuard>& logger);
 private:
-	ResidualIds addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point);
-	ResidualIds addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal);
+	ceres::ResidualBlockId addPointToPointCost4NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point);
+	ceres::ResidualBlockId addPointToPlaneCost4NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal);
+	ceres::ResidualBlockId addPointToPointCost3NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point);
+	ceres::ResidualBlockId addPointToPlaneCost3NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal);
+	ceres::ResidualBlockId addPointToPointCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point);
+	ceres::ResidualBlockId addPointToPlaneCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal);
 	bool useVertex(vertex_descriptor & v);
 	bool addFitCostVertex(ceres::Problem & problem, vertex_descriptor & v, VertexResidualIds &residual_ids);
 	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem, std::unique_ptr<CeresIterationLoggerGuard>& logger);

@@ -25,7 +25,7 @@ public:
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
 	Point getNodePosition(vertex_descriptor node_index) const;
-	PositionDeformation & getNodeDeformation(vertex_descriptor node_index) const;
+	PositionDeformation & getDeformation(vertex_descriptor node_index) const;
 	PositionDeformation deformNode(vertex_descriptor node_index) const;
 public:
 	DeformationGraph invertDeformation() const;
@@ -93,7 +93,7 @@ Point DeformationGraph<PositionDeformation>::deformPoint(const Point & point, co
 	for (auto n_w : nearest_nodes.node_weight_vector)
 	{
 		double w = n_w.second;
-		auto node = getNodeDeformation(n_w.first);
+		auto node = getDeformation(n_w.first);
 		Vector transformed_point = node.deformPosition(point) - CGAL::ORIGIN;
 		transformed_point *= w;
 		deformed_point += transformed_point;
@@ -115,7 +115,7 @@ Vector DeformationGraph<PositionDeformation>::deformNormal(const Vector & normal
 	for (auto n_w : nearest_nodes.node_weight_vector)
 	{
 		double w = n_w.second;
-		auto node = getNodeDeformation(n_w.first);
+		auto node = getDeformation(n_w.first);
 		Vector transformed_normal = node.deformNormal(normal);
 		transformed_normal *= w;
 		deformed_normal += transformed_normal;
@@ -131,7 +131,7 @@ Point DeformationGraph<PositionDeformation>::getNodePosition(vertex_descriptor n
 }
 
 template <typename PositionDeformation>
-PositionDeformation & DeformationGraph<PositionDeformation>::getNodeDeformation(vertex_descriptor node_index) const
+PositionDeformation & DeformationGraph<PositionDeformation>::getDeformation(vertex_descriptor node_index) const
 {
 	auto deformation_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation"); // todo needs to be unique ptr (deep copy not possible)
 	assert(deformation_nodes.second);
@@ -141,7 +141,7 @@ PositionDeformation & DeformationGraph<PositionDeformation>::getNodeDeformation(
 template <typename PositionDeformation>
 PositionDeformation DeformationGraph<PositionDeformation>::deformNode(vertex_descriptor node_index) const
 {
-	auto node = getNodeDeformation(node_index);
+	auto node = getDeformation(node_index);
 	Point deformed_point = _global.deformPosition(node.getDeformedPosition());
 	return PositionDeformation(deformed_point);
 }
@@ -174,7 +174,7 @@ DeformationGraph<PositionDeformation> DeformationGraph<PositionDeformation>::inv
 	auto deformations = property_deformations.first;
 	for (auto v : mesh.vertices())
 	{
-		auto & node = getNodeDeformation(v);
+		auto & node = getDeformation(v);
 		auto deformed_position = _global.deformPosition(node.getDeformedPosition()); //??
 		auto invert_deformation = node.invertDeformation();	// TODO	
 
