@@ -49,7 +49,7 @@ Vector RigidDeformation::deformNormal(const Vector & normal) const
 
 RigidDeformation RigidDeformation::invertDeformation() const
 {
-	return RigidDeformation(-_r, -_t, _g);
+	return RigidDeformation(-_r, -_t, getDeformedPosition());
 }
 
 RigidDeformation::RigidDeformation()

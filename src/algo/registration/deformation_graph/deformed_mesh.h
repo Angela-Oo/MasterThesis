@@ -114,7 +114,7 @@ NearestNodes DeformedMesh<DeformationGraph>::createNearestNodes(vertex_descripto
 
 	// max distance
 	vertex_descriptor last_node_descriptor = nearest_deformation_nodes[nearest_deformation_nodes.size() - 1];
-	Point last_node = _deformation_graph.getNodePosition(last_node_descriptor);
+	Point last_node = _deformation_graph.getDeformation(last_node_descriptor).position();
 	double d_max = std::sqrt(CGAL::squared_distance(point, last_node));
 	if (nearest_deformation_nodes.size() < 2) {
 		d_max = 1.;
@@ -127,7 +127,7 @@ NearestNodes DeformedMesh<DeformationGraph>::createNearestNodes(vertex_descripto
 	for (size_t i = 0; i < nearest_deformation_nodes.size() - 1; ++i)
 	{
 		vertex_descriptor v = nearest_deformation_nodes[i];
-		Point node_point = _deformation_graph.getNodePosition(v);
+		Point node_point = _deformation_graph.getDeformation(v).position();
 		double distance = std::sqrt(CGAL::squared_distance(point, node_point));
 		double weight = std::pow(1. - (distance / d_max), 2);
 		vertex_weight_vector.push_back(std::make_pair(v, weight));

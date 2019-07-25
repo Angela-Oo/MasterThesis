@@ -24,7 +24,6 @@ public:
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
-	Point getNodePosition(vertex_descriptor node_index) const;
 	PositionDeformation & getDeformation(vertex_descriptor node_index) const;
 	PositionDeformation deformNode(vertex_descriptor node_index) const;
 public:
@@ -122,12 +121,6 @@ Vector DeformationGraph<PositionDeformation>::deformNormal(const Vector & normal
 	}
 	Vector global_deformed_normal = _global.deformNormal(deformed_normal);
 	return global_deformed_normal;
-}
-
-template <typename PositionDeformation>
-Point DeformationGraph<PositionDeformation>::getNodePosition(vertex_descriptor node_index) const
-{
-	return getDeformation(node_index).position();
 }
 
 template <typename PositionDeformation>

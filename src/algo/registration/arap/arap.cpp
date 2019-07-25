@@ -71,10 +71,10 @@ ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCost4NN(ceres::Problem 
 		std::cout << "help nearest node is smaller than expected" << std::endl;
 
 	auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global.position(),
-																			_deformation_graph.getNodePosition(n_w_vector[0].first),
-																			_deformation_graph.getNodePosition(n_w_vector[1].first),
-																			_deformation_graph.getNodePosition(n_w_vector[2].first),
-																			_deformation_graph.getNodePosition(n_w_vector[3].first),
+																			_deformation_graph.getDeformation(n_w_vector[0].first).position(),
+																			_deformation_graph.getDeformation(n_w_vector[1].first).position(),
+																			_deformation_graph.getDeformation(n_w_vector[2].first).position(),
+																			_deformation_graph.getDeformation(n_w_vector[3].first).position(),
 																			n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
@@ -101,10 +101,10 @@ ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCost4NN(ceres::Problem 
 
 	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
 																			_deformed_mesh->point(v), global.position(),
-																			_deformation_graph.getNodePosition(n_w_vector[0].first),
-																			_deformation_graph.getNodePosition(n_w_vector[1].first),
-																			_deformation_graph.getNodePosition(n_w_vector[2].first),
-																			_deformation_graph.getNodePosition(n_w_vector[3].first),
+																			_deformation_graph.getDeformation(n_w_vector[0].first).position(),
+																			_deformation_graph.getDeformation(n_w_vector[1].first).position(),
+																			_deformation_graph.getDeformation(n_w_vector[2].first).position(),
+																			_deformation_graph.getDeformation(n_w_vector[3].first).position(),
 																			n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
 
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
@@ -130,9 +130,9 @@ ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCost3NN(ceres::Problem 
 		std::cout << "help nearest node is smaller than expected" << std::endl;
 
 	auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global.position(),
-																		  _deformation_graph.getNodePosition(n_w_vector[0].first),
-																		  _deformation_graph.getNodePosition(n_w_vector[1].first),
-																		  _deformation_graph.getNodePosition(n_w_vector[2].first),
+																		  _deformation_graph.getDeformation(n_w_vector[0].first).position(),
+																		  _deformation_graph.getDeformation(n_w_vector[1].first).position(),
+																		  _deformation_graph.getDeformation(n_w_vector[2].first).position(),
 																		  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second);
 
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
@@ -158,9 +158,9 @@ ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCost3NN(ceres::Problem 
 
 	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
 																		  _deformed_mesh->point(v), global.position(),
-																		  _deformation_graph.getNodePosition(n_w_vector[0].first),
-																		  _deformation_graph.getNodePosition(n_w_vector[1].first),
-																		  _deformation_graph.getNodePosition(n_w_vector[2].first),
+																		  _deformation_graph.getDeformation(n_w_vector[0].first).position(),
+																		  _deformation_graph.getDeformation(n_w_vector[1].first).position(),
+																		  _deformation_graph.getDeformation(n_w_vector[2].first).position(),
 																		  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second);
 
 	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
@@ -222,10 +222,10 @@ bool AsRigidAsPossible::useVertex(vertex_descriptor & v)
 	if (_registration_options.ignore_deformation_graph_border_vertices)
 		use_vertex = !_src.is_border(v, true);
 
-	if (_set_of_vertices_to_use.empty() &&
-		_registration_options.use_vertex_random_probability < 1.) {
-		use_vertex = random_bool_with_prob(_registration_options.use_vertex_random_probability);
-	}
+	//if (_set_of_vertices_to_use.empty() &&
+	//	_registration_options.use_vertex_random_probability < 1.) {
+	//	use_vertex = random_bool_with_prob(_registration_options.use_vertex_random_probability);
+	//}
 
 	if (_deformed_mesh->nearestNodes(v).node_weight_vector.size() < _registration_options.dg_options.number_of_interpolation_neighbors)
 		use_vertex = false;
@@ -261,7 +261,7 @@ VertexResidualIds AsRigidAsPossible::addFitCost(ceres::Problem &problem, std::un
 	auto & mesh = _deformation_graph._mesh;
 	int i = 0;
 
-	// random at each iteration
+	// use all vertices
 	if (_set_of_vertices_to_use.empty()) {
 		for (auto & v : _deformed_mesh->vertices())
 		{
