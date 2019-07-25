@@ -25,6 +25,7 @@ private:
 	SurfaceMesh _target;
 	ceres::Solver::Options _ceres_options;
 	boost::optional<RigidDeformation> _previouse_deformation;
+	boost::optional<SurfaceMesh> _true_source;
 	RigidDeformation _deformation;
 	Point _global_position;
 	CeresLogger _ceres_logger;
@@ -32,6 +33,7 @@ private:
 	std::unique_ptr<RigidDeformedMesh> _rigid_deformed_mesh;
 	std::vector<vertex_descriptor> _set_of_vertices_to_use;
 private:
+	bool _deformed_points_returns_deformed_previouse_frame = true;
 	bool _with_icp = true;
 	double _current_cost = 1.;
 	double _last_cost = 2.;

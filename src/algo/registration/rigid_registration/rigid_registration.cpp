@@ -9,7 +9,10 @@ namespace Registration {
 
 const SurfaceMesh & RigidRegistration::getSource()
 {
-	return _source;
+	if (_true_source)
+		return _true_source.get();
+	else
+		return _source;
 }
 
 const SurfaceMesh & RigidRegistration::getTarget()
@@ -19,8 +22,14 @@ const SurfaceMesh & RigidRegistration::getTarget()
 
 SurfaceMesh RigidRegistration::getDeformedPoints()
 {
-	RigidDeformedMesh deformed(getSource(), _deformation);
-	return deformed.deformPoints();
+	if (_deformed_points_returns_deformed_previouse_frame) {
+		RigidDeformedMesh deformed(_source, _deformation);
+		return deformed.deformPoints();
+	}
+	else {
+		RigidDeformedMesh deformed(getSource(), getDeformation());
+		return deformed.deformPoints();
+	}
 }
 
 SurfaceMesh RigidRegistration::getInverseDeformedPoints()
@@ -178,7 +187,10 @@ void RigidRegistration::evaluateResidual(ceres::Problem & problem,
 void RigidRegistration::init()
 {
 	_ceres_logger.write("start Rigid registration \n");
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 0.5, 45., 20., 0.01);
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 
+																		   _options.correspondence_max_distance,
+																		   _options.correspondence_max_angle_deviation,
+																		   10.);
 	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
 
 	if (_options.use_vertex_random_probability < 1.) {
@@ -243,6 +255,7 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 	: _source(previous_mesh)
 	, _target(target)
 	, _previouse_deformation(boost::optional<RigidDeformation>(rigid_deformation))
+	, _true_source(boost::optional<SurfaceMesh>(source))
 	, _ceres_options(ceres_option)
 	, _options(options)
 	, _ceres_logger(logger)
