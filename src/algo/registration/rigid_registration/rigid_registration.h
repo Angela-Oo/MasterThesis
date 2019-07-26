@@ -16,7 +16,7 @@ namespace Registration {
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 
-class RigidRegistration : public IRigidRegistration
+class RigidRegistration : public IRegistration
 {
 public:
 	typedef typename RigidDeformation RigidRegistration::Deformation;
@@ -58,8 +58,8 @@ public:
 	const SurfaceMesh & getTarget() override;
 	SurfaceMesh getDeformedPoints() override;
 	SurfaceMesh getInverseDeformedPoints() override;
-	const RigidDeformation & getRigidDeformation() override;
-	const RigidDeformation & getDeformation();
+	RigidDeformation getRigidDeformation();
+	RigidDeformation getDeformation();
 	bool shouldBeSavedAsImage();
 private:
 	void init();

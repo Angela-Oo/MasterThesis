@@ -11,7 +11,7 @@ namespace Registration {
 
 // deformation of vi at node j = (Rj(vi-gj) + gj + tj)
 template<typename T>
-void deform_point(const Point & point_, const Point const global_center_, const T * const rotation, const T * const translation, T* result)
+void deform_point(const Point & point_, const Point & global_center_, const T * const rotation, const T * const translation, T* result)
 {
 	T point[3];
 	T global_center[3];

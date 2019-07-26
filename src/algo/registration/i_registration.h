@@ -81,12 +81,5 @@ public:
 };
 
 
-class IRigidRegistration : public IRegistration
-{
-public:
-	virtual const RigidDeformation & getRigidDeformation() = 0;
-public:
-	virtual ~IRigidRegistration() = default;
-};
 
 }

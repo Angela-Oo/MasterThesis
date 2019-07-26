@@ -39,15 +39,17 @@ SurfaceMesh RigidRegistration::getInverseDeformedPoints()
 	return deformed.deformPoints();
 }
 
-const RigidDeformation & RigidRegistration::getRigidDeformation()
+RigidDeformation RigidRegistration::getRigidDeformation()
 {
 	return getDeformation();
 }
 
-const RigidDeformation & RigidRegistration::getDeformation()
+RigidDeformation RigidRegistration::getDeformation()
 {
 	if (_previouse_deformation) {
-		return _previouse_deformation.get() + _deformation;
+		auto previouse_def = _previouse_deformation.get();
+		auto deformaton = previouse_def + _deformation;
+		return deformaton;
 	}
 	else {
 		return _deformation;
