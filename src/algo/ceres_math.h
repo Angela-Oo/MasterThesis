@@ -48,7 +48,7 @@ void mat3d_to_T(const ml::mat3d& m, T* matrix)
 	matrix[5] = T(m(2, 1));
 	matrix[6] = T(m(0, 2));
 	matrix[7] = T(m(1, 2));
-	matrix[8] = T(m(2, 1));
+	matrix[8] = T(m(2, 2));
 }
 
 template<typename T>
@@ -62,7 +62,7 @@ void Matrix3x3_toT(const Matrix& m, T* matrix)
 	matrix[5] = T(m.m(2, 1));
 	matrix[6] = T(m.m(0, 2));
 	matrix[7] = T(m.m(1, 2));
-	matrix[8] = T(m.m(2, 1));
+	matrix[8] = T(m.m(2, 2));
 }
 
 template<typename T>
