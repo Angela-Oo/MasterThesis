@@ -234,6 +234,7 @@
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h" />
     <ClInclude Include="src\algo\registration\arap\arap_factory.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph_deform_mesh.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\deformed_mesh.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\i_deformation.h" />
@@ -249,6 +250,7 @@
     <ClInclude Include="src\algo\registration\interface\registration_type.h" />
     <ClInclude Include="src\algo\registration\options\ceres_option.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deformation.h" />
+    <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deform_mesh.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration_factory.h" />
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformation.h" />

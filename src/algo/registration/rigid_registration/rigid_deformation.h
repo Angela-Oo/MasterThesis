@@ -24,7 +24,6 @@ public:
 	Vector deformNormal(const Vector & normal) const;;
 public:
 	RigidDeformation invertDeformation() const;
-
 public:
 	RigidDeformation();
 	RigidDeformation(Point position);

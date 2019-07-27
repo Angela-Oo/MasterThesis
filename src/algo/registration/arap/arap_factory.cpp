@@ -34,27 +34,10 @@ void ARAPFactory::setFixedPositions(std::vector<vertex_descriptor> fixed_positio
 	_fixed_positions = fixed_positions;
 }
 
-SurfaceMesh ARAPFactory::deformationGraphMesh(const AsRigidAsPossible::Deformation & deformation)
-{
-	return deformationGraphToSurfaceMesh(deformation, _options.evaluate_residuals);
-}
-
-SurfaceMesh ARAPFactory::deformedMesh(const SurfaceMesh & mesh, const AsRigidAsPossible::Deformation & deformation)
-{
-	DeformedMesh<AsRigidAsPossible::Deformation> deformed(mesh, deformation, _options.dg_options.number_of_interpolation_neighbors);
-	return deformed.deformPoints();
-}
-
 
 std::string ARAPFactory::registrationType()
 {
 	return "arap";
-}
-
-void ARAPFactory::logConfiguration()
-{
-	logRegistrationOptions(_logger, _options);
-	logCeresOptions(_logger, _ceres_options);
 }
 
 ARAPFactory::ARAPFactory(const RegistrationOptions & options,

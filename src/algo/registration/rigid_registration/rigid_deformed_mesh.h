@@ -10,9 +10,11 @@ private:
 	const RigidDeformation & _deformation;
 	SurfaceMesh _mesh;
 public:
-	SurfaceMesh deformPoints();
+	SurfaceMesh deformPoints(const SurfaceMesh & mesh);
+	SurfaceMesh deformationGraphMesh();
+	SurfaceMesh deformedMesh(const SurfaceMesh & mesh);
 public:
-	RigidDeformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation_graph);
+	RigidDeformedMesh(const RigidDeformation & deformation_graph);
 };
 
 }

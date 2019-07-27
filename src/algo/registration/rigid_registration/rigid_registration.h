@@ -19,7 +19,7 @@ typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
 class RigidRegistration : public IRegistration
 {
 public:
-	typedef typename RigidDeformation RigidRegistration::Deformation;
+	using Deformation = RigidDeformation;
 private:
 	SurfaceMesh _source;
 	SurfaceMesh _target;
@@ -30,7 +30,6 @@ private:
 	Point _global_position;
 	CeresLogger _ceres_logger;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
-	std::unique_ptr<RigidDeformedMesh> _rigid_deformed_mesh;
 	std::vector<vertex_descriptor> _set_of_vertices_to_use;
 private:
 	bool _deformed_points_returns_deformed_previouse_frame = true;

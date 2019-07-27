@@ -5,11 +5,16 @@
 #include <ceres/ceres.h>
 #include "algo/surface_mesh/mesh_definition.h"
 #include "arap.h"
+#include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
 
 namespace Registration {
 
 class ARAPFactory
 {
+public:
+	using Registration = AsRigidAsPossible;
+	using DeformMesh = DeformationGraphDeformMesh<typename DeformationGraph<AsRigidAsPossible::Deformation>>;
+private:
 	ceres::Solver::Options _ceres_options;
 	RegistrationOptions _options;
 	std::shared_ptr<FileWriter> _logger;
@@ -24,11 +29,8 @@ public:
 												  const SurfaceMesh & target,
 												  const SurfaceMesh & previous_mesh, // used for non rigid registration
 												  const AsRigidAsPossible::Deformation & deformation_graph);
-	SurfaceMesh deformationGraphMesh(const AsRigidAsPossible::Deformation & deformation_graph);
-	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const AsRigidAsPossible::Deformation & deformation_graph);
 	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
 	std::string registrationType();
-	void logConfiguration();
 public:
 	ARAPFactory(const RegistrationOptions & options,
 				const ceres::Solver::Options & ceres_options,

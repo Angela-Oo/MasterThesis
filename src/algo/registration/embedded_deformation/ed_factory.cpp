@@ -36,27 +36,9 @@ void EmbeddedDeformationFactory::setFixedPositions(std::vector<vertex_descriptor
 	_fixed_positions = fixed_positions;
 }
 
-SurfaceMesh EmbeddedDeformationFactory::deformationGraphMesh(const EmbeddedDeformation::Deformation & deformation)
-{
-	return deformationGraphToSurfaceMesh(deformation, _options.evaluate_residuals);
-}
-
-SurfaceMesh EmbeddedDeformationFactory::deformedMesh(const SurfaceMesh & mesh, const EmbeddedDeformation::Deformation & deformation)
-{
-	DeformedMesh<DeformationGraph<EDDeformation>> deformed(mesh, deformation, _options.dg_options.number_of_interpolation_neighbors);
-	return deformed.deformPoints();
-}
-
-
 std::string EmbeddedDeformationFactory::registrationType()
 {
 	return "arap";
-}
-
-void EmbeddedDeformationFactory::logConfiguration()
-{
-	logRegistrationOptions(_logger, _options);
-	logCeresOptions(_logger, _ceres_options);
 }
 
 EmbeddedDeformationFactory::EmbeddedDeformationFactory(const RegistrationOptions & options,

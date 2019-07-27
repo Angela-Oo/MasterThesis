@@ -23,20 +23,20 @@ const SurfaceMesh & RigidRegistration::getTarget()
 SurfaceMesh RigidRegistration::getDeformedPoints()
 {
 	if (_deformed_points_returns_deformed_previouse_frame) {
-		RigidDeformedMesh deformed(_source, _deformation);
-		return deformed.deformPoints();
+		RigidDeformedMesh deformed(_deformation);
+		return deformed.deformPoints(_source);
 	}
 	else {
-		RigidDeformedMesh deformed(getSource(), getDeformation());
-		return deformed.deformPoints();
+		RigidDeformedMesh deformed(getDeformation());
+		return deformed.deformPoints(getSource());
 	}
 }
 
 SurfaceMesh RigidRegistration::getInverseDeformedPoints()
 {
 	auto inverseDeformation = _deformation.invertDeformation();
-	RigidDeformedMesh deformed(getTarget(), inverseDeformation);
-	return deformed.deformPoints();
+	RigidDeformedMesh deformed(inverseDeformation);
+	return deformed.deformPoints(getTarget());
 }
 
 RigidDeformation RigidRegistration::getRigidDeformation()
@@ -193,7 +193,6 @@ void RigidRegistration::init()
 																		   _options.correspondence_max_distance,
 																		   _options.correspondence_max_angle_deviation,
 																		   10.);
-	_rigid_deformed_mesh = std::make_unique<RigidDeformedMesh>(_source, _deformation);
 
 	if (_options.use_vertex_random_probability < 1.) {
 
