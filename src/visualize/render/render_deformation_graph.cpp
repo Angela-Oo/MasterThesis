@@ -1,5 +1,5 @@
 #include "render_deformation_graph.h"
-#include "algo/registration/hsv_to_rgb.h"
+#include "algo/registration/util/hsv_to_rgb.h"
 
 using namespace Registration;
 namespace Visualize {

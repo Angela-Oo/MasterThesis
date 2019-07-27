@@ -1,5 +1,5 @@
 #include "arap_factory.h"
-#include "algo/registration/helper/log_option.h"
+#include "algo/registration/util/log_option.h"
 
 namespace Registration {
 

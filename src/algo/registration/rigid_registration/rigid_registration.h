@@ -2,12 +2,12 @@
 
 #include "rigid_deformation.h"
 #include "rigid_deformed_mesh.h"
-#include "algo/registration/i_registration.h"
+#include "algo/registration/interface/i_registration.h"
 #include "algo/file_writer.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include <ceres/ceres.h>
-#include "algo/ceres_iteration_logger.h"
+#include "algo/registration/util/ceres_iteration_logger.h"
 //#include <optional>
 #include "boost/optional.hpp"
 

@@ -1,13 +1,13 @@
 #pragma once
-#include "../mLibInclude.h"
-#include "kinect/SensorDataWrapper.h"
+#include "mLibInclude.h"
 #include "i_showData.h"
 #include "render/pointsRenderer.h"
 #include "kinect/PrimeSenseSensor.h"
-#include "algo/registration/registration.h"
+#include "kinect/SensorDataWrapper.h"
 #include "input_reader/i_reader.h"
+#include "algo/registration/interface/registration.h"
+#include "algo/registration/interface/i_registration.h"
 #include <chrono>
-#include "algo/registration/i_registration.h"
 
 
 class ShowKinectData : public IShowData

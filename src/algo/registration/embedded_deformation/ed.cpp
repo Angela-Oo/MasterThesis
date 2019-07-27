@@ -1,11 +1,12 @@
 #include "stdafx.h"
 
+
 #include "ed.h"
-#include "ed_cost_functions.h"
-#include "algo/ceres_iteration_logger.h"
-#include "algo/mesh_simplification/mesh_simplification.h"
 #include "ed_deformation.h"
-#include "algo/registration/ceres_residual_evaluation.h"
+#include "ed_cost_functions.h"
+#include "algo/registration/util/ceres_iteration_logger.h"
+#include "algo/registration/util/ceres_residual_evaluation.h"
+#include "algo/mesh_simplification/mesh_simplification.h"
 
 namespace Registration {
 namespace ED {

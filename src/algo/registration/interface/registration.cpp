@@ -1,19 +1,17 @@
 #include "stdafx.h"
 
 #include "registration.h"
-#include "ceres_option.h"
+#include "algo/registration/options/ceres_option.h"
 #include "algo/registration/rigid_registration/rigid_registration.h"
 #include "algo/registration/embedded_deformation/ed.h"
 #include "algo/registration/arap/arap.h"
 #include "algo/registration/rigid_before_non_rigid_registration/rigid_before_non_rigid_registration.h"
-
-
 #include "algo/registration/arap/arap_factory.h"
 #include "algo/registration/embedded_deformation/ed_factory.h"
 #include "algo/registration/rigid_registration/rigid_factory.h"
 #include "algo/registration/rigid_before_non_rigid_registration/rigid_before_non_rigid_registration_factory.h"
 
-#include "algo/registration/sequence_registration/template_sequence_registration.h"
+#include "algo/registration/sequence_registration/sequence_registration.h"
 
 namespace Registration {
 

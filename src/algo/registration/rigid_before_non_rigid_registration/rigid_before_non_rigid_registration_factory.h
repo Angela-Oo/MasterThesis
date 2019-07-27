@@ -7,7 +7,7 @@
 #include "rigid_before_non_rigid_registration.h"
 #include "algo/registration/rigid_registration/rigid_factory.h"
 #include "algo/registration/arap/arap_factory.h"
-#include "algo/registration/helper/log_option.h"
+#include "algo/registration/util/log_option.h"
 
 namespace Registration {
 

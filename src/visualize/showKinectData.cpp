@@ -1,12 +1,12 @@
 #include "stdafx.h"
 #include "showKinectData.h"
-#include <numeric>
-#include "algo/registration/rigid_registration/rigid_registration.h"
 #include "input_reader/kinect_reader.h"
-#include <ceres/ceres.h>
-#include "algo/registration/ceres_option.h"
+#include "algo/registration/rigid_registration/rigid_registration.h"
+#include "algo/registration/options/ceres_option.h"
 #include "algo/registration/embedded_deformation/ed.h"
 #include "algo/surface_mesh/mesh_convertion.h"
+#include <ceres/ceres.h>
+#include <numeric>
 
 using namespace ml;
 

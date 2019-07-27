@@ -1,10 +1,11 @@
 #pragma once
 
-#include "algo/registration/i_registration.h"
-#include "algo/surface_mesh/mesh_definition.h"
-#include "algo/registration/deformation_graph/deformation_graph.h"
 #include "rigid_before_non_rigid_deformation.h"
+#include "algo/registration/interface/i_registration.h"
+#include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/rigid_registration/rigid_registration.h"
+#include "algo/surface_mesh/mesh_definition.h"
+
 
 namespace Registration {
 

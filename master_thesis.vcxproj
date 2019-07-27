@@ -223,8 +223,6 @@
     <ClInclude Include="mLib\include\mLibMBase.h" />
     <ClInclude Include="mLib\include\mLibOpenMesh.h" />
     <ClInclude Include="mLib\include\mLibZLib.h" />
-    <ClInclude Include="src\algo\ceres_iteration_logger.h" />
-    <ClInclude Include="src\algo\ceres_math.h" />
     <ClInclude Include="src\algo\evaluate_registration.h" />
     <ClInclude Include="src\algo\file_writer.h" />
     <ClInclude Include="src\algo\mesh_simplification\isotropic_remeshing.h" />
@@ -235,8 +233,6 @@
     <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h" />
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h" />
     <ClInclude Include="src\algo\registration\arap\arap_factory.h" />
-    <ClInclude Include="src\algo\registration\ceres_option.h" />
-    <ClInclude Include="src\algo\registration\ceres_residual_evaluation.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\deformed_mesh.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h" />
@@ -247,10 +243,11 @@
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_factory.h" />
     <ClInclude Include="src\algo\registration\find_corresponding_points\find_corresponding_points.h" />
-    <ClInclude Include="src\algo\registration\helper\log_option.h" />
-    <ClInclude Include="src\algo\registration\hsv_to_rgb.h" />
-    <ClInclude Include="src\algo\registration\i_registration.h" />
-    <ClInclude Include="src\algo\registration\registration.h" />
+    <ClInclude Include="src\algo\registration\interface\i_registration.h" />
+    <ClInclude Include="src\algo\registration\interface\i_sequence_registration.h" />
+    <ClInclude Include="src\algo\registration\interface\registration.h" />
+    <ClInclude Include="src\algo\registration\interface\registration_type.h" />
+    <ClInclude Include="src\algo\registration\options\ceres_option.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deformation.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration_factory.h" />
@@ -259,8 +256,12 @@
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.h" />
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_factory.h" />
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_registration.h" />
-    <ClInclude Include="src\algo\registration\sequence_registration\i_sequence_registration.h" />
-    <ClInclude Include="src\algo\registration\sequence_registration\template_sequence_registration.h" />
+    <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h" />
+    <ClInclude Include="src\algo\registration\util\ceres_iteration_logger.h" />
+    <ClInclude Include="src\algo\registration\util\ceres_math.h" />
+    <ClInclude Include="src\algo\registration\util\ceres_residual_evaluation.h" />
+    <ClInclude Include="src\algo\registration\util\hsv_to_rgb.h" />
+    <ClInclude Include="src\algo\registration\util\log_option.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_convertion.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_definition.h" />
     <ClInclude Include="src\algo\surface_mesh\nearest_neighbor_search.h" />
@@ -295,7 +296,6 @@
     <ClInclude Include="src\visualize\showSensData.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\algo\ceres_iteration_logger.cpp" />
     <ClCompile Include="src\algo\evaluate_registration.cpp" />
     <ClCompile Include="src\algo\file_writer.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\isotropic_remeshing.cpp" />
@@ -305,20 +305,21 @@
     <ClCompile Include="src\algo\registration\arap\arap.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_factory.cpp" />
-    <ClCompile Include="src\algo\registration\ceres_option.cpp" />
-    <ClCompile Include="src\algo\registration\ceres_residual_evaluation.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_factory.cpp" />
     <ClCompile Include="src\algo\registration\find_corresponding_points\find_corresponding_points.cpp" />
-    <ClCompile Include="src\algo\registration\helper\log_option.cpp" />
-    <ClCompile Include="src\algo\registration\hsv_to_rgb.cpp" />
-    <ClCompile Include="src\algo\registration\registration.cpp" />
+    <ClCompile Include="src\algo\registration\interface\registration.cpp" />
+    <ClCompile Include="src\algo\registration\options\ceres_option.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformation.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_factory.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_registration.cpp" />
+    <ClCompile Include="src\algo\registration\util\ceres_iteration_logger.cpp" />
+    <ClCompile Include="src\algo\registration\util\ceres_residual_evaluation.cpp" />
+    <ClCompile Include="src\algo\registration\util\hsv_to_rgb.cpp" />
+    <ClCompile Include="src\algo\registration\util\log_option.cpp" />
     <ClCompile Include="src\algo\surface_mesh\mesh_convertion.cpp" />
     <ClCompile Include="src\algo\surface_mesh\nearest_neighbor_search.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />

@@ -1,21 +1,13 @@
 #include "stdafx.h"
 #include "showMesh.h"
-#include <algorithm>
-#include <cmath>
-
-#include "algo/registration/rigid_registration/rigid_registration.h"
-#include "algo/registration/ceres_option.h"
-
-#include "algo/registration/embedded_deformation/ed.h"
-#include "algo/registration/arap/arap.h"
-#include "algo/registration/arap/arap_factory.h"
-#include "algo/registration/rigid_registration/rigid_factory.h"
-
+#include "algo/registration/options/ceres_option.h"
+#include "algo/registration/interface/registration.h"
 #include "algo/surface_mesh/mesh_convertion.h"
-
 #include <chrono>  // chrono::system_clock
 #include <ctime>   // localtime
 #include <iomanip> // put_time
+#include <algorithm>
+#include <cmath>
 
 std::string ShowMesh::getImageFolderName(RegistrationType type)
 {

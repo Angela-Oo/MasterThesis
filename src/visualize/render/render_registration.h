@@ -4,9 +4,8 @@
 #include "pointsRenderer.h"
 #include "meshRenderer.h"
 #include "mesh/i_mesh_sequence.h"
-#include "algo/registration/i_registration.h"
-#include "algo/registration/sequence_registration/i_sequence_registration.h"
-
+#include "algo/registration/interface/i_registration.h"
+#include "algo/registration/interface/i_sequence_registration.h"
 #include <memory>
 
 using namespace Registration;

@@ -8,11 +8,11 @@
 #include <vector>
 #include <ceres/ceres.h>
 
-#include "algo/registration/i_registration.h"
+#include "algo/registration/interface/i_registration.h"
 
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 
-#include "algo/ceres_iteration_logger.h"
+#include "algo/registration/util/ceres_iteration_logger.h"
 
 namespace Registration {
 namespace ED {

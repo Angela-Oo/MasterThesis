@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mLibInclude.h"
-#include "algo/ceres_math.h"
+#include "algo/registration/util/ceres_math.h"
 #include <vector>
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>

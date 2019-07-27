@@ -1,9 +1,8 @@
 #pragma once
 #include "mLibInclude.h"
-#include "visualize/constantBuffer.h"
-#include "algo/registration/i_registration.h"
-
+#include "algo/registration/interface/i_registration.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
+#include "visualize/constantBuffer.h"
 
 ml::vec3f PointToVec3f(const Point & p);
 

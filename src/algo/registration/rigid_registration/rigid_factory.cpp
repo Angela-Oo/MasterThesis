@@ -1,5 +1,5 @@
 #include "rigid_factory.h"
-#include "algo/registration/helper/log_option.h"
+#include "algo/registration/util/log_option.h"
 
 namespace Registration {
 
@@ -35,7 +35,6 @@ SurfaceMesh RigidFactory::deformedMesh(const SurfaceMesh & mesh, const RigidDefo
 	RigidDeformedMesh deformed(mesh, deformation);
 	return deformed.deformPoints();
 }
-
 
 
 std::string RigidFactory::registrationType()

@@ -2,11 +2,12 @@
 
 #include "arap.h"
 #include "arap_cost_functions.h"
-#include "algo/ceres_iteration_logger.h"
-#include "boost/graph/adjacency_list.hpp"
-#include "boost/graph/connected_components.hpp"
+#include "algo/registration/util/ceres_iteration_logger.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
-#include "algo/registration/ceres_residual_evaluation.h"
+#include "algo/registration/util/ceres_residual_evaluation.h"
+
+//#include "boost/graph/adjacency_list.hpp"
+//#include "boost/graph/connected_components.hpp"
 #include <random>
 
 namespace Registration {

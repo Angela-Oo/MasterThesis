@@ -7,7 +7,7 @@
 #include "i_deformation.h"
 #include <CGAL/squared_distance_3.h> //for 3D functions
 #include "nearest_nodes.h"
-#include "algo/registration/hsv_to_rgb.h"
+#include "algo/registration/util/hsv_to_rgb.h"
 
 namespace Registration
 {

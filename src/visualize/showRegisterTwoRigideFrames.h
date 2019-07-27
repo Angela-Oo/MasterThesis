@@ -1,9 +1,8 @@
 #pragma once
 #include "../mLibInclude.h"
 #include "i_showData.h"
-#include "algo/registration/registration.h"
-#include "algo/registration/i_registration.h"
-#include "input_reader/depth_image_reader.h"
+#include "input_reader/i_reader.h"
+#include "algo/registration/interface/i_registration.h"
 #include "render/pointsRenderer.h"
 
 class ShowTwoRigideRegisteredFrames : public IShowData

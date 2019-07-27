@@ -1,7 +1,7 @@
 #pragma once
 
 #include "algo/file_writer.h"
-#include "algo/registration/i_registration.h"
+#include "algo/registration/interface/i_registration.h"
 #include <ceres/ceres.h>
 
 namespace Registration {

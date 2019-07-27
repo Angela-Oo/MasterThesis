@@ -3,15 +3,14 @@
 #include "mLibInclude.h"
 #include "arap_deformation.h"
 #include "algo/file_writer.h"
-#include <ceres/ceres.h>
-#include "algo/registration/i_registration.h"
+
+#include "algo/registration/interface/i_registration.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
-
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
-
-#include "algo/ceres_iteration_logger.h"
+#include "algo/registration/util/ceres_iteration_logger.h"
+#include <ceres/ceres.h>
 
 namespace Registration {
 

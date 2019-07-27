@@ -1,12 +1,13 @@
 #include "stdafx.h"
 #include "showRegisterTwoRigideFrames.h"
-#include <numeric>
+
 #include "ext-depthcamera/calibratedSensorData.h"
-#include "algo/registration/registration.h"
+#include "algo/registration/interface/registration.h"
 #include "algo/registration/embedded_deformation/ed.h"
 #include "input_reader/depth_image_reader.h"
-#include "algo/registration/ceres_option.h"
+#include "algo/registration/options/ceres_option.h"
 #include "algo/surface_mesh/mesh_convertion.h"
+#include <numeric>
 
 void ShowTwoRigideRegisteredFrames::renderPoints()
 {

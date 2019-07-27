@@ -7,11 +7,9 @@
 
 #include "algo/file_writer.h"
 #include "algo/evaluate_registration.h"
-#include "algo/registration/registration.h"
-//#include "algo/registration/sequence_registration/sequence_registration.h"
-#include "algo/registration/sequence_registration/template_sequence_registration.h"
-
-#include "algo/registration/arap/arap.h"
+#include "algo/registration/interface/i_registration.h"
+#include "algo/registration/interface/registration_type.h"
+#include "algo/registration/sequence_registration/sequence_registration.h"
 
 
 class ShowMesh : public IShowData

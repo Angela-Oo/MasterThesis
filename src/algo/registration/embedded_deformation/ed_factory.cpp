@@ -1,5 +1,5 @@
 #include "ed_factory.h"
-#include "algo/registration/helper/log_option.h"
+#include "algo/registration/util/log_option.h"
 #include "algo/registration/embedded_deformation/ed.h"
 
 namespace Registration {

@@ -1,29 +1,14 @@
 #pragma once
 
-#include "algo/file_writer.h"
-#include "algo/mesh_simplification/mesh_simplification.h"
-#include <ceres/ceres.h>
-#include "input_reader/mesh_reader.h"
-
 #include "i_registration.h"
-#include "algo/registration/sequence_registration/i_sequence_registration.h"
+#include "i_sequence_registration.h"
+#include "registration_type.h"
+#include "algo/file_writer.h"
+#include "input_reader/mesh_reader.h"
+#include <ceres/ceres.h>
 
 typedef ml::TriMeshf Mesh;
 namespace Registration {
-
-enum class RegistrationType
-{
-	ARAP,
-	ARAP_Without_RIGID,
-	ARAP_WithoutICP,
-	ED,
-	ED_Without_RIGID,
-	ED_WithoutICP,
-	Rigid,
-	ARAP_AllFrames,
-	ED_AllFrames,
-	Rigid_AllFrames
-};
 
 
 std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationType type,
