@@ -92,7 +92,20 @@ RigidDeformation::RigidDeformation(Matrix r, Vector t, Point g)
 
 RigidDeformation operator+(const RigidDeformation & lhs, const RigidDeformation & rhs)
 {
-	return RigidDeformation(lhs._r + rhs._r, lhs._t + rhs._t, lhs.position());
+	auto lhs_t = Matrix(CGAL::TRANSLATION, lhs.translation());
+	auto rhs_t = Matrix(CGAL::TRANSLATION, rhs.translation());
+
+	auto lhs_transformation = lhs.rotation() * lhs_t;
+	auto rhs_transformation = rhs.rotation() * rhs_t;
+	Matrix r = rhs_transformation * lhs_transformation;
+	
+	Vector t (r.m(0, 3), r.m(1, 3), r.m(2, 3));
+	return RigidDeformation(r, t, lhs.position());
+
+	// works only if the rotation axis is equal
+	//auto r = lhs._r + rhs._r;
+	//auto t = lhs._t + rhs._t;
+	//return RigidDeformation(r, t, lhs.position());
 }
 
 
