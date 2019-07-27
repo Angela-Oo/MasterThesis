@@ -121,6 +121,7 @@ bool SequenceRegistrationT<Registration, RegistrationFactory>::solve()
 		throw std::exception("not enougth meshes");
 	if (!_registration && _current < _mesh_sequence->size()) {
 		nextFrame();
+		return false;
 	}
 	if (_registration) {
 		auto frame_finished = _registration->finished();
