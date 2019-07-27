@@ -10,7 +10,7 @@
 namespace Registration {
 
 template<typename RegistrationFactory>
-class SequenceRegistrationT : public ISequenceRegistration
+class SequenceRegistration : public ISequenceRegistration
 {
 public:
 	using Registration = typename RegistrationFactory::Registration;
@@ -36,7 +36,7 @@ public:
 	bool finished() override;
 	bool solve() override;
 public:
-	SequenceRegistrationT(std::shared_ptr<IMeshReader> mesh_sequence,
+	SequenceRegistration(std::shared_ptr<IMeshReader> mesh_sequence,
 						  RegistrationFactory registration_factory,
 						  const RegistrationOptions & options,
 						  std::shared_ptr<FileWriter> logger);
@@ -45,7 +45,7 @@ public:
 
 
 template<typename RegistrationFactory>
-std::pair<bool, std::string> SequenceRegistrationT<RegistrationFactory>::saveCurrentFrameAsImage()
+std::pair<bool, std::string> SequenceRegistration<RegistrationFactory>::saveCurrentFrameAsImage()
 {
 	bool save_as_image = false;
 	std::string image_index = "";
@@ -63,19 +63,19 @@ std::pair<bool, std::string> SequenceRegistrationT<RegistrationFactory>::saveCur
 
 
 template<typename RegistrationFactory>
-SurfaceMesh SequenceRegistrationT<RegistrationFactory>::getMesh(size_t frame)
+SurfaceMesh SequenceRegistration<RegistrationFactory>::getMesh(size_t frame)
 {
 	return _mesh_sequence->getMesh(frame);
 }
 
 template<typename RegistrationFactory>
-SurfaceMesh SequenceRegistrationT<RegistrationFactory>::getDeformedMesh(size_t frame)
+SurfaceMesh SequenceRegistration<RegistrationFactory>::getDeformedMesh(size_t frame)
 {
 	return _deformed_meshes[frame];
 }
 
 template<typename RegistrationFactory>
-SurfaceMesh SequenceRegistrationT<RegistrationFactory>::getInverseDeformedMesh(size_t frame)
+SurfaceMesh SequenceRegistration<RegistrationFactory>::getInverseDeformedMesh(size_t frame)
 {
 	Deformation invert_deformation = _deformation[frame].invertDeformation();
 	auto deform_mesh = RegistrationFactory::DeformMesh(invert_deformation);
@@ -83,20 +83,20 @@ SurfaceMesh SequenceRegistrationT<RegistrationFactory>::getInverseDeformedMesh(s
 }
 
 template<typename RegistrationFactory>
-SurfaceMesh SequenceRegistrationT<RegistrationFactory>::getDeformationGraphMesh(size_t frame)
+SurfaceMesh SequenceRegistration<RegistrationFactory>::getDeformationGraphMesh(size_t frame)
 {
 	auto deform_mesh = RegistrationFactory::DeformMesh(_deformation[frame]);
 	return deform_mesh.deformationGraphMesh();
 }
 
 template<typename RegistrationFactory>
-size_t SequenceRegistrationT<RegistrationFactory>::getCurrent()
+size_t SequenceRegistration<RegistrationFactory>::getCurrent()
 {
 	return _current;
 }
 
 template<typename RegistrationFactory>
-void SequenceRegistrationT<RegistrationFactory>::nextFrame()
+void SequenceRegistration<RegistrationFactory>::nextFrame()
 {
 	_current++;
 	auto & source = _mesh_sequence->getMesh(0);
@@ -113,13 +113,13 @@ void SequenceRegistrationT<RegistrationFactory>::nextFrame()
 }
 
 template<typename RegistrationFactory>
-bool SequenceRegistrationT<RegistrationFactory>::finished()
+bool SequenceRegistration<RegistrationFactory>::finished()
 {
 	return _finished;
 }
 
 template<typename RegistrationFactory>
-bool SequenceRegistrationT<RegistrationFactory>::solve()
+bool SequenceRegistration<RegistrationFactory>::solve()
 {
 	if (_current >= _mesh_sequence->size())
 		throw std::exception("not enougth meshes");
@@ -155,7 +155,7 @@ bool SequenceRegistrationT<RegistrationFactory>::solve()
 }
 
 template<typename RegistrationFactory>
-SequenceRegistrationT<RegistrationFactory>::SequenceRegistrationT(std::shared_ptr<IMeshReader> mesh_sequence,
+SequenceRegistration<RegistrationFactory>::SequenceRegistration(std::shared_ptr<IMeshReader> mesh_sequence,
 																				RegistrationFactory registration_factory,
 																				const RegistrationOptions & options,
 																				std::shared_ptr<FileWriter> logger)
