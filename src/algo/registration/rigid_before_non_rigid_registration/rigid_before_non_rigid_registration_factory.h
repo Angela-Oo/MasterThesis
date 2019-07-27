@@ -11,12 +11,13 @@
 
 namespace Registration {
 
-template<typename NonRigidRegistration, typename Factory>
+template<typename Factory>
 class RigidBeforeNonRigidRegistrationFactory
 {
 public:
-	using Deformation = typename NonRigidRegistration::Deformation;
-	using Registration = NonRigidRegistration;
+	using NonRigidRegistration = typename Factory::Registration;
+	using Deformation = typename Factory::Registration::Deformation;
+	using Registration = typename RigidBeforeNonRigidRegistration<typename Factory::Registration>;
 	using DeformMesh = typename RigidBeforeNonRigidDeformMesh<typename Deformation>;
 private:
 	RigidFactory _rigid_factory;
@@ -44,19 +45,19 @@ public:
 };
 
 
-template<typename NonRigidRegistration, typename Factory>
-std::unique_ptr<RigidBeforeNonRigidRegistration<NonRigidRegistration>>
-RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::operator()(const SurfaceMesh & source, const SurfaceMesh & target)
+template<typename Factory>
+std::unique_ptr<RigidBeforeNonRigidRegistration<typename Factory::Registration>>
+RigidBeforeNonRigidRegistrationFactory<Factory>::operator()(const SurfaceMesh & source, const SurfaceMesh & target)
 {
 	return std::make_unique <RigidBeforeNonRigidRegistration<NonRigidRegistration>>(_rigid_factory(source, target),
 																					_non_rigid_factory(source, target));
 }
 
-template<typename NonRigidRegistration, typename Factory>
-std::unique_ptr<RigidBeforeNonRigidRegistration<NonRigidRegistration>>
-RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::operator()(const SurfaceMesh & source,
-																				  const SurfaceMesh & target,
-																				  const RigidBeforeNonRigidDeformation<Deformation> & deformation)
+template<typename Factory>
+std::unique_ptr<RigidBeforeNonRigidRegistration<typename Factory::Registration>>
+RigidBeforeNonRigidRegistrationFactory<Factory>::operator()(const SurfaceMesh & source,
+															const SurfaceMesh & target,
+															const RigidBeforeNonRigidDeformation<Deformation> & deformation)
 {
 	// new calc rigid deformation 
 	//return std::make_unique<RigidBeforeNonRigidRegistration<NonRigidRegistration>>(_rigid_factory(source, target),
@@ -67,12 +68,12 @@ RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::operator(
 																				   _non_rigid_factory(source, target, deformation.non_rigid_deformation));
 }
 
-template<typename NonRigidRegistration, typename Factory>
-std::unique_ptr<RigidBeforeNonRigidRegistration<NonRigidRegistration>>
-RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::operator()(const SurfaceMesh & source,
-																				  const SurfaceMesh & target,
-																				  const SurfaceMesh & previous_mesh,
-																				  const RigidBeforeNonRigidDeformation<Deformation> & deformation)
+template<typename Factory>
+std::unique_ptr<RigidBeforeNonRigidRegistration<typename Factory::Registration>>
+RigidBeforeNonRigidRegistrationFactory<Factory>::operator()(const SurfaceMesh & source,
+															const SurfaceMesh & target,
+															const SurfaceMesh & previous_mesh,
+															const RigidBeforeNonRigidDeformation<Deformation> & deformation)
 {
 	if (_options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation) {
 		return std::make_unique<RigidBeforeNonRigidRegistration<NonRigidRegistration>>(_rigid_factory(source, target, previous_mesh, deformation.non_rigid_deformation.getRigidDeformation()),
@@ -84,22 +85,22 @@ RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::operator(
 	}
 }
 
-template<typename NonRigidRegistration, typename Factory>
-void RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::setFixedPositions(std::vector<vertex_descriptor> fixed_positions)
+template<typename Factory>
+void RigidBeforeNonRigidRegistrationFactory<Factory>::setFixedPositions(std::vector<vertex_descriptor> fixed_positions)
 {
 	_fixed_positions = fixed_positions;
 }
 
-template<typename NonRigidRegistration, typename Factory>
-std::string RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::registrationType()
+template<typename Factory>
+std::string RigidBeforeNonRigidRegistrationFactory<Factory>::registrationType()
 {
 	return "rigid and non rigid registration";
 }
 
-template<typename NonRigidRegistration, typename Factory>
-RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::RigidBeforeNonRigidRegistrationFactory(const RegistrationOptions & options,
-																											  const ceres::Solver::Options & ceres_options,
-																											  std::shared_ptr<FileWriter> logger)
+template<typename Factory>
+RigidBeforeNonRigidRegistrationFactory<Factory>::RigidBeforeNonRigidRegistrationFactory(const RegistrationOptions & options,
+																						const ceres::Solver::Options & ceres_options,
+																						std::shared_ptr<FileWriter> logger)
 	: _options(options)
 	, _ceres_options(ceres_options)
 	, _logger(logger)
