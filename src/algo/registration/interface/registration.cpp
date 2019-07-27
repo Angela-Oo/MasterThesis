@@ -12,6 +12,8 @@
 #include "algo/registration/rigid_before_non_rigid_registration/rigid_before_non_rigid_registration_factory.h"
 
 #include "algo/registration/sequence_registration/sequence_registration.h"
+#include "algo/registration/sequence_registration/refine_deformation_graph_registration_factory.h"
+#include "algo/registration/sequence_registration/refine_deformation_graph_registration.h"
 
 namespace Registration {
 
@@ -23,7 +25,8 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationTy
 {
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP_AllFrames) {
-		using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<ARAPFactory>;
+		//using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<ARAPFactory>;
+		using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<RefineDeformationGraphRegistrationFactory<ARAPFactory>>;
 		SequenceARAPFactory factory(options, ceres_options, logger);
 		return std::make_unique<SequenceRegistrationT<SequenceARAPFactory>>(mesh_sequence, factory, options, logger);
 	}

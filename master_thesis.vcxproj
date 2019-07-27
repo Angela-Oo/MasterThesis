@@ -239,6 +239,7 @@
     <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\i_deformation.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\nearest_nodes.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph\refine_deformation_graph.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h" />
@@ -258,6 +259,8 @@
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.h" />
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_factory.h" />
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_registration.h" />
+    <ClInclude Include="src\algo\registration\sequence_registration\refine_deformation_graph_registration.h" />
+    <ClInclude Include="src\algo\registration\sequence_registration\refine_deformation_graph_registration_factory.h" />
     <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h" />
     <ClInclude Include="src\algo\registration\util\ceres_iteration_logger.h" />
     <ClInclude Include="src\algo\registration\util\ceres_math.h" />
