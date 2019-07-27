@@ -10,6 +10,10 @@ namespace Registration {
 
 class RigidFactory
 {
+public:
+	using Registration = RigidRegistration;
+	using DeformMesh = RigidDeformedMesh;
+private:
 	ceres::Solver::Options _ceres_options;
 	RegistrationOptions _options;
 	std::shared_ptr<FileWriter> _logger;
@@ -24,10 +28,7 @@ public:
 												  const SurfaceMesh & target,
 												  const SurfaceMesh & previous_mesh, // used for non rigid registration
 												  const RigidDeformation & deformation);
-	SurfaceMesh deformationGraphMesh(const RigidDeformation & deformation);
-	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation);
 	std::string registrationType();
-	void logConfiguration();
 public:
 	RigidFactory(const RegistrationOptions & options,
 				 const ceres::Solver::Options & ceres_options,

@@ -1,16 +1,20 @@
 #pragma once
 
-
-#include "algo/file_writer.h"
-#include <ceres/ceres.h>
-#include "algo/surface_mesh/mesh_definition.h"
 #include "ed.h"
+#include "algo/file_writer.h"
+#include "algo/surface_mesh/mesh_definition.h"
+#include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
+#include <ceres/ceres.h>
 
 namespace Registration {
 using namespace ED;
 
 class EmbeddedDeformationFactory
 {
+public:
+	using Registration = EmbeddedDeformation;
+	using DeformMesh = DeformationGraphDeformMesh<typename DeformationGraph<EmbeddedDeformation::Deformation>>;
+private:
 	ceres::Solver::Options _ceres_options;
 	RegistrationOptions _options;
 	std::shared_ptr<FileWriter> _logger;
@@ -25,11 +29,8 @@ public:
 													const SurfaceMesh & target,
 													const SurfaceMesh & previous_mesh, // used for non rigid registration
 													const EmbeddedDeformation::Deformation & deformation_graph);
-	SurfaceMesh deformationGraphMesh(const EmbeddedDeformation::Deformation & deformation_graph);
-	SurfaceMesh deformedMesh(const SurfaceMesh & mesh, const EmbeddedDeformation::Deformation & deformation_graph);
 	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
 	std::string registrationType();
-	void logConfiguration();
 public:
 	EmbeddedDeformationFactory(const RegistrationOptions & options,
 							   const ceres::Solver::Options & ceres_options,

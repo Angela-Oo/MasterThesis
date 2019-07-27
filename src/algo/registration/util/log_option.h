@@ -9,4 +9,6 @@ namespace Registration {
 void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const RegistrationOptions & registration_options);
 void logCeresOptions(std::shared_ptr<FileWriter> logger, const ceres::Solver::Options & ceres_options);
 
+void logOptions(std::shared_ptr<FileWriter> logger, const RegistrationOptions & registration_options, const ceres::Solver::Options & ceres_options);
+
 }

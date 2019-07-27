@@ -70,7 +70,6 @@ void ShowMesh::nonRigidRegistration()
 											   target);
 		}
 
-		//factory.logConfiguration();
 		renderRegistration();
 		_image_name = "frame_" + std::to_string(_registration->currentIteration());
 	}

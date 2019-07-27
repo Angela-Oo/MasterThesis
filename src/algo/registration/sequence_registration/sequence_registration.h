@@ -77,13 +77,15 @@ template<typename Registration, typename RegistrationFactory>
 SurfaceMesh SequenceRegistrationT<Registration, RegistrationFactory>::getInverseDeformedMesh(size_t frame)
 {
 	Deformation invert_deformation = _deformation[frame].invertDeformation();
-	return _registration_factory.deformedMesh(_mesh_sequence->getMesh(frame), invert_deformation);
+	auto deform_mesh = RegistrationFactory::DeformMesh(invert_deformation);
+	return deform_mesh.deformedMesh(_mesh_sequence->getMesh(frame));
 }
 
 template<typename Registration, typename RegistrationFactory>
 SurfaceMesh SequenceRegistrationT<Registration, RegistrationFactory>::getDeformationGraphMesh(size_t frame)
 {
-	return _registration_factory.deformationGraphMesh(_deformation[frame]);
+	auto deform_mesh = RegistrationFactory::DeformMesh(_deformation[frame]);
+	return deform_mesh.deformationGraphMesh();
 }
 
 template<typename Registration, typename RegistrationFactory>
@@ -175,8 +177,6 @@ SequenceRegistrationT<Registration, RegistrationFactory>::SequenceRegistrationT(
 
 	//std::string algo = (registration_type == RegistrationType::ARAP) ? "arap" : "ed";
 	_ceres_logger->write("Register all frames with " + _registration_factory.registrationType());
-
-	_registration_factory.logConfiguration();
 }
 
 }

@@ -680,6 +680,12 @@
     <ClInclude Include="src\algo\registration\interface\i_sequence_registration.h">
       <Filter>1 algo\3 registration\0 interface</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph_deform_mesh.h">
+      <Filter>1 algo\3 registration\3 deformation graph</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deform_mesh.h">
+      <Filter>1 algo\3 registration\9 ridid before non rigid deformation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />

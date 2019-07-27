@@ -25,28 +25,12 @@ std::unique_ptr<RigidRegistration> RigidFactory::operator()(const SurfaceMesh & 
 }
 
 
-SurfaceMesh RigidFactory::deformationGraphMesh(const RigidDeformation & deformation)
-{
-	return SurfaceMesh();
-}
-
-SurfaceMesh RigidFactory::deformedMesh(const SurfaceMesh & mesh, const RigidDeformation & deformation)
-{
-	RigidDeformedMesh deformed(mesh, deformation);
-	return deformed.deformPoints();
-}
-
 
 std::string RigidFactory::registrationType()
 {
 	return "rigid";
 }
 
-void RigidFactory::logConfiguration()
-{
-	logRegistrationOptions(_logger, _options);
-	logCeresOptions(_logger, _ceres_options);
-}
 
 RigidFactory::RigidFactory(const RegistrationOptions & options,
 						   const ceres::Solver::Options & ceres_options,

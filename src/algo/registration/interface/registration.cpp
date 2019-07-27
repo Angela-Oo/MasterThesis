@@ -21,6 +21,7 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationTy
 																  std::shared_ptr<FileWriter> logger,
 																  std::shared_ptr<IMeshReader> mesh_sequence)
 {
+	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP_AllFrames) {
 		using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<AsRigidAsPossible, ARAPFactory>;
 		SequenceARAPFactory factory(options, ceres_options, logger);
@@ -46,8 +47,9 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 												  ceres::Solver::Options & ceres_options,
 												  std::shared_ptr<FileWriter> logger,
 												  const SurfaceMesh & source,
-												  const SurfaceMesh & target) {
-
+												  const SurfaceMesh & target) 
+{
+	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP) {
 		RigidBeforeNonRigidRegistrationFactory<AsRigidAsPossible, ARAPFactory> factory(options, ceres_options, logger);
 		return factory(source, target);
@@ -84,6 +86,7 @@ std::unique_ptr<INonRigidRegistration> createRegistrationNoICP(RegistrationType 
 															   const SurfaceMesh & target,
 															   std::vector<vertex_descriptor> fixed_positions)
 {
+	logOptions(logger, options, ceres_options);
 	if (fixed_positions.empty())
 		std::cout << "fixed position are not set" << std::endl;
 	if (type == RegistrationType::ED_WithoutICP) {

@@ -70,4 +70,11 @@ void logCeresOptions(std::shared_ptr<FileWriter> logger, const ceres::Solver::Op
 	logger->write(ss.str());
 }
 
+
+void logOptions(std::shared_ptr<FileWriter> logger, const RegistrationOptions & registration_options, const ceres::Solver::Options & ceres_options)
+{
+	logRegistrationOptions(logger, registration_options);
+	logCeresOptions(logger, ceres_options);
+}
+
 }
