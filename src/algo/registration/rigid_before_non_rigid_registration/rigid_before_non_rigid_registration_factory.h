@@ -77,8 +77,7 @@ RigidBeforeNonRigidRegistrationFactory<NonRigidRegistration, Factory>::operator(
 																				  const SurfaceMesh & previous_mesh,
 																				  const RigidBeforeNonRigidDeformation<Deformation> & deformation)
 {
-	bool use_rigid_deformation_from_non_rigid_global_deformation = true;
-	if (use_rigid_deformation_from_non_rigid_global_deformation) {
+	if (_options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation) {
 		return std::make_unique<RigidBeforeNonRigidRegistration<NonRigidRegistration>>(_rigid_factory(source, target, previous_mesh, deformation.non_rigid_deformation.getRigidDeformation()),
 																					   _non_rigid_factory(source, target, deformation.non_rigid_deformation));
 	}

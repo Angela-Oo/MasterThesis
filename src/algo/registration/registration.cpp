@@ -26,16 +26,16 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationTy
 	if (type == RegistrationType::ARAP_AllFrames) {
 		using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<AsRigidAsPossible, ARAPFactory>;
 		SequenceARAPFactory factory(options, ceres_options, logger);
-		return std::make_unique<SequenceRegistrationT<RigidBeforeNonRigidRegistration<AsRigidAsPossible>, SequenceARAPFactory>>(mesh_sequence, factory, logger);
+		return std::make_unique<SequenceRegistrationT<RigidBeforeNonRigidRegistration<AsRigidAsPossible>, SequenceARAPFactory>>(mesh_sequence, factory, options, logger);
 	}
 	else if (type == RegistrationType::ED_AllFrames) {
 		using SequenceEDFactory = RigidBeforeNonRigidRegistrationFactory<EmbeddedDeformation, EmbeddedDeformationFactory>;
 		SequenceEDFactory factory(options, ceres_options, logger);
-		return std::make_unique<SequenceRegistrationT<RigidBeforeNonRigidRegistration<EmbeddedDeformation>, SequenceEDFactory>>(mesh_sequence, factory, logger);
+		return std::make_unique<SequenceRegistrationT<RigidBeforeNonRigidRegistration<EmbeddedDeformation>, SequenceEDFactory>>(mesh_sequence, factory, options, logger);
 	}
 	else if (type == RegistrationType::Rigid_AllFrames) {
 		Registration::RigidFactory factory(options, ceres_options, logger);
-		return std::make_unique<SequenceRegistrationT<RigidRegistration, Registration::RigidFactory>>(mesh_sequence, factory, logger);
+		return std::make_unique<SequenceRegistrationT<RigidRegistration, Registration::RigidFactory>>(mesh_sequence, factory, options, logger);
 	}
 	else {
 		throw("Registration type makes no sense in this configuration");

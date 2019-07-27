@@ -22,6 +22,7 @@ private:
 	size_t _current;	
 	bool _finished;
 	RegistrationFactory _registration_factory;
+	bool _use_previouse_frame_for_rigid_registration;
 	std::unique_ptr<CeresLogger> _ceres_logger;
 public:
 	std::pair<bool, std::string> saveCurrentFrameAsImage() override;
@@ -36,6 +37,7 @@ public:
 public:
 	SequenceRegistrationT(std::shared_ptr<IMeshReader> mesh_sequence,
 						  RegistrationFactory registration_factory,
+						  const RegistrationOptions & options,
 						  std::shared_ptr<FileWriter> logger);
 };
 
@@ -97,8 +99,7 @@ void SequenceRegistrationT<Registration, RegistrationFactory>::nextFrame()
 	auto & source = _mesh_sequence->getMesh(0);
 	auto & target = _mesh_sequence->getMesh(_current);
 
-	bool use_previouse_frame_for_rigid_registration = true;
-	if (use_previouse_frame_for_rigid_registration) {
+	if (_use_previouse_frame_for_rigid_registration) {
 		auto & prev_mesh = _mesh_sequence->getMesh(_current - 1);
 		_registration = _registration_factory(source, target, prev_mesh, _deformation[_current - 1]);
 	}
@@ -153,12 +154,14 @@ bool SequenceRegistrationT<Registration, RegistrationFactory>::solve()
 template<typename Registration, typename RegistrationFactory>
 SequenceRegistrationT<Registration, RegistrationFactory>::SequenceRegistrationT(std::shared_ptr<IMeshReader> mesh_sequence,
 																				RegistrationFactory registration_factory,
+																				const RegistrationOptions & options,
 																				std::shared_ptr<FileWriter> logger)
 	: _mesh_sequence(mesh_sequence)
 	, _registration_factory(registration_factory)
 	, _ceres_logger(std::make_unique<CeresLogger>(logger))
 	, _current(1)
 	, _finished(false)
+	, _use_previouse_frame_for_rigid_registration(options.sequence_options.use_previouse_frame_for_rigid_registration)
 {
 	_deformation.resize(_mesh_sequence->size());
 	_deformed_meshes.resize(_mesh_sequence->size());

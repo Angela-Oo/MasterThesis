@@ -23,6 +23,19 @@ struct DeformationGraphOptions
 	{}
 };
 
+struct SequenceRegistrationOptions
+{
+	// if true init rigid deformation with non rigid global deformation else init rigid deformation with previouse rigid deformation
+	bool init_rigid_deformation_with_non_rigid_globale_deformation;
+	bool use_previouse_frame_for_rigid_registration;
+
+	SequenceRegistrationOptions()
+		: init_rigid_deformation_with_non_rigid_globale_deformation(true)
+		, use_previouse_frame_for_rigid_registration(true)
+	{}
+};
+
+
 struct RegistrationOptions
 {
 	double smooth;
@@ -34,6 +47,7 @@ struct RegistrationOptions
 	bool ignore_deformation_graph_border_vertices;
 	bool evaluate_residuals;
 	double use_vertex_random_probability; // value between 0. and 1.
+	SequenceRegistrationOptions sequence_options;
 	DeformationGraphOptions dg_options;
 	ReduceMeshStrategy mesh_reduce_strategy;
 
