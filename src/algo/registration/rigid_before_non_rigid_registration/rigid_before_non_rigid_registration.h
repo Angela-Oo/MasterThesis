@@ -84,7 +84,7 @@ SurfaceMesh RigidBeforeNonRigidRegistration<NonRigidRegistration>::getDeformatio
 		return _non_rigid_registration->getDeformationGraphMesh();
 	}
 	else {
-		return SurfaceMesh();//_rigid_registration->getDeformationGraphMesh();
+		return SurfaceMesh();
 	}
 };
 
@@ -96,7 +96,7 @@ bool RigidBeforeNonRigidRegistration<NonRigidRegistration>::solveIteration()
 	}
 	else {
 		_finished_rigid_registration = _rigid_registration->finished();
-		_deformation.is_rigid_deformation = _finished_rigid_registration;
+		_deformation.is_rigid_deformation = !_finished_rigid_registration;
 		if (!_finished_rigid_registration) {
 			_rigid_registration->solveIteration();
 		}
