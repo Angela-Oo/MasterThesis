@@ -54,7 +54,9 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 {
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP) {
-		RigidBeforeNonRigidRegistrationFactory<ARAPFactory> factory(options, ceres_options, logger);
+		//RigidBeforeNonRigidRegistrationFactory<RefineDeformationGraphRegistrationFactory<ARAPFactory>> factory(options, ceres_options, logger);
+		RefineDeformationGraphRegistrationFactory<ARAPFactory> factory(options, ceres_options, logger);
+		//RigidBeforeNonRigidRegistrationFactory<ARAPFactory> factory(options, ceres_options, logger);
 		return factory(source, target);
 	}
 	else if (type == RegistrationType::ED) {

@@ -145,9 +145,24 @@ void setVertexColor(SurfaceMesh & mesh, double reference_cost, bool use_only_smo
 
 void setEdgeColor(SurfaceMesh & mesh, double reference_cost)
 {
-	if (mesh.property_map<edge_descriptor, double>("e:smooth_cost").second) {
+	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
+	auto refine_property_map = mesh.property_map<edge_descriptor, bool>("e:refine");
+
+	if (refine_property_map.second) {
+		auto refine = refine_property_map.first;
+		for (auto & e : mesh.edges())
+		{
+			if (refine[e]) {
+				edge_colors[e] = ml::RGBColor::Red.toVec4f();
+			}
+			else {
+				edge_colors[e] = ml::RGBColor::Blue.toVec4f();
+			}
+		}
+	}
+	else if (mesh.property_map<edge_descriptor, double>("e:smooth_cost").second) {
 		auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:smooth_cost").first;
-		auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
+
 		for (auto & e : mesh.edges())
 		{
 			double error = (reference_cost > 0.) ? (smooth_costs[e] / reference_cost) : smooth_costs[e];

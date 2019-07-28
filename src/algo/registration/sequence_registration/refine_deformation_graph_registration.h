@@ -13,8 +13,10 @@ class RefineDeformationGraphRegistration : public INonRigidRegistration
 public:
 	using Deformation = typename NonRigidRegistration::Deformation;
 private:
+	Deformation _refined;
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
 	bool _is_refined;
+	bool _finished;
 public:
 	bool finished() override;
 	bool solveIteration() override;
@@ -63,19 +65,29 @@ SurfaceMesh RefineDeformationGraphRegistration<NonRigidRegistration>::getInverse
 template<typename NonRigidRegistration>
 SurfaceMesh RefineDeformationGraphRegistration<NonRigidRegistration>::getDeformationGraphMesh()
 {
-	return _non_rigid_registration->getDeformationGraphMesh();
+	if (_is_refined) {
+		return deformationGraphToSurfaceMesh(_refined, true);
+	}
+	else {
+		return _non_rigid_registration->getDeformationGraphMesh();
+	}
 };
 
 template<typename NonRigidRegistration>
 bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 {
-	bool finished = _non_rigid_registration->solveIteration();
-	if (finished && _is_refined == false) {
-		auto refined = refineDeformationGraph(_non_rigid_registration->getDeformation());
+	bool finished = _non_rigid_registration->finished();
+	if (finished == false) {
+		_non_rigid_registration->solveIteration();
+	}
+	else if(_is_refined == false) {
+		_refined = refineDeformationGraph(_non_rigid_registration->getDeformation());
+		_is_refined = true;
 	}
 	else {
-		return finished;
+		_finished = true;
 	}
+	return _finished;
 }
 
 template<typename NonRigidRegistration>
@@ -93,13 +105,18 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solve()
 template<typename NonRigidRegistration>
 bool RefineDeformationGraphRegistration<NonRigidRegistration>::finished()
 {
-	return _non_rigid_registration->finished();
+	return _finished;
 }
 
 template<typename NonRigidRegistration>
 const typename NonRigidRegistration::Deformation & RefineDeformationGraphRegistration<NonRigidRegistration>::getDeformation()
 {
+	//if (_is_refined) {
+	//	return _refined;
+	//}
+	//else {
 	return _non_rigid_registration->getDeformation();
+	//}
 }
 
 template<typename NonRigidRegistration>
@@ -118,6 +135,7 @@ template<typename NonRigidRegistration>
 RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration)
 	: _non_rigid_registration(std::move(non_rigid_registration))
 	, _is_refined(false)
+	, _finished(false)
 {
 }
 
