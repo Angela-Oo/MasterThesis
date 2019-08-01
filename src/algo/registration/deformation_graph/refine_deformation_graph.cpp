@@ -14,7 +14,7 @@ std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh)
 	auto smooth_cost = smooth_cost_property_map.first;
 
 	double max_smooth_cost = *(std::max_element(smooth_cost.begin(), smooth_cost.end()));
-	double refine_max_smooth_cost = std::max(max_smooth_cost * 0.5, 0.01);
+	double refine_max_smooth_cost = std::max(max_smooth_cost * 0.9, 0.01);
 
 	std::cout << "max smoot " << max_smooth_cost << " refine " << refine_max_smooth_cost;
 	auto refine_property_map = refined_mesh.add_property_map<edge_descriptor, bool>("e:refine", false);
@@ -35,13 +35,14 @@ void splitEdge(edge_descriptor e, SurfaceMesh & mesh)
 {
 	auto he = mesh.halfedge(e);
 
-	Vector source = mesh.point(mesh.source(he)) - CGAL::ORIGIN;
-	Vector target = mesh.point(mesh.target(he)) - CGAL::ORIGIN;
-	Point center_point = CGAL::ORIGIN + ((source + target) * 0.5);
+	Point source = mesh.point(mesh.source(he));
+	Point target = mesh.point(mesh.target(he));
+	Vector dir = target - source;
+	Point center_point = source + (dir * 0.5);
 
 	auto new_he_f0 = CGAL::Euler::split_edge(he, mesh);
 	mesh.point(mesh.target(new_he_f0)) = center_point;
-	
+		
 	auto split_f0_he0 = new_he_f0;
 	auto split_f0_he1 = mesh.prev(mesh.prev(new_he_f0));
 
