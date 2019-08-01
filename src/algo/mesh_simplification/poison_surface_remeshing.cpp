@@ -1,7 +1,5 @@
-#include "stdafx.h"
-
 #include "poison_surface_remeshing.h"
-
+#include "mLibCore.h"
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
 #include <CGAL/poisson_surface_reconstruction.h>

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "mLibInclude.h"
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>
 #include <functional>

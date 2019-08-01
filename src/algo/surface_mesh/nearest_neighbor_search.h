@@ -1,8 +1,6 @@
 #pragma once
 
-#include <stdafx.h>
 #include "algo/surface_mesh/mesh_definition.h"
-
 #include <CGAL/Search_traits_3.h>
 #include <CGAL/Search_traits_adapter.h>
 #include <CGAL/Orthogonal_k_neighbor_search.h>

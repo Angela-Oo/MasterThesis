@@ -1,9 +1,7 @@
 #pragma once
 
-#include "stdafx.h"
-
 #include "algo/surface_mesh/nearest_neighbor_search.h"
-
+#include "algo/surface_mesh/mesh_definition.h"
 
 double angle_between_to_vectors_in_rad(Vector vector_a, Vector vector_b);
 

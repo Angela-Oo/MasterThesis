@@ -1,18 +1,14 @@
 #pragma once
 
-#include "mLibInclude.h"
+#include "ed_deformation.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
-#include "ed_deformation.h"
+#include "algo/registration/interface/i_registration.h"
+#include "algo/registration/find_corresponding_points/find_corresponding_points.h"
+#include "algo/registration/util/ceres_iteration_logger.h"
 #include "algo/file_writer.h"
 #include <vector>
 #include <ceres/ceres.h>
-
-#include "algo/registration/interface/i_registration.h"
-
-#include "algo/registration/find_corresponding_points/find_corresponding_points.h"
-
-#include "algo/registration/util/ceres_iteration_logger.h"
 
 namespace Registration {
 namespace ED {

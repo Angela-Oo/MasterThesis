@@ -1,6 +1,7 @@
-#include "stdafx.h"
 #include "file_writer.h"
 #include <experimental/filesystem>
+#include <fstream>
+#include <iostream>
 
 void FileWriter::write(std::string text)
 {	

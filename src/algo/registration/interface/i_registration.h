@@ -1,15 +1,13 @@
 #pragma once
 
-#include "mLibInclude.h"
+//#include "mLibInclude.h"
 //#include "graph_node_type.h"
-
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/rigid_registration/rigid_deformation.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
+#include "algo/surface_mesh/mesh_definition.h"
 
 namespace Registration {
-
-
 
 
 struct DeformationGraphOptions

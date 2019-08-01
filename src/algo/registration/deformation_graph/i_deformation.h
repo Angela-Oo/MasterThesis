@@ -1,9 +1,7 @@
 #pragma once
 
-#include "stdafx.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/registration/rigid_registration/rigid_deformation.h"
-
 
 namespace Registration {
 

@@ -1,6 +1,3 @@
-#include "stdafx.h"
-
-
 #include "ed.h"
 #include "ed_deformation.h"
 #include "ed_cost_functions.h"

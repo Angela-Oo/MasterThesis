@@ -1,6 +1,6 @@
-#include "stdafx.h"
 #include "ceres_iteration_logger.h"
-
+#include <sstream>
+#include <iomanip>
 
 std::string getDurationAsString(std::chrono::time_point<std::chrono::system_clock> start_time)
 {

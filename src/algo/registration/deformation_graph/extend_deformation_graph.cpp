@@ -1,8 +1,8 @@
 #include "extend_deformation_graph.h"
 
-#include <CGAL/boost/graph/Euler_operations.h>
 #include "algo/surface_mesh/nearest_neighbor_search.h"
 #include <CGAL/Polygon_mesh_processing/border.h>
+#include <CGAL/boost/graph/Euler_operations.h>
 #include <vector>
 
 void cutAreaOutOfMesh(SurfaceMesh & mesh, const SurfaceMesh & cut_area, double covered_if_distance_is_smaller_than)

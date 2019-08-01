@@ -1,11 +1,8 @@
-#include "stdafx.h"
-
 #include "mesh_simplification.h"
-#include "algo/surface_mesh/mesh_convertion.h"
-
 #include "poison_surface_remeshing.h"
 #include "make_mesh_3_remeshing.h"
 #include "isotropic_remeshing.h"
+#include "algo/surface_mesh/mesh_convertion.h"
 #include <CGAL/Polygon_mesh_processing/repair.h>
 
 Mesh createReducedMesh(const Mesh & mesh, double target_edge_length, ReduceMeshStrategy strategy)

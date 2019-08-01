@@ -2,7 +2,7 @@
 
 #include "refine_deformation_graph.h"
 #include <algorithm>
-#include <CGAL/boost/graph/Euler_operations.h>
+//#include <CGAL/boost/graph/Euler_operations.h>
 
 namespace Registration
 {

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "mLibInclude.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/surface_mesh/nearest_neighbor_search.h"
 

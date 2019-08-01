@@ -1,6 +1,6 @@
 #pragma once
-#include "mLibCore.h"
 #include "algo/surface_mesh/mesh_definition.h"
+#include "mLibCore.h"
 
 namespace Registration {
 

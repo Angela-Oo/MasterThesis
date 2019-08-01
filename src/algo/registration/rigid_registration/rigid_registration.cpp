@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "rigid_registration.h"
 #include "rigid_deformation_cost_function.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h" // set color todo

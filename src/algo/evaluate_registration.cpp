@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "evaluate_registration.h"
 #include <CGAL/Polygon_mesh_processing/compute_normal.h>
 

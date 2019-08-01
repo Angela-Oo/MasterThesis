@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "rigid_deformed_mesh.h"
 
 namespace Registration {

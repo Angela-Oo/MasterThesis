@@ -1,4 +1,3 @@
-#include "stdafx.h"
 #include "rigid_deformation.h"
 #include "algo/registration/util/ceres_math.h"
 #include "ceres/rotation.h"

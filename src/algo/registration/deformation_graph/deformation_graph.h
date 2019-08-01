@@ -1,13 +1,12 @@
 #pragma once
 
-#include "mLibInclude.h"
-#include <vector>
+#include "nearest_nodes.h"
+#include "i_deformation.h"
+#include "algo/registration/util/hsv_to_rgb.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/surface_mesh/nearest_neighbor_search.h"
-#include "i_deformation.h"
 #include <CGAL/squared_distance_3.h> //for 3D functions
-#include "nearest_nodes.h"
-#include "algo/registration/util/hsv_to_rgb.h"
+#include <vector>
 
 namespace Registration
 {

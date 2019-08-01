@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mLibInclude.h"
+#include "mLibCore.h"
 #include "algo/mesh_simplification/mesh_simplification.h"
 
 template<typename T>

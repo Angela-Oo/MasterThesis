@@ -1,7 +1,7 @@
 #pragma once
 
-#include "mLibInclude.h"
 #include "deformation_graph.h"
+#include "algo/surface_mesh/mesh_definition.h"
 
 namespace Registration
 {

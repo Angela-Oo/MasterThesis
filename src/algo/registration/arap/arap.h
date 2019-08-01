@@ -1,9 +1,7 @@
 #pragma once
 
-#include "mLibInclude.h"
 #include "arap_deformation.h"
 #include "algo/file_writer.h"
-
 #include "algo/registration/interface/i_registration.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"

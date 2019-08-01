@@ -1,7 +1,4 @@
-#include "stdafx.h"
-
 #include "isotropic_remeshing.h"
-
 #include <CGAL/Polygon_mesh_processing/remesh.h>
 #include <CGAL/Polygon_mesh_processing/border.h>
 
@@ -39,7 +36,4 @@ SurfaceMesh isotropicRemeshing(const SurfaceMesh & mesh, double target_edge_leng
 	std::cout << "count of surface mesh vertices " << surface_mesh.number_of_vertices() << std::endl;
 	return surface_mesh;
 }
-
-
-
 

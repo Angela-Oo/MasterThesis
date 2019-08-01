@@ -1,6 +1,5 @@
-#include "stdafx.h"
-
 #include "arap_deformation.h"
+#include "mLibCore.h"
 #include <ceres/rotation.h>
 
 

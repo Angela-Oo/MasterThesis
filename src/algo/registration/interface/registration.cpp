@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "registration.h"
 #include "algo/registration/options/ceres_option.h"
 #include "algo/registration/rigid_registration/rigid_registration.h"

@@ -1,5 +1,5 @@
-#include "stdafx.h"
 #include "find_corresponding_points.h"
+#include "mLibCore.h"
 
 
 double angle_between_to_vectors_in_rad(Vector vector_a, Vector vector_b)

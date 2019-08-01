@@ -1,10 +1,9 @@
 #pragma once
 
-
-#include "algo/file_writer.h"
-#include <ceres/ceres.h>
-#include "algo/surface_mesh/mesh_definition.h"
 #include "rigid_registration.h"
+#include "algo/file_writer.h"
+#include "algo/surface_mesh/mesh_definition.h"
+#include <ceres/ceres.h>
 
 namespace Registration {
 

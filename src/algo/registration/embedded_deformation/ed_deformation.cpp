@@ -1,5 +1,3 @@
-#include "stdafx.h"
-
 #include "ed_deformation.h"
 
 namespace Registration {
