@@ -45,12 +45,12 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\master_thesis.vcxproj">
       <Project>{28114563-f715-4042-a798-b2a73d9c8ac4}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -88,8 +88,8 @@
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)mLibExternal\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;gflags_debug.lib;glogd.lib;ceres-debug.lib;OpenNI2.lib;FW1FontWrapperd.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)mLibExternal\lib;$(SolutionDir)\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;gflags_debug.lib;glogd.lib;ceres-debug.lib;OpenNI2.lib;FW1FontWrapperd.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;FreeImage.lib;refine_deformation_graph.obj;file_writer.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -123,7 +123,7 @@
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
-      <AdditionalLibraryDirectories>$(SolutionDir)mLibExternal\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)mLibExternal\lib;$(SolutionDir)\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;glog.lib;gflags.lib;ceres.lib;OpenNI2.lib;FW1FontWrapper.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;FreeImage.lib;CGAL_Core-vc140-mt-4.13.lib;CGAL_ImageIO-vc140-mt-4.13.lib;CGAL-vc140-mt-4.13.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

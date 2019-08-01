@@ -1,10 +1,9 @@
 #include "pch.h"
 
 #include "mLibInclude.h"
-//#include "mLibCore.h"
-//#include "mLibCGAL.h"
 #include "algo/surface_mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/refine_deformation_graph.h"
+
 
 TEST(TestCaseName, TestName) {
   EXPECT_EQ(1, 1);
@@ -18,9 +17,7 @@ TEST(TestCaseName, TestName) {
 //       \   |   /
 //          v2
 TEST(Refine, TestOneEdge) {
-	SurfaceMesh mesh;
-
-	
+	SurfaceMesh mesh;	
 	std::vector<vertex_descriptor> vids;
 	vids.push_back(mesh.add_vertex(Point( 0.,  2., 0.)));
 	vids.push_back(mesh.add_vertex(Point( 3.,  0., 0.)));
@@ -37,9 +34,9 @@ TEST(Refine, TestOneEdge) {
 	auto e = mesh.edge(mesh.halfedge(vids[2]));
 	smooth_cost_property_map.first[e] = 1.;
 
-	//auto edges = Registration::getEdgesToRefine(mesh);
-	//EXPECT_EQ(edges.size(), 1);
-	//EXPECT_EQ(edges[0], e);
+	auto edges = Registration::getEdgesToRefine(mesh);
+	EXPECT_EQ(edges.size(), 1);
+	EXPECT_EQ(edges[0], e);
 }
 
 
