@@ -78,6 +78,9 @@ TEST_F(RefineOneEdge, TestSplitCenterEdge)
 	auto f_it = mesh.faces().begin();
 	auto last_vid = *(mesh.vertices().begin() + 4);
 
+	auto new_v = mesh.point(last_vid);
+	EXPECT_EQ(new_v, Point(0., 0., 0.));
+
 	auto vf0 = mesh.vertices_around_face(mesh.halfedge(*f_it)).begin();
 	EXPECT_EQ(*vf0, vids[1]);
 	vf0++;
