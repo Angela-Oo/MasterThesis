@@ -2,7 +2,7 @@
 
 #include "refine_deformation_graph.h"
 #include <algorithm>
-//#include <CGAL/boost/graph/Euler_operations.h>
+#include <CGAL/boost/graph/Euler_operations.h>
 
 namespace Registration
 {
@@ -31,6 +31,28 @@ std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh)
 	return refine_edges;
 }
 
+void splitEdge(edge_descriptor e, SurfaceMesh & mesh)
+{
+	auto he = mesh.halfedge(e);
+
+	Vector source = mesh.point(mesh.source(he)) - CGAL::ORIGIN;
+	Vector target = mesh.point(mesh.target(he)) - CGAL::ORIGIN;
+	Point center_point = CGAL::ORIGIN + ((source + target) * 0.5);
+
+	auto new_he_f0 = CGAL::Euler::split_edge(he, mesh);
+	mesh.point(mesh.target(new_he_f0)) = center_point;
+	
+	auto split_f0_he0 = new_he_f0;
+	auto split_f0_he1 = mesh.prev(mesh.prev(new_he_f0));
+
+	auto new_he_f1 = mesh.opposite(new_he_f0);
+	auto split_f1_he0 = mesh.prev(new_he_f1);
+	auto split_f1_he1 = mesh.next(new_he_f1);
+
+	CGAL::Euler::split_face(split_f0_he0, split_f0_he1, mesh);
+	CGAL::Euler::split_face(split_f1_he0, split_f1_he1, mesh);
+}
+
 SurfaceMesh refineDeformationGraph(const SurfaceMesh & deformation_graph_mesh)
 {
 	SurfaceMesh refined_mesh = deformation_graph_mesh;
@@ -39,10 +61,9 @@ SurfaceMesh refineDeformationGraph(const SurfaceMesh & deformation_graph_mesh)
 
 	auto refine_property_map = refined_mesh.property_map<edge_descriptor, bool>("e:refine");
 	auto refine = refine_property_map.first;
-	for (auto e : refined_mesh.edges())
+	for (auto e : refine_edges)
 	{
-		//refined_mesh.add_vertex()
-		//CGAL::Euler::add_center_vertex(refined_mesh.halfedge(e), refined_mesh);
+		splitEdge(e, refined_mesh);
 	}
 
 	return refined_mesh;

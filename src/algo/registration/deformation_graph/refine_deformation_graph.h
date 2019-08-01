@@ -9,6 +9,8 @@ namespace Registration
 
 std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh);
 
+void splitEdge(edge_descriptor e, SurfaceMesh & mesh);
+
 SurfaceMesh refineDeformationGraph(const SurfaceMesh & deformation_graph_mesh);
 
 
