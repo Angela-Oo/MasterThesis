@@ -83,10 +83,13 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
+      <AdditionalIncludeDirectories>$(SolutionDir)\src;$(SolutionDir)\mLibExternal\includes;$(SolutionDir)\mLib\include;$(SolutionDir)mLibExternal\includes\directXsdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
+      <AdditionalLibraryDirectories>$(SolutionDir)mLibExternal\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;gflags_debug.lib;glogd.lib;ceres-debug.lib;OpenNI2.lib;FW1FontWrapperd.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -113,12 +116,15 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>$(SolutionDir)\mLib\include;$(SolutionDir)\mLibExternal\includes;$(SolutionDir)\src;$(SolutionDir)mLibExternal\includes\directXsdk;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <AdditionalLibraryDirectories>$(SolutionDir)mLibExternal\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;glog.lib;gflags.lib;ceres.lib;OpenNI2.lib;FW1FontWrapper.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;FreeImage.lib;CGAL_Core-vc140-mt-4.13.lib;CGAL_ImageIO-vc140-mt-4.13.lib;CGAL-vc140-mt-4.13.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
