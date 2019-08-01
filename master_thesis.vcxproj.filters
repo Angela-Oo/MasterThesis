@@ -840,6 +840,9 @@
     <ClCompile Include="src\algo\registration\interface\registration.cpp">
       <Filter>1 algo\3 registration\0 interface</Filter>
     </ClCompile>
+    <ClCompile Include="src\algo\registration\deformation_graph\refine_deformation_graph.cpp">
+      <Filter>1 algo\3 registration\3 deformation graph</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\pointCloud.hlsl">

@@ -311,6 +311,7 @@
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_factory.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp" />
+    <ClCompile Include="src\algo\registration\deformation_graph\refine_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_factory.cpp" />
