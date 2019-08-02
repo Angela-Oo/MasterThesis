@@ -47,63 +47,6 @@ public:
 };
 
 
-TEST_F(RefineOneEdge, TestMesh) 
-{	
-	EXPECT_EQ(mesh.number_of_faces(), 2);
-	EXPECT_EQ(mesh.number_of_vertices(), 4);
-
-	auto he = mesh.halfedge(fids[0]);
-	auto s = mesh.source(he);
-	auto t = mesh.target(he);
-	EXPECT_EQ(vids[2], s);
-	EXPECT_EQ(vids[0], t);
-}
-
-TEST_F(RefineOneEdge, TestSplitCenterEdge)
-{
-	auto he = mesh.halfedge(fids[0]);
-	auto e = mesh.edge(he);
-
-	Registration::splitEdge(e, mesh);
-
-	EXPECT_EQ(mesh.number_of_faces(), 4);
-	EXPECT_EQ(mesh.number_of_vertices(), 5);
-
-	auto f_it = mesh.faces().begin();
-	auto last_vid = *(mesh.vertices().begin() + 4);
-
-	auto new_v = mesh.point(last_vid);
-	EXPECT_EQ(new_v, Point(0., 0., 0.));
-
-	auto vf0 = mesh.vertices_around_face(mesh.halfedge(*f_it)).begin();
-	EXPECT_EQ(*vf0, vids[1]);
-	vf0++;
-	EXPECT_EQ(*vf0, vids[2]);
-	vf0++;
-	EXPECT_EQ(*vf0, last_vid);
-
-	auto vf1 = mesh.vertices_around_face(mesh.halfedge(*(++f_it))).begin();
-	EXPECT_EQ(*vf1, vids[3]);
-	vf1++;
-	EXPECT_EQ(*vf1, vids[0]);
-	vf1++;;
-	EXPECT_EQ(*vf1, last_vid);
-
-	auto vf2 = mesh.vertices_around_face(mesh.halfedge(*(++f_it))).begin();
-	EXPECT_EQ(*vf2, last_vid);
-	vf2++;
-	EXPECT_EQ(*vf2, vids[0]);
-	vf2++;;
-	EXPECT_EQ(*vf2, vids[1]);
-
-	auto vf3 = mesh.vertices_around_face(mesh.halfedge(*(++f_it))).begin();
-	EXPECT_EQ(*vf3, last_vid);
-	vf3++;
-	EXPECT_EQ(*vf3, vids[2]);
-	vf3++;;
-	EXPECT_EQ(*vf3, vids[3]);
-}
-
 TEST_F(RefineOneEdge, TestEdgesToRefine)
 {
 	auto smooth_cost_property_map = mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
@@ -173,28 +116,6 @@ public:
 };
 
 
-TEST_F(RefineFace, TestMesh)
-{
-	EXPECT_EQ(mesh.number_of_faces(), 1);
-	EXPECT_EQ(mesh.number_of_vertices(), 3);
-}
-
-TEST_F(RefineFace, TestSplitFace)
-{
-	auto f = *mesh.faces().begin();
-
-	Registration::splitFace(f, mesh);
-
-	EXPECT_EQ(mesh.number_of_faces(), 4);
-	EXPECT_EQ(mesh.number_of_vertices(), 6);
-
-	auto v_it = mesh.vertices().begin() + 3;
-	EXPECT_EQ(mesh.point(*v_it), Point(1., 1.5, 0.));
-	++v_it;
-	EXPECT_EQ(mesh.point(*v_it), Point(-1., 1.5, 0.));
-	++v_it;
-	EXPECT_EQ(mesh.point(*v_it), Point(0., 0., 0.));
-}
 
 
 
@@ -245,23 +166,7 @@ public:
 
 
 
-TEST_F(RefineThreeEdges, TestMesh)
-{
-	EXPECT_EQ(mesh.number_of_faces(), 4);
-	EXPECT_EQ(mesh.number_of_vertices(), 6);
-}
 
-TEST_F(RefineThreeEdges, TestSplitTriangle)
-{
-	auto he = mesh.halfedge(fids[0]);
-	auto f = mesh.face(he);
-
-	Registration::splitFace(f, mesh);
-
-	EXPECT_EQ(mesh.number_of_faces(), 4);
-	EXPECT_EQ(mesh.number_of_vertices(), 5);
-
-}
 
 //TEST_F(RefineThreeEdges, TestEdgesToRefine)
 //{
