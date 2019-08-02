@@ -9,6 +9,9 @@ namespace Registration
 {
 std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh);
 
+// gets all edges to refine and also edges that need to be additional split as e.g. the third edge in a triangle
+std::vector<edge_descriptor> getEdgesToSplit(SurfaceMesh & mesh);
+
 SurfaceMesh refineDeformationGraph(const SurfaceMesh & deformation_graph_mesh);
 
 
@@ -58,17 +61,10 @@ std::map<face_descriptor, std::vector<vertex_descriptor>> splitDeformationGraphE
 template <typename PositionDeformation>
 SurfaceMesh refineDeformationGraphMesh(SurfaceMesh mesh)
 {
-	std::vector<edge_descriptor> refine_edges = getEdgesToRefine(mesh);
+	std::vector<edge_descriptor> refine_edges = getEdgesToSplit(mesh);
 
 	std::map<face_descriptor, std::vector<vertex_descriptor>> fe = splitDeformationGraphEdges<PositionDeformation>(refine_edges, mesh);
-	for (auto f : fe) {
-		if (f.second.size() == 2) {
-			splitFace(f.first, f.second[0], f.second[1], mesh);
-		}
-		else if (f.second.size() == 3) {
-			splitFace(f.first, f.second[0], f.second[1], f.second[2], mesh);
-		}
-	}
+	splitFaces(fe, mesh);
 	
 	mesh.collect_garbage();
 	return mesh;

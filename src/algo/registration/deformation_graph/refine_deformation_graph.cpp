@@ -33,6 +33,32 @@ std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh)
 	return refine_edges;
 }
 
+std::vector<edge_descriptor> getEdgesToSplit(SurfaceMesh & mesh)
+{
+	auto edges = getEdgesToRefine(mesh);
+	std::map<face_descriptor, std::vector<edge_descriptor>> fe;
+	for (auto e : edges)
+	{
+		auto f0 = mesh.face(mesh.halfedge(e));
+		auto f1 = mesh.face(mesh.opposite(mesh.halfedge(e)));
+
+		fe[f0].push_back(e);
+		fe[f1].push_back(e);		
+	}
+
+	for (auto f : fe)
+	{
+		if (f.second.size() == 2) {
+			for (auto e : CGAL::edges_around_face(mesh.halfedge(f.first), mesh))
+			{
+				if (e != f.second[0] && e != f.second[1])
+					edges.push_back(e);
+			}
+		}
+	}
+	return edges;
+}
+
 
 void refineMesh(std::vector<edge_descriptor> refine_edges, SurfaceMesh & mesh)
 {

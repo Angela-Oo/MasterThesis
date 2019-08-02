@@ -47,6 +47,18 @@ boost::optional<halfedge_descriptor> halfedgeCorrespondingToFace(face_descriptor
 	return boost::optional<halfedge_descriptor>();
 }
 
+bool splitFace(face_descriptor f, vertex_descriptor v0, SurfaceMesh & mesh)
+{
+	auto he0 = halfedgeCorrespondingToFace(f, v0, mesh);
+
+	if (he0) {
+		auto he1 = mesh.prev(mesh.prev(*he0));
+		CGAL::Euler::split_face(*he0, he1, mesh);
+		return true;
+	}
+	return false;
+}
+
 bool splitFace(face_descriptor f, vertex_descriptor v0, vertex_descriptor v1, SurfaceMesh & mesh)
 {
 	auto he0 = halfedgeCorrespondingToFace(f, v0, mesh);
@@ -75,6 +87,22 @@ bool splitFace(face_descriptor f, vertex_descriptor v0, vertex_descriptor v1, ve
 	return false;
 }
 
+
+
+void splitFaces(const std::map<face_descriptor, std::vector<vertex_descriptor>> & face_vertices_to_split_map, SurfaceMesh & mesh)
+{
+	for (auto f : face_vertices_to_split_map) {
+		if (f.second.size() == 2) {
+			splitFace(f.first, f.second[0], f.second[1], mesh);
+		}
+		else if (f.second.size() == 3) {
+			splitFace(f.first, f.second[0], f.second[1], f.second[2], mesh);
+		}
+		else if (f.second.size() == 1) {
+			splitFace(f.first, f.second[0], mesh);
+		}
+	}
+}
 
 
 void splitFace(face_descriptor f, SurfaceMesh & mesh)
