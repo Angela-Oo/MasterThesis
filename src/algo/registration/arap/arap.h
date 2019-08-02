@@ -71,6 +71,7 @@ public:
 	SurfaceMesh getDeformationGraphMesh() override;
 public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
+	void setDeformation(const Deformation & deformation_graph);
 	const DeformationGraph<ARAPDeformation> & getDeformation();
 	std::vector<Point> getFixedPostions() override;
 	bool shouldBeSavedAsImage() override;

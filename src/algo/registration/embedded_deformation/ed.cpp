@@ -46,6 +46,16 @@ const DeformationGraph<EDDeformation> & EmbeddedDeformation::getDeformation()
 	return _deformation_graph;
 }
 
+void EmbeddedDeformation::setDeformation(const Deformation & deformation_graph)
+{
+	_current_cost = 1.;
+	_last_cost = 2.;
+	_solve_iteration = 0;
+
+	_deformation_graph = deformation_graph;
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_src, _deformation_graph, 4);
+}
+
 SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
 {
 	return deformationGraphToSurfaceMesh(_deformation_graph, _evaluate_residuals);

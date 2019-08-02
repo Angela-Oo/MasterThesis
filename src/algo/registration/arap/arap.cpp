@@ -435,6 +435,16 @@ void AsRigidAsPossible::init()
 	}
 }
 
+void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
+{
+	_current_cost = 1.;
+	_last_cost = 2.;
+	_solve_iteration = 0;
+
+	_deformation_graph = deformation_graph;
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
+}
+
 void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)
 {
 	_deformation_graph.setRigidDeformation(rigid_deformation);// createGlobalDeformationFromRigidDeformation(rigid_deformation));

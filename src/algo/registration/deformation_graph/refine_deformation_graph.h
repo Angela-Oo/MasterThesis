@@ -70,6 +70,7 @@ SurfaceMesh refineDeformationGraphMesh(SurfaceMesh mesh)
 		}
 	}
 	
+	mesh.collect_garbage();
 	return mesh;
 }
 

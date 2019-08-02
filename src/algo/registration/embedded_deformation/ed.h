@@ -74,6 +74,7 @@ public:
 public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation);
 	const DeformationGraph<EDDeformation> & getDeformation();
+	void setDeformation(const Deformation & deformation_graph);
 	std::vector<Point> getFixedPostions() override;
 	bool shouldBeSavedAsImage() override;
 public:

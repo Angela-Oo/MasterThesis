@@ -82,6 +82,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	}
 	else if(_is_refined == false) {
 		_refined = refineDeformationGraph(_non_rigid_registration->getDeformation());
+		_non_rigid_registration->setDeformation(_refined);
 		_is_refined = true;
 	}
 	else {
