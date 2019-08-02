@@ -13,6 +13,8 @@ private:
 	double _w; // weight
 	Point _position;
 public:
+	ml::vec6d deformation() const { return _d; }
+public:
 	double * d() { return (&_d)->getData(); }
 	double * w() { return &_w; }
 public:
@@ -35,6 +37,8 @@ public:
 	ARAPDeformation(const ARAPDeformation& deformation, bool inverse);
 };
 
+
+ARAPDeformation linearInterpolation(const ARAPDeformation & deformation0, const ARAPDeformation & deformation1, double t = 0.5);
 
 //std::shared_ptr<ARAPDeformation> createDeformation();
 

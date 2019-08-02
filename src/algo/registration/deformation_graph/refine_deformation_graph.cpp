@@ -69,39 +69,6 @@ SurfaceMesh refineDeformationGraph(const SurfaceMesh & deformation_graph_mesh)
 	std::vector<edge_descriptor> refine_edges = getEdgesToRefine(refined_mesh);
 	refineMesh(refine_edges, refined_mesh);
 
-	//auto refine_property_map = refined_mesh.property_map<edge_descriptor, bool>("e:refine");
-	//auto level_property_map = refined_mesh.add_property_map<vertex_descriptor, int>("v:level", 0);
-	//auto refine = refine_property_map.first;
-	//auto level = level_property_map.first;
-
-	//std::map<face_descriptor, std::vector<vertex_descriptor>> fe;
-	//for (auto e : refine_edges)
-	//{
-	//	auto he = refined_mesh.halfedge(e);
-	//	auto ohe = refined_mesh.opposite(he);
-	//	auto f0 = refined_mesh.face(he);
-	//	auto f1 = refined_mesh.face(ohe);
-
-	//	auto new_he = splitEdgeAtCenter(e, refined_mesh);
-	//	auto new_v = refined_mesh.target(new_he);
-	//	level[new_v] = 1;
-
-	//	//refined_mesh.halfedges_around_target()
-	//	fe[f0].push_back(new_v);
-	//	fe[f1].push_back(new_v);
-	//	//splitEdge(e, refined_mesh);
-	//}
-	//for (auto f : fe) {
-	//	if(f.second.size() == 2) {
-	//		auto v0 = f.second[0];
-	//		auto v1 = f.second[1];
-	//		splitFace(f.first, v0, v1, refined_mesh);
-	//	}
-	//	else if(f.second.size() == 3) {
-	//		splitFace(f.first, f.second[0], f.second[1], f.second[2], refined_mesh);
-	//	}
-	//}
-
 	return refined_mesh;
 }
 

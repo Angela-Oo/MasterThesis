@@ -84,4 +84,14 @@ EDDeformation::EDDeformation(const EDDeformation & deformation, bool inverse)
 }
 
 
+
+EDDeformation linearInterpolation(const EDDeformation & deformation0, const EDDeformation & deformation1, double t)
+{
+	Vector dir = deformation1.position() - deformation0.position();
+	Point position = deformation0.position() + dir * t;
+
+	//auto d = (deformation0.deformation() + deformation1.deformation()) * t;// TODO
+	return EDDeformation(position);
+}
+
 }

@@ -88,4 +88,14 @@ ARAPDeformation::ARAPDeformation(const ARAPDeformation & deformation, bool inver
 }
 
 
+ARAPDeformation linearInterpolation(const ARAPDeformation & deformation0, const ARAPDeformation & deformation1, double t)
+{
+	Vector dir = deformation1.position() - deformation0.position();
+	Point position = deformation0.position() + (dir * t);
+
+	auto d = (deformation0.deformation() + deformation1.deformation()) * t;
+	return ARAPDeformation(position , d);
+}
+
+
 }

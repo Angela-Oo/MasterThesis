@@ -38,4 +38,6 @@ public:
 };
 
 
+EDDeformation linearInterpolation(const EDDeformation & deformation0, const EDDeformation & deformation1, double t);
+
 }
