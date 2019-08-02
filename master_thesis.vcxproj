@@ -269,6 +269,7 @@
     <ClInclude Include="src\algo\registration\util\log_option.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_convertion.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_definition.h" />
+    <ClInclude Include="src\algo\surface_mesh\mesh_operations.h" />
     <ClInclude Include="src\algo\surface_mesh\nearest_neighbor_search.h" />
     <ClInclude Include="src\appShowKinectData.h" />
     <ClInclude Include="src\appTest.h" />
@@ -327,6 +328,7 @@
     <ClCompile Include="src\algo\registration\util\hsv_to_rgb.cpp" />
     <ClCompile Include="src\algo\registration\util\log_option.cpp" />
     <ClCompile Include="src\algo\surface_mesh\mesh_convertion.cpp" />
+    <ClCompile Include="src\algo\surface_mesh\mesh_operations.cpp" />
     <ClCompile Include="src\algo\surface_mesh\nearest_neighbor_search.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\appTest.cpp" />

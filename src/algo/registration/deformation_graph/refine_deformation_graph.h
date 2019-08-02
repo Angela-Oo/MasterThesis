@@ -6,12 +6,7 @@
 
 namespace Registration
 {
-
 std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh);
-
-void splitEdge(edge_descriptor e, SurfaceMesh & mesh);
-
-void splitFace(face_descriptor f, SurfaceMesh & mesh);
 
 SurfaceMesh refineDeformationGraph(const SurfaceMesh & deformation_graph_mesh);
 
@@ -25,12 +20,15 @@ DeformationGraph<PositionDeformation> refineDeformationGraph(const DeformationGr
 	auto deformation = deformation_property_map.first;
 	for (auto v : refined_mesh.vertices())
 	{
-		if (deformation[v].position() == CGAL::ORIGIN) // TODO this is not the correct criterium
+		if (deformation[v].position() == CGAL::ORIGIN) { // TODO this is not the correct criterium 
+			//deformation[v].
 			deformation[v] = PositionDeformation(refined_mesh.point(v));
+		}
 	}
 
 	return DeformationGraph<PositionDeformation>(refined_mesh, deformation_graph._global);
 }
+
 
 
 }

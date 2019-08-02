@@ -695,6 +695,9 @@
     <ClInclude Include="src\algo\registration\sequence_registration\refine_deformation_graph_registration_factory.h">
       <Filter>1 algo\3 registration\9 sequence registration</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\surface_mesh\mesh_operations.h">
+      <Filter>1 algo\0 surface mesh</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -842,6 +845,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\refine_deformation_graph.cpp">
       <Filter>1 algo\3 registration\3 deformation graph</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\surface_mesh\mesh_operations.cpp">
+      <Filter>1 algo\0 surface mesh</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
