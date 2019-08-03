@@ -40,6 +40,8 @@ public:
 
 ARAPDeformation linearInterpolation(const ARAPDeformation & deformation0, const ARAPDeformation & deformation1, double t = 0.5);
 
+
+ARAPDeformation mean(const ARAPDeformation & d0, const ARAPDeformation & d1, const ARAPDeformation & d2);
 //std::shared_ptr<ARAPDeformation> createDeformation();
 
 }

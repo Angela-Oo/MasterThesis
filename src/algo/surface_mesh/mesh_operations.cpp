@@ -140,4 +140,21 @@ void splitFaceAtEdge(face_descriptor f, SurfaceMesh & mesh)
 }
 
 
+
+
+vertex_descriptor splitFace(face_descriptor f, SurfaceMesh & mesh)
+{
+	auto he = CGAL::Euler::add_center_vertex(mesh.halfedge(f), mesh);
+	return mesh.target(he);
+}
+
+
+
+void flipEdges(std::vector<edge_descriptor> & edges, SurfaceMesh & mesh)
+{
+	for (auto e : edges) {
+		CGAL::Euler::flip_edge(mesh.halfedge(e), mesh);
+	}
+}
+
 }

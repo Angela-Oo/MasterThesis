@@ -60,7 +60,21 @@ std::vector<edge_descriptor> getEdgesToSplit(SurfaceMesh & mesh)
 }
 
 
-void refineMesh(std::vector<edge_descriptor> refine_edges, SurfaceMesh & mesh)
+std::map<face_descriptor, std::vector<edge_descriptor>> getFacesToSplit(std::vector<edge_descriptor>& edges, SurfaceMesh & mesh)
+{
+	std::map<face_descriptor, std::vector<edge_descriptor>> faces;
+	for (auto e : edges)
+	{
+		auto f0 = mesh.face(mesh.halfedge(e));
+		auto f1 = mesh.face(mesh.opposite(mesh.halfedge(e)));
+
+		faces[f0].push_back(e);
+		faces[f1].push_back(e);
+	}
+	return faces;
+}
+
+void refineMeshBySplittingEdges(std::vector<edge_descriptor> refine_edges, SurfaceMesh & mesh)
 {
 	//auto refine_property_map = mesh.property_map<edge_descriptor, bool>("e:refine");
 
@@ -93,7 +107,7 @@ SurfaceMesh refineDeformationGraph(const SurfaceMesh & deformation_graph_mesh)
 	SurfaceMesh refined_mesh = deformation_graph_mesh;
 
 	std::vector<edge_descriptor> refine_edges = getEdgesToRefine(refined_mesh);
-	refineMesh(refine_edges, refined_mesh);
+	refineMeshBySplittingEdges(refine_edges, refined_mesh);
 
 	return refined_mesh;
 }

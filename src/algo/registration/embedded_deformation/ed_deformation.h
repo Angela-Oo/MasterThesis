@@ -40,4 +40,6 @@ public:
 
 EDDeformation linearInterpolation(const EDDeformation & deformation0, const EDDeformation & deformation1, double t);
 
+EDDeformation mean(const EDDeformation & d0, const EDDeformation & d1, const EDDeformation & d2);
+
 }

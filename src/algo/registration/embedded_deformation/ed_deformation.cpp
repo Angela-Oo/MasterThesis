@@ -94,4 +94,11 @@ EDDeformation linearInterpolation(const EDDeformation & deformation0, const EDDe
 	return EDDeformation(position);
 }
 
+EDDeformation mean(const EDDeformation & d0, const EDDeformation & d1, const EDDeformation & d2)
+{
+	Vector position = ((d0.position() - CGAL::ORIGIN) + (d1.position() - CGAL::ORIGIN) + (d2.position() - CGAL::ORIGIN)) / 3.;
+	//auto d = (d0.deformation() + d1.deformation() + d2.deformation()) / 3.;
+	return EDDeformation(CGAL::ORIGIN + position);// , d);
+}
+
 }

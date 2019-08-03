@@ -20,6 +20,11 @@ bool splitFaceAtEdge(face_descriptor f, vertex_descriptor v0, vertex_descriptor 
 
 void splitFaceAtEdge(face_descriptor f, SurfaceMesh & mesh);
 
+// at center
+vertex_descriptor splitFace(face_descriptor f, SurfaceMesh & mesh);
+
+void flipEdges(std::vector<edge_descriptor> & edges, SurfaceMesh & mesh);
+
 
 void splitFaces(const std::map<face_descriptor, std::vector<vertex_descriptor>> & face_vertices_to_split_map, SurfaceMesh & mesh);
 

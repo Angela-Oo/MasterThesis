@@ -94,8 +94,16 @@ ARAPDeformation linearInterpolation(const ARAPDeformation & deformation0, const 
 	Point position = deformation0.position() + (dir * t);
 
 	auto d = (deformation0.deformation() + deformation1.deformation()) * t;
+	//auto d = deformation0.deformation() + ((deformation1.deformation() - deformation0.deformation()) * t);
 	return ARAPDeformation(position , d);
 }
 
+
+ARAPDeformation mean(const ARAPDeformation & d0, const ARAPDeformation & d1, const ARAPDeformation & d2)
+{
+	Vector position = ((d0.position() - CGAL::ORIGIN) + (d1.position() - CGAL::ORIGIN) + (d2.position() - CGAL::ORIGIN)) / 3.;	
+	auto d = (d0.deformation() + d1.deformation() + d2.deformation()) / 3.;
+	return ARAPDeformation(CGAL::ORIGIN + position, d);
+}
 
 }
