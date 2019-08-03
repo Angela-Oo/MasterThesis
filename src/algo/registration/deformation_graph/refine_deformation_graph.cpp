@@ -16,7 +16,7 @@ std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh)
 	auto smooth_cost = smooth_cost_property_map.first;
 
 	double max_smooth_cost = *(std::max_element(smooth_cost.begin(), smooth_cost.end()));
-	double refine_max_smooth_cost = std::max(max_smooth_cost * 0.6, 0.01);
+	double refine_max_smooth_cost = std::max(max_smooth_cost * 0.9, 0.01);
 
 	std::cout << "max smoot " << max_smooth_cost << " refine " << refine_max_smooth_cost;
 	auto refine_property_map = refined_mesh.add_property_map<edge_descriptor, bool>("e:refine", false);
@@ -80,10 +80,10 @@ void refineMesh(std::vector<edge_descriptor> refine_edges, SurfaceMesh & mesh)
 	}
 	for (auto f : fe) {
 		if (f.second.size() == 2) {
-			splitFace(f.first, f.second[0], f.second[1], mesh);
+			splitFaceAtEdge(f.first, f.second[0], f.second[1], mesh);
 		}
 		else if (f.second.size() == 3) {
-			splitFace(f.first, f.second[0], f.second[1], f.second[2], mesh);
+			splitFaceAtEdge(f.first, f.second[0], f.second[1], f.second[2], mesh);
 		}
 	}
 }

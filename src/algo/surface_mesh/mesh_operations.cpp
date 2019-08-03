@@ -47,7 +47,7 @@ boost::optional<halfedge_descriptor> halfedgeCorrespondingToFace(face_descriptor
 	return boost::optional<halfedge_descriptor>();
 }
 
-bool splitFace(face_descriptor f, vertex_descriptor v0, SurfaceMesh & mesh)
+bool splitFaceAtEdge(face_descriptor f, vertex_descriptor v0, SurfaceMesh & mesh)
 {
 	auto he0 = halfedgeCorrespondingToFace(f, v0, mesh);
 
@@ -59,7 +59,7 @@ bool splitFace(face_descriptor f, vertex_descriptor v0, SurfaceMesh & mesh)
 	return false;
 }
 
-bool splitFace(face_descriptor f, vertex_descriptor v0, vertex_descriptor v1, SurfaceMesh & mesh)
+bool splitFaceAtEdge(face_descriptor f, vertex_descriptor v0, vertex_descriptor v1, SurfaceMesh & mesh)
 {
 	auto he0 = halfedgeCorrespondingToFace(f, v0, mesh);
 	auto he1 = halfedgeCorrespondingToFace(f, v1, mesh);
@@ -72,7 +72,7 @@ bool splitFace(face_descriptor f, vertex_descriptor v0, vertex_descriptor v1, Su
 }
 
 
-bool splitFace(face_descriptor f, vertex_descriptor v0, vertex_descriptor v1, vertex_descriptor v2, SurfaceMesh & mesh)
+bool splitFaceAtEdge(face_descriptor f, vertex_descriptor v0, vertex_descriptor v1, vertex_descriptor v2, SurfaceMesh & mesh)
 {
 	auto he0 = halfedgeCorrespondingToFace(f, v0, mesh);
 	auto he1 = halfedgeCorrespondingToFace(f, v1, mesh);
@@ -93,19 +93,19 @@ void splitFaces(const std::map<face_descriptor, std::vector<vertex_descriptor>> 
 {
 	for (auto f : face_vertices_to_split_map) {
 		if (f.second.size() == 2) {
-			splitFace(f.first, f.second[0], f.second[1], mesh);
+			splitFaceAtEdge(f.first, f.second[0], f.second[1], mesh);
 		}
 		else if (f.second.size() == 3) {
-			splitFace(f.first, f.second[0], f.second[1], f.second[2], mesh);
+			splitFaceAtEdge(f.first, f.second[0], f.second[1], f.second[2], mesh);
 		}
 		else if (f.second.size() == 1) {
-			splitFace(f.first, f.second[0], mesh);
+			splitFaceAtEdge(f.first, f.second[0], mesh);
 		}
 	}
 }
 
 
-void splitFace(face_descriptor f, SurfaceMesh & mesh)
+void splitFaceAtEdge(face_descriptor f, SurfaceMesh & mesh)
 {
 	auto he_0 = mesh.halfedge(f);
 	auto he_1 = mesh.next(he_0);
