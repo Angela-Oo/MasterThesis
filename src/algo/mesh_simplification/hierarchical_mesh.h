@@ -14,7 +14,10 @@ private:
 	std::map<vertex_descriptor, double> _candidates;
 	RadiusNearestNeighborSearch _search;
 private:
+	void supportVertex(vertex_descriptor v);
+	void addCandidate(std::pair<vertex_descriptor, double> n);
 	vertex_descriptor nextVertex();
+	bool finished();
 	void updateUnsupportedVertices(Point point);
 public:
 	SurfaceMesh create();

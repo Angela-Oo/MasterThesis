@@ -230,6 +230,7 @@
     <ClInclude Include="src\algo\mesh_simplification\make_mesh_3_remeshing.h" />
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h" />
     <ClInclude Include="src\algo\mesh_simplification\poison_surface_remeshing.h" />
+    <ClInclude Include="src\algo\mesh_simplification\triangulation.h" />
     <ClInclude Include="src\algo\registration\arap\arap.h" />
     <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h" />
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h" />
@@ -311,6 +312,7 @@
     <ClCompile Include="src\algo\mesh_simplification\make_mesh_3_remeshing.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\poison_surface_remeshing.cpp" />
+    <ClCompile Include="src\algo\mesh_simplification\triangulation.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_factory.cpp" />

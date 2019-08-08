@@ -704,6 +704,9 @@
     <ClInclude Include="src\algo\mesh_simplification\hierarchical_mesh.h">
       <Filter>1 algo\1 mesh simplification</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\mesh_simplification\triangulation.h">
+      <Filter>1 algo\1 mesh simplification</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -859,6 +862,9 @@
       <Filter>4 input_reader</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\mesh_simplification\hierarchical_mesh.cpp">
+      <Filter>1 algo\1 mesh simplification</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\mesh_simplification\triangulation.cpp">
       <Filter>1 algo\1 mesh simplification</Filter>
     </ClCompile>
   </ItemGroup>

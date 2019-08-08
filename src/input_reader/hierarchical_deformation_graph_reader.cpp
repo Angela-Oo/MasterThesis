@@ -4,7 +4,7 @@
 
 const SurfaceMesh & HierarchicalDeformationGraphReader::getMesh(size_t frame)
 {
-	assert(frame < _meshes.size());
+	assert(frame < _hierarchical_deformation_graph.size());
 	return _hierarchical_deformation_graph[frame];
 }
 

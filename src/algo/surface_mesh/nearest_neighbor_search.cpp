@@ -38,10 +38,10 @@ Radius_search RadiusNearestNeighborSearch::search(Point point)
 	return search;
 }
 
-std::map<vertex_descriptor, double> RadiusNearestNeighborSearch::search(Point point, double radius) {
+std::vector<std::pair<vertex_descriptor, double>> RadiusNearestNeighborSearch::search(Point point, double radius) {
 	auto s = search(point);
 
-	std::map<vertex_descriptor, double> nearest_neighbors_in_radius;
+	std::vector<std::pair<vertex_descriptor, double>> neighbors_in_radius;
 	for (Radius_search::iterator it = s.begin(); it != s.end(); ++it) {
 		auto distance = std::sqrt(it->second);
 		if (distance > radius) {
@@ -49,10 +49,10 @@ std::map<vertex_descriptor, double> RadiusNearestNeighborSearch::search(Point po
 		}
 		else {
 			auto vertex_handle = it->first;
-			nearest_neighbors_in_radius[it->first] = distance;
+			neighbors_in_radius.emplace_back(std::make_pair(vertex_handle, distance));
 		}
 	}
-	return nearest_neighbors_in_radius;
+	return neighbors_in_radius;
 }
 
 RadiusNearestNeighborSearch::RadiusNearestNeighborSearch(const SurfaceMesh & mesh)

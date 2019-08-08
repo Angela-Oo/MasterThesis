@@ -43,7 +43,7 @@ class RadiusNearestNeighborSearch
 	Vertex_point_pmap _vertex_point_property_map;
 public:
 	Radius_search search(Point point);
-	std::map<vertex_descriptor, double> search(Point point, double radius);
+	std::vector<std::pair<vertex_descriptor, double>> search(Point point, double radius);
 	RadiusNearestNeighborSearch(const SurfaceMesh & mesh);
 	RadiusNearestNeighborSearch(const SurfaceMesh & mesh,
 								const std::vector<vertex_descriptor>::iterator vertices_begin,
