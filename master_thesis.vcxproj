@@ -274,6 +274,7 @@
     <ClInclude Include="src\appShowKinectData.h" />
     <ClInclude Include="src\appTest.h" />
     <ClInclude Include="src\input_reader\depth_image_reader.h" />
+    <ClInclude Include="src\input_reader\hierarchical_deformation_graph_reader.h" />
     <ClInclude Include="src\input_reader\i_reader.h" />
     <ClInclude Include="src\input_reader\kinect_reader.h" />
     <ClInclude Include="src\input_reader\mesh_reader.h" />
@@ -333,6 +334,7 @@
     <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\appTest.cpp" />
     <ClCompile Include="src\input_reader\depth_image_reader.cpp" />
+    <ClCompile Include="src\input_reader\hierarchical_deformation_graph_reader.cpp" />
     <ClCompile Include="src\input_reader\kinect_reader.cpp" />
     <ClCompile Include="src\input_reader\mesh_reader.cpp" />
     <ClCompile Include="src\kinect\BinaryDumpReader.cpp" />

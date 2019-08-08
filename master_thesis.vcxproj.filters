@@ -698,6 +698,9 @@
     <ClInclude Include="src\algo\surface_mesh\mesh_operations.h">
       <Filter>1 algo\0 surface mesh</Filter>
     </ClInclude>
+    <ClInclude Include="src\input_reader\hierarchical_deformation_graph_reader.h">
+      <Filter>4 input_reader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -848,6 +851,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\surface_mesh\mesh_operations.cpp">
       <Filter>1 algo\0 surface mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\input_reader\hierarchical_deformation_graph_reader.cpp">
+      <Filter>4 input_reader</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
