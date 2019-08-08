@@ -36,7 +36,12 @@ public:
 						  const std::vector<vertex_descriptor>::iterator vertices_end);
 };
 
-
+/// RadiusNearestNeighborSearch search(mesh);
+/// Radius_search s = search.search(Point(0., 0., 0.));
+/// for (Radius_search::iterator it = s.begin(); it != s.end(); ++it) {
+/// 	auto distance = std::sqrt(it->second);
+/// 	auto vertex_handle = it->first;
+/// }
 class RadiusNearestNeighborSearch
 {
 	std::unique_ptr<Radius_search::Tree> _tree;

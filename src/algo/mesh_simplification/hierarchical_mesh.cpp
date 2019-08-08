@@ -5,10 +5,15 @@
 
 vertex_descriptor GenerateHierarchicalMesh::nextVertex()
 {
-	auto v_it = std::min_element(_candidates.begin(),
-								 _candidates.end(),
-								 [](const auto& l, const auto& r) -> bool { return l.second < r.second; });
-	return v_it->first;
+	if (_candidates.empty()) {
+		return *_unsupported_vertices.begin();
+	}
+	else {
+		auto v_it = std::min_element(_candidates.begin(),
+									 _candidates.end(),
+									 [](const auto& l, const auto& r) -> bool { return l.second < r.second; });
+		return v_it->first;
+	}
 }
 
 void GenerateHierarchicalMesh::supportVertex(vertex_descriptor v) 
@@ -35,7 +40,7 @@ void GenerateHierarchicalMesh::addCandidate(std::pair<vertex_descriptor, double>
 
 bool GenerateHierarchicalMesh::finished()
 {
-	return _candidates.empty() || _unsupported_vertices.empty();
+	return _unsupported_vertices.empty();
 }
 
 void GenerateHierarchicalMesh::updateUnsupportedVertices(Point point)
@@ -68,19 +73,18 @@ SurfaceMesh GenerateHierarchicalMesh::create()
 		auto h_v = hierarchical_mesh.add_vertex(point);
 		normals[h_v] = mesh_normals[v];
 		supportVertex(v);
-		updateUnsupportedVertices(point);
-		
+		updateUnsupportedVertices(point);		
 	}
 	
-	//return triangulate(hierarchical_mesh, _radius);
-	return hierarchical_mesh;
+	return triangulate(hierarchical_mesh, _max_radius);
+	//return hierarchical_mesh;
 }
 
 
 GenerateHierarchicalMesh::GenerateHierarchicalMesh(const SurfaceMesh & mesh, double radius)
 	: _mesh(mesh)
 	, _radius(radius)
-	, _max_radius(2. * radius)
+	, _max_radius(1.5 * radius)
 	, _search(mesh)
 {
 	for (auto v : mesh.vertices())

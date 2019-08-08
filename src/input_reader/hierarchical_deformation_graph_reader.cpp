@@ -14,7 +14,7 @@ bool HierarchicalDeformationGraphReader::processFrame()
 		_hierarchical_deformation_graph.push_back(createReducedMesh(_mesh, _radius));
 		return true;
 	}
-	else if (_hierarchical_deformation_graph.size() < 2) {
+	else if (_hierarchical_deformation_graph.size() < 4) {
 		double radius = _radius * pow(4, _hierarchical_deformation_graph.size());
 		_hierarchical_deformation_graph.push_back(createHierarchicalMesh(_hierarchical_deformation_graph.back(), radius));
 		return true;
