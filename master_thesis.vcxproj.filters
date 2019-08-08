@@ -701,6 +701,9 @@
     <ClInclude Include="src\input_reader\hierarchical_deformation_graph_reader.h">
       <Filter>4 input_reader</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\mesh_simplification\hierarchical_mesh.h">
+      <Filter>1 algo\1 mesh simplification</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -854,6 +857,9 @@
     </ClCompile>
     <ClCompile Include="src\input_reader\hierarchical_deformation_graph_reader.cpp">
       <Filter>4 input_reader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\mesh_simplification\hierarchical_mesh.cpp">
+      <Filter>1 algo\1 mesh simplification</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

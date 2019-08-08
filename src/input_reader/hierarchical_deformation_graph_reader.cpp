@@ -1,9 +1,6 @@
 #include "hierarchical_deformation_graph_reader.h"
+#include "algo/mesh_simplification/hierarchical_mesh.h"
 
-SurfaceMesh createHierarchicalMesh(const SurfaceMesh & mesh, double radius)
-{
-	return createReducedMesh(mesh, radius);
-}
 
 const SurfaceMesh & HierarchicalDeformationGraphReader::getMesh(size_t frame)
 {
@@ -17,9 +14,9 @@ bool HierarchicalDeformationGraphReader::processFrame()
 		_hierarchical_deformation_graph.push_back(createReducedMesh(_mesh, _radius));
 		return true;
 	}
-	else if (_hierarchical_deformation_graph.size() < 5) {
+	else if (_hierarchical_deformation_graph.size() < 2) {
 		double radius = _radius * pow(4, _hierarchical_deformation_graph.size());
-		_hierarchical_deformation_graph.push_back(createHierarchicalMesh(_hierarchical_deformation_graph.back(), _radius));
+		_hierarchical_deformation_graph.push_back(createHierarchicalMesh(_hierarchical_deformation_graph.back(), radius));
 		return true;
 	}
 	else {

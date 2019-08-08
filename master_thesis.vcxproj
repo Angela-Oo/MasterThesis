@@ -225,6 +225,7 @@
     <ClInclude Include="mLib\include\mLibZLib.h" />
     <ClInclude Include="src\algo\evaluate_registration.h" />
     <ClInclude Include="src\algo\file_writer.h" />
+    <ClInclude Include="src\algo\mesh_simplification\hierarchical_mesh.h" />
     <ClInclude Include="src\algo\mesh_simplification\isotropic_remeshing.h" />
     <ClInclude Include="src\algo\mesh_simplification\make_mesh_3_remeshing.h" />
     <ClInclude Include="src\algo\mesh_simplification\mesh_simplification.h" />
@@ -305,6 +306,7 @@
   <ItemGroup>
     <ClCompile Include="src\algo\evaluate_registration.cpp" />
     <ClCompile Include="src\algo\file_writer.cpp" />
+    <ClCompile Include="src\algo\mesh_simplification\hierarchical_mesh.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\isotropic_remeshing.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\make_mesh_3_remeshing.cpp" />
     <ClCompile Include="src\algo\mesh_simplification\mesh_simplification.cpp" />
