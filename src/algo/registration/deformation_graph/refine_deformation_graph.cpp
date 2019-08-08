@@ -62,14 +62,28 @@ std::vector<edge_descriptor> getEdgesToSplit(SurfaceMesh & mesh)
 
 std::map<face_descriptor, std::vector<edge_descriptor>> getFacesToSplit(std::vector<edge_descriptor>& edges, SurfaceMesh & mesh)
 {
+	auto level_property_map = mesh.property_map<vertex_descriptor, int>("v:level");
+	auto level = level_property_map.first;
+
 	std::map<face_descriptor, std::vector<edge_descriptor>> faces;
 	for (auto e : edges)
 	{
-		auto f0 = mesh.face(mesh.halfedge(e));
-		auto f1 = mesh.face(mesh.opposite(mesh.halfedge(e)));
+		auto he = mesh.halfedge(e);
+		auto ohe = mesh.opposite(he);
 
-		faces[f0].push_back(e);
-		faces[f1].push_back(e);
+		auto v_he = mesh.target(mesh.next(he));
+		auto v_ohe = mesh.target(mesh.next(ohe));
+
+		if (level[v_he] < level[v_ohe]) {
+			faces[mesh.face(he)].push_back(e);
+		}
+		else if (level[v_he] > level[v_ohe]) {
+			faces[mesh.face(ohe)].push_back(e);
+		}
+		else {
+			faces[mesh.face(he)].push_back(e);
+			faces[mesh.face(ohe)].push_back(e);
+		}
 	}
 	return faces;
 }

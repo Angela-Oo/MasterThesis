@@ -16,6 +16,7 @@ private:
 	Deformation _refined;
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
 	bool _is_refined;
+	int _number_of_refinements;
 	bool _finished;
 public:
 	bool finished() override;
@@ -83,7 +84,9 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	else if(_is_refined == false) {
 		_refined = refineDeformationGraph(_non_rigid_registration->getDeformation());
 		_non_rigid_registration->setDeformation(_refined);
-		_is_refined = true;
+		_number_of_refinements++;
+		if(_number_of_refinements > 5)
+			_is_refined = true;
 	}
 	else {
 		_finished = true;
@@ -137,6 +140,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 	: _non_rigid_registration(std::move(non_rigid_registration))
 	, _is_refined(false)
 	, _finished(false)
+	, _number_of_refinements(0)
 {
 }
 
