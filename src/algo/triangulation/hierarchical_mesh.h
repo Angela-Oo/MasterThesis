@@ -20,6 +20,7 @@ public:
 public:
 	HierarchicalMesh() = default;
 	HierarchicalMesh(const std::vector<SurfaceMesh> & meshes);
-
+	HierarchicalMesh(const HierarchicalMesh & deformation_graph);
+	HierarchicalMesh & operator=(HierarchicalMesh other);
 };
 

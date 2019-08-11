@@ -74,16 +74,18 @@ void HierarchicalMesh::refineEdge(edge_descriptor edge)
 
 void HierarchicalMesh::triangulate()
 {
-	SurfaceMesh mesh;
-	for(auto v : _mesh.vertices()) {
-		auto point = add_vertex(_mesh, v, mesh);
+	// removes all faces and edges
+	for (auto v : _mesh.vertices()) {
+		_mesh.set_halfedge(v, SurfaceMesh::null_halfedge());
 	}
-	
-	surfaceMeshFrontTriangulation(mesh);
-	mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.));
-	mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.));
-	mesh.add_property_map<vertex_descriptor, bool>("v:refined", false);
-	_mesh = mesh;
+	for (auto e : _mesh.edges()) {		
+		_mesh.remove_edge(e);
+	}
+	for (auto f : _mesh.faces()) {
+		_mesh.remove_face(f);
+	}
+
+	surfaceMeshFrontTriangulation(_mesh);
 }
 
 HierarchicalMesh::HierarchicalMesh(const std::vector<SurfaceMesh> & meshes)
@@ -98,3 +100,20 @@ HierarchicalMesh::HierarchicalMesh(const std::vector<SurfaceMesh> & meshes)
 	}
 }
 
+HierarchicalMesh::HierarchicalMesh(const HierarchicalMesh & deformation_graph)
+	: _mesh(deformation_graph._mesh)
+	, _meshes(deformation_graph._meshes)
+	, _vertex_cluster_map(deformation_graph._vertex_cluster_map)
+{
+}
+
+HierarchicalMesh & HierarchicalMesh::operator=(HierarchicalMesh other)
+{
+	if (&other == this)
+		return *this;
+
+	_meshes = other._meshes;
+	_mesh = other._mesh;
+	_vertex_cluster_map = other._vertex_cluster_map;
+	return *this;
+}
