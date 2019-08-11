@@ -39,37 +39,40 @@ Point add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original
 }
 
 
-void HierarchicalMesh::refineVertex(vertex_descriptor v)
+std::vector<vertex_descriptor> HierarchicalMesh::refineVertex(vertex_descriptor v)
 {
+	std::vector<vertex_descriptor> new_vertices;
 	auto refined = _mesh.property_map<vertex_descriptor, bool>("v:refined").first;
-	if (!refined[v]) {
+	auto l = _mesh.property_map<vertex_descriptor, unsigned int>("v:level").first[v];
+	if (!refined[v] && l < _meshes.size()) {
 		refined[v] = true;
-		auto finer_level_v = _mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v").first;
-		auto level = _mesh.property_map<vertex_descriptor, unsigned int>("v:level").first;
+		auto finer_level_v = _mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v").first[v];
 
-		auto l = level[v];
-		auto next_l = l + 1;
-		auto map = _vertex_cluster_map[l];
-		auto & child_mesh = _meshes[next_l];
+		auto & child_mesh = _meshes[l + 1];
 
-		if (l < _meshes.size())
+		auto cluster = _vertex_cluster_map[l][v];
+		for (auto c_v : cluster)
 		{
-			auto cluster = map[v];
-			for (auto c_v : cluster)
-			{
+			if (finer_level_v != c_v) {
 				auto p = child_mesh.point(c_v);
 				auto new_v = _mesh.add_vertex(p);
+				new_vertices.push_back(new_v);
 			}
 		}
 	}
+	return new_vertices;
 }
 
-void HierarchicalMesh::refineEdge(edge_descriptor edge)
+
+std::vector<vertex_descriptor> HierarchicalMesh::refineEdge(edge_descriptor edge)
 {
 	auto v0 = _mesh.source(_mesh.halfedge(edge));
 	auto v1 = _mesh.target(_mesh.halfedge(edge));
-	refineVertex(v0);
-	refineVertex(v1);
+
+	std::vector<vertex_descriptor> new_vertices = refineVertex(v0);
+	std::vector<vertex_descriptor> new_vertices_v1 = refineVertex(v1);
+	new_vertices.insert(new_vertices.end(), new_vertices_v1.begin(), new_vertices_v1.end());
+	return new_vertices;
 }
 
 void HierarchicalMesh::triangulate()

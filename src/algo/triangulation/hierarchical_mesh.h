@@ -14,8 +14,9 @@ public:
 	std::vector<SurfaceMesh> _meshes;
 	std::vector<std::map<vertex_descriptor, std::vector<vertex_descriptor>>> _vertex_cluster_map;
 public:
-	void refineVertex(vertex_descriptor vertex);
-	void refineEdge(edge_descriptor edge);
+
+	std::vector<vertex_descriptor> refineVertex(vertex_descriptor vertex);
+	std::vector<vertex_descriptor> refineEdge(edge_descriptor edge);
 	void triangulate();
 public:
 	HierarchicalMesh() = default;

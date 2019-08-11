@@ -122,6 +122,8 @@ SurfaceMesh refineDeformationGraphMeshTest(SurfaceMesh mesh)
 {
 	auto level_property_map = mesh.add_property_map<vertex_descriptor, int>("v:level", 0);
 	auto edges = getEdgesToRefine(mesh);
+	
+
 	auto refine_faces = getFacesToSplit(edges, mesh);
 	std::vector<vertex_descriptor> new_vertices = splitDeformationGraphFaces<PositionDeformation>(refine_faces, mesh);
 	flipEdges(edges, mesh);
@@ -134,9 +136,26 @@ template <typename PositionDeformation>
 DeformationGraph<PositionDeformation> refineDeformationGraph(const DeformationGraph<PositionDeformation> & deformation_graph)
 {
 	//auto refined_mesh = refineDeformationGraphMesh<PositionDeformation>(deformation_graph._mesh);
-	auto refined_mesh = refineDeformationGraphMeshTest<PositionDeformation>(deformation_graph._mesh);
+	//auto refined_mesh = refineDeformationGraphMeshTest<PositionDeformation>(deformation_graph._mesh);
 
-	return DeformationGraph<PositionDeformation>(refined_mesh, deformation_graph._global);
+	auto h_mesh = deformation_graph._hierarchical_mesh;
+	h_mesh._mesh = deformation_graph._mesh;
+	auto edges = getEdgesToRefine(h_mesh._mesh);
+
+	std::vector<vertex_descriptor> new_vertices;
+	for (auto & e : edges) {
+		auto vs = h_mesh.refineEdge(e);
+		new_vertices.insert(new_vertices.end(), vs.begin(), vs.end());
+	}
+	h_mesh.triangulate();
+
+	//auto original_deformation = deformation_graph._mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation").first;
+	auto & deformation_property_map = h_mesh._mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation").first; // TODO
+	for (auto v : new_vertices) {
+		deformation_property_map[v] = PositionDeformation(h_mesh._mesh.point(v));
+	}
+
+	return DeformationGraph<PositionDeformation>(h_mesh, deformation_graph._global);
 }
 
 
