@@ -21,6 +21,8 @@ private:
 	void updateUnsupportedVertices(Point point);
 public:
 	SurfaceMesh create();
+	void triangulateNodes(SurfaceMesh &hierarchical_mesh);
+	void insertNodes(SurfaceMesh &hierarchical_mesh);
 	GenerateHierarchicalMesh(const SurfaceMesh & mesh, double radius);
 };
 

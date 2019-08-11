@@ -1,7 +1,7 @@
 #include "hierarchical_mesh.h"
 #include "triangulation.h"
 
-
+#include <CGAL/Advancing_front_surface_reconstruction.h>
 
 vertex_descriptor GenerateHierarchicalMesh::nextVertex()
 {
@@ -57,14 +57,10 @@ void GenerateHierarchicalMesh::updateUnsupportedVertices(Point point)
 	}
 }
 
-
-SurfaceMesh GenerateHierarchicalMesh::create()
+void GenerateHierarchicalMesh::insertNodes(SurfaceMesh &hierarchical_mesh)
 {
-	SurfaceMesh hierarchical_mesh;
 	auto normals = hierarchical_mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
-
 	auto mesh_normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
-
 	_candidates[*_unsupported_vertices.begin()] = 0.;
 
 	while (!finished()) {
@@ -73,11 +69,24 @@ SurfaceMesh GenerateHierarchicalMesh::create()
 		auto h_v = hierarchical_mesh.add_vertex(point);
 		normals[h_v] = mesh_normals[v];
 		supportVertex(v);
-		updateUnsupportedVertices(point);		
+		updateUnsupportedVertices(point);
 	}
-	
-	return triangulate(hierarchical_mesh, _max_radius);
-	//return hierarchical_mesh;
+}
+
+void GenerateHierarchicalMesh::triangulateNodes(SurfaceMesh &hierarchical_mesh)
+{
+	Construct construct(hierarchical_mesh);
+	CGAL::advancing_front_surface_reconstruction(hierarchical_mesh.points().begin(),
+												 hierarchical_mesh.points().end(),
+												 construct);
+}
+
+SurfaceMesh GenerateHierarchicalMesh::create()
+{
+	SurfaceMesh hierarchical_mesh;
+	insertNodes(hierarchical_mesh);	
+	triangulateNodes(hierarchical_mesh);
+	return hierarchical_mesh;
 }
 
 
