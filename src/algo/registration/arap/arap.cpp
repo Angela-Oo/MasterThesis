@@ -5,6 +5,7 @@
 #include "algo/registration/util/ceres_residual_evaluation.h"
 #include <random>
 
+
 namespace Registration {
 
 bool AsRigidAsPossible::random_bool_with_prob(double prob)  // probability between 0.0 and 1.0
@@ -518,49 +519,6 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
 	return std::make_unique<AsRigidAsPossible>(src, dst, fixed_positions, deformation_graph, option, registration_options, logger);
 }
-
-
-std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
-										                   const SurfaceMesh& dst,
-										                   ceres::Solver::Options option,
-										                   const RegistrationOptions & registration_options,
-										                   std::shared_ptr<FileWriter> logger)
-{	
-	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	auto global = createGlobalDeformation<ARAPDeformation>(src);
-	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
-	return std::make_unique<AsRigidAsPossible>(src, dst, deformation_graph, option, registration_options, logger);
-}
-
-
-std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
-										                   const SurfaceMesh& dst,
-										                   const RigidDeformation & rigid_deformation,
-										                   ceres::Solver::Options option,
-										                   const RegistrationOptions & registration_options,
-										                   std::shared_ptr<FileWriter> logger)	
-{
-	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
-	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
-	return std::make_unique<AsRigidAsPossible>(src, dst, deformation_graph, option, registration_options, logger);
-}
-
-
-std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
-										                   const SurfaceMesh& dst,
-										                   const RigidDeformation & rigid_deformation,
-										                   const DeformationGraph<ARAPDeformation> & deformation_graph,
-										                   ceres::Solver::Options option,
-										                   const RegistrationOptions & registration_options,
-										                   std::shared_ptr<FileWriter> logger)
-{
-	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
-	auto new_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(deformation_graph._mesh, global);
-	return std::make_unique<AsRigidAsPossible>(src, dst, new_deformation_graph, option, registration_options, logger);
-}
-
-
 
 
 

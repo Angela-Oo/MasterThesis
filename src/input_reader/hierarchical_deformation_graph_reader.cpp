@@ -33,7 +33,6 @@ HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shar
 	, _radius(0.05)
 {
 	_reader->processFrame();
-	_reader->processFrame();
 	_mesh = _reader->getMesh(0);
 
 	_hierarchical_mesh = generateHierarchicalMesh(_mesh, _radius, 4);

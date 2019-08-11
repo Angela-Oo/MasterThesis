@@ -108,29 +108,4 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 										  const RegistrationOptions & registration_options,
 										  std::shared_ptr<FileWriter> logger);
 
-std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
-										  const SurfaceMesh& dst,
-										  ceres::Solver::Options option,
-										  const RegistrationOptions & registration_options,
-										  std::shared_ptr<FileWriter> logger);
-
-
-std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
-										  const SurfaceMesh& dst,
-										  const RigidDeformation & rigid_deformation,
-										  ceres::Solver::Options option,
-										  const RegistrationOptions & registration_options,
-										  std::shared_ptr<FileWriter> logger);
-
-
-std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
-										  const SurfaceMesh& dst,
-										  const RigidDeformation & rigid_deformation,
-										  const DeformationGraph<ARAPDeformation> & deformation_graph,
-										  ceres::Solver::Options option,
-										  const RegistrationOptions & registration_options,
-										  std::shared_ptr<FileWriter> logger);
-
-
-
 }
