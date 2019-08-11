@@ -57,19 +57,43 @@ void SurfaceMeshPoissonDiskSampling::updateUnsupportedVertices(Point point)
 	}
 }
 
+Point add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original_mesh, SurfaceMesh & new_mesh)
+{
+	auto original_mesh_normals = original_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
+
+	auto normals = new_mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
+	auto finer_level_v = new_mesh.add_property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v", vertex_descriptor()).first;
+	auto level = new_mesh.add_property_map<vertex_descriptor, unsigned int>("v:level", 0).first;
+
+	auto point = original_mesh.point(v_original_mesh);
+	auto v = new_mesh.add_vertex(point);
+
+	finer_level_v[v] = v_original_mesh;
+	normals[v] = original_mesh_normals[v_original_mesh];
+
+	return point;
+}
+//
+//Point add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original_mesh, SurfaceMesh & new_mesh)
+//{
+//	auto original_mesh_normals = original_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
+//
+//	auto normals = new_mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
+//
+//	auto point = original_mesh.point(v_original_mesh);
+//	auto v = new_mesh.add_vertex(point);
+//	normals[v] = original_mesh_normals[v_original_mesh];
+//	return point;
+//}
 
 SurfaceMesh SurfaceMeshPoissonDiskSampling::create()
 {
-	SurfaceMesh hierarchical_mesh;
-	auto normals = hierarchical_mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
-	auto mesh_normals = _mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
+	SurfaceMesh hierarchical_mesh;	
 	_candidates[*_unsupported_vertices.begin()] = 0.;
 
 	while (!finished()) {
 		auto v = nextVertex();
-		auto point = _mesh.point(v);
-		auto h_v = hierarchical_mesh.add_vertex(point);
-		normals[h_v] = mesh_normals[v];
+		auto point = add_vertex(_mesh, v, hierarchical_mesh);
 		supportVertex(v);
 		updateUnsupportedVertices(point);
 	}

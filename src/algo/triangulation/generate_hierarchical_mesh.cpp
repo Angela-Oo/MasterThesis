@@ -14,6 +14,9 @@ SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radiu
 	CGAL::advancing_front_surface_reconstruction(hierarchical_mesh.points().begin(),
 												 hierarchical_mesh.points().end(),
 												 construct);
+
+	hierarchical_mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.));
+	hierarchical_mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.));
 	return hierarchical_mesh;
 }
 

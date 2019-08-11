@@ -10,6 +10,7 @@ private:
 	std::shared_ptr<MeshReader> _reader;
 	SurfaceMesh _mesh;
 	HierarchicalMesh _hierarchical_mesh;
+	std::vector<SurfaceMesh> _meshes;
 	double _radius;
 public:
 	const SurfaceMesh & getMesh(size_t frame) override;
