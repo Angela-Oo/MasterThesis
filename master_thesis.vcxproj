@@ -269,7 +269,9 @@
     <ClInclude Include="src\algo\remeshing\poison_surface_remeshing.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_convertion.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_operations.h" />
+    <ClInclude Include="src\algo\triangulation\generate_hierarchical_mesh.h" />
     <ClInclude Include="src\algo\triangulation\hierarchical_mesh.h" />
+    <ClInclude Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.h" />
     <ClInclude Include="src\algo\triangulation\triangulation.h" />
     <ClInclude Include="src\appShowKinectData.h" />
     <ClInclude Include="src\appTest.h" />
@@ -332,7 +334,9 @@
     <ClCompile Include="src\algo\remeshing\poison_surface_remeshing.cpp" />
     <ClCompile Include="src\algo\surface_mesh\mesh_convertion.cpp" />
     <ClCompile Include="src\algo\surface_mesh\mesh_operations.cpp" />
+    <ClCompile Include="src\algo\triangulation\generate_hierarchical_mesh.cpp" />
     <ClCompile Include="src\algo\triangulation\hierarchical_mesh.cpp" />
+    <ClCompile Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.cpp" />
     <ClCompile Include="src\algo\triangulation\triangulation.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\appTest.cpp" />

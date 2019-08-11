@@ -713,6 +713,12 @@
     <ClInclude Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.h">
       <Filter>2 algo\1 nearest neighbor search</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\triangulation\generate_hierarchical_mesh.h">
+      <Filter>2 algo\3 triangulation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.h">
+      <Filter>2 algo\3 triangulation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -872,6 +878,12 @@
     </ClCompile>
     <ClCompile Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.cpp">
       <Filter>2 algo\1 nearest neighbor search</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\triangulation\generate_hierarchical_mesh.cpp">
+      <Filter>2 algo\3 triangulation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.cpp">
+      <Filter>2 algo\3 triangulation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

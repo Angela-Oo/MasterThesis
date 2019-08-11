@@ -1,27 +1,17 @@
 #include "hierarchical_deformation_graph_reader.h"
 #include "algo/triangulation/hierarchical_mesh.h"
+#include "algo/triangulation/generate_hierarchical_mesh.h"
 
 
 const SurfaceMesh & HierarchicalDeformationGraphReader::getMesh(size_t frame)
 {
 	assert(frame < _hierarchical_deformation_graph.size());
-	return _hierarchical_deformation_graph[frame];
+	return _hierarchical_mesh._meshes[frame];
 }
 
 bool HierarchicalDeformationGraphReader::processFrame()
 {
-	if (_hierarchical_deformation_graph.empty()) {
-		_hierarchical_deformation_graph.push_back(createReducedMesh(_mesh, _radius));
-		return true;
-	}
-	else if (_hierarchical_deformation_graph.size() < 4) {
-		double radius = _radius * pow(2, _hierarchical_deformation_graph.size());
-		_hierarchical_deformation_graph.push_back(createHierarchicalMesh(_hierarchical_deformation_graph.back(), radius));
-		return true;
-	}
-	else {
-		return false;
-	}
+	return false;
 }
 
 bool HierarchicalDeformationGraphReader::processAllFrames()
@@ -35,17 +25,18 @@ bool HierarchicalDeformationGraphReader::processAllFrames()
 
 size_t HierarchicalDeformationGraphReader::size()
 {
-	return _hierarchical_deformation_graph.size();
+	return _hierarchical_mesh._meshes.size();
 }
-
 
 HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shared_ptr<MeshReader> reader)
 	: _reader(reader)
 	, _radius(0.05)
 {
 	_reader->processFrame();
+	_reader->processFrame();
 	_mesh = _reader->getMesh(0);
-	processAllFrames();
+
+	_hierarchical_mesh = generateHierarchicalMesh(_mesh, _radius, 4);
 }
 
 
