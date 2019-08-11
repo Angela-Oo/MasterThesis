@@ -29,7 +29,7 @@ HierarchicalMesh generateHierarchicalMesh(const SurfaceMesh & mesh, double min_r
 	reduced_mesh.add_property_map<vertex_descriptor, unsigned int>("v:level", levels - 1);
 	meshes.push_back(reduced_mesh);
 
-	for (auto i = 1; i < levels; ++i) {
+	for (unsigned int i = 1; i < levels; ++i) {
 		double radius = min_radius * pow(2, meshes.size());
 		meshes.push_back(generateHierarchicalMeshLevel(meshes.back(), radius));
 	}
