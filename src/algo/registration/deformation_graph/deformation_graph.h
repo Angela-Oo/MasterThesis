@@ -8,6 +8,9 @@
 #include <CGAL/squared_distance_3.h> //for 3D functions
 #include <vector>
 
+#include "algo/triangulation/hierarchical_mesh.h"
+
+
 namespace Registration
 {
 
@@ -16,6 +19,7 @@ class DeformationGraph
 {
 public:
 	SurfaceMesh _mesh;
+	HierarchicalMesh _hierarchical_mesh;
 	PositionDeformation _global;
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
 public:
@@ -33,6 +37,8 @@ public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
 	DeformationGraph(const SurfaceMesh & graph, 
+					 const PositionDeformation & global_deformation);
+	DeformationGraph(const HierarchicalMesh & hierarchical_mesh,
 					 const PositionDeformation & global_deformation);
 	DeformationGraph(const DeformationGraph<PositionDeformation> & deformation_graph);
 	DeformationGraph<PositionDeformation> & operator=(DeformationGraph<PositionDeformation> other);
@@ -183,10 +189,22 @@ DeformationGraph<PositionDeformation>::DeformationGraph(const SurfaceMesh & grap
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
 
+
+template <typename PositionDeformation>
+DeformationGraph<PositionDeformation>::DeformationGraph(const HierarchicalMesh & hierarchical_mesh,
+														const PositionDeformation & global_deformation)
+	: _hierarchical_mesh(hierarchical_mesh)
+	, _global(global_deformation)
+{
+	_mesh = _hierarchical_mesh._mesh;
+	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
+}
+
 template <typename PositionDeformation>
 DeformationGraph<PositionDeformation>::DeformationGraph(const DeformationGraph<PositionDeformation> & deformation_graph)
 	: _global(deformation_graph._global)
 	, _mesh(deformation_graph._mesh)
+	, _hierarchical_mesh(deformation_graph._hierarchical_mesh)
 {
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
@@ -199,6 +217,7 @@ DeformationGraph<PositionDeformation> & DeformationGraph<PositionDeformation>::o
 
 	_global = other._global;
 	_mesh = other._mesh;
+	_hierarchical_mesh = other._hierarchical_mesh;
 
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
@@ -235,6 +254,27 @@ DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh
 	}
 	return DeformationGraph<PositionDeformation>(mesh, global_deformation);
 }
+
+
+template <typename PositionDeformation>
+DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(HierarchicalMesh & mesh,
+																	 PositionDeformation global_deformation)
+{
+	SurfaceMesh::Property_map<vertex_descriptor, PositionDeformation> nodes;
+	bool created;
+	boost::tie(nodes, created) = mesh._mesh.add_property_map<vertex_descriptor, PositionDeformation>("v:node_deformation", PositionDeformation(CGAL::ORIGIN));
+	assert(created);
+	mesh._mesh.add_property_map<edge_descriptor, double>("e:smooth_cost", 0.);
+
+	auto vertex_color = errorToRGB(0.);
+	auto colors = mesh._mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", vertex_color).first;
+	for (auto & v : mesh._mesh.vertices()) {
+		nodes[v] = PositionDeformation(mesh._mesh.point(v));
+		colors[v] = vertex_color;
+	}
+	return DeformationGraph<PositionDeformation>(mesh, global_deformation);
+}
+
 
 
 

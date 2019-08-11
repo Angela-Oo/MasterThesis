@@ -1,6 +1,6 @@
 #include "render_registration.h"
 
-#include "algo/evaluate_registration.h"
+#include "algo/registration_evaluation/evaluate_registration.h"
 #include "render_deformation_graph.h"
 
 std::string renderMeshModeToString(Render render_type)
@@ -59,10 +59,12 @@ void RenderRegistration::renderCurrentFrame(std::shared_ptr<IMeshReader> mesh_re
 		bool override_mesh = _last_rendered_current_frame != _current_frame;
 		if (_render_mesh == Render::ONLY_DEFORMATION_GRAPH) {
 			_mesh_renderer->removeMesh("mesh");
-			_point_renderer->insertMesh("mesh", mesh_reader->getMesh(_current_frame), ml::RGBColor::Cyan, 0.001f, false, override_mesh);
+			_point_renderer->insertMesh("mesh", mesh_reader->getMesh(_current_frame), 0.001f, false, override_mesh);
+			_point_renderer->insertPoints("mesh_p", mesh_reader->getMesh(_current_frame), ml::RGBColor::Green, 0.005f, override_mesh);
 		}
 		else {
 			_point_renderer->removePoints("mesh");
+			_point_renderer->removePoints("mesh_p");
 			_mesh_renderer->insertMesh("mesh", mesh_reader->getMesh(_current_frame), ml::RGBColor::White.toVec4f(), override_mesh);
 		}
 		_last_rendered_current_frame = _current_frame;
