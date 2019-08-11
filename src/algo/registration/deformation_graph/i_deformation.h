@@ -1,6 +1,6 @@
 #pragma once
 
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 #include "algo/registration/rigid_registration/rigid_deformation.h"
 
 namespace Registration {

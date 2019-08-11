@@ -1,6 +1,6 @@
 #pragma once
 
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 
 typedef CGAL::cpp11::array<std::size_t, 3> Facet;
 

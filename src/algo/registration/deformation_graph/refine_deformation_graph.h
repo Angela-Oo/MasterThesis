@@ -1,7 +1,7 @@
 #pragma once
 
 #include "deformation_graph.h"
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 #include "algo/surface_mesh/mesh_operations.h"
 #include <algorithm>
 

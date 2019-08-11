@@ -2,8 +2,8 @@
 
 #include "rigid_before_non_rigid_deform_mesh.h"
 #include "rigid_before_non_rigid_registration.h"
-#include "algo/file_writer.h"
-#include "algo/surface_mesh/mesh_definition.h"
+#include "util/file_writer.h"
+#include "mesh/mesh_definition.h"
 #include "algo/registration/rigid_registration/rigid_factory.h"
 #include "algo/registration/arap/arap_factory.h"
 #include "algo/registration/util/log_option.h"

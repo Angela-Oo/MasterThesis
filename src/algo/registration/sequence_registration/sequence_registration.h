@@ -2,7 +2,7 @@
 
 #include "mesh/i_mesh_sequence.h"
 #include "algo/registration/interface/i_sequence_registration.h"
-#include "algo/file_writer.h"
+#include "util/file_writer.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include <memory>
 #include <vector>

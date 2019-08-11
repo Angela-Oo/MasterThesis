@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mLibCore.h"
-#include "algo/mesh_simplification/mesh_simplification.h"
+#include "algo/remeshing/mesh_simplification.h"
 
 template<typename T>
 void vec3f_to_T(const ml::vec3f& v, T* vector)

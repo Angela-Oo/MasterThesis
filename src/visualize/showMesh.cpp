@@ -3,6 +3,7 @@
 #include "algo/registration/options/ceres_option.h"
 #include "algo/registration/interface/registration.h"
 #include "algo/surface_mesh/mesh_convertion.h"
+#include "input_reader/hierarchical_deformation_graph_reader.h"
 #include <chrono>  // chrono::system_clock
 #include <ctime>   // localtime
 #include <iomanip> // put_time
@@ -342,7 +343,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = false;
+	bool test = true;
 	bool register_on_reference_mesh = true;
 	bool load_compare_mesh = false;
 	bool load_all_frames = true;
@@ -376,7 +377,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_registration_options.smooth = 5.;
 		_registration_options.fit = 10.;
 		_registration_options.use_vertex_random_probability = 0.2;
-		_registration_options.dg_options.edge_length = 0.2;
+		_registration_options.dg_options.edge_length = 0.7;// 0.3;
 	
 		// hand
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
@@ -416,19 +417,29 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_logger = std::make_shared<FileWriter>(_data_name + "_log.txt");
 	}
 	else {
-		_registration_options.evaluate_residuals = true;
-		_registration_options.dg_options.edge_length = 0.07;
-		_registration_options.ignore_deformation_graph_border_vertices = false;
-		_registration_options.dg_options.number_of_interpolation_neighbors = 4;
-		_registration_options.use_vertex_random_probability = 1.;
-		_registration_options.max_iterations = 50;
-		_registration_options.smooth = 20.;
-		_registration_options.fit = 10.;
-		
+		//_registration_options.evaluate_residuals = true;
+		//_registration_options.dg_options.edge_length = 0.07;
+		//_registration_options.ignore_deformation_graph_border_vertices = false;
+		//_registration_options.dg_options.number_of_interpolation_neighbors = 4;
+		//_registration_options.use_vertex_random_probability = 1.;
+		//_registration_options.max_iterations = 50;
+		//_registration_options.smooth = 20.;
+		//_registration_options.fit = 10.;
+		//
 
-		_input_mesh = std::make_shared<DeformationMeshFrames>();
+		//_input_mesh = std::make_shared<DeformationMeshFrames>();
+		//_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
+		//_renderer->_render_reference_mesh = false;
+		//_calculate_error = false;
+		//_renderer->_render_deformation_graph = true;
+		//_data_name = "test";
+
+		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
+		_input_mesh = std::make_shared<HierarchicalDeformationGraphReader>(reference_registration_mesh);
+
 		_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
 		_renderer->_render_reference_mesh = false;
+		_renderer->_render_mesh = Render::ONLY_DEFORMATION_GRAPH;
 		_calculate_error = false;
 		_renderer->_render_deformation_graph = true;
 		_data_name = "test";

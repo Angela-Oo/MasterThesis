@@ -1,6 +1,6 @@
 #pragma once
 #include "mLibInclude.h"
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Surface_mesh.h>
 

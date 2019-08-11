@@ -4,7 +4,7 @@
 #include <ceres/rotation.h>
 #include <functional>
 #include "algo/registration/util/ceres_math.h"
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 
 namespace Registration {
 

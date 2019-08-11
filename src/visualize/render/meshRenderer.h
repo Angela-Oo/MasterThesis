@@ -1,7 +1,7 @@
 #pragma once
 #include "mLibInclude.h"
 #include "visualize/constantBuffer.h"
-#include "algo/mesh_simplification/mesh_simplification.h"
+#include "algo/remeshing/mesh_simplification.h"
 
 struct D3D11MeshAndBuffer
 {

@@ -5,8 +5,8 @@
 #include "render/render_registration.h"
 #include "input_reader/mesh_reader.h"
 
-#include "algo/file_writer.h"
-#include "algo/evaluate_registration.h"
+#include "util/file_writer.h"
+#include "algo/registration_evaluation/evaluate_registration.h"
 #include "algo/registration/interface/i_registration.h"
 #include "algo/registration/interface/registration_type.h"
 #include "algo/registration/sequence_registration/sequence_registration.h"

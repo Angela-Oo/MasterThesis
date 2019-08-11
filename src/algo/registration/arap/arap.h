@@ -1,9 +1,9 @@
 #pragma once
 
 #include "arap_deformation.h"
-#include "algo/file_writer.h"
+#include "util/file_writer.h"
 #include "algo/registration/interface/i_registration.h"
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"

@@ -1,5 +1,5 @@
 #include "hierarchical_deformation_graph_reader.h"
-#include "algo/mesh_simplification/hierarchical_mesh.h"
+#include "algo/triangulation/hierarchical_mesh.h"
 
 
 const SurfaceMesh & HierarchicalDeformationGraphReader::getMesh(size_t frame)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "rigid_before_non_rigid_deformation.h"
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
 #include "algo/registration/rigid_registration/rigid_deformed_mesh.h"
 

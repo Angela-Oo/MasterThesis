@@ -1,7 +1,7 @@
 #pragma once
 
 #include "algo/registration/util/ceres_math.h"
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 #include <vector>
 #include <ceres/ceres.h>
 #include <ceres/rotation.h>

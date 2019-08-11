@@ -1,7 +1,7 @@
 #pragma once
 
-#include "algo/surface_mesh/mesh_definition.h"
-#include "algo/surface_mesh/nearest_neighbor_search.h"
+#include "mesh/mesh_definition.h"
+#include "algo/nearest_neighbor_search/nearest_neighbor_search.h"
 
 class GenerateHierarchicalMesh
 {

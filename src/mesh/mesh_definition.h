@@ -3,9 +3,6 @@
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/Surface_mesh.h>
 
-//#include <CGAL/Search_traits_3.h>
-//#include <CGAL/Search_traits_adapter.h>
-//#include <CGAL/Orthogonal_k_neighbor_search.h>
 
 typedef CGAL::Simple_cartesian<double> Kernel;
 typedef Kernel::Point_3 Point;

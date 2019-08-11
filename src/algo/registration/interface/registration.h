@@ -3,7 +3,7 @@
 #include "i_registration.h"
 #include "i_sequence_registration.h"
 #include "registration_type.h"
-#include "algo/file_writer.h"
+#include "util/file_writer.h"
 #include "input_reader/mesh_reader.h"
 #include <ceres/ceres.h>
 

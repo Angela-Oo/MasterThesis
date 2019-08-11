@@ -1,7 +1,7 @@
 #pragma once
 
 #include "algo/registration/interface/i_registration.h"
-#include "algo/surface_mesh/mesh_definition.h"
+#include "mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/refine_deformation_graph.h"
 
 

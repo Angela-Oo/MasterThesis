@@ -4,7 +4,7 @@
 #include "kinect/ImageReaderSensor.h"
 #include "kinect/SensorDataWrapper.h"
 
-#include "algo/mesh_simplification/mesh_simplification.h"
+#include "algo/remeshing/mesh_simplification.h"
 #include "mesh/i_mesh_sequence.h"
 
 class MeshReader : public IMeshReader

@@ -1,6 +1,6 @@
 #include "extend_deformation_graph.h"
 
-#include "algo/surface_mesh/nearest_neighbor_search.h"
+#include "algo/nearest_neighbor_search/nearest_neighbor_search.h"
 #include <CGAL/Polygon_mesh_processing/border.h>
 #include <CGAL/boost/graph/Euler_operations.h>
 #include <vector>
