@@ -32,23 +32,29 @@ HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shar
 	: _reader(reader)
 	, _radius(0.05)
 {
-	_radius = 0.2;
 	_reader->processFrame();
 	_reader->processFrame();
 	_mesh = _reader->getMesh(0);
 
-	_hierarchical_mesh = generateHierarchicalMesh(_mesh, _radius, 2);
+	_hierarchical_mesh = generateHierarchicalMesh(_mesh, _radius, 4);
 
 	_meshes.insert(_meshes.end(), _hierarchical_mesh._meshes.rbegin(), _hierarchical_mesh._meshes.rend());
 
-	auto edge = *_hierarchical_mesh._mesh.edges_begin();
+	int i = 0;
+	for (auto edge : _hierarchical_mesh._mesh.edges()) {
+		auto marked_edge_mesh = _hierarchical_mesh._mesh;
+		auto color = marked_edge_mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
+		color[edge] = ml::vec4f(1., 0., 0., 1.);
 
-	auto marked_edge_mesh = _hierarchical_mesh._mesh;
-	auto color = marked_edge_mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;	
-	color[edge] = ml::vec4f(1., 0., 0., 1.);
-	_meshes.push_back(marked_edge_mesh);
-
-	_hierarchical_mesh.refineEdge(edge);
+		
+		_hierarchical_mesh.refineEdge(edge);
+		_meshes.push_back(marked_edge_mesh);
+		i++;
+		if (i > 5)
+			break;
+	}
+		
+	_hierarchical_mesh.triangulate();
 	_meshes.push_back(_hierarchical_mesh._mesh);
 }
 

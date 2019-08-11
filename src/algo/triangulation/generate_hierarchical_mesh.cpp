@@ -4,26 +4,6 @@
 #include "algo/remeshing/mesh_simplification.h"
 #include <CGAL/Advancing_front_surface_reconstruction.h>
 
-Point add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original_mesh, SurfaceMesh & new_mesh)
-{
-	auto original_mesh_normals = original_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
-	auto original_mesh_level = original_mesh.property_map<vertex_descriptor, unsigned int>("v:level").first;
-
-	auto normals = new_mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
-	auto finer_level_v = new_mesh.add_property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v", vertex_descriptor()).first;
-	auto level = new_mesh.add_property_map<vertex_descriptor, unsigned int>("v:level", 0).first;
-	auto finer_level_point = new_mesh.add_property_map<vertex_descriptor, Point>("v:finer_level_point", Point(0., 0., 0.)).first;
-
-	auto point = original_mesh.point(v_original_mesh);
-	auto v = new_mesh.add_vertex(point);
-
-	finer_level_v[v] = v_original_mesh;
-	normals[v] = original_mesh_normals[v_original_mesh];
-	level[v] = original_mesh_level[v_original_mesh] - 1;
-	finer_level_point[v] = original_mesh.point(original_mesh.source(original_mesh.halfedge(v_original_mesh)));
-
-	return point;
-}
 
 SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radius)
 {
@@ -37,6 +17,7 @@ SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radiu
 
 	hierarchical_mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.));
 	hierarchical_mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.));
+	hierarchical_mesh.add_property_map<vertex_descriptor, bool>("v:refined", false);
 	return hierarchical_mesh;
 }
 
