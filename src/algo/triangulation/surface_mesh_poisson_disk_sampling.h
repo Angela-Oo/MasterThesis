@@ -22,8 +22,9 @@ private:
 public:
 	/// creates a surface mesh only containing points that are at least radius appart
 	/// the surface mesh only contains points that are also in the mesh passed in the constructor
-	SurfaceMesh create();
-	SurfaceMeshPoissonDiskSampling(const SurfaceMesh & mesh, double radius);
+	SurfaceMesh create(std::function<Point(const SurfaceMesh &, vertex_descriptor, SurfaceMesh &)> add_vertex);
+	SurfaceMeshPoissonDiskSampling(const SurfaceMesh & mesh, 
+								   double radius);
 };
 
 

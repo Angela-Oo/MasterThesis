@@ -37,3 +37,5 @@ struct Construct {
 void surfaceMeshFrontTriangulation(SurfaceMesh & mesh);
 
 SurfaceMesh triangulate(SurfaceMesh mesh, double radius);
+
+void triangulateKNN(SurfaceMesh & mesh, unsigned int k);

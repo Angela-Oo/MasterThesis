@@ -1,5 +1,5 @@
 #include "triangulation.h"
-#include "algo/surface_mesh/nearest_neighbor_search.h"
+#include "algo/nearest_neighbor_search/nearest_neighbor_search.h"
 
 #include <CGAL/Advancing_front_surface_reconstruction.h>
 
@@ -14,7 +14,7 @@ void surfaceMeshFrontTriangulation(SurfaceMesh & mesh)
 }
 
 
-SurfaceMesh triangulateKNN(SurfaceMesh mesh, double radius)
+void triangulateKNN(SurfaceMesh & mesh, unsigned int k)
 {
 	RadiusNearestNeighborSearch search(mesh);
 
@@ -25,7 +25,7 @@ SurfaceMesh triangulateKNN(SurfaceMesh mesh, double radius)
 			if (it->first != v) {
 				mesh.add_edge(it->first, v);
 				++i;
-				if (i > 4)
+				if (i > k)
 					break;
 			}
 		}
@@ -37,8 +37,6 @@ SurfaceMesh triangulateKNN(SurfaceMesh mesh, double radius)
 		//	}
 		//}			
 	}
-
-	return mesh;
 }
 
 
