@@ -88,6 +88,38 @@ ARAPDeformation::ARAPDeformation(const ARAPDeformation & deformation, bool inver
 }
 
 
+ARAPDeformation interpolateDeformations(Point position, std::vector<std::pair<ARAPDeformation, double>> deformation_weights_vector)
+{
+	ml::vec6d d;
+	//for (auto d_w : deformation_weights_vector)
+	//{
+	//	auto deformation = d_w.first;
+	//	double weight = d_w.second;
+	//	
+	//	d += deformation.deformation() * weight;
+	//}
+	// set rotation to zero
+	d[0] = 0.;
+	d[1] = 0.;
+	d[2] = 0.;
+
+	Vector deformed_point(0., 0., 0.);
+	for (auto d_w : deformation_weights_vector)
+	{
+		auto deformation = d_w.first;
+		double weight = d_w.second;
+		Vector transformed_point = deformation.deformPosition(position) - CGAL::ORIGIN;
+		transformed_point *= weight;
+		deformed_point += transformed_point;
+	}
+	Vector translation = deformed_point - (position - CGAL::ORIGIN);
+	d[3] = translation.x();
+	d[4] = translation.y();
+	d[5] = translation.z();
+	return ARAPDeformation(position, d);
+}
+
+
 ARAPDeformation linearInterpolation(const ARAPDeformation & deformation0, const ARAPDeformation & deformation1, double t)
 {
 	Vector dir = deformation1.position() - deformation0.position();

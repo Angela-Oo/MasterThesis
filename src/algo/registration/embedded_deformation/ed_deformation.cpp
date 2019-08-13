@@ -83,6 +83,20 @@ EDDeformation::EDDeformation(const EDDeformation & deformation, bool inverse)
 	}
 }
 
+EDDeformation interpolateDeformations(Point position, std::vector<std::pair<EDDeformation, double>> deformation_weights_vector)
+{
+	// TODO
+	//ml::vec6d d;
+	//for (auto d_w : deformation_weights_vector)
+	//{
+	//	auto deformation = d_w.first;
+	//	double weight = d_w.second;
+
+	//	d += deformation.deformation() * weight;
+	//}
+	return EDDeformation(position);// , d);
+}
+
 
 
 EDDeformation linearInterpolation(const EDDeformation & deformation0, const EDDeformation & deformation1, double t)

@@ -37,6 +37,7 @@ public:
 	ARAPDeformation(const ARAPDeformation& deformation, bool inverse);
 };
 
+ARAPDeformation interpolateDeformations(Point position, std::vector<std::pair<ARAPDeformation, double>> deformation_weights_vector);
 
 ARAPDeformation linearInterpolation(const ARAPDeformation & deformation0, const ARAPDeformation & deformation1, double t = 0.5);
 

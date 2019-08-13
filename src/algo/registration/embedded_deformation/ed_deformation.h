@@ -37,6 +37,7 @@ public:
 	EDDeformation(const EDDeformation& node, bool inverse);
 };
 
+EDDeformation interpolateDeformations(Point position, std::vector<std::pair<EDDeformation, double>> deformation_weights_vector);
 
 EDDeformation linearInterpolation(const EDDeformation & deformation0, const EDDeformation & deformation1, double t);
 

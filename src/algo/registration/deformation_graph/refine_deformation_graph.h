@@ -3,6 +3,7 @@
 #include "deformation_graph.h"
 #include "mesh/mesh_definition.h"
 #include "algo/surface_mesh/mesh_operations.h"
+#include "algo/registration/deformation_graph/deformed_mesh.h"
 #include <algorithm>
 
 namespace Registration
@@ -149,10 +150,19 @@ DeformationGraph<PositionDeformation> refineDeformationGraph(const DeformationGr
 	}
 	h_mesh.triangulate();
 
-	//auto original_deformation = deformation_graph._mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation").first;
 	auto & deformation_property_map = h_mesh._mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation").first; // TODO
 	for (auto v : new_vertices) {
-		deformation_property_map[v] = PositionDeformation(h_mesh._mesh.point(v));
+		int k = 4; // todo
+		NearestNodes kNN = createNearestNodes<DeformationGraph<PositionDeformation>>(deformation_graph, h_mesh._mesh.point(v), k);
+
+		std::vector<std::pair<PositionDeformation, double>> deformation_weights_vector;
+		for (auto n_w : kNN.node_weight_vector)
+		{
+			auto node = deformation_graph.getDeformation(n_w.first);
+			deformation_weights_vector.push_back(std::make_pair(node, n_w.second));
+		}
+		PositionDeformation deformation = interpolateDeformations(h_mesh._mesh.point(v), deformation_weights_vector);
+		deformation_property_map[v] = deformation;
 	}
 
 	return DeformationGraph<PositionDeformation>(h_mesh, deformation_graph._global);
