@@ -3,7 +3,7 @@
 #include "triangulation.h"
 #include "algo/remeshing/mesh_simplification.h"
 #include <CGAL/Advancing_front_surface_reconstruction.h>
-
+#include <CGAL/Polygon_mesh_processing/repair.h>
 
 SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radius)
 {
@@ -18,6 +18,7 @@ SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radiu
 	hierarchical_mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.));
 	hierarchical_mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.));
 	hierarchical_mesh.add_property_map<vertex_descriptor, bool>("v:refined", false);
+	CGAL::Polygon_mesh_processing::remove_isolated_vertices(hierarchical_mesh);
 	return hierarchical_mesh;
 }
 
