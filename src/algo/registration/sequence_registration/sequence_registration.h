@@ -9,14 +9,14 @@
 
 namespace Registration {
 
-template<typename Registration>
+template<typename RegistrationType>
 class SequenceRegistration : public ISequenceRegistration
 {
 public:
-	using Deformation = typename Registration::Deformation;
+	using Deformation = typename RegistrationType::Deformation;
 private:
 	std::shared_ptr<IMeshReader> _mesh_sequence;
-	std::unique_ptr<Registration> _registration;
+	std::unique_ptr<RegistrationType> _registration;
 	std::vector<Deformation> _deformation;
 	std::vector<SurfaceMesh> _deformed_meshes;	
 	size_t _current;	
@@ -45,8 +45,8 @@ public:
 
 
 
-template<typename Registration>
-std::pair<bool, std::string> SequenceRegistration<Registration>::saveCurrentFrameAsImage()
+template<typename RegistrationType>
+std::pair<bool, std::string> SequenceRegistration<RegistrationType>::saveCurrentFrameAsImage()
 {
 	bool save_as_image = false;
 	std::string image_index = "";
@@ -63,41 +63,41 @@ std::pair<bool, std::string> SequenceRegistration<Registration>::saveCurrentFram
 }
 
 
-template<typename Registration>
-SurfaceMesh SequenceRegistration<Registration>::getMesh(size_t frame)
+template<typename RegistrationType>
+SurfaceMesh SequenceRegistration<RegistrationType>::getMesh(size_t frame)
 {
 	return _mesh_sequence->getMesh(frame);
 }
 
-template<typename Registration>
-SurfaceMesh SequenceRegistration<Registration>::getDeformedMesh(size_t frame)
+template<typename RegistrationType>
+SurfaceMesh SequenceRegistration<RegistrationType>::getDeformedMesh(size_t frame)
 {
 	return _deformed_meshes[frame];
 }
 
-template<typename Registration>
-SurfaceMesh SequenceRegistration<Registration>::getInverseDeformedMesh(size_t frame)
+template<typename RegistrationType>
+SurfaceMesh SequenceRegistration<RegistrationType>::getInverseDeformedMesh(size_t frame)
 {
 	Deformation invert_deformation = _deformation[frame].invertDeformation();
-	auto deform_mesh = Registration::DeformMesh(invert_deformation);
+	auto deform_mesh = RegistrationType::DeformMesh(invert_deformation);
 	return deform_mesh.deformedMesh(_mesh_sequence->getMesh(frame));
 }
 
-template<typename Registration>
-SurfaceMesh SequenceRegistration<Registration>::getDeformationGraphMesh(size_t frame)
+template<typename RegistrationType>
+SurfaceMesh SequenceRegistration<RegistrationType>::getDeformationGraphMesh(size_t frame)
 {
-	auto deform_mesh = Registration::DeformMesh(_deformation[frame]);
+	auto deform_mesh = RegistrationType::DeformMesh(_deformation[frame]);
 	return deform_mesh.deformationGraphMesh();
 }
 
-template<typename Registration>
-size_t SequenceRegistration<Registration>::getCurrent()
+template<typename RegistrationType>
+size_t SequenceRegistration<RegistrationType>::getCurrent()
 {
 	return _current;
 }
 
-template<typename Registration>
-void SequenceRegistration<Registration>::nextFrame()
+template<typename RegistrationType>
+void SequenceRegistration<RegistrationType>::nextFrame()
 {
 	_current++;
 	auto & source = _mesh_sequence->getMesh(0);
@@ -105,22 +105,22 @@ void SequenceRegistration<Registration>::nextFrame()
 
 	if (_use_previouse_frame_for_rigid_registration) {
 		auto & prev_mesh = _mesh_sequence->getMesh(_current - 1);
-		_registration = std::make_unique<Registration>(source, target, prev_mesh, _deformation[_current - 1], _ceres_options, _options, _logger);
+		_registration = std::make_unique<RegistrationType>(source, target, prev_mesh, _deformation[_current - 1], _ceres_options, _options, _logger);
 	}
 	else {
-		_registration = std::make_unique<Registration>(source, target, _deformation[_current - 1], _ceres_options, _options, _logger);
+		_registration = std::make_unique<RegistrationType>(source, target, _deformation[_current - 1], _ceres_options, _options, _logger);
 	}
 	_deformation[_current] = _registration->getDeformation();
 }
 
-template<typename Registration>
-bool SequenceRegistration<Registration>::finished()
+template<typename RegistrationType>
+bool SequenceRegistration<RegistrationType>::finished()
 {
 	return _finished;
 }
 
-template<typename Registration>
-bool SequenceRegistration<Registration>::solve()
+template<typename RegistrationType>
+bool SequenceRegistration<RegistrationType>::solve()
 {
 	if (_current >= _mesh_sequence->size())
 		throw std::exception("not enougth meshes");
@@ -155,8 +155,8 @@ bool SequenceRegistration<Registration>::solve()
 	return true;
 }
 
-template<typename Registration>
-SequenceRegistration<Registration>::SequenceRegistration(std::shared_ptr<IMeshReader> mesh_sequence,
+template<typename RegistrationType>
+SequenceRegistration<RegistrationType>::SequenceRegistration(std::shared_ptr<IMeshReader> mesh_sequence,
 														 const RegistrationOptions & options,
 														 std::shared_ptr<FileWriter> logger)
 	: _mesh_sequence(mesh_sequence)
@@ -173,7 +173,7 @@ SequenceRegistration<Registration>::SequenceRegistration(std::shared_ptr<IMeshRe
 
 	auto & source = _mesh_sequence->getMesh(0);
 	auto & target = _mesh_sequence->getMesh(_current);
-	_registration = std::make_unique<Registration>(source, target, _ceres_options, _options, _logger);
+	_registration = std::make_unique<RegistrationType>(source, target, _ceres_options, _options, _logger);
 
 	_deformation[0] = _registration->getDeformation();
 	_deformed_meshes[0] = source;

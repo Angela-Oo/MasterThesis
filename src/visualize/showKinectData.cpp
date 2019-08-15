@@ -100,7 +100,7 @@ void ShowKinectData::non_rigid_registration(int frame_a, int frame_b)
 			mesh_b.m_vertices.push_back(p);
 
 		Registration::RegistrationOptions options;
-		_registration = Registration::ED::createEmbeddedDeformation(convertToCGALMesh(mesh_a), convertToCGALMesh(mesh_b), ceresOption(), options);
+		_registration = Registration::createEmbeddedDeformation(convertToCGALMesh(mesh_a), convertToCGALMesh(mesh_b), ceresOption(), options);
 
 		renderRegisteredPoints();
 	}

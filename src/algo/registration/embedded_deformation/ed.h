@@ -12,7 +12,6 @@
 #include <ceres/ceres.h>
 
 namespace Registration {
-namespace ED {
 
 typedef std::vector<ceres::ResidualBlockId> ResidualIds;
 typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
@@ -107,7 +106,7 @@ public:
 
 
 
-EDDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
+EDDeformation createGlobalEDDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
 
 
 std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
@@ -141,6 +140,5 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 															   std::shared_ptr<FileWriter> logger = nullptr);
 
 
-}
 
 }

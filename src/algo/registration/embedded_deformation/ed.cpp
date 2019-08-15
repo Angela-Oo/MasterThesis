@@ -6,7 +6,6 @@
 #include "algo/remeshing/mesh_simplification.h"
 
 namespace Registration {
-namespace ED {
 
 const SurfaceMesh & EmbeddedDeformation::getSource()
 {
@@ -69,7 +68,7 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Pr
 	auto & global = _deformation_graph._global;
 	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
-	auto cost_function = FitStarPointToPointCostFunction::Create(target_point, _deformed_mesh->point(v), global.position(),
+	auto cost_function = ED::FitStarPointToPointCostFunction::Create(target_point, _deformed_mesh->point(v), global.position(),
 																 _deformation_graph.getDeformation(n_w_vector[0].first).position(),
 																 _deformation_graph.getDeformation(n_w_vector[1].first).position(),
 																 _deformation_graph.getDeformation(n_w_vector[2].first).position(),
@@ -92,7 +91,7 @@ ceres::ResidualBlockId EmbeddedDeformation::addPointToPlaneCostForNode(ceres::Pr
 	auto & global = _deformation_graph._global;
 	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
 
-	ceres::CostFunction* cost_function = FitStarPointToPlaneCostFunction::Create(target_point, target_normal,
+	ceres::CostFunction* cost_function = ED::FitStarPointToPlaneCostFunction::Create(target_point, target_normal,
 																				 _deformed_mesh->point(v), global.position(),
 																				 _deformation_graph.getDeformation(n_w_vector[0].first).position(),
 																				 _deformation_graph.getDeformation(n_w_vector[1].first).position(),
@@ -170,7 +169,7 @@ EdgeResidualIds EmbeddedDeformation::addSmoothCost(ceres::Problem &problem)
 		auto target = mesh.target(e);
 		auto source = mesh.source(e);
 
-		ceres::CostFunction* cost_function = SmoothCostFunction::Create(mesh.point(source), mesh.point(target));
+		ceres::CostFunction* cost_function = ED::SmoothCostFunction::Create(mesh.point(source), mesh.point(target));
 		auto loss_function = new ceres::ScaledLoss(NULL, a_smooth, ceres::TAKE_OWNERSHIP);
 		auto residual_id = problem.AddResidualBlock(cost_function, loss_function,
 													deformations[source].r(), deformations[source].t(), deformations[target].t());
@@ -189,7 +188,7 @@ VertexResidualIds EmbeddedDeformation::addRotationCost(ceres::Problem &problem)
 	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, EDDeformation>("v:node_deformation").first;
 	for (auto & v : _deformation_graph._mesh.vertices())
 	{
-		ceres::CostFunction* cost_function = RotationCostFunction::Create();
+		ceres::CostFunction* cost_function = ED::RotationCostFunction::Create();
 		auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), a_rigid, ceres::TAKE_OWNERSHIP);
 		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v].r()));
 	}
@@ -203,7 +202,7 @@ VertexResidualIds EmbeddedDeformation::addConfCost(ceres::Problem &problem)
 	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, EDDeformation>("v:node_deformation").first;
 	for (auto & v : _deformation_graph._mesh.vertices())
 	{
-		ceres::CostFunction* cost_function = ConfCostFunction::Create();
+		ceres::CostFunction* cost_function = ED::ConfCostFunction::Create();
 		auto loss_function = new ceres::ScaledLoss(NULL, a_conf, ceres::TAKE_OWNERSHIP);
 		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v].w()));
 	}
@@ -231,7 +230,7 @@ bool EmbeddedDeformation::solveIteration()
 		auto conf_residual_ids = addConfCost(problem);
 
 		// add global rotation cost
-		ceres::CostFunction* cost_function = RotationCostFunction::Create();
+		ceres::CostFunction* cost_function = ED::RotationCostFunction::Create();
 		auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), a_rigid, ceres::TAKE_OWNERSHIP);
 		problem.AddResidualBlock(cost_function, loss_function, _deformation_graph._global.r());
 
@@ -304,7 +303,7 @@ void EmbeddedDeformation::evaluateResidual(ceres::Problem & problem,
 
 void EmbeddedDeformation::setRigidDeformation(const RigidDeformation & rigid_deformation)
 {
-	_deformation_graph.setRigidDeformation(rigid_deformation);// createGlobalDeformationFromRigidDeformation(rigid_deformation));
+	_deformation_graph.setRigidDeformation(rigid_deformation);
 }
 
 
@@ -393,7 +392,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 
 //-----------------------------------------------------------------------------
 
-EDDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
+EDDeformation createGlobalEDDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
 {	
 	auto r = rigid_deformation.rotation();
 	//double x = r.m(0,1);
@@ -437,7 +436,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 										                       std::shared_ptr<FileWriter> logger)
 {
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
+	auto global = createGlobalEDDeformationFromRigidDeformation(rigid_deformation);
 	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
 	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options, logger);
 }
@@ -451,12 +450,12 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 										                       const RegistrationOptions & registration_options,
 										                       std::shared_ptr<FileWriter> logger)
 {
-	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
+	auto global = createGlobalEDDeformationFromRigidDeformation(rigid_deformation);
 	auto new_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(deformation_graph._mesh, global);
 	return std::make_unique<EmbeddedDeformation>(src, dst, new_deformation_graph, option, registration_options, logger);
 }
 
 
 
-}
+
 }

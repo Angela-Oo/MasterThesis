@@ -1,16 +1,11 @@
 #include "registration.h"
+#include "algo/registration/util/log_option.h"
 #include "algo/registration/options/ceres_option.h"
-#include "algo/registration/rigid_registration/rigid_registration.h"
-#include "algo/registration/embedded_deformation/ed.h"
 #include "algo/registration/arap/arap.h"
+#include "algo/registration/embedded_deformation/ed.h"
+#include "algo/registration/rigid_registration/rigid_registration.h"
 #include "algo/registration/rigid_before_non_rigid_registration/rigid_before_non_rigid_registration.h"
-#include "algo/registration/arap/arap_factory.h"
-#include "algo/registration/embedded_deformation/ed_factory.h"
-#include "algo/registration/rigid_registration/rigid_factory.h"
-#include "algo/registration/rigid_before_non_rigid_registration/rigid_before_non_rigid_registration_factory.h"
-
 #include "algo/registration/sequence_registration/sequence_registration.h"
-#include "algo/registration/deformation_graph_refinement/refine_deformation_graph_registration_factory.h"
 #include "algo/registration/deformation_graph_refinement/refine_deformation_graph_registration.h"
 
 namespace Registration {
@@ -48,25 +43,19 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP) {
 		//RigidBeforeNonRigidRegistrationFactory<RefineDeformationGraphRegistrationFactory<ARAPFactory>> factory(options, ceres_options, logger);
-		RefineDeformationGraphRegistrationFactory<AsRigidAsPossible> factory(options, ceres_options, logger);
-		//RigidBeforeNonRigidRegistrationFactory<ARAPFactory> factory(options, ceres_options, logger);
-		return factory(source, target);
+		return std::make_unique<RefineDeformationGraphRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::ED) {
-		RigidBeforeNonRigidRegistrationFactory<EmbeddedDeformation> factory(options, ceres_options, logger);
-		return factory(source, target);
+		return std::make_unique<RigidBeforeNonRigidRegistration<EmbeddedDeformation>>(source, target, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::ARAP_Without_RIGID) {
-		ARAPFactory factory(options, ceres_options, logger);
-		return factory(source, target);
+		return std::make_unique<AsRigidAsPossible>(source, target, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::ED_Without_RIGID) {
-		EmbeddedDeformationFactory factory(options, ceres_options, logger);
-		return factory(source, target);
+		return std::make_unique<EmbeddedDeformation>(source, target, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::Rigid) {
-		RigidFactory factory(options, ceres_options, logger);
-		return factory(source, target);
+		return std::make_unique<RigidRegistration>(source, target, ceres_options, options, logger);
 	}
 	else {
 		throw("Registration type makes no sense in this configuration");
@@ -88,10 +77,10 @@ std::unique_ptr<INonRigidRegistration> createRegistrationNoICP(RegistrationType 
 	if (fixed_positions.empty())
 		std::cout << "fixed position are not set" << std::endl;
 	if (type == RegistrationType::ED_WithoutICP) {
-		return ED::createEmbeddedDeformation(source, target, fixed_positions, ceres_options, options, logger);
+		return createEmbeddedDeformation(source, target, fixed_positions, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::ARAP_WithoutICP) {
-		return Registration::createAsRigidAsPossible(source, target, fixed_positions, ceres_options, options, logger);
+		return createAsRigidAsPossible(source, target, fixed_positions, ceres_options, options, logger);
 	}
 	else {
 		throw("Registration type is not non rigid without icp");

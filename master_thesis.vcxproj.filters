@@ -617,18 +617,6 @@
     <ClInclude Include="src\mesh\i_mesh_sequence.h">
       <Filter>1 mesh</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\arap\arap_factory.h">
-      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\rigid_registration\rigid_factory.h">
-      <Filter>2 algo\4 registration\5 rigid registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\embedded_deformation\ed_factory.h">
-      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_registration_factory.h">
-      <Filter>2 algo\4 registration\8 ridid before non rigid deformation</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deformation.h">
       <Filter>2 algo\4 registration\8 ridid before non rigid deformation</Filter>
     </ClInclude>
@@ -717,9 +705,6 @@
       <Filter>2 algo\3 triangulation</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_registration.h">
-      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_registration_factory.h">
       <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_deformation.h">
@@ -827,15 +812,6 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp">
       <Filter>2 algo\4 registration\3 deformation graph</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\arap\arap_factory.cpp">
-      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\rigid_registration\rigid_factory.cpp">
-      <Filter>2 algo\4 registration\5 rigid registration</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\registration\embedded_deformation\ed_factory.cpp">
-      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\util\ceres_iteration_logger.cpp">
       <Filter>2 algo\4 registration\2 util</Filter>

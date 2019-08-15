@@ -14,7 +14,7 @@ template<typename NonRigidRegistration>
 class RigidBeforeNonRigidRegistration : public INonRigidRegistration
 {
 public:	
-	using Deformation = RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation>;
+	using Deformation = typename RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation>;
 	using DeformMesh = typename RigidBeforeNonRigidDeformMesh<typename NonRigidRegistration::Deformation, typename NonRigidRegistration::DeformMesh>;
 private:
 	Deformation _deformation;
@@ -50,14 +50,14 @@ public:
 									std::shared_ptr<FileWriter> logger = nullptr);
 	RigidBeforeNonRigidRegistration(const SurfaceMesh & source,
 									const SurfaceMesh & target,
-									const Deformation & deformation_graph,
+									const typename RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation> & deformation_graph,
 									ceres::Solver::Options ceres_option,
 									const RegistrationOptions & options,
 									std::shared_ptr<FileWriter> logger = nullptr);
 	RigidBeforeNonRigidRegistration(const SurfaceMesh & source,
 									const SurfaceMesh & target,
 									const SurfaceMesh & previous_mesh, 
-									const Deformation & deformation_graph,
+									const typename RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation> & deformation_graph,
 									ceres::Solver::Options ceres_option,
 									const RegistrationOptions & options,
 									std::shared_ptr<FileWriter> logger = nullptr);

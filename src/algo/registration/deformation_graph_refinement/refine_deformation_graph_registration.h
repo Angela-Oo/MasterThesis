@@ -5,6 +5,7 @@
 #include "algo/registration/interface/i_registration.h"
 #include "mesh/mesh_definition.h"
 #include "deformation_graph_refinement.h"
+#include "algo/triangulation/generate_hierarchical_mesh.h"
 
 namespace Registration {
 
