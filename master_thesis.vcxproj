@@ -223,6 +223,10 @@
     <ClInclude Include="mLib\include\mLibMBase.h" />
     <ClInclude Include="mLib\include\mLibOpenMesh.h" />
     <ClInclude Include="mLib\include\mLibZLib.h" />
+    <ClInclude Include="src\algo\hierarchical_mesh\generate_hierarchical_mesh.h" />
+    <ClInclude Include="src\algo\hierarchical_mesh\hierarchical_mesh.h" />
+    <ClInclude Include="src\algo\hierarchical_mesh\surface_mesh_poisson_disk_sampling.h" />
+    <ClInclude Include="src\algo\hierarchical_mesh\triangulation.h" />
     <ClInclude Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.h" />
     <ClInclude Include="src\algo\registration\arap\arap.h" />
     <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h" />
@@ -233,11 +237,10 @@
     <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\i_deformation.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\nearest_nodes.h" />
-    <ClInclude Include="src\algo\registration\deformation_graph\refine_deformation_graph.h" />
-    <ClInclude Include="src\algo\registration\deformation_graph_refinement\deformation_graph_refinement.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.h" />
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deform_mesh.h" />
-    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_deformation.h" />
-    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_registration.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deformation.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_registration.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h" />
@@ -267,10 +270,6 @@
     <ClInclude Include="src\algo\remeshing\poison_surface_remeshing.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_convertion.h" />
     <ClInclude Include="src\algo\surface_mesh\mesh_operations.h" />
-    <ClInclude Include="src\algo\triangulation\generate_hierarchical_mesh.h" />
-    <ClInclude Include="src\algo\triangulation\hierarchical_mesh.h" />
-    <ClInclude Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.h" />
-    <ClInclude Include="src\algo\triangulation\triangulation.h" />
     <ClInclude Include="src\appShowKinectData.h" />
     <ClInclude Include="src\appTest.h" />
     <ClInclude Include="src\input_reader\depth_image_reader.h" />
@@ -305,11 +304,15 @@
     <ClInclude Include="src\visualize\showSensData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\algo\hierarchical_mesh\generate_hierarchical_mesh.cpp" />
+    <ClCompile Include="src\algo\hierarchical_mesh\hierarchical_mesh.cpp" />
+    <ClCompile Include="src\algo\hierarchical_mesh\surface_mesh_poisson_disk_sampling.cpp" />
+    <ClCompile Include="src\algo\hierarchical_mesh\triangulation.cpp" />
     <ClCompile Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp" />
-    <ClCompile Include="src\algo\registration\deformation_graph\refine_deformation_graph.cpp" />
+    <ClCompile Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp" />
     <ClCompile Include="src\algo\registration\find_corresponding_points\find_corresponding_points.cpp" />
@@ -329,10 +332,6 @@
     <ClCompile Include="src\algo\remeshing\poison_surface_remeshing.cpp" />
     <ClCompile Include="src\algo\surface_mesh\mesh_convertion.cpp" />
     <ClCompile Include="src\algo\surface_mesh\mesh_operations.cpp" />
-    <ClCompile Include="src\algo\triangulation\generate_hierarchical_mesh.cpp" />
-    <ClCompile Include="src\algo\triangulation\hierarchical_mesh.cpp" />
-    <ClCompile Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.cpp" />
-    <ClCompile Include="src\algo\triangulation\triangulation.cpp" />
     <ClCompile Include="src\appShowKinectData.cpp" />
     <ClCompile Include="src\appTest.cpp" />
     <ClCompile Include="src\input_reader\depth_image_reader.cpp" />

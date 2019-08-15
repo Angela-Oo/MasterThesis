@@ -70,9 +70,6 @@
     <Filter Include="2 algo\2 remeshing">
       <UniqueIdentifier>{5e66546d-06c8-463d-83c2-c372bdcaab7a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2 algo\3 triangulation">
-      <UniqueIdentifier>{0ec5b9cd-bdd3-4db6-8bb7-637c6c0c4729}</UniqueIdentifier>
-    </Filter>
     <Filter Include="2 algo\4 registration">
       <UniqueIdentifier>{81ca46bf-dc3c-4097-ba7b-9ce561fcf050}</UniqueIdentifier>
     </Filter>
@@ -111,6 +108,9 @@
     </Filter>
     <Filter Include="2 algo\4 registration\10 sequence registration">
       <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2 algo\3 hierarchical mesh">
+      <UniqueIdentifier>{0ec5b9cd-bdd3-4db6-8bb7-637c6c0c4729}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -656,9 +656,6 @@
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph_deform_mesh.h">
       <Filter>2 algo\4 registration\3 deformation graph</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph\refine_deformation_graph.h">
-      <Filter>2 algo\4 registration\3 deformation graph</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deform_mesh.h">
       <Filter>2 algo\4 registration\8 ridid before non rigid deformation</Filter>
     </ClInclude>
@@ -677,12 +674,6 @@
     <ClInclude Include="src\algo\registration_evaluation\evaluate_registration.h">
       <Filter>2 algo\5 registration evaluation</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\triangulation\hierarchical_mesh.h">
-      <Filter>2 algo\3 triangulation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\triangulation\triangulation.h">
-      <Filter>2 algo\3 triangulation</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\remeshing\isotropic_remeshing.h">
       <Filter>2 algo\2 remeshing</Filter>
     </ClInclude>
@@ -698,23 +689,29 @@
     <ClInclude Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.h">
       <Filter>2 algo\1 nearest neighbor search</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\triangulation\generate_hierarchical_mesh.h">
-      <Filter>2 algo\3 triangulation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.h">
-      <Filter>2 algo\3 triangulation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_registration.h">
-      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_deformation.h">
-      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\deformation_graph_refinement\deformation_graph_refinement.h">
-      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deform_mesh.h">
       <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deformation.h">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_registration.h">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.h">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\hierarchical_mesh\generate_hierarchical_mesh.h">
+      <Filter>2 algo\3 hierarchical mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\hierarchical_mesh\hierarchical_mesh.h">
+      <Filter>2 algo\3 hierarchical mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\hierarchical_mesh\surface_mesh_poisson_disk_sampling.h">
+      <Filter>2 algo\3 hierarchical mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\hierarchical_mesh\triangulation.h">
+      <Filter>2 algo\3 hierarchical mesh</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -831,9 +828,6 @@
     <ClCompile Include="src\algo\registration\interface\registration.cpp">
       <Filter>2 algo\4 registration\0 interface</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\deformation_graph\refine_deformation_graph.cpp">
-      <Filter>2 algo\4 registration\3 deformation graph</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\surface_mesh\mesh_operations.cpp">
       <Filter>2 algo\0 surface mesh</Filter>
     </ClCompile>
@@ -845,12 +839,6 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration_evaluation\evaluate_registration.cpp">
       <Filter>2 algo\5 registration evaluation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\triangulation\hierarchical_mesh.cpp">
-      <Filter>2 algo\3 triangulation</Filter>
-    </ClCompile>
-    <ClCompile Include="src\algo\triangulation\triangulation.cpp">
-      <Filter>2 algo\3 triangulation</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\remeshing\isotropic_remeshing.cpp">
       <Filter>2 algo\2 remeshing</Filter>
@@ -867,11 +855,20 @@
     <ClCompile Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.cpp">
       <Filter>2 algo\1 nearest neighbor search</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\triangulation\generate_hierarchical_mesh.cpp">
-      <Filter>2 algo\3 triangulation</Filter>
+    <ClCompile Include="src\algo\hierarchical_mesh\generate_hierarchical_mesh.cpp">
+      <Filter>2 algo\3 hierarchical mesh</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.cpp">
-      <Filter>2 algo\3 triangulation</Filter>
+    <ClCompile Include="src\algo\hierarchical_mesh\hierarchical_mesh.cpp">
+      <Filter>2 algo\3 hierarchical mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\hierarchical_mesh\surface_mesh_poisson_disk_sampling.cpp">
+      <Filter>2 algo\3 hierarchical mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\hierarchical_mesh\triangulation.cpp">
+      <Filter>2 algo\3 hierarchical mesh</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.cpp">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

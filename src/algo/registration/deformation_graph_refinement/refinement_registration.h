@@ -1,11 +1,12 @@
 #pragma once
 
-#include "refine_deformation_graph_deformation.h"
+#include "refinement_deformation.h"
 #include "refinement_deform_mesh.h"
+#include "refinement_deformation_graph.h"
+#include "algo/hierarchical_mesh/generate_hierarchical_mesh.h"
 #include "algo/registration/interface/i_registration.h"
 #include "mesh/mesh_definition.h"
-#include "deformation_graph_refinement.h"
-#include "algo/triangulation/generate_hierarchical_mesh.h"
+
 
 namespace Registration {
 
@@ -106,7 +107,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	}
 	else if(_is_refined == false) {
 		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
-		_deformation.non_rigid_deformation = refineDeformationGraph(_deformation);
+		_deformation.non_rigid_deformation = refineHierarchicalMesh(_deformation);
 		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
 		_number_of_refinements++;
 		if(_number_of_refinements > 8)
@@ -188,7 +189,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 {
 	auto hierarchical_mesh = generateHierarchicalMesh(source, options.dg_options.edge_length, 4);
 	auto global = createGlobalDeformation<typename NonRigidRegistration::PositionDeformation>(source);
-	auto deformation_graph = createDeformationGraphFromMesh<typename NonRigidRegistration::PositionDeformation>(hierarchical_mesh._mesh, global);
+	auto deformation_graph = createDeformationGraphFromMesh<typename NonRigidRegistration::PositionDeformation>(hierarchical_mesh._meshes[0], global);
 
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation_graph, ceres_option, options, logger);
 	_deformation.hierarchical_mesh = hierarchical_mesh;

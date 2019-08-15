@@ -10,14 +10,10 @@ Point add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original
 class HierarchicalMesh
 {
 public:
-	SurfaceMesh _mesh;
 	std::vector<SurfaceMesh> _meshes;
 	std::vector<std::map<vertex_descriptor, std::vector<vertex_descriptor>>> _vertex_cluster_map;
 public:
-
-	std::vector<vertex_descriptor> refineVertex(vertex_descriptor vertex);
-	std::vector<vertex_descriptor> refineEdge(edge_descriptor edge);
-	void triangulate();
+	SurfaceMesh getInitMesh();
 public:
 	HierarchicalMesh() = default;
 	HierarchicalMesh(const std::vector<SurfaceMesh> & meshes);
@@ -25,3 +21,16 @@ public:
 	HierarchicalMesh & operator=(HierarchicalMesh other);
 };
 
+
+class HierarchicalMeshRefinement
+{
+	const HierarchicalMesh & _hierarchical_mesh;
+private:
+	std::vector<vertex_descriptor> refineVertex(vertex_descriptor vertex, SurfaceMesh & mesh);
+	std::vector<vertex_descriptor> refineEdge(edge_descriptor edge, SurfaceMesh & mesh);
+	void triangulate(SurfaceMesh & mesh);
+public:
+	std::vector<vertex_descriptor> refine(std::vector<edge_descriptor> edges, SurfaceMesh & mesh);
+public:
+	HierarchicalMeshRefinement(const HierarchicalMesh & hierarchical_mesh);
+};

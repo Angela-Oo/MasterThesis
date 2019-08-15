@@ -2,7 +2,7 @@
 
 #include "i_reader.h"
 #include "mesh_reader.h"
-#include "algo/triangulation/hierarchical_mesh.h"
+#include "algo/hierarchical_mesh/hierarchical_mesh.h"
 
 class HierarchicalDeformationGraphReader : public IMeshReader
 {

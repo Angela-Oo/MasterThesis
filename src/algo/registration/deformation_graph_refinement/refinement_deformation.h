@@ -1,8 +1,8 @@
 #pragma once
 
 #include "algo/registration/interface/i_registration.h"
+#include "algo/hierarchical_mesh/hierarchical_mesh.h"
 #include "mesh/mesh_definition.h"
-#include "algo/triangulation/hierarchical_mesh.h"
 
 namespace Registration {
 
