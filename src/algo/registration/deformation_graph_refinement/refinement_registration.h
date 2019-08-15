@@ -110,7 +110,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 		_deformation.non_rigid_deformation = refineHierarchicalMesh(_deformation);
 		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
 		_number_of_refinements++;
-		if(_number_of_refinements > 8)
+		if(_number_of_refinements > 4)
 			_is_refined = true;
 	}
 	else {

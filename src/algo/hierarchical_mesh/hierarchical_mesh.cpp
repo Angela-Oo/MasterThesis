@@ -97,10 +97,8 @@ std::vector<vertex_descriptor> HierarchicalMeshRefinement::refineVertex(vertex_d
 			color[v] = ml::vec4f(0., 1., 0., 1.);
 		auto cluster_id = mesh.property_map<vertex_descriptor, vertex_descriptor>("v:cluster").first;
 		auto finer_level_v = mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v").first;
-
 		
 		auto & child_mesh = _hierarchical_mesh._meshes[l + 1];
-		auto finer_level_v_test = child_mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v").first;
 
 		const std::vector<vertex_descriptor> & cluster = _hierarchical_mesh._vertex_cluster_map[l].at(cluster_id[v]);
 		for (auto c_v : cluster)
@@ -110,8 +108,13 @@ std::vector<vertex_descriptor> HierarchicalMeshRefinement::refineVertex(vertex_d
 				auto new_v = mesh.add_vertex(p);
 				levels[new_v] = l + 1;
 				cluster_id[new_v] = c_v;
-				finer_level_v[new_v] = finer_level_v_test[c_v];
+				
 				new_vertices.push_back(new_v);
+
+				auto next_finer_level_v = child_mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v");
+				if (next_finer_level_v.second) {
+					finer_level_v[new_v] = next_finer_level_v.first[c_v];
+				}
 			}
 		}
 	}
