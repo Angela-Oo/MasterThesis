@@ -42,6 +42,25 @@ public:
 	// without icp
 	RigidBeforeNonRigidRegistration(std::unique_ptr<RigidRegistration> rigid_registration,
 									std::unique_ptr<NonRigidRegistration> non_rigid_registration);
+
+	RigidBeforeNonRigidRegistration(const SurfaceMesh & source,
+									const SurfaceMesh & target,
+									ceres::Solver::Options ceres_option,
+									const RegistrationOptions & options,
+									std::shared_ptr<FileWriter> logger = nullptr);
+	RigidBeforeNonRigidRegistration(const SurfaceMesh & source,
+									const SurfaceMesh & target,
+									const Deformation & deformation_graph,
+									ceres::Solver::Options ceres_option,
+									const RegistrationOptions & options,
+									std::shared_ptr<FileWriter> logger = nullptr);
+	RigidBeforeNonRigidRegistration(const SurfaceMesh & source,
+									const SurfaceMesh & target,
+									const SurfaceMesh & previous_mesh, 
+									const Deformation & deformation_graph,
+									ceres::Solver::Options ceres_option,
+									const RegistrationOptions & options,
+									std::shared_ptr<FileWriter> logger = nullptr);
 };
 
 
@@ -165,6 +184,48 @@ RigidBeforeNonRigidRegistration<NonRigidRegistration>::RigidBeforeNonRigidRegist
 	, _finished_rigid_registration(false)
 {
 	_deformation.rigid_deformation = _rigid_registration->getRigidDeformation();
+}
+
+
+template<typename NonRigidRegistration>
+RigidBeforeNonRigidRegistration<NonRigidRegistration>::RigidBeforeNonRigidRegistration(const SurfaceMesh & source,
+																					   const SurfaceMesh & target,
+																					   ceres::Solver::Options ceres_option,
+																					   const RegistrationOptions & options,
+																					   std::shared_ptr<FileWriter> logger = nullptr)
+{
+	_rigid_registration = std::make_unique<RigidRegistration>(source, target, ceres_option, options, logger);
+	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, ceres_option, options, logger);
+}
+
+template<typename NonRigidRegistration>
+RigidBeforeNonRigidRegistration<NonRigidRegistration>::RigidBeforeNonRigidRegistration(const SurfaceMesh & source,
+																					   const SurfaceMesh & target,
+																					   const typename RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation> & deformation,
+																					   ceres::Solver::Options ceres_option,
+																					   const RegistrationOptions & options,
+																					   std::shared_ptr<FileWriter> logger = nullptr)
+{
+	_rigid_registration = std::make_unique<RigidRegistration>(source, target, deformation.rigid_deformation, ceres_option, options, logger);
+	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation.non_rigid_deformation, ceres_option, options, logger);
+}
+
+template<typename NonRigidRegistration>
+RigidBeforeNonRigidRegistration<NonRigidRegistration>::RigidBeforeNonRigidRegistration(const SurfaceMesh & source,
+																					   const SurfaceMesh & target,
+																					   const SurfaceMesh & previous_mesh,
+																					   const typename RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation> & deformation,
+																					   ceres::Solver::Options ceres_option,
+																					   const RegistrationOptions & options,
+																					   std::shared_ptr<FileWriter> logger = nullptr)
+{
+	if (options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation) {
+		_rigid_registration = std::make_unique<RigidRegistration>(source, target, previous_mesh, deformation.non_rigid_deformation.getRigidDeformation(), ceres_option, options, logger);
+	}
+	else {
+		_rigid_registration = std::make_unique<RigidRegistration>(source, target, previous_mesh, deformation.rigid_deformation, ceres_option, options, logger);
+	}
+	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation.non_rigid_deformation, ceres_option, options, logger);
 }
 
 }
