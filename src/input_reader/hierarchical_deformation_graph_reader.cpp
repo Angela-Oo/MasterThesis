@@ -44,10 +44,9 @@ HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shar
 		auto marked_edge_mesh = _hierarchical_mesh._mesh;
 		auto color = marked_edge_mesh.property_map<edge_descriptor, ml::vec4f>("e:color").first;
 		color[edge] = ml::vec4f(1., 0., 0., 1.);
-
 		
 		_hierarchical_mesh.refineEdge(edge);
-		_meshes.push_back(marked_edge_mesh);
+		//_meshes.push_back(marked_edge_mesh);
 		i++;
 		if (i > 5)
 			break;

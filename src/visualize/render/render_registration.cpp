@@ -44,7 +44,12 @@ Render RenderRegistration::nextRenderMeshMode()
 
 void RenderRegistration::saveCurrentWindowAsImage(std::string folder, std::string filename)
 {
-	_mesh_renderer->saveCurrentWindowAsImage(folder, filename);
+	try {
+		_mesh_renderer->saveCurrentWindowAsImage(folder, filename);
+	}
+	catch (...) {
+		std::cout << "could not save image " << filename << std::endl;
+	}
 }
 
 void RenderRegistration::renderMesh(std::string id, SurfaceMesh & mesh, ml::RGBColor color)
