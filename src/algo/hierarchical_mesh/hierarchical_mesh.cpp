@@ -14,6 +14,7 @@ std::map<vertex_descriptor, std::vector<vertex_descriptor>> cluster(const Surfac
 		for (Neighbor_search::iterator it = s.begin(); it != s.end(); ++it) {
 			auto nearest_v = it->first;
 			vertex_cluster_map[nearest_v].push_back(v);
+			break;
 		}		
 	}
 	return vertex_cluster_map;
@@ -28,14 +29,14 @@ Point add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original
 	auto normals = new_mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
 	auto finer_level_v = new_mesh.add_property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v", vertex_descriptor()).first;
 	auto level = new_mesh.add_property_map<vertex_descriptor, unsigned int>("v:level", 0).first;
-
+	auto cluster = new_mesh.add_property_map<vertex_descriptor, vertex_descriptor>("v:cluster", vertex_descriptor()).first;
 	auto point = original_mesh.point(v_original_mesh);
 	auto v = new_mesh.add_vertex(point);
 
 	finer_level_v[v] = v_original_mesh;
 	normals[v] = original_mesh_normals[v_original_mesh];
 	level[v] = original_mesh_level[v_original_mesh] - 1;
-
+	cluster[v] = v;
 	return point;
 }
 
@@ -90,20 +91,26 @@ std::vector<vertex_descriptor> HierarchicalMeshRefinement::refineVertex(vertex_d
 	auto l = levels[v];
 	if (!refined[v] && l < _hierarchical_mesh._meshes.size()) {
 		refined[v] = true;
-		color[v] = ml::vec4f(1., 0., 0., 1.);
+		if(l == 0)
+			color[v] = ml::vec4f(1., 0., 0., 1.);
+		else
+			color[v] = ml::vec4f(0., 1., 0., 1.);
+		auto cluster_id = mesh.property_map<vertex_descriptor, vertex_descriptor>("v:cluster").first;
 		auto finer_level_v = mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v").first;
 
+		
 		auto & child_mesh = _hierarchical_mesh._meshes[l + 1];
+		auto finer_level_v_test = child_mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v").first;
 
-		const std::vector<vertex_descriptor> & cluster = _hierarchical_mesh._vertex_cluster_map[l].at(v);
+		const std::vector<vertex_descriptor> & cluster = _hierarchical_mesh._vertex_cluster_map[l].at(cluster_id[v]);
 		for (auto c_v : cluster)
-		{
-			
+		{			
 			if (finer_level_v[v] != c_v) {
 				auto p = child_mesh.point(c_v);
 				auto new_v = mesh.add_vertex(p);
 				levels[new_v] = l + 1;
-				finer_level_v[new_v] = c_v;
+				cluster_id[new_v] = c_v;
+				finer_level_v[new_v] = finer_level_v_test[c_v];
 				new_vertices.push_back(new_v);
 			}
 		}

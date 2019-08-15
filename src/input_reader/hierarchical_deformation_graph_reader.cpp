@@ -39,20 +39,26 @@ HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shar
 	_meshes.insert(_meshes.end(), _hierarchical_mesh._meshes.rbegin(), _hierarchical_mesh._meshes.rend());
 	auto mesh_to_refine = _hierarchical_mesh.getInitMesh();
 
-	std::vector<edge_descriptor> edges;
-	int i = 0;
-	for (auto edge : mesh_to_refine.edges()) {
-		auto color = mesh_to_refine.property_map<edge_descriptor, ml::vec4f>("e:color").first;
-		color[edge] = ml::vec4f(1., 0., 0., 1.);
-		
-		edges.push_back(edge);
-		i++;
-		if (i > 5)
-			break;
-	}
-	HierarchicalMeshRefinement mesh_refinement(_hierarchical_mesh);
-	mesh_refinement.refine(edges, mesh_to_refine);
+	auto color = mesh_to_refine.property_map<edge_descriptor, ml::vec4f>("e:color").first;
+	
+	auto edge = *mesh_to_refine.edges().begin();
+	color[edge] = ml::vec4f(1., 0., 0., 1.);
+	_meshes.push_back(mesh_to_refine);
 
+	HierarchicalMeshRefinement mesh_refinement(_hierarchical_mesh);
+	auto vertices = mesh_refinement.refine({ edge }, mesh_to_refine);
+
+	_meshes.push_back(mesh_to_refine);
+
+	std::vector<edge_descriptor> edges;
+	for (auto v : vertices) {
+		auto edge = mesh_to_refine.edge(mesh_to_refine.halfedge(v));
+		color[edge] = ml::vec4f(0., 1., 0., 1.);
+		edges.push_back(edge);
+	}	
+	_meshes.push_back(mesh_to_refine);
+
+	mesh_refinement.refine(edges, mesh_to_refine);
 	_meshes.push_back(mesh_to_refine);
 }
 

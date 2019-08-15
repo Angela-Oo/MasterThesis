@@ -5,7 +5,7 @@
 #include <CGAL/Advancing_front_surface_reconstruction.h>
 #include <CGAL/Polygon_mesh_processing/repair.h>
 
-SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radius)
+SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radius, unsigned int level)
 {
 	SurfaceMeshPoissonDiskSampling poisson_disk_sampling(mesh, radius);
 	SurfaceMesh hierarchical_mesh = poisson_disk_sampling.create(add_vertex);
@@ -32,7 +32,8 @@ HierarchicalMesh generateHierarchicalMesh(const SurfaceMesh & mesh, double min_r
 
 	for (unsigned int i = 1; i < levels; ++i) {
 		double radius = min_radius * pow(2, meshes.size());
-		meshes.push_back(generateHierarchicalMeshLevel(meshes.back(), radius));
+		auto level = levels - i - 1;
+		meshes.push_back(generateHierarchicalMeshLevel(meshes.back(), radius, level));
 	}
 	std::reverse(meshes.begin(), meshes.end());
 	HierarchicalMesh hierarchical_mesh(meshes);
