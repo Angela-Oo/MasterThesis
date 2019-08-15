@@ -1,6 +1,7 @@
 #pragma once
 
 #include "rigid_before_non_rigid_deformation.h"
+#include "rigid_before_non_rigid_deform_mesh.h"
 #include "algo/registration/interface/i_registration.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/rigid_registration/rigid_registration.h"
@@ -14,6 +15,7 @@ class RigidBeforeNonRigidRegistration : public INonRigidRegistration
 {
 public:	
 	using Deformation = RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation>;
+	using DeformMesh = typename RigidBeforeNonRigidDeformMesh<typename NonRigidRegistration::Deformation, typename NonRigidRegistration::DeformMesh>;
 private:
 	Deformation _deformation;
 	std::unique_ptr<RigidRegistration> _rigid_registration;

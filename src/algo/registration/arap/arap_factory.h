@@ -3,7 +3,7 @@
 #include "arap.h"
 #include "util/file_writer.h"
 #include "mesh/mesh_definition.h"
-#include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
+
 #include <ceres/ceres.h>
 
 namespace Registration {
@@ -12,8 +12,6 @@ class ARAPFactory
 {
 public:
 	using Registration = AsRigidAsPossible;
-	using PositionDeformation = ARAPDeformation;
-	using DeformMesh = DeformationGraphDeformMesh<typename AsRigidAsPossible::Deformation>;
 private:
 	ceres::Solver::Options _ceres_options;
 	RegistrationOptions _options;

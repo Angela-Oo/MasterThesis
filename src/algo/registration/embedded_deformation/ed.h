@@ -3,6 +3,7 @@
 #include "ed_deformation.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
+#include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
 #include "algo/registration/interface/i_registration.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
@@ -20,7 +21,9 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 class EmbeddedDeformation : public INonRigidRegistration
 {
 public:
-	using Deformation = DeformationGraph<EDDeformation>;
+	using PositionDeformation = EDDeformation;
+	using Deformation = DeformationGraph<PositionDeformation>;
+	using DeformMesh = DeformationGraphDeformMesh<typename Deformation>;
 private:
 	SurfaceMesh _src;
 	SurfaceMesh _dst;

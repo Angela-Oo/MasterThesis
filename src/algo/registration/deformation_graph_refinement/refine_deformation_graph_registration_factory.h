@@ -16,8 +16,6 @@ class RefineDeformationGraphRegistrationFactory
 {
 public:
 	using Registration = typename RefineDeformationGraphRegistration<typename Factory::Registration>;
-	using PositionDeformation = typename Factory::PositionDeformation;
-	using DeformMesh = typename RefinementDeformMesh<typename Factory::Registration::Deformation, typename Factory::DeformMesh>;
 private:
 	Factory _non_rigid_factory;
 	const RegistrationOptions & _options;
@@ -47,8 +45,8 @@ std::unique_ptr<RefineDeformationGraphRegistration<typename Factory::Registratio
 RefineDeformationGraphRegistrationFactory<Factory>::operator()(const SurfaceMesh & source, const SurfaceMesh & target)
 {
 	auto hierarchicalMesh = generateHierarchicalMesh(source, _options.dg_options.edge_length, 4);
-	auto global = createGlobalDeformation<typename Factory::PositionDeformation>(source);
-	auto deformation_graph = createDeformationGraphFromMesh<typename Factory::PositionDeformation>(hierarchicalMesh._mesh, global);
+	auto global = createGlobalDeformation<typename Registration::PositionDeformation>(source);
+	auto deformation_graph = createDeformationGraphFromMesh<typename Registration::PositionDeformation>(hierarchicalMesh._mesh, global);
 	return std::make_unique<RefineDeformationGraphRegistration<typename Factory::Registration>>(_non_rigid_factory(source, target, deformation_graph), hierarchicalMesh);
 }
 

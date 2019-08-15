@@ -78,14 +78,14 @@ template<typename RegistrationFactory>
 SurfaceMesh SequenceRegistration<RegistrationFactory>::getInverseDeformedMesh(size_t frame)
 {
 	Deformation invert_deformation = _deformation[frame].invertDeformation();
-	auto deform_mesh = RegistrationFactory::DeformMesh(invert_deformation);
+	auto deform_mesh = RegistrationFactory::Registration::DeformMesh(invert_deformation);
 	return deform_mesh.deformedMesh(_mesh_sequence->getMesh(frame));
 }
 
 template<typename RegistrationFactory>
 SurfaceMesh SequenceRegistration<RegistrationFactory>::getDeformationGraphMesh(size_t frame)
 {
-	auto deform_mesh = RegistrationFactory::DeformMesh(_deformation[frame]);
+	auto deform_mesh = RegistrationFactory::Registration::DeformMesh(_deformation[frame]);
 	return deform_mesh.deformationGraphMesh();
 }
 

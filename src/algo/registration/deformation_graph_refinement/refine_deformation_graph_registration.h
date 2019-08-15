@@ -1,9 +1,10 @@
 #pragma once
 
+#include "refine_deformation_graph_deformation.h"
+#include "refinement_deform_mesh.h"
 #include "algo/registration/interface/i_registration.h"
 #include "mesh/mesh_definition.h"
 #include "deformation_graph_refinement.h"
-#include "refine_deformation_graph_deformation.h"
 
 namespace Registration {
 
@@ -12,6 +13,9 @@ class RefineDeformationGraphRegistration : public INonRigidRegistration
 {
 public:
 	using Deformation = RefineDeformationGraphDeformation<typename NonRigidRegistration::Deformation>;
+	using PositionDeformation = typename NonRigidRegistration::PositionDeformation;
+	using DeformMesh = typename RefinementDeformMesh<typename NonRigidRegistration::Deformation, typename NonRigidRegistration::DeformMesh>;
+private:
 	using NonRigidDeformation = typename NonRigidRegistration::Deformation;
 private:
 	Deformation _deformation;

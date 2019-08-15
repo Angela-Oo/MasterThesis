@@ -1,6 +1,6 @@
 #pragma once
 
-#include "rigid_before_non_rigid_deform_mesh.h"
+
 #include "rigid_before_non_rigid_registration.h"
 #include "rigid_before_non_rigid_deformation.h"
 #include "util/file_writer.h"
@@ -15,10 +15,10 @@ namespace Registration {
 template<typename Factory>
 class RigidBeforeNonRigidRegistrationFactory
 {
-public:
-	using NonRigidRegistration = typename Factory::Registration;
+public:	
 	using Registration = typename RigidBeforeNonRigidRegistration<typename Factory::Registration>;
-	using DeformMesh = typename RigidBeforeNonRigidDeformMesh<typename Factory::Registration::Deformation, typename Factory::DeformMesh>;
+private:
+	using NonRigidRegistration = typename Factory::Registration;
 private:
 	RigidFactory _rigid_factory;
 	Factory _non_rigid_factory;

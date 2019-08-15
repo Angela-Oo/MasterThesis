@@ -6,6 +6,7 @@
 #include "mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
+#include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include <ceres/ceres.h>
@@ -19,7 +20,9 @@ typedef std::map<edge_descriptor, ResidualIds> EdgeResidualIds;
 class AsRigidAsPossible : public INonRigidRegistration
 {
 public:
-	using Deformation = DeformationGraph<ARAPDeformation>;
+	using PositionDeformation = ARAPDeformation;
+	using Deformation = DeformationGraph<PositionDeformation>;
+	using DeformMesh = DeformationGraphDeformMesh<typename Deformation>;
 private:
 	SurfaceMesh _src;
 	SurfaceMesh _dst;

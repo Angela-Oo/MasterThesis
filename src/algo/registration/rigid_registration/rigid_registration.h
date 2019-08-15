@@ -19,6 +19,7 @@ class RigidRegistration : public IRegistration
 {
 public:
 	using Deformation = RigidDeformation;
+	using DeformMesh = RigidDeformedMesh;
 private:
 	SurfaceMesh _source;
 	SurfaceMesh _target;

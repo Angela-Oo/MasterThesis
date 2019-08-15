@@ -11,7 +11,6 @@ class RigidFactory
 {
 public:
 	using Registration = RigidRegistration;
-	using DeformMesh = RigidDeformedMesh;
 private:
 	ceres::Solver::Options _ceres_options;
 	RegistrationOptions _options;
