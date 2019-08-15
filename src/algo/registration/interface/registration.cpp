@@ -24,12 +24,12 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationTy
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP_AllFrames) {
 		//using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<ARAPFactory>;
-		using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<RefineDeformationGraphRegistrationFactory<ARAPFactory>>;
+		using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<RefineDeformationGraphRegistration<AsRigidAsPossible>>;
 		SequenceARAPFactory factory(options, ceres_options, logger);
 		return std::make_unique<SequenceRegistration<SequenceARAPFactory>>(mesh_sequence, factory, options, logger);
 	}
 	else if (type == RegistrationType::ED_AllFrames) {
-		using SequenceEDFactory = RigidBeforeNonRigidRegistrationFactory<EmbeddedDeformationFactory>;
+		using SequenceEDFactory = RigidBeforeNonRigidRegistrationFactory<EmbeddedDeformation>;
 		SequenceEDFactory factory(options, ceres_options, logger);
 		return std::make_unique<SequenceRegistration<SequenceEDFactory>>(mesh_sequence, factory, options, logger);
 	}
@@ -53,12 +53,12 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP) {
 		//RigidBeforeNonRigidRegistrationFactory<RefineDeformationGraphRegistrationFactory<ARAPFactory>> factory(options, ceres_options, logger);
-		RefineDeformationGraphRegistrationFactory<ARAPFactory> factory(options, ceres_options, logger);
+		RefineDeformationGraphRegistrationFactory<AsRigidAsPossible> factory(options, ceres_options, logger);
 		//RigidBeforeNonRigidRegistrationFactory<ARAPFactory> factory(options, ceres_options, logger);
 		return factory(source, target);
 	}
 	else if (type == RegistrationType::ED) {
-		RigidBeforeNonRigidRegistrationFactory<EmbeddedDeformationFactory> factory(options, ceres_options, logger);
+		RigidBeforeNonRigidRegistrationFactory<EmbeddedDeformation> factory(options, ceres_options, logger);
 		return factory(source, target);
 	}
 	else if (type == RegistrationType::ARAP_Without_RIGID) {

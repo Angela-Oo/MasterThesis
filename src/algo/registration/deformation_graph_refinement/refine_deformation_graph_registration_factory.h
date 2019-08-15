@@ -11,21 +11,22 @@
 
 namespace Registration {
 
-template<typename Factory>
+template<typename NonRigidRegistration>
 class RefineDeformationGraphRegistrationFactory
 {
 public:
-	using Registration = typename RefineDeformationGraphRegistration<typename Factory::Registration>;
+	using Registration = typename RefineDeformationGraphRegistration<typename NonRigidRegistration>;
 private:
-	Factory _non_rigid_factory;
-	const RegistrationOptions & _options;
+	ceres::Solver::Options _ceres_options;
+	RegistrationOptions _options;
+	std::shared_ptr<FileWriter> _logger;
 public:
-	std::unique_ptr<RefineDeformationGraphRegistration<typename Factory::Registration>> operator()(const SurfaceMesh & source,
+	std::unique_ptr<RefineDeformationGraphRegistration<typename NonRigidRegistration>> operator()(const SurfaceMesh & source,
 																								   const SurfaceMesh & target);
-	std::unique_ptr<RefineDeformationGraphRegistration<typename Factory::Registration>> operator()(const SurfaceMesh & source,
+	std::unique_ptr<RefineDeformationGraphRegistration<typename NonRigidRegistration>> operator()(const SurfaceMesh & source,
 																								   const SurfaceMesh & target,
 																								   const typename Registration::Deformation & deformation_graph);
-	std::unique_ptr<RefineDeformationGraphRegistration<typename Factory::Registration>> operator()(const SurfaceMesh & source,
+	std::unique_ptr<RefineDeformationGraphRegistration<typename NonRigidRegistration>> operator()(const SurfaceMesh & source,
 																								   const SurfaceMesh & target,
 																								   const SurfaceMesh & previous_mesh, // used for non rigid registration
 																								   const typename Registration::Deformation & deformation_graph);
@@ -40,53 +41,58 @@ public:
 
 
 
-template<typename Factory>
-std::unique_ptr<RefineDeformationGraphRegistration<typename Factory::Registration>>
-RefineDeformationGraphRegistrationFactory<Factory>::operator()(const SurfaceMesh & source, const SurfaceMesh & target)
+template<typename NonRigidRegistration>
+std::unique_ptr<RefineDeformationGraphRegistration<typename NonRigidRegistration>>
+RefineDeformationGraphRegistrationFactory<NonRigidRegistration>::operator()(const SurfaceMesh & source, const SurfaceMesh & target)
 {
 	auto hierarchicalMesh = generateHierarchicalMesh(source, _options.dg_options.edge_length, 4);
 	auto global = createGlobalDeformation<typename Registration::PositionDeformation>(source);
 	auto deformation_graph = createDeformationGraphFromMesh<typename Registration::PositionDeformation>(hierarchicalMesh._mesh, global);
-	return std::make_unique<RefineDeformationGraphRegistration<typename Factory::Registration>>(_non_rigid_factory(source, target, deformation_graph), hierarchicalMesh);
+
+	auto non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation_graph, _ceres_options, _options, _logger);
+	return std::make_unique<RefineDeformationGraphRegistration<typename NonRigidRegistration>>(std::move(non_rigid_registration), hierarchicalMesh);
 }
 
-template<typename Factory>
-std::unique_ptr<RefineDeformationGraphRegistration<typename Factory::Registration>>
-RefineDeformationGraphRegistrationFactory<Factory>::operator()(const SurfaceMesh & source,
+template<typename NonRigidRegistration>
+std::unique_ptr<RefineDeformationGraphRegistration<typename NonRigidRegistration>>
+RefineDeformationGraphRegistrationFactory<NonRigidRegistration>::operator()(const SurfaceMesh & source,
 															   const SurfaceMesh & target,
-															   const typename RefineDeformationGraphRegistration<typename Factory::Registration>::Deformation & deformation)
+															   const typename RefineDeformationGraphRegistration<typename NonRigidRegistration>::Deformation & deformation)
 {
-	return std::make_unique<RefineDeformationGraphRegistration<typename Factory::Registration>>(_non_rigid_factory(source, target, deformation.non_rigid_deformation), deformation.hierarchical_mesh);
+	auto non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation.non_rigid_deformation, _ceres_options, _options, _logger);
+	return std::make_unique<RefineDeformationGraphRegistration<typename NonRigidRegistration>>(std::move(non_rigid_registration), deformation.hierarchical_mesh);
 }
 
-template<typename Factory>
-std::unique_ptr<RefineDeformationGraphRegistration<typename Factory::Registration>>
-RefineDeformationGraphRegistrationFactory<Factory>::operator()(const SurfaceMesh & source,
+template<typename NonRigidRegistration>
+std::unique_ptr<RefineDeformationGraphRegistration<typename NonRigidRegistration>>
+RefineDeformationGraphRegistrationFactory<NonRigidRegistration>::operator()(const SurfaceMesh & source,
 															   const SurfaceMesh & target,
 															   const SurfaceMesh & previous_mesh,
-															   const typename RefineDeformationGraphRegistration<typename Factory::Registration>::Deformation & deformation)
+															   const typename RefineDeformationGraphRegistration<typename NonRigidRegistration>::Deformation & deformation)
 {
-	return std::make_unique<RefineDeformationGraphRegistration<typename Factory::Registration>>(_non_rigid_factory(source, target, previous_mesh, deformation), deformation.hierarchical_mesh);
+	return this->(source, target, deformation);
+	//std::make_unique<RefineDeformationGraphRegistration<typename NonRigidRegistration>>(_non_rigid_factory(source, target, previous_mesh, deformation), deformation.hierarchical_mesh);
 }
 
-template<typename Factory>
-void RefineDeformationGraphRegistrationFactory<Factory>::setFixedPositions(std::vector<vertex_descriptor> fixed_positions)
+template<typename NonRigidRegistration>
+void RefineDeformationGraphRegistrationFactory<NonRigidRegistration>::setFixedPositions(std::vector<vertex_descriptor> fixed_positions)
 {
-	_non_rigid_factory.setFixedPositions(fixed_positions);
 }
 
-template<typename Factory>
-std::string RefineDeformationGraphRegistrationFactory<Factory>::registrationType()
+template<typename NonRigidRegistration>
+std::string RefineDeformationGraphRegistrationFactory<NonRigidRegistration>::registrationType()
 {
-	return _non_rigid_factory.registrationType();
+	return "todo"; // todo
+	//return _non_rigid_factory.registrationType();
 }
 
 template<typename Factory>
 RefineDeformationGraphRegistrationFactory<Factory>::RefineDeformationGraphRegistrationFactory(const RegistrationOptions & options,
 																							  const ceres::Solver::Options & ceres_options,
 																							  std::shared_ptr<FileWriter> logger)
-	: _non_rigid_factory(options, ceres_options, logger)
-	, _options(options)
+	: _options(options)
+	, _ceres_options(ceres_options)
+	, _logger(logger)
 { }
 
 

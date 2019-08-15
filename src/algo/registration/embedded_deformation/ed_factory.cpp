@@ -13,14 +13,14 @@ std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(cons
 	auto global = createGlobalDeformation<EDDeformation>(source);
 	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
 
-	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger);
+	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options, _logger);
 }
 
 std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(const SurfaceMesh & source,
 																			const SurfaceMesh & target,
 																			const EmbeddedDeformation::Deformation & deformation_graph)
 {
-	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options.evaluate_residuals, _logger);
+	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, _ceres_options, _options, _logger);
 }
 
 std::unique_ptr<EmbeddedDeformation> EmbeddedDeformationFactory::operator()(const SurfaceMesh & source,

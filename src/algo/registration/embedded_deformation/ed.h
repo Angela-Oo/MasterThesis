@@ -25,9 +25,10 @@ public:
 	using Deformation = DeformationGraph<PositionDeformation>;
 	using DeformMesh = DeformationGraphDeformMesh<typename Deformation>;
 private:
-	SurfaceMesh _src;
-	SurfaceMesh _dst;
-	ceres::Solver::Options _options;
+	SurfaceMesh _source;
+	SurfaceMesh _target;
+	ceres::Solver::Options _ceres_option;
+	RegistrationOptions _options;
 	DeformationGraph<EDDeformation> _deformation_graph;
 	std::unique_ptr<DeformedMesh<Deformation>> _deformed_mesh;
 	std::vector<vertex_descriptor> _fixed_positions;
@@ -39,7 +40,6 @@ private:
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 100;
-	bool _evaluate_residuals;
 public:
 	double a_rigid;
 	double a_smooth;
@@ -82,20 +82,25 @@ public:
 	bool shouldBeSavedAsImage() override;
 public:
 	// without icp
-	EmbeddedDeformation(const SurfaceMesh& src,
-						const SurfaceMesh& dst,
+	EmbeddedDeformation(const SurfaceMesh& source,
+						const SurfaceMesh& target,
 						std::vector<vertex_descriptor> fixed_positions,
 						const DeformationGraph<EDDeformation> & deformation_graph,
-						ceres::Solver::Options option,
-						bool evaluate_residuals,
+						ceres::Solver::Options ceres_option,
+						const RegistrationOptions & options,
 						std::shared_ptr<FileWriter> logger);
 
+	EmbeddedDeformation(const SurfaceMesh& source,
+						const SurfaceMesh& target,
+						ceres::Solver::Options ceres_option,
+						const RegistrationOptions & options,
+						std::shared_ptr<FileWriter> logger);
 	// with icp
-	EmbeddedDeformation(const SurfaceMesh& src,
-						const SurfaceMesh& dst,
+	EmbeddedDeformation(const SurfaceMesh& source,
+						const SurfaceMesh& target,
 						const DeformationGraph<EDDeformation> & deformation_graph,
-						ceres::Solver::Options option,
-						bool evaluate_residuals = false,
+						ceres::Solver::Options ceres_option,
+						const RegistrationOptions & options,
 						std::shared_ptr<FileWriter> logger = nullptr);
 };
 

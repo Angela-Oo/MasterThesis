@@ -10,12 +10,12 @@ namespace ED {
 
 const SurfaceMesh & EmbeddedDeformation::getSource()
 {
-	return _src;
+	return _source;
 }
 
 const SurfaceMesh & EmbeddedDeformation::getTarget()
 {
-	return _dst;
+	return _target;
 }
 
 SurfaceMesh EmbeddedDeformation::getDeformedPoints()
@@ -26,7 +26,7 @@ SurfaceMesh EmbeddedDeformation::getDeformedPoints()
 SurfaceMesh EmbeddedDeformation::getInverseDeformedPoints()
 {
 	auto inverse_deformation = _deformation_graph.invertDeformation();
-	DeformedMesh<Deformation> deformed(_dst, inverse_deformation, 4); // todo
+	DeformedMesh<Deformation> deformed(_target, inverse_deformation, 4); // todo
 	return deformed.deformPoints();
 }
 
@@ -34,7 +34,7 @@ std::vector<Point> EmbeddedDeformation::getFixedPostions()
 {
 	std::vector<Point> positions;
 	for (auto & v : _fixed_positions) {
-		positions.push_back(_dst.point(v));
+		positions.push_back(_target.point(v));
 	}
 	return positions;
 }
@@ -53,12 +53,12 @@ void EmbeddedDeformation::setDeformation(const Deformation & deformation_graph)
 	_solve_iteration = 0;
 
 	_deformation_graph = deformation_graph;
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_src, _deformation_graph, 4);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, 4);
 }
 
 SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
 {
-	return deformationGraphToSurfaceMesh(_deformation_graph, _evaluate_residuals);
+	return deformationGraphToSurfaceMesh(_deformation_graph, _options.evaluate_residuals);
 }
 
 ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor v, const Point & target_point)
@@ -114,13 +114,13 @@ VertexResidualIds EmbeddedDeformation::addFitCostWithoutICP(ceres::Problem &prob
 	VertexResidualIds residual_ids;
 	auto & mesh = _deformation_graph._mesh;
 	
-	auto target_normals = _dst.property_map<vertex_descriptor, Vector>("v:normal").first;
+	auto target_normals = _target.property_map<vertex_descriptor, Vector>("v:normal").first;
 	for (auto & v : mesh.vertices())
 	{
 		if (_fixed_positions.empty() || (std::find(_fixed_positions.begin(), _fixed_positions.end(), v) != _fixed_positions.end()))
 		{
-			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _dst.point(v)));
-			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _dst.point(v), target_normals[v]));
+			residual_ids[v].push_back(addPointToPointCostForNode(problem, v, _target.point(v)));
+			residual_ids[v].push_back(addPointToPlaneCostForNode(problem, v, _target.point(v), target_normals[v]));
 		}
 	}
 	return residual_ids;
@@ -236,9 +236,9 @@ bool EmbeddedDeformation::solveIteration()
 		problem.AddResidualBlock(cost_function, loss_function, _deformation_graph._global.r());
 
 
-		ceres::Solve(_options, &problem, &summary);
+		ceres::Solve(_ceres_option, &problem, &summary);
 
-		if(_evaluate_residuals)
+		if(_options.evaluate_residuals)
 			evaluateResidual(problem, fit_residual_ids, smooth_residual_ids, rotation_residual_ids, conf_residual_ids);
 
 		_last_cost = _current_cost;
@@ -273,7 +273,7 @@ bool EmbeddedDeformation::solve()
 
 bool EmbeddedDeformation::finished()
 {
-	double tol = _options.function_tolerance;
+	double tol = _ceres_option.function_tolerance;
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
 	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
@@ -324,48 +324,69 @@ void EmbeddedDeformation::setParameters()
 }
 
 
-EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
-										 const SurfaceMesh& dst,
+EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
+										 const SurfaceMesh& target,
 										 std::vector<vertex_descriptor> fixed_positions,
 										 const DeformationGraph<EDDeformation> & deformation_graph,
-										 ceres::Solver::Options option,
-										 bool evaluate_residuals,
+										 ceres::Solver::Options ceres_option,
+										 const RegistrationOptions & options,
 										 std::shared_ptr<FileWriter> logger)
-	: _src(src)
-	, _dst(dst)
-	, _options(option)
+	: _source(source)
+	, _target(target)
+	, _ceres_option(ceres_option)
+	, _options(options)
 	, _deformation_graph(deformation_graph)
 	, _fixed_positions(fixed_positions)
-	, _evaluate_residuals(evaluate_residuals)
 	, _ceres_logger(logger)
 	, _with_icp(false)
 {
 	setParameters();
 	a_smooth = 10.;
 	a_fit = 10.;
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation, 10.);
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(src, _deformation_graph, 4); // todo
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, 4); // todo
+}
+
+EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
+										 const SurfaceMesh& target,
+										 ceres::Solver::Options ceres_option,
+										 const RegistrationOptions & options,
+										 std::shared_ptr<FileWriter> logger)
+	: _source(source)
+	, _target(target)
+	, _ceres_option(ceres_option)
+	, _options(options)
+	, _ceres_logger(logger)
+	, _with_icp(true)
+{
+	auto reduced_mesh = createReducedMesh(source, _options.dg_options.edge_length, _options.mesh_reduce_strategy);
+	auto global = createGlobalDeformation<EDDeformation>(_source);
+	_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
+
+	setParameters();
+
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, 4); // todo
 }
 
 
-
-EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& src,
-										 const SurfaceMesh& dst,
+EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
+										 const SurfaceMesh& target,
 										 const DeformationGraph<EDDeformation> & deformation_graph,
-										 ceres::Solver::Options option,
-										 bool evaluate_residuals,
+										 ceres::Solver::Options ceres_option,
+										 const RegistrationOptions & options,
 										 std::shared_ptr<FileWriter> logger)
-	: _src(src)
-	, _dst(dst)
-	, _options(option)
+	: _source(source)
+	, _target(target)
+	, _ceres_option(ceres_option)
+	, _options(options)
 	, _deformation_graph(deformation_graph)
-	, _evaluate_residuals(evaluate_residuals)
 	, _ceres_logger(logger)
 	, _with_icp(true)
 {
 	setParameters();
-	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(dst, _find_max_distance, _find_max_angle_deviation, 10.);
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(src, _deformation_graph, 4); // todo
+	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, 4); // todo
 }
 
 
@@ -391,7 +412,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	auto global = createGlobalDeformation<EDDeformation>(reduced_mesh);
 	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
-	return std::make_unique<EmbeddedDeformation>(src, dst, fixed_positions, deformation_graph, option, registration_options.evaluate_residuals, logger);
+	return std::make_unique<EmbeddedDeformation>(src, dst, fixed_positions, deformation_graph, option, registration_options, logger);
 }
 
 
@@ -404,7 +425,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	auto global = createGlobalDeformation<EDDeformation>(reduced_mesh);
 	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
-	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options.evaluate_residuals, logger);
+	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options, logger);
 }
 
 
@@ -418,7 +439,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
 	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
-	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options.evaluate_residuals, logger);
+	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options, logger);
 }
 
 
@@ -432,7 +453,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 {
 	auto global = createGlobalDeformationFromRigidDeformation(rigid_deformation);
 	auto new_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(deformation_graph._mesh, global);
-	return std::make_unique<EmbeddedDeformation>(src, dst, new_deformation_graph, option, registration_options.evaluate_residuals, logger);
+	return std::make_unique<EmbeddedDeformation>(src, dst, new_deformation_graph, option, registration_options, logger);
 }
 
 

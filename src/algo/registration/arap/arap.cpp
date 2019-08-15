@@ -411,6 +411,25 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 	//	evaluateResiduals(_deformation_graph._mesh, problem, conf_residual_block_ids, conf_cost.first, a_conf);
 }
 
+void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
+{
+	_current_cost = 1.;
+	_last_cost = 2.;
+	_solve_iteration = 0;
+
+	_deformation_graph = deformation_graph;
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
+}
+
+void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)
+{
+	_deformation_graph.setRigidDeformation(rigid_deformation);// createGlobalDeformationFromRigidDeformation(rigid_deformation));
+}
+
+bool AsRigidAsPossible::shouldBeSavedAsImage()
+{
+	return finished();
+}
 
 void AsRigidAsPossible::init()
 {
@@ -436,25 +455,6 @@ void AsRigidAsPossible::init()
 	}
 }
 
-void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
-{
-	_current_cost = 1.;
-	_last_cost = 2.;
-	_solve_iteration = 0;
-
-	_deformation_graph = deformation_graph;
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
-}
-
-void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)
-{
-	_deformation_graph.setRigidDeformation(rigid_deformation);// createGlobalDeformationFromRigidDeformation(rigid_deformation));
-}
-
-bool AsRigidAsPossible::shouldBeSavedAsImage()
-{
-	return finished();
-}
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
@@ -472,6 +472,24 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _registration_options(registration_options)
 	, _with_icp(false)
 {
+	init();
+}
+
+
+AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
+									 const SurfaceMesh& target,
+									 ceres::Solver::Options option,
+									 const RegistrationOptions & registration_options,
+									 std::shared_ptr<FileWriter> logger)
+	: _src(source)
+	, _dst(target)
+	, _options(option)
+	, _ceres_logger(logger)
+	, _registration_options(registration_options)
+{
+	auto reduced_mesh = createReducedMesh(source, _registration_options.dg_options.edge_length, _registration_options.mesh_reduce_strategy);
+	auto global = createGlobalDeformation<ARAPDeformation>(source);
+	_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
 	init();
 }
 

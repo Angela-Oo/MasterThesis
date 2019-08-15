@@ -83,7 +83,14 @@ public:
 	AsRigidAsPossible(const SurfaceMesh& src,
 					  const SurfaceMesh& dst,
 					  std::vector<vertex_descriptor> fixed_positions,
-					  const DeformationGraph<ARAPDeformation> & deformation_graph,
+					  const Deformation & deformation_graph,
+					  ceres::Solver::Options option,
+					  const RegistrationOptions & registration_options,
+					  std::shared_ptr<FileWriter> logger = nullptr);
+
+	// generate deformation graph
+	AsRigidAsPossible(const SurfaceMesh& src,
+					  const SurfaceMesh& dst,
 					  ceres::Solver::Options option,
 					  const RegistrationOptions & registration_options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
@@ -91,7 +98,7 @@ public:
 	// with icp
 	AsRigidAsPossible(const SurfaceMesh& src,
 					  const SurfaceMesh& dst,
-					  const DeformationGraph<ARAPDeformation> & deformation_graph,
+					  const Deformation & deformation_graph,
 					  ceres::Solver::Options option,
 					  const RegistrationOptions & registration_options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
