@@ -10,8 +10,8 @@
 #include "algo/registration/rigid_before_non_rigid_registration/rigid_before_non_rigid_registration_factory.h"
 
 #include "algo/registration/sequence_registration/sequence_registration.h"
-#include "algo/registration/sequence_registration/refine_deformation_graph_registration_factory.h"
-#include "algo/registration/sequence_registration/refine_deformation_graph_registration.h"
+#include "algo/registration/deformation_graph_refinement/refine_deformation_graph_registration_factory.h"
+#include "algo/registration/deformation_graph_refinement/refine_deformation_graph_registration.h"
 
 namespace Registration {
 

@@ -103,11 +103,14 @@
     <Filter Include="2 algo\4 registration\8 ridid before non rigid deformation">
       <UniqueIdentifier>{4d5bfdda-b0a3-457b-85d9-1eb28279e6a1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2 algo\4 registration\9 sequence registration">
-      <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="2 algo\5 registration evaluation">
       <UniqueIdentifier>{a6c1516d-ac45-4659-a6b9-82a24263f324}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2 algo\4 registration\9 deformation graph refinement">
+      <UniqueIdentifier>{0fef68b0-71f7-49b5-bb89-c370b181c472}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2 algo\4 registration\10 sequence registration">
+      <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -651,7 +654,7 @@
       <Filter>2 algo\4 registration\1 options</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h">
-      <Filter>2 algo\4 registration\9 sequence registration</Filter>
+      <Filter>2 algo\4 registration\10 sequence registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\interface\registration.h">
       <Filter>2 algo\4 registration\0 interface</Filter>
@@ -670,12 +673,6 @@
     </ClInclude>
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deform_mesh.h">
       <Filter>2 algo\4 registration\8 ridid before non rigid deformation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\sequence_registration\refine_deformation_graph_registration.h">
-      <Filter>2 algo\4 registration\9 sequence registration</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\sequence_registration\refine_deformation_graph_registration_factory.h">
-      <Filter>2 algo\4 registration\9 sequence registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\surface_mesh\mesh_operations.h">
       <Filter>2 algo\0 surface mesh</Filter>
@@ -718,6 +715,15 @@
     </ClInclude>
     <ClInclude Include="src\algo\triangulation\surface_mesh_poisson_disk_sampling.h">
       <Filter>2 algo\3 triangulation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_registration.h">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_registration_factory.h">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_deformation.h">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
