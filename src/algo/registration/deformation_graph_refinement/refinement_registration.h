@@ -122,12 +122,11 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 template<typename NonRigidRegistration>
 size_t RefineDeformationGraphRegistration<NonRigidRegistration>::currentIteration()
 {
-	//if (_current_iteration == 0)
-	//	return _current_iteration;
-	//else
-	//	return _number_of_refinements + 1;// _current_iteration;
-
-	return _current_iteration;
+	if (_current_iteration == 0)
+		return _current_iteration;
+	else
+		return _number_of_refinements + 1;
+	//return _current_iteration;
 }
 
 template<typename NonRigidRegistration>

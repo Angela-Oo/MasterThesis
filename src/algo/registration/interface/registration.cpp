@@ -42,11 +42,12 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 {
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP) {
-		//return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>(source, target, ceres_options, options, logger);
-		return std::make_unique<RefineDeformationGraphRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
+		return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>(source, target, ceres_options, options, logger);
+		//return std::make_unique<RefineDeformationGraphRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::ED) {
-		return std::make_unique<RigidBeforeNonRigidRegistration<EmbeddedDeformation>>(source, target, ceres_options, options, logger);
+		return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<EmbeddedDeformation>>>(source, target, ceres_options, options, logger);
+		//return std::make_unique<RigidBeforeNonRigidRegistration<EmbeddedDeformation>>(source, target, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::ARAP_Without_RIGID) {
 		return std::make_unique<AsRigidAsPossible>(source, target, ceres_options, options, logger);
