@@ -67,12 +67,7 @@ SurfaceMesh RefineDeformationGraphRegistration<NonRigidRegistration>::getInverse
 template<typename NonRigidRegistration>
 SurfaceMesh RefineDeformationGraphRegistration<NonRigidRegistration>::getDeformationGraphMesh()
 {
-	if (_is_refined) {
-		return deformationGraphToSurfaceMesh(_refined, true);
-	}
-	else {
-		return _non_rigid_registration->getDeformationGraphMesh();
-	}
+	return _non_rigid_registration->getDeformationGraphMesh();
 };
 
 template<typename NonRigidRegistration>
@@ -99,6 +94,11 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 template<typename NonRigidRegistration>
 size_t RefineDeformationGraphRegistration<NonRigidRegistration>::currentIteration()
 {
+	//if (_current_iteration == 0)
+	//	return _current_iteration;
+	//else
+	//	return _number_of_refinements + 1;// _current_iteration;
+
 	return _current_iteration;
 }
 
@@ -117,12 +117,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::finished()
 template<typename NonRigidRegistration>
 const typename NonRigidRegistration::Deformation & RefineDeformationGraphRegistration<NonRigidRegistration>::getDeformation()
 {
-	//if (_is_refined) {
-	//	return _refined;
-	//}
-	//else {
 	return _non_rigid_registration->getDeformation();
-	//}
 }
 
 template<typename NonRigidRegistration>
@@ -134,6 +129,9 @@ void RefineDeformationGraphRegistration<NonRigidRegistration>::setRigidDeformati
 template<typename NonRigidRegistration>
 bool RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
 {
+	//bool save = _non_rigid_registration->shouldBeSavedAsImage();
+	//bool registration_finished = _non_rigid_registration->finished();
+	//return (save && registration_finished);
 	return _non_rigid_registration->shouldBeSavedAsImage();
 }
 

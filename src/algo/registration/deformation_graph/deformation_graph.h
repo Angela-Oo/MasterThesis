@@ -90,15 +90,14 @@ Point DeformationGraph<PositionDeformation>::deformPoint(const Point & point, co
 {
 	Vector deformed_point(0., 0., 0.);
 
-	auto & property_map_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
-	assert(property_map_nodes.second);
-	auto & nodes = property_map_nodes.first;
-
+	// vi' = sum_j  wj(vi) * [ Rj(vi - gj) + gj + tj ]
 	for (auto n_w : nearest_nodes.node_weight_vector)
 	{
 		double w = n_w.second;
-		auto node = getDeformation(n_w.first);
-		Vector transformed_point = node.deformPosition(point) - CGAL::ORIGIN;
+		auto deformation = getDeformation(n_w.first);
+		//  [ Rj(vi - gj) + gj + tj ]
+		Vector transformed_point = deformation.deformPosition(point) - CGAL::ORIGIN;
+		//  wj(vi) * [ Rj(vi - gj) + gj + tj ]
 		transformed_point *= w;
 		deformed_point += transformed_point;
 	}
@@ -131,7 +130,7 @@ Vector DeformationGraph<PositionDeformation>::deformNormal(const Vector & normal
 template <typename PositionDeformation>
 PositionDeformation & DeformationGraph<PositionDeformation>::getDeformation(vertex_descriptor node_index) const
 {
-	auto deformation_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation"); // todo needs to be unique ptr (deep copy not possible)
+	auto deformation_nodes = _mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation");
 	assert(deformation_nodes.second);
 	return deformation_nodes.first[node_index];
 }

@@ -22,14 +22,12 @@ SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_g
 template <typename DeformationGraph>
 NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Point point, unsigned int k)
 {
-	//auto point = _mesh.point(v);
-
 	std::vector<vertex_descriptor> nearest_deformation_nodes = deformation_graph.getKNearestNodes(point, k + 1);
 
 	// calculate weights
 
-	// max distance
-	vertex_descriptor last_node_descriptor = nearest_deformation_nodes[nearest_deformation_nodes.size() - 1];
+	// max distance d_max distance to the k+1 node
+	vertex_descriptor last_node_descriptor = nearest_deformation_nodes.back();
 	Point last_node = deformation_graph.getDeformation(last_node_descriptor).position();
 	double d_max = std::sqrt(CGAL::squared_distance(point, last_node));
 	if (nearest_deformation_nodes.size() < 2) {
@@ -38,18 +36,21 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 	}
 
 	// calculate weight per deformation node
+	// wj(vi) = (1. - || vi - gj || / d_max)^2
 	std::vector<std::pair<vertex_descriptor, double>> vertex_weight_vector;
 	double sum = 0.;
 	for (size_t i = 0; i < nearest_deformation_nodes.size() - 1; ++i)
 	{
 		vertex_descriptor v = nearest_deformation_nodes[i];
 		Point node_point = deformation_graph.getDeformation(v).position();
+
 		double distance = std::sqrt(CGAL::squared_distance(point, node_point));
-		double weight = std::pow(1. - (distance / d_max), 2);
+		double weight = 1. - (distance / d_max);
+		weight = std::pow(weight, 2);
 		vertex_weight_vector.push_back(std::make_pair(v, weight));
 		sum += weight;
 	}
-	// divide by sum
+	// normalize weights by dividing through the sum of all weights
 	std::for_each(vertex_weight_vector.begin(), vertex_weight_vector.end(), [sum](std::pair<vertex_descriptor, double> & v_w) { v_w.second = v_w.second / sum; });
 
 	if (vertex_weight_vector.size() < k) {
@@ -71,8 +72,6 @@ private:
 	const DeformationGraph & _deformation_graph;
 	SurfaceMesh _mesh;
 	unsigned int _k; // number of interpolated deformation graph nodes per vertex
-private:
-	//NearestNodes createNearestNodes(vertex_descriptor v) const;
 public:
 	CGAL::Iterator_range<SurfaceMesh::Vertex_iterator> vertices() const;
 	uint32_t number_of_vertices() const;
