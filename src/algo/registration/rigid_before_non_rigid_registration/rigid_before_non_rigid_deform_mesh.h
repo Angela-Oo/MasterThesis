@@ -8,7 +8,7 @@
 namespace Registration
 {
 
-template <typename NonRigidDeformation>
+template <typename NonRigidDeformation, typename DeformMesh>
 class RigidBeforeNonRigidDeformMesh
 {
 private:
@@ -21,34 +21,34 @@ public:
 	RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation, unsigned int number_of_interpolation_neighbors = 4);
 };
 
-template <typename NonRigidDeformation>
-SurfaceMesh RigidBeforeNonRigidDeformMesh<NonRigidDeformation>::deformationGraphMesh()
+template <typename NonRigidDeformation, typename DeformMesh>
+SurfaceMesh RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::deformationGraphMesh()
 {
 	if (_deformation.is_rigid_deformation) {
 		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation);
 		return deform_mesh.deformationGraphMesh();
 	}
 	else {
-		DeformationGraphDeformMesh<NonRigidDeformation> deform_mesh(_deformation.non_rigid_deformation, _k);
+		DeformMesh deform_mesh(_deformation.non_rigid_deformation, _k);
 		return deform_mesh.deformationGraphMesh();
 	}
 }
 
-template <typename NonRigidDeformation>
-SurfaceMesh RigidBeforeNonRigidDeformMesh<NonRigidDeformation>::deformedMesh(const SurfaceMesh & mesh)
+template <typename NonRigidDeformation, typename DeformMesh>
+SurfaceMesh RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::deformedMesh(const SurfaceMesh & mesh)
 {
 	if (_deformation.is_rigid_deformation) {
 		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation);
 		return deform_mesh.deformedMesh(mesh);
 	}
 	else {
-		DeformationGraphDeformMesh<NonRigidDeformation> deform_mesh(_deformation.non_rigid_deformation, _k);
+		DeformMesh deform_mesh(_deformation.non_rigid_deformation, _k);
 		return deform_mesh.deformedMesh(mesh);
 	}
 }
 
-template <typename NonRigidDeformation>
-RigidBeforeNonRigidDeformMesh<NonRigidDeformation>::RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation, unsigned int number_of_interpolation_neighbors)
+template <typename NonRigidDeformation, typename DeformMesh>
+RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation, unsigned int number_of_interpolation_neighbors)
 	: _deformation(deformation)
 	, _k(number_of_interpolation_neighbors)
 {}

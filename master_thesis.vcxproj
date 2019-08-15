@@ -235,6 +235,8 @@
     <ClInclude Include="src\algo\registration\deformation_graph\i_deformation.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\nearest_nodes.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\refine_deformation_graph.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\deformation_graph_refinement.h" />
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deform_mesh.h" />
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_deformation.h" />
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_registration.h" />
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_registration_factory.h" />

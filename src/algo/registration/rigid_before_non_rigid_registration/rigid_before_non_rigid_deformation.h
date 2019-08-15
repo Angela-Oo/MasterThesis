@@ -9,8 +9,6 @@ template<typename NonRigidDeformation>
 class RigidBeforeNonRigidDeformation
 {
 public:
-	using Deformation = NonRigidDeformation;
-public:
 	RigidDeformation rigid_deformation;
 	NonRigidDeformation non_rigid_deformation;
 	bool is_rigid_deformation;

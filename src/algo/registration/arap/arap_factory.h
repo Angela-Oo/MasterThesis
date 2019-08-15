@@ -12,7 +12,8 @@ class ARAPFactory
 {
 public:
 	using Registration = AsRigidAsPossible;
-	using DeformMesh = DeformationGraphDeformMesh<typename DeformationGraph<AsRigidAsPossible::Deformation>>;
+	using PositionDeformation = ARAPDeformation;
+	using DeformMesh = DeformationGraphDeformMesh<typename AsRigidAsPossible::Deformation>;
 private:
 	ceres::Solver::Options _ceres_options;
 	RegistrationOptions _options;

@@ -2,8 +2,8 @@
 
 #include "algo/registration/interface/i_registration.h"
 #include "mesh/mesh_definition.h"
-#include "algo/registration/deformation_graph/refine_deformation_graph.h"
-
+#include "deformation_graph_refinement.h"
+#include "refine_deformation_graph_deformation.h"
 
 namespace Registration {
 
@@ -11,9 +11,10 @@ template<typename NonRigidRegistration>
 class RefineDeformationGraphRegistration : public INonRigidRegistration
 {
 public:
-	using Deformation = typename NonRigidRegistration::Deformation;
+	using Deformation = RefineDeformationGraphDeformation<typename NonRigidRegistration::Deformation>;
+	using NonRigidDeformation = typename NonRigidRegistration::Deformation;
 private:
-	Deformation _refined;
+	Deformation _deformation;
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
 	bool _is_refined;
 	int _number_of_refinements;
@@ -35,8 +36,7 @@ public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	bool shouldBeSavedAsImage() override;
 public:
-	// without icp
-	RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration);
+	RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration, HierarchicalMesh hierarchical_mesh);
 };
 
 
@@ -79,8 +79,9 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 		_non_rigid_registration->solveIteration();
 	}
 	else if(_is_refined == false) {
-		_refined = refineDeformationGraph(_non_rigid_registration->getDeformation());
-		_non_rigid_registration->setDeformation(_refined);
+		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
+		_deformation.non_rigid_deformation = refineDeformationGraph(_deformation);
+		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
 		_number_of_refinements++;
 		if(_number_of_refinements > 8)
 			_is_refined = true;
@@ -115,9 +116,10 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::finished()
 }
 
 template<typename NonRigidRegistration>
-const typename NonRigidRegistration::Deformation & RefineDeformationGraphRegistration<NonRigidRegistration>::getDeformation()
+const RefineDeformationGraphDeformation<typename NonRigidRegistration::Deformation> & RefineDeformationGraphRegistration<NonRigidRegistration>::getDeformation()
 {
-	return _non_rigid_registration->getDeformation();
+	_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
+	return _deformation;
 }
 
 template<typename NonRigidRegistration>
@@ -136,12 +138,13 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsIm
 }
 
 template<typename NonRigidRegistration>
-RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration)
+RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration, HierarchicalMesh hierarchical_mesh)
 	: _non_rigid_registration(std::move(non_rigid_registration))
 	, _is_refined(false)
 	, _finished(false)
 	, _number_of_refinements(0)
 	, _current_iteration(0)
+	, _deformation(std::move(hierarchical_mesh))
 {
 }
 

@@ -725,6 +725,12 @@
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refine_deformation_graph_deformation.h">
       <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\deformation_graph_refinement.h">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deform_mesh.h">
+      <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />

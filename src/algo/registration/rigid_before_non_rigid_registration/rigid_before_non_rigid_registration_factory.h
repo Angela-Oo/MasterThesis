@@ -2,6 +2,7 @@
 
 #include "rigid_before_non_rigid_deform_mesh.h"
 #include "rigid_before_non_rigid_registration.h"
+#include "rigid_before_non_rigid_deformation.h"
 #include "util/file_writer.h"
 #include "mesh/mesh_definition.h"
 #include "algo/registration/rigid_registration/rigid_factory.h"
@@ -16,9 +17,8 @@ class RigidBeforeNonRigidRegistrationFactory
 {
 public:
 	using NonRigidRegistration = typename Factory::Registration;
-	using Deformation = typename Factory::Registration::Deformation;
 	using Registration = typename RigidBeforeNonRigidRegistration<typename Factory::Registration>;
-	using DeformMesh = typename RigidBeforeNonRigidDeformMesh<typename Deformation>;
+	using DeformMesh = typename RigidBeforeNonRigidDeformMesh<typename Factory::Registration::Deformation, typename Factory::DeformMesh>;
 private:
 	RigidFactory _rigid_factory;
 	Factory _non_rigid_factory;
@@ -31,11 +31,11 @@ public:
 																					  const SurfaceMesh & target);
 	std::unique_ptr<RigidBeforeNonRigidRegistration<NonRigidRegistration>> operator()(const SurfaceMesh & source,
 																					  const SurfaceMesh & target,
-																					  const RigidBeforeNonRigidDeformation<Deformation> & deformation_graph);
+																					  const typename Registration::Deformation & deformation_graph);
 	std::unique_ptr<RigidBeforeNonRigidRegistration<NonRigidRegistration>> operator()(const SurfaceMesh & source,
 																					  const SurfaceMesh & target,
 																					  const SurfaceMesh & previous_mesh, // used for non rigid registration
-																					  const RigidBeforeNonRigidDeformation<Deformation> & deformation_graph);
+																					  const typename Registration::Deformation & deformation_graph);
 	void setFixedPositions(std::vector<vertex_descriptor> fixed_positions);
 	std::string registrationType();
 public:
@@ -57,7 +57,7 @@ template<typename Factory>
 std::unique_ptr<RigidBeforeNonRigidRegistration<typename Factory::Registration>>
 RigidBeforeNonRigidRegistrationFactory<Factory>::operator()(const SurfaceMesh & source,
 															const SurfaceMesh & target,
-															const RigidBeforeNonRigidDeformation<Deformation> & deformation)
+															const typename RigidBeforeNonRigidRegistration<typename Factory::Registration>::Deformation & deformation)
 {
 	// new calc rigid deformation 
 	//return std::make_unique<RigidBeforeNonRigidRegistration<NonRigidRegistration>>(_rigid_factory(source, target),
@@ -73,7 +73,7 @@ std::unique_ptr<RigidBeforeNonRigidRegistration<typename Factory::Registration>>
 RigidBeforeNonRigidRegistrationFactory<Factory>::operator()(const SurfaceMesh & source,
 															const SurfaceMesh & target,
 															const SurfaceMesh & previous_mesh,
-															const RigidBeforeNonRigidDeformation<Deformation> & deformation)
+															const typename RigidBeforeNonRigidRegistration<typename Factory::Registration>::Deformation & deformation)
 {
 	if (_options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation) {
 		return std::make_unique<RigidBeforeNonRigidRegistration<NonRigidRegistration>>(_rigid_factory(source, target, previous_mesh, deformation.non_rigid_deformation.getRigidDeformation()),

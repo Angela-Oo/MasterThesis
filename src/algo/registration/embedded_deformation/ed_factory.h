@@ -13,7 +13,8 @@ class EmbeddedDeformationFactory
 {
 public:
 	using Registration = EmbeddedDeformation;
-	using DeformMesh = DeformationGraphDeformMesh<typename DeformationGraph<EmbeddedDeformation::Deformation>>;
+	using PositionDeformation = EDDeformation;
+	using DeformMesh = DeformationGraphDeformMesh<typename EmbeddedDeformation::Deformation>;
 private:
 	ceres::Solver::Options _ceres_options;
 	RegistrationOptions _options;
