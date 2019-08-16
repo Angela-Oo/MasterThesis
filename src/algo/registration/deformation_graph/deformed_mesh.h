@@ -31,7 +31,7 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 	double d_max = 1.;
 
 	auto radius_map = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:radius");
-	if (radius_map.second) {
+	if (false) { //radius_map.second) {
 		// calculate weight per deformation node
 		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
 		
@@ -41,8 +41,43 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 			Point node_point = deformation_graph.getDeformation(v).position();
 
 			double distance = CGAL::squared_distance(point, node_point);
-			double radius = pow(radius_map.first[v], 2);
+			//double radius = pow((radius_map.first[v] * 2.0), 2);
+			double radius = pow((radius_map.first[v]), 2);
 			double weight = 1. - (distance / radius);
+			weight = std::pow(weight, 3);
+			weight = std::max(0., weight);
+			vertex_weight_vector.push_back(std::make_pair(v, weight));
+			sum += weight;
+		}
+	}
+	else if (false) { //radius_map.second) {
+		// calculate weight per deformation node
+		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
+		std::vector<double> distances;
+		std::vector<Point> points;
+		for (size_t i = 0; i < nearest_deformation_nodes.size() - 1; ++i)
+		{
+			vertex_descriptor v = nearest_deformation_nodes[i];
+			Point node_point = deformation_graph.getDeformation(v).position();
+			double distance = CGAL::squared_distance(point, node_point);
+			distances.push_back(distance);
+			points.push_back(node_point);
+		}
+		double radius = *std::max_element(distances.begin(), distances.end());
+		
+		for (size_t i = 0; i < points.size() - 1; ++i)
+		{
+			double d = CGAL::squared_distance(points[i], points[i+1]);
+			if (d > radius)
+				radius = d;
+		}
+
+		//radius = *std::max_element(distances.begin(), distances.end());
+
+		for (size_t i = 0; i < distances.size(); ++i)
+		{
+			auto v = nearest_deformation_nodes[i];
+			double weight = 1. - (distances[i] / radius);
 			weight = std::pow(weight, 3);
 			weight = std::max(0., weight);
 			vertex_weight_vector.push_back(std::make_pair(v, weight));
