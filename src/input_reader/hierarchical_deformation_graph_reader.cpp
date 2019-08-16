@@ -36,7 +36,8 @@ HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shar
 	_mesh = _reader->getMesh(0);
 
 	_hierarchical_mesh = generateHierarchicalMesh(_mesh, _radius, 4);
-	_meshes.insert(_meshes.end(), _hierarchical_mesh._meshes.rbegin(), _hierarchical_mesh._meshes.rend());
+	for (unsigned int i = 0; i < _hierarchical_mesh.size(); ++i)
+		_meshes.emplace_back(_hierarchical_mesh.getMesh(i));
 	auto mesh_to_refine = _hierarchical_mesh.getInitMesh();
 
 	auto color = mesh_to_refine.property_map<edge_descriptor, ml::vec4f>("e:color").first;

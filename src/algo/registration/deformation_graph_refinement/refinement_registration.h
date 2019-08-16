@@ -188,7 +188,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 {
 	auto hierarchical_mesh = generateHierarchicalMesh(source, options.dg_options.edge_length, 4);
 	auto global = createGlobalDeformation<typename NonRigidRegistration::PositionDeformation>(source);
-	auto deformation_graph = createDeformationGraphFromMesh<typename NonRigidRegistration::PositionDeformation>(hierarchical_mesh._meshes[0], global);
+	auto deformation_graph = createDeformationGraphFromMesh<typename NonRigidRegistration::PositionDeformation>(hierarchical_mesh.getInitMesh(), global);
 
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation_graph, ceres_option, options, logger);
 	_deformation.hierarchical_mesh = hierarchical_mesh;

@@ -21,28 +21,54 @@ std::map<vertex_descriptor, std::vector<vertex_descriptor>> cluster(const Surfac
 }
 
 
-Point add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original_mesh, SurfaceMesh & new_mesh)
+MeshLevel getMeshLevel(const SurfaceMesh & mesh, const vertex_descriptor & v)
 {
-	auto original_mesh_normals = original_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
-	auto original_mesh_level = original_mesh.property_map<vertex_descriptor, unsigned int>("v:level").first;
-
-	auto normals = new_mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
-	auto finer_level_v = new_mesh.add_property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v", vertex_descriptor()).first;
-	auto level = new_mesh.add_property_map<vertex_descriptor, unsigned int>("v:level", 0).first;
-	auto cluster = new_mesh.add_property_map<vertex_descriptor, vertex_descriptor>("v:cluster", vertex_descriptor()).first;
-	auto point = original_mesh.point(v_original_mesh);
-	auto v = new_mesh.add_vertex(point);
-
-	finer_level_v[v] = v_original_mesh;
-	normals[v] = original_mesh_normals[v_original_mesh];
-	level[v] = original_mesh_level[v_original_mesh] - 1;
-	cluster[v] = v;
-	return point;
+	auto levels = mesh.property_map<vertex_descriptor, MeshLevel>("v:level");
+	if (mesh.is_valid(v) && levels.second) {
+		return levels.first[v];
+	}
+	else {
+		throw std::exception("mesh does not contain expected vertex or has no property map v:level");
+	}
 }
+
+
 
 SurfaceMesh HierarchicalMesh::getInitMesh()
 {
-	return _meshes[0];
+	SurfaceMesh mesh = _meshes[0];
+	mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.));
+	mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.));
+	mesh.add_property_map<vertex_descriptor, bool>("v:refined", false);
+	return mesh;
+}
+
+bool HierarchicalMesh::validLevel(unsigned int level) const
+{
+	return level < _meshes.size();
+}
+
+size_t HierarchicalMesh::size() const
+{
+	return _meshes.size();
+}
+
+const SurfaceMesh & HierarchicalMesh::getMesh(unsigned int level) const
+{
+	assert(level < _meshes.size());
+	return _meshes[level];
+}
+
+const std::map<vertex_descriptor, std::vector<vertex_descriptor>> & HierarchicalMesh::getClusters(unsigned int level) const
+{
+	assert(level < _meshes.size());
+	return _vertex_cluster_map[level];
+}
+
+const std::vector<vertex_descriptor> & HierarchicalMesh::getCluster(const MeshLevel & v) const
+{
+	auto clusters = getClusters(v.level);
+	return clusters.at(v.cluster_v);
 }
 
 HierarchicalMesh::HierarchicalMesh(const std::vector<SurfaceMesh> & meshes)
@@ -77,44 +103,27 @@ HierarchicalMesh & HierarchicalMesh::operator=(HierarchicalMesh other)
 
 
 
-
-
-
-
-
 std::vector<vertex_descriptor> HierarchicalMeshRefinement::refineVertex(vertex_descriptor v, SurfaceMesh & mesh)
 {
 	std::vector<vertex_descriptor> new_vertices;
 	auto refined = mesh.property_map<vertex_descriptor, bool>("v:refined").first;
-	auto color = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-	auto levels = mesh.property_map<vertex_descriptor, unsigned int>("v:level").first;
-	auto l = levels[v];
-	if (!refined[v] && l < _hierarchical_mesh._meshes.size()) {
-		refined[v] = true;
-		if(l == 0)
-			color[v] = ml::vec4f(1., 0., 0., 1.);
-		else
-			color[v] = ml::vec4f(0., 1., 0., 1.);
-		auto cluster_id = mesh.property_map<vertex_descriptor, vertex_descriptor>("v:cluster").first;
-		auto finer_level_v = mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v").first;
-		
-		auto & child_mesh = _hierarchical_mesh._meshes[l + 1];
+	//auto color = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+	auto levels = mesh.property_map<vertex_descriptor, MeshLevel>("v:level").first;
 
-		const std::vector<vertex_descriptor> & cluster = _hierarchical_mesh._vertex_cluster_map[l].at(cluster_id[v]);
+	auto mesh_level = levels[v];
+	if (!refined[v] && _hierarchical_mesh.validLevel(mesh_level.level)) {
+		refined[v] = true;
+		auto & child_mesh = _hierarchical_mesh.getMesh(mesh_level.level + 1);
+
+		const std::vector<vertex_descriptor> & cluster = _hierarchical_mesh.getCluster(mesh_level);
 		for (auto c_v : cluster)
-		{			
-			if (finer_level_v[v] != c_v) {
+		{
+			if (mesh_level.cluster_v_finer_level != c_v) {
 				auto p = child_mesh.point(c_v);
 				auto new_v = mesh.add_vertex(p);
-				levels[new_v] = l + 1;
-				cluster_id[new_v] = c_v;
-				
-				new_vertices.push_back(new_v);
+				levels[new_v] = getMeshLevel(child_mesh, c_v);
 
-				auto next_finer_level_v = child_mesh.property_map<vertex_descriptor, vertex_descriptor>("v:finer_level_v");
-				if (next_finer_level_v.second) {
-					finer_level_v[new_v] = next_finer_level_v.first[c_v];
-				}
+				new_vertices.push_back(new_v);			
 			}
 		}
 	}

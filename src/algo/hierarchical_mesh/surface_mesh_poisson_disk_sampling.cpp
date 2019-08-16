@@ -57,19 +57,7 @@ void SurfaceMeshPoissonDiskSampling::updateUnsupportedVertices(Point point)
 	}
 }
 
-SurfaceMesh SurfaceMeshPoissonDiskSampling::create(std::function<Point(const SurfaceMesh &, vertex_descriptor, SurfaceMesh &)> add_vertex)
-{
-	SurfaceMesh hierarchical_mesh;	
-	_candidates[*_unsupported_vertices.begin()] = 0.;
 
-	while (!finished()) {
-		auto v = nextVertex();
-		auto point = add_vertex(_mesh, v, hierarchical_mesh);
-		supportVertex(v);
-		updateUnsupportedVertices(point);
-	}
-	return hierarchical_mesh;
-}
 
 SurfaceMeshPoissonDiskSampling::SurfaceMeshPoissonDiskSampling(const SurfaceMesh & mesh, double radius)
 	: _mesh(mesh)

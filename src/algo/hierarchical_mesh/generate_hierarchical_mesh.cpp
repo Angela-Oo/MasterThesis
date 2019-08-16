@@ -5,19 +5,45 @@
 #include <CGAL/Advancing_front_surface_reconstruction.h>
 #include <CGAL/Polygon_mesh_processing/repair.h>
 
+
+SurfaceMesh HierarchicalMeshLevelCreator::create_mesh()
+{
+	SurfaceMesh mesh;
+	mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
+	mesh.add_property_map<vertex_descriptor, MeshLevel>("v:level", MeshLevel(_level, _radius)).first;
+	return mesh;
+}
+
+Point HierarchicalMeshLevelCreator::add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original_mesh, SurfaceMesh & new_mesh)
+{
+	auto original_mesh_normals = original_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
+	//auto original_mesh_level = original_mesh.property_map<vertex_descriptor, MeshLevel>("v:level").first;
+
+	auto normals = new_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
+	auto level = new_mesh.property_map<vertex_descriptor, MeshLevel>("v:level").first;
+
+	auto point = original_mesh.point(v_original_mesh);
+	auto v = new_mesh.add_vertex(point);
+
+	level[v].cluster_v = v;
+	level[v].cluster_v_finer_level = v_original_mesh;
+	//level[v].level = original_mesh_level[v_original_mesh].level - 1;
+	normals[v] = original_mesh_normals[v_original_mesh];
+	//cluster[v] = v;
+	return point;
+}
+
+
 SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radius, unsigned int level)
 {
 	SurfaceMeshPoissonDiskSampling poisson_disk_sampling(mesh, radius);
-	SurfaceMesh hierarchical_mesh = poisson_disk_sampling.create(add_vertex);
+	SurfaceMesh hierarchical_mesh = poisson_disk_sampling.create(HierarchicalMeshLevelCreator(level, radius));
 
 	Construct construct(hierarchical_mesh);
 	CGAL::advancing_front_surface_reconstruction(hierarchical_mesh.points().begin(),
 												 hierarchical_mesh.points().end(),
 												 construct);
 
-	hierarchical_mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.));
-	hierarchical_mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.));
-	hierarchical_mesh.add_property_map<vertex_descriptor, bool>("v:refined", false);
 	CGAL::Polygon_mesh_processing::remove_isolated_vertices(hierarchical_mesh);
 	return hierarchical_mesh;
 }
