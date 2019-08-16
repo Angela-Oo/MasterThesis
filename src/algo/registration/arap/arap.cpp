@@ -488,6 +488,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 	, _registration_options(registration_options)
 {
 	auto reduced_mesh = createReducedMesh(source, _registration_options.dg_options.edge_length, _registration_options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", _registration_options.dg_options.edge_length);
 	auto global = createGlobalDeformation<ARAPDeformation>(source);
 	_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
 	init();
@@ -533,6 +534,7 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 										                   std::shared_ptr<FileWriter> logger)
 {
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.dg_options.edge_length);
 	auto global = createGlobalDeformation<ARAPDeformation>(reduced_mesh);
 	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
 	return std::make_unique<AsRigidAsPossible>(src, dst, fixed_positions, deformation_graph, option, registration_options, logger);

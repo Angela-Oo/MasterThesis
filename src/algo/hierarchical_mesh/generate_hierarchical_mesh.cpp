@@ -10,14 +10,14 @@ SurfaceMesh HierarchicalMeshLevelCreator::create_mesh()
 {
 	SurfaceMesh mesh;
 	mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
-	mesh.add_property_map<vertex_descriptor, MeshLevel>("v:level", MeshLevel(_level, _radius)).first;
+	mesh.add_property_map<vertex_descriptor, MeshLevel>("v:level", MeshLevel(_level)).first;
+	mesh.add_property_map<vertex_descriptor, double>("v:radius", _radius).first;
 	return mesh;
 }
 
 Point HierarchicalMeshLevelCreator::add_vertex(const SurfaceMesh & original_mesh, vertex_descriptor v_original_mesh, SurfaceMesh & new_mesh)
 {
 	auto original_mesh_normals = original_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
-	//auto original_mesh_level = original_mesh.property_map<vertex_descriptor, MeshLevel>("v:level").first;
 
 	auto normals = new_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	auto level = new_mesh.property_map<vertex_descriptor, MeshLevel>("v:level").first;
@@ -27,7 +27,6 @@ Point HierarchicalMeshLevelCreator::add_vertex(const SurfaceMesh & original_mesh
 
 	level[v].cluster_v = v;
 	level[v].cluster_v_finer_level = v_original_mesh;
-	//level[v].level = original_mesh_level[v_original_mesh].level - 1;
 	normals[v] = original_mesh_normals[v_original_mesh];
 	//cluster[v] = v;
 	return point;
@@ -53,7 +52,7 @@ HierarchicalMesh generateHierarchicalMesh(const SurfaceMesh & mesh, double min_r
 	std::vector<SurfaceMesh> meshes;
 
 	auto reduced_mesh = createReducedMesh(mesh, min_radius);
-	reduced_mesh.add_property_map<vertex_descriptor, unsigned int>("v:level", levels - 1);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", min_radius);
 	meshes.push_back(reduced_mesh);
 
 	for (unsigned int i = 1; i < levels; ++i) {

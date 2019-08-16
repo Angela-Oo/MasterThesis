@@ -11,14 +11,11 @@ struct MeshLevel
 	unsigned int level;
 	vertex_descriptor cluster_v;
 	vertex_descriptor cluster_v_finer_level;
-	double radius;
 	MeshLevel()
 		: level(0)
-		, radius(1.)
 	{}
-	MeshLevel(unsigned int l, double r)
+	MeshLevel(unsigned int l)
 		: level(l)
-		, radius(r)
 	{}
 };
 
