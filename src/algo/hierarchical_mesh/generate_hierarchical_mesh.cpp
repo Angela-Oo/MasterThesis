@@ -52,6 +52,7 @@ HierarchicalMesh generateHierarchicalMesh(const SurfaceMesh & mesh, double min_r
 	std::vector<SurfaceMesh> meshes;
 
 	auto reduced_mesh = createReducedMesh(mesh, min_radius);
+	reduced_mesh.add_property_map<vertex_descriptor, MeshLevel>("v:level", MeshLevel(levels - 1));
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", min_radius);
 	meshes.push_back(reduced_mesh);
 

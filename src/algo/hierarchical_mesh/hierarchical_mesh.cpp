@@ -55,20 +55,33 @@ size_t HierarchicalMesh::size() const
 
 const SurfaceMesh & HierarchicalMesh::getMesh(unsigned int level) const
 {
-	assert(level < _meshes.size());
-	return _meshes[level];
+	if (level < _meshes.size()) {
+		return _meshes[level];		
+	}
+	else {
+		throw std::exception("level does not exists");
+	}
 }
 
 const std::map<vertex_descriptor, std::vector<vertex_descriptor>> & HierarchicalMesh::getClusters(unsigned int level) const
 {
-	assert(level < _meshes.size());
-	return _vertex_cluster_map[level];
+	if (level < _meshes.size()) {
+		return _vertex_cluster_map[level];
+	}
+	else {
+		throw std::exception("level does not exists");
+	}
 }
 
 const std::vector<vertex_descriptor> & HierarchicalMesh::getCluster(const MeshLevel & v) const
 {
-	auto clusters = getClusters(v.level);
-	return clusters.at(v.cluster_v);
+	auto & clusters = getClusters(v.level);
+	if (clusters.find(v.cluster_v) != clusters.end()) {
+		return clusters.at(v.cluster_v);
+	}
+	else {
+		throw std::exception("cluster does not exists");
+	}
 }
 
 HierarchicalMesh::HierarchicalMesh(const std::vector<SurfaceMesh> & meshes)
@@ -107,23 +120,29 @@ std::vector<vertex_descriptor> HierarchicalMeshRefinement::refineVertex(vertex_d
 {
 	std::vector<vertex_descriptor> new_vertices;
 	auto refined = mesh.property_map<vertex_descriptor, bool>("v:refined").first;
-	//auto color = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
 	auto levels = mesh.property_map<vertex_descriptor, MeshLevel>("v:level").first;
+	auto radius = mesh.property_map<vertex_descriptor, double>("v:radius").first;
 
 	auto mesh_level = levels[v];
 	if (!refined[v] && _hierarchical_mesh.validLevel(mesh_level.level)) {
 		refined[v] = true;
 		auto & child_mesh = _hierarchical_mesh.getMesh(mesh_level.level + 1);
+		auto child_radius = child_mesh.property_map<vertex_descriptor, double>("v:radius").first;
 
 		const std::vector<vertex_descriptor> & cluster = _hierarchical_mesh.getCluster(mesh_level);
+		
 		for (auto c_v : cluster)
 		{
 			if (mesh_level.cluster_v_finer_level != c_v) {
 				auto p = child_mesh.point(c_v);
 				auto new_v = mesh.add_vertex(p);
 				levels[new_v] = getMeshLevel(child_mesh, c_v);
+				radius[new_v] = child_radius[c_v];
 
 				new_vertices.push_back(new_v);			
+			}
+			else {
+				radius[v] = child_radius[c_v];
 			}
 		}
 	}
