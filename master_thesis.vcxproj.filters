@@ -106,11 +106,14 @@
     <Filter Include="2 algo\4 registration\9 deformation graph refinement">
       <UniqueIdentifier>{0fef68b0-71f7-49b5-bb89-c370b181c472}</UniqueIdentifier>
     </Filter>
-    <Filter Include="2 algo\4 registration\10 sequence registration">
-      <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="2 algo\3 hierarchical mesh">
       <UniqueIdentifier>{0ec5b9cd-bdd3-4db6-8bb7-637c6c0c4729}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2 algo\4 registration\10 deformation graph adaptive rigidity">
+      <UniqueIdentifier>{add350db-8fc7-465a-85cc-cba5e1d28e6f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="2 algo\4 registration\11 sequence registration">
+      <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -642,7 +645,7 @@
       <Filter>2 algo\4 registration\1 options</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h">
-      <Filter>2 algo\4 registration\10 sequence registration</Filter>
+      <Filter>2 algo\4 registration\11 sequence registration</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\interface\registration.h">
       <Filter>2 algo\4 registration\0 interface</Filter>
@@ -712,6 +715,12 @@
     </ClInclude>
     <ClInclude Include="src\algo\hierarchical_mesh\triangulation.h">
       <Filter>2 algo\3 hierarchical mesh</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_adaptive_rigidity\adaptive_rigidity_registration.h">
+      <Filter>2 algo\4 registration\10 deformation graph adaptive rigidity</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\deformation_graph_adaptive_rigidity\adaptive_rigidity.h">
+      <Filter>2 algo\4 registration\10 deformation graph adaptive rigidity</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

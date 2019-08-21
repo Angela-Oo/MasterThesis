@@ -29,7 +29,7 @@ DeformationGraph<PositionDeformation> refineHierarchicalMesh(const RefineDeforma
 			for (auto n_w : kNN.node_weight_vector)
 			{
 				auto node = deformation.non_rigid_deformation.getDeformation(n_w.first);
-					deformation_weights_vector.push_back(std::make_pair(node, n_w.second));
+				deformation_weights_vector.push_back(std::make_pair(node, n_w.second));
 			}
 			PositionDeformation deformed_position = interpolateDeformations(refined_mesh.point(v), deformation_weights_vector);
 			deformation_property_map[v] = deformed_position;

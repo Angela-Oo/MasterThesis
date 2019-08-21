@@ -7,6 +7,7 @@
 #include "algo/registration/rigid_before_non_rigid_registration/rigid_before_non_rigid_registration.h"
 #include "algo/registration/sequence_registration/sequence_registration.h"
 #include "algo/registration/deformation_graph_refinement/refinement_registration.h"
+#include "algo/registration/deformation_graph_adaptive_rigidity/adaptive_rigidity_registration.h"
 
 namespace Registration {
 
@@ -42,8 +43,9 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 {
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP) {
-		return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>(source, target, ceres_options, options, logger);
+		//return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>(source, target, ceres_options, options, logger);
 		//return std::make_unique<RefineDeformationGraphRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
+		return std::make_unique<AdaptiveRigidityRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::ED) {
 		return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<EmbeddedDeformation>>>(source, target, ceres_options, options, logger);
