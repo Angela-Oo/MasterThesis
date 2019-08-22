@@ -722,6 +722,9 @@
     <ClInclude Include="src\algo\registration\deformation_graph_adaptive_rigidity\adaptive_rigidity.h">
       <Filter>2 algo\4 registration\10 deformation graph adaptive rigidity</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_cost.h">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -878,6 +881,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.cpp">
       <Filter>2 algo\4 registration\9 deformation graph refinement</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\arap\arap_cost.cpp">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

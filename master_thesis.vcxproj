@@ -229,6 +229,7 @@
     <ClInclude Include="src\algo\hierarchical_mesh\triangulation.h" />
     <ClInclude Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.h" />
     <ClInclude Include="src\algo\registration\arap\arap.h" />
+    <ClInclude Include="src\algo\registration\arap\arap_cost.h" />
     <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h" />
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h" />
@@ -312,6 +313,7 @@
     <ClCompile Include="src\algo\hierarchical_mesh\triangulation.cpp" />
     <ClCompile Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap.cpp" />
+    <ClCompile Include="src\algo\registration\arap\arap_cost.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.cpp" />

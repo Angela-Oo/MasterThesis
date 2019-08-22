@@ -49,10 +49,6 @@ private:
 						  std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 						  std::unique_ptr<CeresIterationLoggerGuard>& logger);
 private:
-	ceres::ResidualBlockId addPointToPointCost4NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point);
-	ceres::ResidualBlockId addPointToPlaneCost4NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal);
-	ceres::ResidualBlockId addPointToPointCost3NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point);
-	ceres::ResidualBlockId addPointToPlaneCost3NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal);
 	ceres::ResidualBlockId addPointToPointCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point);
 	ceres::ResidualBlockId addPointToPlaneCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal);
 	bool useVertex(vertex_descriptor & v);

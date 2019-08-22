@@ -1,5 +1,6 @@
 #include "arap.h"
 #include "arap_cost_functions.h"
+#include "arap_cost.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include "algo/remeshing/mesh_simplification.h"
 #include "algo/registration/util/ceres_residual_evaluation.h"
@@ -55,143 +56,24 @@ std::vector<Point> AsRigidAsPossible::getFixedPostions()
 	return positions;
 }
 
-ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCost4NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point)
-{
-	float point_to_point_weighting = 0.1f;
-	double weight = _registration_options.fit * point_to_point_weighting;
-
-	auto & global = _deformation_graph._global;
-	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
-
-	assert(_registration_options.dg_options.number_of_interpolation_neighbors == 4);
-	if (n_w_vector.size() < 4)
-		std::cout << "help nearest node is smaller than expected" << std::endl;
-
-	auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global.position(),
-																			_deformation_graph.getDeformation(n_w_vector[0].first).position(),
-																			_deformation_graph.getDeformation(n_w_vector[1].first).position(),
-																			_deformation_graph.getDeformation(n_w_vector[2].first).position(),
-																			_deformation_graph.getDeformation(n_w_vector[3].first).position(),
-																			n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
-
-	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function,
-									global.d(),
-									_deformation_graph.getDeformation(n_w_vector[0].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[1].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[2].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[3].first).d());
-}
-
-ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCost4NN(ceres::Problem &problem,
-													             vertex_descriptor v,
-													             const Point & target_point, 
-													             const Vector & target_normal)
-{
-	float point_to_plane_weighting = 0.9f;
-	double weight = _registration_options.fit * point_to_plane_weighting;
-
-	auto & global = _deformation_graph._global;
-	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
-
-	assert(_registration_options.dg_options.number_of_interpolation_neighbors == 4);
-
-	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
-																			_deformed_mesh->point(v), global.position(),
-																			_deformation_graph.getDeformation(n_w_vector[0].first).position(),
-																			_deformation_graph.getDeformation(n_w_vector[1].first).position(),
-																			_deformation_graph.getDeformation(n_w_vector[2].first).position(),
-																			_deformation_graph.getDeformation(n_w_vector[3].first).position(),
-																			n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second, n_w_vector[3].second);
-
-	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function,
-									global.d(),
-									_deformation_graph.getDeformation(n_w_vector[0].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[1].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[2].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[3].first).d());
-}
-
-
-ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCost3NN(ceres::Problem &problem, vertex_descriptor v, const Point & target_point)
-{
-	assert(_registration_options.dg_options.number_of_interpolation_neighbors == 3);
-
-	float point_to_point_weighting = 0.1f;
-	double weight = _registration_options.fit * point_to_point_weighting;
-
-	auto & global = _deformation_graph._global;
-	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
-	if (n_w_vector.size() < 3)
-		std::cout << "help nearest node is smaller than expected" << std::endl;
-
-	auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, _deformed_mesh->point(v), global.position(),
-																		  _deformation_graph.getDeformation(n_w_vector[0].first).position(),
-																		  _deformation_graph.getDeformation(n_w_vector[1].first).position(),
-																		  _deformation_graph.getDeformation(n_w_vector[2].first).position(),
-																		  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second);
-
-	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function,
-									global.d(),
-									_deformation_graph.getDeformation(n_w_vector[0].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[1].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[2].first).d());
-}
-
-ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCost3NN(ceres::Problem &problem,
-													  vertex_descriptor v,
-													  const Point & target_point,
-													  const Vector & target_normal)
-{
-	assert(_registration_options.dg_options.number_of_interpolation_neighbors == 3);
-
-	float point_to_plane_weighting = 0.9f;
-	double weight = _registration_options.fit * point_to_plane_weighting;
-
-	auto & global = _deformation_graph._global;
-	auto n_w_vector = _deformed_mesh->nearestNodes(v).node_weight_vector;
-
-	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
-																		  _deformed_mesh->point(v), global.position(),
-																		  _deformation_graph.getDeformation(n_w_vector[0].first).position(),
-																		  _deformation_graph.getDeformation(n_w_vector[1].first).position(),
-																		  _deformation_graph.getDeformation(n_w_vector[2].first).position(),
-																		  n_w_vector[0].second, n_w_vector[1].second, n_w_vector[2].second);
-
-	auto loss_function = new ceres::ScaledLoss(NULL, weight, ceres::TAKE_OWNERSHIP);
-	return problem.AddResidualBlock(cost_function, loss_function,
-									global.d(),
-									_deformation_graph.getDeformation(n_w_vector[0].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[1].first).d(),
-									_deformation_graph.getDeformation(n_w_vector[2].first).d());
-}
-
 ceres::ResidualBlockId AsRigidAsPossible::addPointToPointCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point)
 {
-	if (_registration_options.dg_options.number_of_interpolation_neighbors == 4) {
-		return addPointToPointCost4NN(problem, v, target_point);
-	}
-	else if (_registration_options.dg_options.number_of_interpolation_neighbors == 3) {
-		return addPointToPointCost3NN(problem, v, target_point);
-	}
-	else {
-		throw std::exception("no implementation for this number of interpolation neighbors");
-	}
+	float point_to_point_weighting = 0.1f;
+	double loss_weighting = _registration_options.fit * point_to_point_weighting;
+
+	return pointToPointCost(problem, loss_weighting, _registration_options.dg_options.number_of_interpolation_neighbors,
+							_deformation_graph, *(_deformed_mesh.get()), v,
+							target_point);
 }
 
 ceres::ResidualBlockId AsRigidAsPossible::addPointToPlaneCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal)
 {
-	if (_registration_options.dg_options.number_of_interpolation_neighbors == 4) {
-		return addPointToPlaneCost4NN(problem, v, target_point, target_normal);
-	}
-	else if (_registration_options.dg_options.number_of_interpolation_neighbors == 3) {
-		return addPointToPlaneCost3NN(problem, v, target_point, target_normal);
-	}
-	else {
-		throw std::exception("no implementation for this number of interpolation neighbors");
-	}
+	float point_to_plane_weighting = 0.9f;
+	double loss_weighting = _registration_options.fit * point_to_plane_weighting;
+
+	return pointToPlaneCost(problem, loss_weighting, _registration_options.dg_options.number_of_interpolation_neighbors,
+							_deformation_graph, *(_deformed_mesh.get()), v,
+							target_point, target_normal);
 }
 
 VertexResidualIds AsRigidAsPossible::addFitCostWithoutICP(ceres::Problem &problem)
