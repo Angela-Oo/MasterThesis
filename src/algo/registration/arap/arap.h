@@ -1,15 +1,18 @@
 #pragma once
 
 #include "arap_deformation.h"
+#include "arap_cost.h"
 #include "util/file_writer.h"
 #include "algo/registration/interface/i_registration.h"
 #include "mesh/mesh_definition.h"
+
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include <ceres/ceres.h>
+#include <memory>
 
 namespace Registration {
 
@@ -29,9 +32,11 @@ private:
 	ceres::Solver::Options _options;
 	DeformationGraph<ARAPDeformation> _deformation_graph;
 	std::unique_ptr<DeformedMesh<Deformation>> _deformed_mesh;
-	std::vector<vertex_descriptor> _set_of_vertices_to_use;
+	//std::vector<vertex_descriptor> _set_of_vertices_to_use;
 	std::vector<vertex_descriptor> _fixed_positions;
-	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
+	//std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
+	std::unique_ptr<AsRigidAsPossibleFitCost> _fit_cost;
+	std::unique_ptr<AsRigidAsPossibleFitCostWithoutICP> _fit_cost_without_icp;
 private:
 	RegistrationOptions _registration_options;
 	bool _with_icp = true;
@@ -42,6 +47,7 @@ private:
 	CeresLogger _ceres_logger;
 	std::knuth_b _rand_engine;
 private:
+	std::vector<vertex_descriptor> subsetOfVerticesToFit();
 	void init();
 	bool random_bool_with_prob(double prob);
 	void evaluateResidual(ceres::Problem & problem,
@@ -49,12 +55,12 @@ private:
 						  std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 						  std::unique_ptr<CeresIterationLoggerGuard>& logger);
 private:
-	ceres::ResidualBlockId addPointToPointCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point);
-	ceres::ResidualBlockId addPointToPlaneCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal);
-	bool useVertex(vertex_descriptor & v);
-	bool addFitCostVertex(ceres::Problem & problem, vertex_descriptor & v, VertexResidualIds &residual_ids);
-	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem, std::unique_ptr<CeresIterationLoggerGuard>& logger);
-	std::map<vertex_descriptor, ResidualIds> addFitCostWithoutICP(ceres::Problem &problem);
+	//ceres::ResidualBlockId addPointToPointCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point);
+	//ceres::ResidualBlockId addPointToPlaneCost(ceres::Problem &problem, vertex_descriptor v, const Point & target_point, const Vector & target_normal);
+	//bool useVertex(vertex_descriptor & v);
+	//bool addFitCostVertex(ceres::Problem & problem, vertex_descriptor & v, VertexResidualIds &residual_ids);
+	//std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem, std::unique_ptr<CeresIterationLoggerGuard>& logger);
+	//std::map<vertex_descriptor, ResidualIds> addFitCostWithoutICP(ceres::Problem &problem);
 	std::map<edge_descriptor, ResidualIds> addAsRigidAsPossibleCost(ceres::Problem &problem);
 	std::map<vertex_descriptor, ResidualIds> addConfCost(ceres::Problem &problem);
 public:
