@@ -6,14 +6,14 @@
 namespace Registration {
 
 
-std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh);
+std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh, double min_smooth_cost = 0.01, double percentage_max_smooth_cost = 0.9);
 
 
 template <typename PositionDeformation>
 DeformationGraph<PositionDeformation> refineHierarchicalMesh(const RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation)
 {
 	auto refined_mesh = deformation.non_rigid_deformation._mesh;
-	auto edges = getEdgesToRefine(refined_mesh);
+	auto edges = getEdgesToRefine(refined_mesh, 0.01, 0.9);
 
 	HierarchicalMeshRefinement mesh_refiner(deformation.hierarchical_mesh);
 	auto new_vertices = mesh_refiner.refine(edges, refined_mesh);

@@ -30,9 +30,10 @@ SurfaceMesh isotropicRemeshing(const SurfaceMesh & mesh, double target_edge_leng
 													   surface_mesh,
 													   CGAL::Polygon_mesh_processing::parameters::number_of_iterations(10));// .relax_constraints(true));// .protect_constraints(true));
 
+	surface_mesh.collect_garbage();
 	auto normals = surface_mesh.property_map<vertex_descriptor, Vector>("v:normal").first;
 	CGAL::Polygon_mesh_processing::compute_vertex_normals(surface_mesh, normals);
-
+	
 	std::cout << "count of surface mesh vertices " << surface_mesh.number_of_vertices() << std::endl;
 	return surface_mesh;
 }

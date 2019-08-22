@@ -96,7 +96,12 @@ SurfaceMesh AdaptiveRigidityRegistration<NonRigidRegistration>::getDeformationGr
 
 template<typename NonRigidRegistration>
 bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
-{
+{	
+	if (!_non_rigid_registration->getDeformation()._mesh.property_map<edge_descriptor, double>("e:rigidity").second) {
+		auto deformation = _non_rigid_registration->getDeformation();
+		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 100.);
+		_non_rigid_registration->setDeformation(deformation);
+	}
 	bool finished = _non_rigid_registration->finished();
 	if (finished == false) {
 		_current_iteration++;
@@ -104,10 +109,10 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 	}
 	else if(_is_refined == false) {
 		auto deformation = _non_rigid_registration->getDeformation();
-		deformation = adaptRigidity(deformation);
+		auto number_adapted_edges = adaptRigidity(deformation);
 		_non_rigid_registration->setDeformation(deformation);
 		_number_of_refinements++;
-		if(_number_of_refinements > 4)
+		if(number_adapted_edges == 0 || _number_of_refinements > 20)
 			_is_refined = true;
 	}
 	else {
@@ -129,7 +134,10 @@ size_t AdaptiveRigidityRegistration<NonRigidRegistration>::currentIteration()
 template<typename NonRigidRegistration>
 bool AdaptiveRigidityRegistration<NonRigidRegistration>::solve()
 {
-	return _non_rigid_registration->solve();
+	while (!finished()) {
+		solveIteration();
+	}
+	return true;
 }
 
 template<typename NonRigidRegistration>

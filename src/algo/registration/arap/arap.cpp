@@ -291,13 +291,19 @@ EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &prob
 	EdgeResidualIds residual_ids;
 	auto & mesh = _deformation_graph._mesh;
 	auto deformations = mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
+	auto & edge_rigidity = mesh.property_map<edge_descriptor, double>("e:rigidity");
 	for (auto e : mesh.halfedges())
 	{		
 		auto target = mesh.target(e);
 		auto source = mesh.source(e);
 
+		double smooth = _registration_options.smooth;
+		if (edge_rigidity.second) {
+			smooth = edge_rigidity.first[mesh.edge(e)];
+		}
+
 		ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(mesh.point(source), mesh.point(target));
-		auto loss_function = new ceres::ScaledLoss(NULL, _registration_options.smooth, ceres::TAKE_OWNERSHIP);
+		auto loss_function = new ceres::ScaledLoss(NULL, smooth, ceres::TAKE_OWNERSHIP);
 		auto residual_id = problem.AddResidualBlock(cost_function, loss_function, 
 													deformations[source].d(), deformations[target].d());
 
@@ -338,7 +344,6 @@ bool AsRigidAsPossible::solveIteration()
 		else
 			fit_residual_ids = addFitCostWithoutICP(problem);
 		EdgeResidualIds arap_residual_ids = addAsRigidAsPossibleCost(problem);
-		//VertexResidualIds conf_residual_ids = addConfCost(problem);
 
 		ceres::Solve(_options, &problem, &summary);
 
@@ -361,7 +366,7 @@ bool AsRigidAsPossible::solveIteration()
 	}
 	bool finished_registration = finished();
 	if (finished_registration) {
-		_ceres_logger.write("finished Rigid registration ");
+		_ceres_logger.write("finished non rigid registration with arap ");
 	}
 	return finished_registration;
 }
