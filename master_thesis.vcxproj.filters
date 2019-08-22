@@ -734,6 +734,15 @@
     <ClInclude Include="src\algo\registration\arap\i_arap_fit_cost.h">
       <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_smooth_cost.h">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity.h">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\i_arap_smooth_cost.h">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -898,6 +907,12 @@
       <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap_fit_cost_without_icp.cpp">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\arap\arap_smooth_cost.cpp">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity.cpp">
       <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
     </ClCompile>
   </ItemGroup>

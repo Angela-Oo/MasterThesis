@@ -234,7 +234,10 @@
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h" />
     <ClInclude Include="src\algo\registration\arap\arap_fit_cost.h" />
     <ClInclude Include="src\algo\registration\arap\arap_fit_cost_without_icp.h" />
+    <ClInclude Include="src\algo\registration\arap\arap_smooth_cost.h" />
+    <ClInclude Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity.h" />
     <ClInclude Include="src\algo\registration\arap\i_arap_fit_cost.h" />
+    <ClInclude Include="src\algo\registration\arap\i_arap_smooth_cost.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph_deform_mesh.h" />
     <ClInclude Include="src\algo\registration\deformation_graph\deformed_mesh.h" />
@@ -320,6 +323,8 @@
     <ClCompile Include="src\algo\registration\arap\arap_deformation.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_fit_cost.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_fit_cost_without_icp.cpp" />
+    <ClCompile Include="src\algo\registration\arap\arap_smooth_cost.cpp" />
+    <ClCompile Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />

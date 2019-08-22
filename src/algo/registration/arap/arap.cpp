@@ -1,13 +1,22 @@
+
+#ifndef GLOG_NO_ABBREVIATED_SEVERITIES
+#define GLOG_NO_ABBREVIATED_SEVERITIES
+#endif // !GLOG_NO_ABBREVIATED_SEVERITIES
+
+#include "glog/logging.h"
+
 #include "arap.h"
-#include "arap_cost_functions.h"
-#include "arap_cost.h"
+//#include "arap_cost_functions.h"
+#include "arap_fit_cost.h"
+#include "arap_fit_cost_without_icp.h"
+#include "arap_smooth_cost.h"
+#include "arap_smooth_cost_adaptive_rigidity.h"
 
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include "algo/remeshing/mesh_simplification.h"
 #include "algo/registration/util/ceres_residual_evaluation.h"
 
-#include "arap_fit_cost.h"
-#include "arap_fit_cost_without_icp.h"
+
 #include <random>
 
 
@@ -16,12 +25,12 @@ namespace Registration {
 
 const SurfaceMesh & AsRigidAsPossible::getSource()
 {
-	return _src;
+	return _source;
 }
 
 const SurfaceMesh & AsRigidAsPossible::getTarget()
 {
-	return _dst;
+	return _target;
 }
 
 SurfaceMesh AsRigidAsPossible::getDeformedPoints()
@@ -32,7 +41,7 @@ SurfaceMesh AsRigidAsPossible::getDeformedPoints()
 SurfaceMesh AsRigidAsPossible::getInverseDeformedPoints()
 {
 	auto inverse_deformation = _deformation_graph.invertDeformation();
-	DeformedMesh<Deformation> deformed(_dst, inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
+	DeformedMesh<Deformation> deformed(_target, inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 
@@ -51,18 +60,6 @@ std::vector<Point> AsRigidAsPossible::getFixedPostions()
 	return _fit_cost->getFixedPostions();
 }
 
-EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &problem)
-{
-	bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second;
-	if (use_rigidity) {
-		return asRigidAsPossibleCostUseRigidity(problem, _registration_options.smooth, _deformation_graph);
-	}
-	else {
-		return asRigidAsPossibleCost(problem, _registration_options.smooth, _deformation_graph);
-	}
-}
-
-
 bool AsRigidAsPossible::solveIteration()
 {
 	if (_solve_iteration == 0)
@@ -73,11 +70,8 @@ bool AsRigidAsPossible::solveIteration()
 		auto logger = _ceres_logger.CreateCeresIterationLogger(summary);
 
 		ceres::Problem problem;
-
-		 _fit_cost->addFitCost(problem, _deformation_graph, *(_deformed_mesh.get()), logger);
-
-		 bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second;
-		 EdgeResidualIds arap_residual_ids = addAsRigidAsPossibleCost(problem);
+		_fit_cost->addFitCost(problem, _deformation_graph, *(_deformed_mesh.get()), logger);
+		EdgeResidualIds arap_residual_ids = _smooth_cost->asRigidAsPossibleCost(problem, _registration_options.smooth, _deformation_graph);
 
 		ceres::Solve(_options, &problem, &summary);
 
@@ -88,24 +82,29 @@ bool AsRigidAsPossible::solveIteration()
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
-
-		if (!use_rigidity)
-		{
-			auto scale_factor_tol = 0.0001;// 0.00001;
-			if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-				(_registration_options.smooth > 0.005))// && a_conf > 0.05))
-			{
-				_registration_options.smooth /= 2.;
-				_registration_options.conf /= 2.;
-				std::cout << std::endl << "scale factor: smooth " << _registration_options.smooth << " conf " << _registration_options.conf;
-			}
-		}
+		updateSmoothFactor();
 	}
 	bool finished_registration = finished();
 	if (finished_registration) {
 		_ceres_logger.write("finished non rigid registration with arap ");
 	}
 	return finished_registration;
+}
+
+void AsRigidAsPossible::updateSmoothFactor()
+{
+	bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second;
+	if (!use_rigidity)
+	{
+		auto scale_factor_tol = 0.0001;// 0.00001;
+		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
+			(_registration_options.smooth > 0.005))// && a_conf > 0.05))
+		{
+			_registration_options.smooth /= 2.;
+			_registration_options.conf /= 2.;
+			std::cout << std::endl << "scale factor: smooth " << _registration_options.smooth << " conf " << _registration_options.conf;
+		}
+	}
 }
 
 size_t AsRigidAsPossible::currentIteration()
@@ -153,7 +152,7 @@ void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
 	_solve_iteration = 0;
 
 	_deformation_graph = deformation_graph;
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
 }
 
 void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)
@@ -192,8 +191,9 @@ std::vector<vertex_descriptor> AsRigidAsPossible::subsetOfVerticesToFit()
 
 void AsRigidAsPossible::init()
 {
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_src, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
+	_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>();
 }
 
 
@@ -204,8 +204,8 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 ceres::Solver::Options option,
 									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
-	: _src(src)
-	, _dst(dst)
+	: _source(src)
+	, _target(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
 	, _ceres_logger(logger)
@@ -213,7 +213,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _with_icp(false)
 {
 	init();
-	_fit_cost = std::make_unique<AsRigidAsPossibleFitCostWithoutICP>(_dst, fixed_positions, subsetOfVerticesToFit(), _registration_options);
+	_fit_cost = std::make_unique<AsRigidAsPossibleFitCostWithoutICP>(_target, fixed_positions, subsetOfVerticesToFit(), _registration_options);
 }
 
 
@@ -222,8 +222,8 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 									 ceres::Solver::Options option,
 									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
-	: _src(source)
-	, _dst(target)
+	: _source(source)
+	, _target(target)
 	, _options(option)
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
@@ -234,7 +234,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 	auto global = createGlobalDeformation<ARAPDeformation>(source);
 	_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
 	init();
-	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_dst, subsetOfVerticesToFit(), _registration_options);
+	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_target, subsetOfVerticesToFit(), _registration_options);
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
@@ -243,15 +243,15 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 ceres::Solver::Options option,
 									 const RegistrationOptions & registration_options,
 									 std::shared_ptr<FileWriter> logger)
-	: _src(src)
-	, _dst(dst)
+	: _source(src)
+	, _target(dst)
 	, _options(option)
 	, _deformation_graph(deformation_graph)
 	, _ceres_logger(logger)
 	, _registration_options(registration_options)
 {
 	init();
-	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_dst, subsetOfVerticesToFit(), _registration_options);
+	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_target, subsetOfVerticesToFit(), _registration_options);
 }
 
 

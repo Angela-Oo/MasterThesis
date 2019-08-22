@@ -1,15 +1,14 @@
 #pragma once
 
-#include "arap_deformation.h"
 #include "i_arap_fit_cost.h"
+#include "arap_deformation.h"
+#include "i_arap_smooth_cost.h"
 #include "util/file_writer.h"
 #include "algo/registration/interface/i_registration.h"
 #include "mesh/mesh_definition.h"
-
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
-#include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include <ceres/ceres.h>
 #include <memory>
@@ -27,13 +26,14 @@ public:
 	using Deformation = DeformationGraph<PositionDeformation>;
 	using DeformMesh = DeformationGraphDeformMesh<typename Deformation>;
 private:
-	SurfaceMesh _src;
-	SurfaceMesh _dst;
+	SurfaceMesh _source;
+	SurfaceMesh _target;
 	ceres::Solver::Options _options;
 	DeformationGraph<ARAPDeformation> _deformation_graph;
 	std::unique_ptr<DeformedMesh<Deformation>> _deformed_mesh;
 private:
 	std::unique_ptr<IAsRigidAsPossibleFitCost> _fit_cost;
+	std::unique_ptr<IAsRigidAsPossibleSmoothCost> _smooth_cost;
 private:
 	RegistrationOptions _registration_options;
 	bool _with_icp = true;
@@ -43,16 +43,15 @@ private:
 private:
 	CeresLogger _ceres_logger;
 private:
-	std::vector<vertex_descriptor> subsetOfVerticesToFit();
 	void init();
+	std::vector<vertex_descriptor> subsetOfVerticesToFit();	
 	void evaluateResidual(ceres::Problem & problem,
 						  std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 						  std::unique_ptr<CeresIterationLoggerGuard>& logger);
-private:
-	std::map<edge_descriptor, ResidualIds> addAsRigidAsPossibleCost(ceres::Problem &problem);
 public:
 	bool finished() override;
 	bool solveIteration() override;
+	void updateSmoothFactor();
 	size_t currentIteration() override;
 	bool solve() override;
 public:

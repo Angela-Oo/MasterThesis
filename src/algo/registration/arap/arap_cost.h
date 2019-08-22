@@ -82,13 +82,4 @@ ceres::ResidualBlockId asRigidAsPossibleCost(ceres::Problem & problem,
 											 const vertex_descriptor &target);
 
 
-std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> asRigidAsPossibleCostUseRigidity(ceres::Problem &problem,
-																					            double loss_weighting,
-																					            DeformationGraph<ARAPDeformation> & deformation_graph);
-
-
-std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> asRigidAsPossibleCost(ceres::Problem &problem,
-																					 double loss_weighting,
-																					 DeformationGraph<ARAPDeformation> & deformation_graph);
-
 }
