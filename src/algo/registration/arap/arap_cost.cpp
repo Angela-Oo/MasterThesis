@@ -4,12 +4,12 @@
 
 namespace Registration {
 
-const ceres::ResidualBlockId & pointToPointCost3NN(ceres::Problem & problem,
-												   double loss_weighting,
-												   DeformationGraph<ARAPDeformation> & deformation_graph,
-												   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
-												   const vertex_descriptor &v,
-												   const Point & target_point)
+ceres::ResidualBlockId pointToPointCost3NN(ceres::Problem & problem,
+										   double loss_weighting,
+										   DeformationGraph<ARAPDeformation> & deformation_graph,
+										   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										   const vertex_descriptor &v,
+										   const Point & target_point)
 {
 	auto n_w_vector = deformed_mesh.nearestNodes(v).node_weight_vector;
 	auto & global = deformation_graph._global;	
@@ -34,12 +34,12 @@ const ceres::ResidualBlockId & pointToPointCost3NN(ceres::Problem & problem,
 
 
 
-const ceres::ResidualBlockId & pointToPointCost4NN(ceres::Problem & problem,
-												   double loss_weighting,
-												   DeformationGraph<ARAPDeformation> & deformation_graph,
-												   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
-												   const vertex_descriptor &v,
-												   const Point & target_point)
+ceres::ResidualBlockId pointToPointCost4NN(ceres::Problem & problem,
+										   double loss_weighting,
+										   DeformationGraph<ARAPDeformation> & deformation_graph,
+										   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										   const vertex_descriptor &v,
+										   const Point & target_point)
 {	
 	auto n_w_vector = deformed_mesh.nearestNodes(v).node_weight_vector;
 	auto & global = deformation_graph._global;
@@ -65,13 +65,13 @@ const ceres::ResidualBlockId & pointToPointCost4NN(ceres::Problem & problem,
 }
 
 
-const ceres::ResidualBlockId & pointToPointCost(ceres::Problem & problem,
-												double loss_weighting,
-												double k_neighbors,
-												DeformationGraph<ARAPDeformation> & deformation_graph,
-												DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
-												const vertex_descriptor &v,
-												const Point & target_point)
+ceres::ResidualBlockId pointToPointCost(ceres::Problem & problem,
+										double loss_weighting,
+										double k_neighbors,
+										DeformationGraph<ARAPDeformation> & deformation_graph,
+										DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										const vertex_descriptor &v,
+										const Point & target_point)
 {
 	if (k_neighbors == 3)
 		return pointToPointCost3NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point);
@@ -86,13 +86,13 @@ const ceres::ResidualBlockId & pointToPointCost(ceres::Problem & problem,
 // point to plane
 
 
-const ceres::ResidualBlockId & pointToPlaneCost3NN(ceres::Problem & problem,
-												   double loss_weighting,
-												   DeformationGraph<ARAPDeformation> & deformation_graph,
-												   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
-												   const vertex_descriptor &v,
-												   const Point & target_point,
-												   const Vector & target_normal)
+ceres::ResidualBlockId pointToPlaneCost3NN(ceres::Problem & problem,
+										   double loss_weighting,
+										   DeformationGraph<ARAPDeformation> & deformation_graph,
+										   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										   const vertex_descriptor &v,
+										   const Point & target_point,
+										   const Vector & target_normal)
 {
 	auto n_w_vector = deformed_mesh.nearestNodes(v).node_weight_vector;
 	auto & global = deformation_graph._global;
@@ -111,13 +111,13 @@ const ceres::ResidualBlockId & pointToPlaneCost3NN(ceres::Problem & problem,
 									deformation_graph.getDeformation(n_w_vector[2].first).d());
 }
 
-const ceres::ResidualBlockId & pointToPlaneCost4NN(ceres::Problem & problem,
-												   double loss_weighting,
-												   DeformationGraph<ARAPDeformation> & deformation_graph,
-												   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
-												   const vertex_descriptor &v,
-												   const Point & target_point,
-												   const Vector & target_normal)
+ceres::ResidualBlockId pointToPlaneCost4NN(ceres::Problem & problem,
+										   double loss_weighting,
+										   DeformationGraph<ARAPDeformation> & deformation_graph,
+										   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										   const vertex_descriptor &v,
+										   const Point & target_point,
+										   const Vector & target_normal)
 {
 	auto n_w_vector = deformed_mesh.nearestNodes(v).node_weight_vector;
 	auto & global = deformation_graph._global;
@@ -138,14 +138,14 @@ const ceres::ResidualBlockId & pointToPlaneCost4NN(ceres::Problem & problem,
 									deformation_graph.getDeformation(n_w_vector[3].first).d());
 }
 
-const ceres::ResidualBlockId & pointToPlaneCost(ceres::Problem & problem,
-												double loss_weighting,
-												double k_neighbors,
-												DeformationGraph<ARAPDeformation> & deformation_graph,
-												DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
-												const vertex_descriptor &v,
-												const Point & target_point,
-												const Vector & target_normal)
+ceres::ResidualBlockId pointToPlaneCost(ceres::Problem & problem,
+										double loss_weighting,
+										double k_neighbors,
+										DeformationGraph<ARAPDeformation> & deformation_graph,
+										DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										const vertex_descriptor &v,
+										const Point & target_point,
+										const Vector & target_normal)
 {
 	if (k_neighbors == 3)
 		return pointToPlaneCost3NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point, target_normal);
@@ -157,5 +157,65 @@ const ceres::ResidualBlockId & pointToPlaneCost(ceres::Problem & problem,
 	}
 }
 
+
+
+
+ceres::ResidualBlockId asRigidAsPossibleCost(ceres::Problem & problem,
+											 double loss_weighting,
+											 DeformationGraph<ARAPDeformation> & deformation_graph,
+											 const vertex_descriptor &source,
+											 const vertex_descriptor &target)
+{
+	auto deformations = deformation_graph._mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
+
+	ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(deformation_graph._mesh.point(source), deformation_graph._mesh.point(target));
+	auto loss_function = new ceres::ScaledLoss(NULL, loss_weighting, ceres::TAKE_OWNERSHIP);
+	return problem.AddResidualBlock(cost_function, loss_function,
+									deformations[source].d(), deformations[target].d());
+}
+
+
+std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> asRigidAsPossibleCost(ceres::Problem &problem, 
+																					 double loss_weighting,
+																					 DeformationGraph<ARAPDeformation> & deformation_graph)
+{
+	std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> residual_ids;
+	auto & mesh = deformation_graph._mesh;
+
+	auto & edge_rigidity = mesh.property_map<edge_descriptor, double>("e:rigidity");
+	for (auto e : mesh.halfedges())
+	{
+		auto residual_id = asRigidAsPossibleCost(problem, loss_weighting, deformation_graph, mesh.source(e), mesh.target(e));
+		auto edge = deformation_graph._mesh.edge(e);
+		residual_ids[edge].push_back(residual_id);
+	}
+
+	return residual_ids;
+}
+
+
+std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> asRigidAsPossibleCostUseRigidity(ceres::Problem &problem,
+																					            double loss_weighting,
+																					            DeformationGraph<ARAPDeformation> & deformation_graph)
+{
+	std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> residual_ids;
+	auto & mesh = deformation_graph._mesh;
+
+	auto & edge_rigidity = mesh.property_map<edge_descriptor, double>("e:rigidity");
+	for (auto e : mesh.halfedges())
+	{
+		double smooth = loss_weighting;
+		if (edge_rigidity.second) {
+			smooth = edge_rigidity.first[mesh.edge(e)];
+		}
+
+		auto residual_id = asRigidAsPossibleCost(problem, smooth, deformation_graph, mesh.source(e), mesh.target(e));
+
+		auto edge = deformation_graph._mesh.edge(e);
+		residual_ids[edge].push_back(residual_id);
+	}
+
+	return residual_ids;
+}
 
 }

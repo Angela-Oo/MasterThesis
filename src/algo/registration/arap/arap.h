@@ -46,12 +46,10 @@ private:
 	std::vector<vertex_descriptor> subsetOfVerticesToFit();
 	void init();
 	void evaluateResidual(ceres::Problem & problem,
-						  std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
 						  std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 						  std::unique_ptr<CeresIterationLoggerGuard>& logger);
 private:
 	std::map<edge_descriptor, ResidualIds> addAsRigidAsPossibleCost(ceres::Problem &problem);
-	std::map<vertex_descriptor, ResidualIds> addConfCost(ceres::Problem &problem);
 public:
 	bool finished() override;
 	bool solveIteration() override;

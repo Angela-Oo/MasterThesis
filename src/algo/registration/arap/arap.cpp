@@ -1,5 +1,6 @@
 #include "arap.h"
 #include "arap_cost_functions.h"
+#include "arap_cost.h"
 
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include "algo/remeshing/mesh_simplification.h"
@@ -52,44 +53,15 @@ std::vector<Point> AsRigidAsPossible::getFixedPostions()
 
 EdgeResidualIds AsRigidAsPossible::addAsRigidAsPossibleCost(ceres::Problem &problem)
 {
-	EdgeResidualIds residual_ids;
-	auto & mesh = _deformation_graph._mesh;
-	auto deformations = mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
-	auto & edge_rigidity = mesh.property_map<edge_descriptor, double>("e:rigidity");
-	for (auto e : mesh.halfedges())
-	{		
-		auto target = mesh.target(e);
-		auto source = mesh.source(e);
-
-		double smooth = _registration_options.smooth;
-		if (edge_rigidity.second) {
-			smooth = edge_rigidity.first[mesh.edge(e)];
-		}
-
-		ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(mesh.point(source), mesh.point(target));
-		auto loss_function = new ceres::ScaledLoss(NULL, smooth, ceres::TAKE_OWNERSHIP);
-		auto residual_id = problem.AddResidualBlock(cost_function, loss_function, 
-													deformations[source].d(), deformations[target].d());
-
-		auto edge = _deformation_graph._mesh.edge(e);
-		residual_ids[edge].push_back(residual_id);
+	bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second;
+	if (use_rigidity) {
+		return asRigidAsPossibleCostUseRigidity(problem, _registration_options.smooth, _deformation_graph);
 	}
-
-	return residual_ids;
+	else {
+		return asRigidAsPossibleCost(problem, _registration_options.smooth, _deformation_graph);
+	}
 }
 
-VertexResidualIds AsRigidAsPossible::addConfCost(ceres::Problem &problem)
-{
-	VertexResidualIds residual_ids;
-	auto deformations = _deformation_graph._mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
-	for(auto & v : _deformation_graph._mesh.vertices())
-	{
-		ceres::CostFunction* cost_function = ConfCostFunction::Create();
-		auto loss_function = new ceres::ScaledLoss(NULL, _registration_options.conf, ceres::TAKE_OWNERSHIP);
-		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v].w()));
-	}
-	return residual_ids;
-}
 
 bool AsRigidAsPossible::solveIteration()
 {
@@ -101,26 +73,32 @@ bool AsRigidAsPossible::solveIteration()
 		auto logger = _ceres_logger.CreateCeresIterationLogger(summary);
 
 		ceres::Problem problem;
-		VertexResidualIds fit_residual_ids = _fit_cost->addFitCost(problem, _deformation_graph, *(_deformed_mesh.get()), logger);
-		EdgeResidualIds arap_residual_ids = addAsRigidAsPossibleCost(problem);
+
+		 _fit_cost->addFitCost(problem, _deformation_graph, *(_deformed_mesh.get()), logger);
+
+		 bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second;
+		 EdgeResidualIds arap_residual_ids = addAsRigidAsPossibleCost(problem);
 
 		ceres::Solve(_options, &problem, &summary);
 
 		// evaluate
 		if (_registration_options.evaluate_residuals) {
-			evaluateResidual(problem, fit_residual_ids, arap_residual_ids, logger);
+			evaluateResidual(problem, arap_residual_ids, logger);
 		}
 
 		_last_cost = _current_cost;
 		_current_cost = summary.final_cost;
 
-		auto scale_factor_tol = 0.0001;// 0.00001;
-		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-			(_registration_options.smooth > 0.005))// && a_conf > 0.05))
+		if (!use_rigidity)
 		{
-			_registration_options.smooth /= 2.;
-			_registration_options.conf /= 2.;
-			std::cout << std::endl << "scale factor: smooth " << _registration_options.smooth << " conf " << _registration_options.conf;
+			auto scale_factor_tol = 0.0001;// 0.00001;
+			if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
+				(_registration_options.smooth > 0.005))// && a_conf > 0.05))
+			{
+				_registration_options.smooth /= 2.;
+				_registration_options.conf /= 2.;
+				std::cout << std::endl << "scale factor: smooth " << _registration_options.smooth << " conf " << _registration_options.conf;
+			}
 		}
 	}
 	bool finished_registration = finished();
@@ -153,7 +131,6 @@ bool AsRigidAsPossible::finished()
 }
 
 void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
-										 std::map<vertex_descriptor, ResidualIds> & fit_residual_block_ids,
 										 std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
 										 std::unique_ptr<CeresIterationLoggerGuard>& logger)
 {
@@ -162,17 +139,11 @@ void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
 	if (smooth_cost.second) {
 		auto max_and_mean_cost = evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, _registration_options.smooth);
 		logger->write("max smooth: " + std::to_string(max_and_mean_cost.first) + " reference smooth " + std::to_string(max_and_mean_cost.second * 10.), false);
-	}
-	
+	}	
 	// fit
 	//auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost");
 	//if(fit_cost.second)
 	//	evaluateResiduals(_deformation_graph._mesh, problem, fit_residual_block_ids, fit_cost.first, a_fit);
-
-	//// conf
-	//auto conf_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:conf_cost");
-	//if (conf_cost.second)
-	//	evaluateResiduals(_deformation_graph._mesh, problem, conf_residual_block_ids, conf_cost.first, a_conf);
 }
 
 void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
