@@ -71,54 +71,5 @@ const ceres::ResidualBlockId & pointToPlaneCost(ceres::Problem & problem,
 												const Point & target_point,
 												const Vector & target_normal);
 
-typedef std::vector<ceres::ResidualBlockId> ResidualIds;
-typedef std::map<vertex_descriptor, ResidualIds> VertexResidualIds;
-
-class AsRigidAsPossibleFitCost
-{
-private:
-	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
-	std::vector<vertex_descriptor> _subset_of_vertices_to_fit;
-	RegistrationOptions _options;
-private:
-	bool useVertex(vertex_descriptor & v, DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh);
-	bool addFitCostVertex(ceres::Problem & problem, vertex_descriptor & v, DeformationGraph<ARAPDeformation> & deformation_graph,
-						  DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh, VertexResidualIds &residual_ids);
-public:
-	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem, 
-														DeformationGraph<ARAPDeformation> & deformation_graph,
-														DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh, 
-														std::unique_ptr<CeresIterationLoggerGuard>& logger);
-public:
-	AsRigidAsPossibleFitCost(SurfaceMesh & target,
-							 std::vector<vertex_descriptor> & subset_of_vertices_to_fit,
-							 RegistrationOptions options);
-};
-
-class AsRigidAsPossibleFitCostWithoutICP
-{
-private:
-	SurfaceMesh & _target;
-	std::vector<vertex_descriptor> _subset_of_vertices_to_fit;
-	RegistrationOptions _options;
-	std::vector<vertex_descriptor> _fixed_positions;
-private:
-	ResidualIds addFitCostVertex(ceres::Problem & problem,
-								 DeformationGraph<ARAPDeformation> & deformation_graph,
-								 DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
-								 SurfaceMesh::Vertex_index & v);
-public:
-	std::map<vertex_descriptor, ResidualIds> addFitCost(ceres::Problem &problem,
-														DeformationGraph<ARAPDeformation> & deformation_graph,
-														DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
-														std::unique_ptr<CeresIterationLoggerGuard>& logger);
-
-public:
-	AsRigidAsPossibleFitCostWithoutICP(SurfaceMesh & target,
-									   std::vector<vertex_descriptor> fixed_positions,
-									   std::vector<vertex_descriptor> & subset_of_vertices_to_fit,
-									   RegistrationOptions options);
-};
-
 
 }
