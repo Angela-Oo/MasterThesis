@@ -19,8 +19,9 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationTy
 {
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP_AllFrames) {
-		//using SequenceARAPFactory = RigidBeforeNonRigidRegistrationFactory<ARAPFactory>;
-		return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>>(mesh_sequence, options, logger);
+		return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<AdaptiveRigidityRegistration<AsRigidAsPossible>>>>(mesh_sequence, options, logger);
+		//return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<AsRigidAsPossible>>>(mesh_sequence, options, logger);
+		//return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>>(mesh_sequence, options, logger);
 	}
 	else if (type == RegistrationType::ED_AllFrames) {
 		return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<EmbeddedDeformation>>>(mesh_sequence, options, logger);
@@ -44,8 +45,8 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 	logOptions(logger, options, ceres_options);
 	if (type == RegistrationType::ARAP) {
 		//return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>(source, target, ceres_options, options, logger);
-		//return std::make_unique<RefineDeformationGraphRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
-		return std::make_unique<AdaptiveRigidityRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
+		return std::make_unique<RefineDeformationGraphRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
+		//return std::make_unique<AdaptiveRigidityRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
 	}
 	else if (type == RegistrationType::ED) {
 		return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<EmbeddedDeformation>>>(source, target, ceres_options, options, logger);

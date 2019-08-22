@@ -21,6 +21,7 @@ public:
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
 public:
 	std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const;
+	//std::vector<vertex_descriptor> DeformationGraph::getKNearestNodesTest(const Point & point, unsigned int k) const;
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
@@ -79,6 +80,18 @@ std::vector<vertex_descriptor> DeformationGraph<PositionDeformation>::getKNeares
 		indices.push_back(sorted_node_distance[i].first);
 	return indices;
 }
+
+//
+//template <typename PositionDeformation>
+//std::vector<vertex_descriptor> DeformationGraph<PositionDeformation>::getKNearestNodesTest(const Point & point, unsigned int k) const
+//{
+//	Neighbor_search search = _knn_search->search(point, k);
+//	std::vector<vertex_descriptor> indices;
+//	for (Neighbor_search::iterator it = search.begin(); it != search.end(); ++it) {
+//		indices.push_back(it->first);
+//	}
+//	return indices;
+//}
 
 template <typename PositionDeformation>
 Point DeformationGraph<PositionDeformation>::deformPoint(const Point & point, const NearestNodes & nearest_nodes) const

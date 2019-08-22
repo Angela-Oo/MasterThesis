@@ -343,14 +343,14 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
 	ml::mat4f transformation = transform2 * transform * rotation * scale;
 
-	bool test = true;
+	bool test = false;
 	bool register_on_reference_mesh = true;
 	bool load_compare_mesh = false;
-	bool load_all_frames = true;
-	unsigned int number_of_frames_to_load = 20;
+	bool load_all_frames = false;
+	unsigned int number_of_frames_to_load = 10;
 	if (!test) {
 		_registration_options.evaluate_residuals = true;
-		_registration_options.dg_options.edge_length = 0.3;// 0.15;
+		_registration_options.dg_options.edge_length = 0.05;// 0.2;// 0.05;// 0.15;
 		_registration_options.ignore_deformation_graph_border_vertices = false;
 		_registration_options.dg_options.number_of_interpolation_neighbors = 4;
 		_registration_options.use_vertex_random_probability = 0.5;
@@ -377,14 +377,12 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_registration_options.smooth = 5.;
 		_registration_options.fit = 10.;
 		_registration_options.use_vertex_random_probability = 0.2;
-		_registration_options.dg_options.edge_length = 0.7;// 0.3;
 	
 		// hand
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
 		//_data_name = "hand";
-		//_registration_options.dg_options.edge_length = 0.15;
-		//_registration_options.use_vertex_random_probability = 0.5;
+		//_registration_options.use_vertex_random_probability = 0.15;
 
 		if (register_on_reference_mesh || load_compare_mesh) {
 			if (load_all_frames) {
