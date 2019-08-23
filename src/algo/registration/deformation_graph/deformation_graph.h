@@ -7,7 +7,8 @@
 #include "algo/nearest_neighbor_search/nearest_neighbor_search.h"
 #include <CGAL/squared_distance_3.h> //for 3D functions
 #include <vector>
-
+#include "algo/registration/util/math.h"
+#include "algo/registration/util/dual_quaternion.h"
 
 namespace Registration
 {
@@ -27,6 +28,7 @@ public:
 public:
 	std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const;
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
+	Point deformDLBPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
 	PositionDeformation & getDeformation(vertex_descriptor node_index) const;
@@ -116,6 +118,29 @@ Point DeformationGraph<PositionDeformation>::deformPoint(const Point & point, co
 	}
 
 	Point global_deformed_point = _global.deformPosition(CGAL::ORIGIN + deformed_point);
+	return global_deformed_point;
+}
+
+template <typename PositionDeformation>
+Point DeformationGraph<PositionDeformation>::deformDLBPoint(const Point & point, const NearestNodes & nearest_nodes) const
+{
+	// vi' = sum_j  wj(vi) * [ Rj(vi - gj) + gj + tj ]
+	DualQuaternion dq(ml::mat4d::identity());
+	for (auto n_w : nearest_nodes.node_weight_vector)
+	{
+		double w = n_w.second;
+		auto deformation = getDeformation(n_w.first);
+		auto dual_transformation = deformation.deformDLBPosition();
+		DualNumber weight(w, w);// 0.);// w);
+		dual_transformation = dual_transformation * weight;
+		dq += dual_transformation;
+	}
+
+	dq.normalize();
+	ml::mat4d transformation = dq.operator ml::mat4d();
+	ml::vec3d deformed_point = transformation * convertVector(point - CGAL::ORIGIN);
+
+	Point global_deformed_point = _global.deformPosition(CGAL::ORIGIN + convertVector(deformed_point));
 	return global_deformed_point;
 }
 

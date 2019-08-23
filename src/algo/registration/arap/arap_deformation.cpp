@@ -2,6 +2,8 @@
 #include "mLibCore.h"
 #include <ceres/rotation.h>
 
+#include "algo/registration/util/math.h"
+#include "algo/registration/util/dual_quaternion.h"
 
 namespace Registration {
 
@@ -10,7 +12,8 @@ Matrix ARAPDeformation::rotation() const
 	ml::mat3d r;
 	ceres::AngleAxisToRotationMatrix(_d.array, r.getData());
 	auto r_t =  r.getTranspose(); // why??
-	Matrix m(r_t(0, 0), r_t(0, 1), r_t(0, 2), r_t(1, 0), r_t(1, 1), r_t(1, 2), r_t(2, 0), r_t(2, 1), r_t(2, 2));
+	Matrix m = convertMatrix(r_t);
+	//Matrix m(r_t(0, 0), r_t(0, 1), r_t(0, 2), r_t(1, 0), r_t(1, 1), r_t(1, 2), r_t(2, 0), r_t(2, 1), r_t(2, 2));
 	return m;
 }
 
@@ -36,6 +39,19 @@ Point ARAPDeformation::deformPosition(const Point & point) const
 	Vector rotated_point = rotation()(edge);
 	Vector moved_position = (_position - CGAL::ORIGIN) + translation();
 	return CGAL::ORIGIN + moved_position + rotated_point;
+}
+
+DualQuaternion ARAPDeformation::deformDLBPosition() const
+{
+	Matrix r = rotation();
+	Vector t = translation();
+	ml::mat3d rotation_m = convertMatrix(r);
+	ml::vec3d translation = convertVector(t);
+
+	ml::mat4d transformation(rotation_m, translation);	
+	DualQuaternion dual(transformation);
+
+	return dual;
 }
 
 Vector ARAPDeformation::deformNormal(const Vector & normal) const
@@ -102,6 +118,12 @@ ARAPDeformation interpolateDeformations(Point position, std::vector<std::pair<AR
 	d[0] = 0.;
 	d[1] = 0.;
 	d[2] = 0.;
+	for (auto d_w : deformation_weights_vector)
+	{
+		auto deformation = d_w.first.deformation();
+		double weight = d_w.second;	
+		d += (deformation * weight);
+	}
 
 	Vector deformed_point(0., 0., 0.);
 	for (auto d_w : deformation_weights_vector)

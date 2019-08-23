@@ -3,6 +3,7 @@
 #include "algo/registration/deformation_graph/i_deformation.h"
 #include "algo/registration/rigid_registration/rigid_deformation.h"
 #include "mLibCore.h"
+#include "algo/registration/util/dual_quaternion.h"
 
 namespace Registration {
 
@@ -24,6 +25,7 @@ public:
 public:
 	Point getDeformedPosition() const;
 	Point deformPosition(const Point & point) const;
+	DualQuaternion deformDLBPosition() const;
 	Vector deformNormal(const Vector & normal) const;
 public:
 	double weight() const { return _w; };

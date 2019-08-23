@@ -164,18 +164,6 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsIm
 	return _non_rigid_registration->shouldBeSavedAsImage();
 }
 
-//template<typename NonRigidRegistration>
-//RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration, HierarchicalMesh hierarchical_mesh)
-//	: _non_rigid_registration(std::move(non_rigid_registration))
-//	, _is_refined(false)
-//	, _finished(false)
-//	, _number_of_refinements(0)
-//	, _current_iteration(0)
-//	, _deformation(std::move(hierarchical_mesh))
-//{
-//}
-
-
 template<typename NonRigidRegistration>
 RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(const SurfaceMesh& source,
 														                                     const SurfaceMesh& target,
