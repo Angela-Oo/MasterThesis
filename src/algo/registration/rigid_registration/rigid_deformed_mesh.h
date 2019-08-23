@@ -15,6 +15,7 @@ public:
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh);
 public:
 	RigidDeformedMesh(const RigidDeformation & deformation_graph);
+	RigidDeformedMesh(const RigidDeformation & deformation_graph, unsigned int k);
 };
 
 }

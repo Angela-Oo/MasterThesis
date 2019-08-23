@@ -26,7 +26,7 @@ template <typename NonRigidDeformation, typename DeformMesh>
 SurfaceMesh RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::deformationGraphMesh()
 {
 	if (_deformation.is_rigid_deformation) {
-		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation);
+		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation, _k);
 		return deform_mesh.deformationGraphMesh();
 	}
 	else {
@@ -39,7 +39,7 @@ template <typename NonRigidDeformation, typename DeformMesh>
 SurfaceMesh RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::deformedMesh(const SurfaceMesh & mesh)
 {
 	if (_deformation.is_rigid_deformation) {
-		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation);
+		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation, _k);
 		return deform_mesh.deformedMesh(mesh);
 	}
 	else {

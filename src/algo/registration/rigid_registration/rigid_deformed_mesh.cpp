@@ -25,4 +25,9 @@ RigidDeformedMesh::RigidDeformedMesh(const RigidDeformation & deformation)
 	: _deformation(deformation)
 {}
 
+
+RigidDeformedMesh::RigidDeformedMesh(const RigidDeformation & deformation, unsigned int k)
+	: _deformation(deformation)
+{}
+
 }
