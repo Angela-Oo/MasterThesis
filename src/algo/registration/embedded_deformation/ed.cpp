@@ -25,7 +25,7 @@ SurfaceMesh EmbeddedDeformation::getDeformedPoints()
 SurfaceMesh EmbeddedDeformation::getInverseDeformedPoints()
 {
 	auto inverse_deformation = _deformation_graph.invertDeformation();
-	DeformedMesh<Deformation> deformed(_target, inverse_deformation, _options.dg_options.number_of_interpolation_neighbors);
+	DeformedMesh<Deformation> deformed(_target, inverse_deformation);
 	return deformed.deformPoints();
 }
 
@@ -52,7 +52,7 @@ void EmbeddedDeformation::setDeformation(const Deformation & deformation_graph)
 	_solve_iteration = 0;
 
 	_deformation_graph = deformation_graph;
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, 4);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 }
 
 SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
@@ -343,7 +343,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	a_smooth = 10.;
 	a_fit = 10.;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _options.dg_options.number_of_interpolation_neighbors);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
@@ -361,12 +361,12 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	auto reduced_mesh = createReducedMesh(source, _options.dg_options.edge_length, _options.mesh_reduce_strategy);
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", _options.dg_options.edge_length);
 	auto global = createGlobalDeformation<EDDeformation>(_source);
-	_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
+	_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, _options.dg_options.number_of_interpolation_neighbors);
 
 	setParameters();
 
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _options.dg_options.number_of_interpolation_neighbors);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 }
 
 
@@ -386,7 +386,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 {
 	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _options.dg_options.number_of_interpolation_neighbors);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 }
 
 
@@ -412,7 +412,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.dg_options.edge_length);
 	auto global = createGlobalDeformation<EDDeformation>(reduced_mesh);
-	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(src, dst, fixed_positions, deformation_graph, option, registration_options, logger);
 }
 
@@ -426,7 +426,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.dg_options.edge_length);
 	auto global = createGlobalDeformation<EDDeformation>(reduced_mesh);
-	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options, logger);
 }
 
@@ -441,7 +441,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.dg_options.edge_length);
 	auto global = createGlobalEDDeformationFromRigidDeformation(rigid_deformation);
-	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options, logger);
 }
 
@@ -455,7 +455,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 										                       std::shared_ptr<FileWriter> logger)
 {
 	auto global = createGlobalEDDeformationFromRigidDeformation(rigid_deformation);
-	auto new_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(deformation_graph._mesh, global);
+	auto new_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(deformation_graph._mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(src, dst, new_deformation_graph, option, registration_options, logger);
 }
 

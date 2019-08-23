@@ -41,7 +41,7 @@ SurfaceMesh AsRigidAsPossible::getDeformedPoints()
 SurfaceMesh AsRigidAsPossible::getInverseDeformedPoints()
 {
 	auto inverse_deformation = _deformation_graph.invertDeformation();
-	DeformedMesh<Deformation> deformed(_target, inverse_deformation, _registration_options.dg_options.number_of_interpolation_neighbors);
+	DeformedMesh<Deformation> deformed(_target, inverse_deformation);
 	return deformed.deformPoints();
 }
 
@@ -152,7 +152,7 @@ void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
 	_solve_iteration = 0;
 
 	_deformation_graph = deformation_graph;
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 }
 
 void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)
@@ -191,7 +191,7 @@ std::vector<vertex_descriptor> AsRigidAsPossible::subsetOfVerticesToFit()
 
 void AsRigidAsPossible::init()
 {
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _registration_options.dg_options.number_of_interpolation_neighbors);
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
 	_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>();
 }
@@ -232,7 +232,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", _registration_options.dg_options.edge_length);
 
 	auto global = createGlobalDeformation<ARAPDeformation>(source);
-	_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
+	_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, _registration_options.dg_options.number_of_interpolation_neighbors);
 	init();
 	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_target, subsetOfVerticesToFit(), _registration_options);
 }
@@ -280,7 +280,7 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.dg_options.edge_length);
 	auto global = createGlobalDeformation<ARAPDeformation>(reduced_mesh);
-	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global);
+	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
 	return std::make_unique<AsRigidAsPossible>(src, dst, fixed_positions, deformation_graph, option, registration_options, logger);
 }
 

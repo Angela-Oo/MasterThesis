@@ -11,12 +11,11 @@ class DeformationGraphDeformMesh
 {
 private:
 	const DeformationGraph & _deformation;
-	unsigned int _k; // number of interpolated deformation graph nodes per vertex
 public:
 	SurfaceMesh deformationGraphMesh();
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh);
 public:
-	DeformationGraphDeformMesh(const DeformationGraph & deformation_graph, unsigned int number_of_interpolation_neighbors);
+	DeformationGraphDeformMesh(const DeformationGraph & deformation_graph, unsigned int number_of_interpolation_neighbors = 4); // todo
 };
 
 template <typename DeformationGraph>
@@ -28,14 +27,13 @@ SurfaceMesh DeformationGraphDeformMesh<DeformationGraph>::deformationGraphMesh()
 template <typename DeformationGraph>
 SurfaceMesh DeformationGraphDeformMesh<DeformationGraph>::deformedMesh(const SurfaceMesh & mesh)
 {
-	DeformedMesh<DeformationGraph> deformed(mesh, _deformation, _k);
+	DeformedMesh<DeformationGraph> deformed(mesh, _deformation);
 	return deformed.deformPoints();
 }
 
 template <typename DeformationGraph>
-DeformationGraphDeformMesh<DeformationGraph>::DeformationGraphDeformMesh(const DeformationGraph & deformation, unsigned int number_of_interpolation_neighbors)
+DeformationGraphDeformMesh<DeformationGraph>::DeformationGraphDeformMesh(const DeformationGraph & deformation, unsigned int number_of_interpolation_neighbors) // todo
 	: _deformation(deformation)
-	, _k(number_of_interpolation_neighbors)
 {}
 
 

@@ -18,10 +18,14 @@ class DeformationGraph
 public:
 	SurfaceMesh _mesh;
 	PositionDeformation _global;
+private:
+	unsigned int _k; // number of interpolation neighbors
+public:
 	std::unique_ptr<NearestNeighborSearch> _knn_search;
 public:
+	unsigned int getNumberOfInterpolationNeighbors() const { return _k; }
+public:
 	std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const;
-	//std::vector<vertex_descriptor> DeformationGraph::getKNearestNodesTest(const Point & point, unsigned int k) const;
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
 public:
@@ -35,7 +39,8 @@ public:
 	DeformationGraph() = default;
 	// all mesh vertices will be deformation nodes
 	DeformationGraph(const SurfaceMesh & graph, 
-					 const PositionDeformation & global_deformation);
+					 const PositionDeformation & global_deformation,
+					 unsigned int k);
 	DeformationGraph(const DeformationGraph<PositionDeformation> & deformation_graph);
 	DeformationGraph<PositionDeformation> & operator=(DeformationGraph<PositionDeformation> other);
 };
@@ -184,14 +189,16 @@ DeformationGraph<PositionDeformation> DeformationGraph<PositionDeformation>::inv
 	}
 
 	auto global = _global.invertDeformation();
-	return DeformationGraph(mesh, global);
+	return DeformationGraph(mesh, global, _k);
 }
 
 template <typename PositionDeformation>
 DeformationGraph<PositionDeformation>::DeformationGraph(const SurfaceMesh & graph,
-														const PositionDeformation & global_deformation)
+														const PositionDeformation & global_deformation,
+														unsigned int k)
 	: _mesh(graph)
 	, _global(global_deformation)
+	, _k(k)
 {
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
@@ -202,6 +209,7 @@ template <typename PositionDeformation>
 DeformationGraph<PositionDeformation>::DeformationGraph(const DeformationGraph<PositionDeformation> & deformation_graph)
 	: _global(deformation_graph._global)
 	, _mesh(deformation_graph._mesh)
+	, _k(deformation_graph._k)
 {
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 }
@@ -214,6 +222,7 @@ DeformationGraph<PositionDeformation> & DeformationGraph<PositionDeformation>::o
 
 	_global = other._global;
 	_mesh = other._mesh;
+	_k = other._k;
 
 	_knn_search = std::make_unique<NearestNeighborSearch>(_mesh);
 	return *this;
@@ -234,7 +243,8 @@ PositionDeformation createGlobalDeformation(const SurfaceMesh & mesh)
 
 template <typename PositionDeformation>
 DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh mesh,
-																	 PositionDeformation global_deformation)
+																	 PositionDeformation global_deformation,
+																	 unsigned int number_of_interpolation_neighbors)
 {
 	SurfaceMesh::Property_map<vertex_descriptor, PositionDeformation> nodes;
 	bool created;
@@ -248,7 +258,7 @@ DeformationGraph<PositionDeformation> createDeformationGraphFromMesh(SurfaceMesh
 		nodes[v] = PositionDeformation(mesh.point(v));
 		colors[v] = vertex_color;
 	}
-	return DeformationGraph<PositionDeformation>(mesh, global_deformation);
+	return DeformationGraph<PositionDeformation>(mesh, global_deformation, number_of_interpolation_neighbors);
 }
 
 

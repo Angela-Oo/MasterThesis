@@ -11,33 +11,30 @@ class RefinementDeformMesh
 {
 private:
 	const RefineDeformationGraphDeformation<Deformation> & _deformation;
-	unsigned int _k; // number of interpolated deformation graph nodes per vertex
 public:
 	SurfaceMesh deformationGraphMesh();
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh);
 public:
-	RefinementDeformMesh(const RefineDeformationGraphDeformation<Deformation> & deformation, 
-						 unsigned int number_of_interpolation_neighbors);
+	RefinementDeformMesh(const RefineDeformationGraphDeformation<Deformation> & deformation);
 };
 
 template <typename Deformation, typename DeformMesh>
 SurfaceMesh RefinementDeformMesh<Deformation, DeformMesh>::deformationGraphMesh()
 {
-	DeformMesh deform_mesh(_deformation.non_rigid_deformation, _k);
+	DeformMesh deform_mesh(_deformation.non_rigid_deformation);
 	return deform_mesh.deformationGraphMesh();
 }
 
 template <typename Deformation, typename DeformMesh>
 SurfaceMesh RefinementDeformMesh<Deformation, DeformMesh>::deformedMesh(const SurfaceMesh & mesh)
 {
-	DeformMesh deform_mesh(_deformation.non_rigid_deformation, _k);
+	DeformMesh deform_mesh(_deformation.non_rigid_deformation);
 	return deform_mesh.deformedMesh(mesh);
 }
 
 template <typename Deformation, typename DeformMesh>
-RefinementDeformMesh<Deformation, DeformMesh>::RefinementDeformMesh(const RefineDeformationGraphDeformation<Deformation> & deformation, unsigned int number_of_interpolation_neighbors)
+RefinementDeformMesh<Deformation, DeformMesh>::RefinementDeformMesh(const RefineDeformationGraphDeformation<Deformation> & deformation)
 	: _deformation(deformation)
-	, _k(number_of_interpolation_neighbors)
 {}
 
 

@@ -18,19 +18,18 @@ public:
 	SurfaceMesh deformationGraphMesh();
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh);
 public:
-	RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation, 
-								  unsigned int number_of_interpolation_neighbors);
+	RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation);
 };
 
 template <typename NonRigidDeformation, typename DeformMesh>
 SurfaceMesh RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::deformationGraphMesh()
 {
 	if (_deformation.is_rigid_deformation) {
-		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation, _k);
+		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation);
 		return deform_mesh.deformationGraphMesh();
 	}
 	else {
-		DeformMesh deform_mesh(_deformation.non_rigid_deformation, _k);
+		DeformMesh deform_mesh(_deformation.non_rigid_deformation);
 		return deform_mesh.deformationGraphMesh();
 	}
 }
@@ -39,19 +38,18 @@ template <typename NonRigidDeformation, typename DeformMesh>
 SurfaceMesh RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::deformedMesh(const SurfaceMesh & mesh)
 {
 	if (_deformation.is_rigid_deformation) {
-		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation, _k);
+		RigidDeformedMesh deform_mesh(_deformation.rigid_deformation);
 		return deform_mesh.deformedMesh(mesh);
 	}
 	else {
-		DeformMesh deform_mesh(_deformation.non_rigid_deformation, _k);
+		DeformMesh deform_mesh(_deformation.non_rigid_deformation);
 		return deform_mesh.deformedMesh(mesh);
 	}
 }
 
 template <typename NonRigidDeformation, typename DeformMesh>
-RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation, unsigned int number_of_interpolation_neighbors)
+RigidBeforeNonRigidDeformMesh<NonRigidDeformation, DeformMesh>::RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation)
 	: _deformation(deformation)
-	, _k(number_of_interpolation_neighbors)
 {}
 
 

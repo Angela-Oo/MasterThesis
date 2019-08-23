@@ -20,8 +20,9 @@ SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_g
 
 
 template <typename DeformationGraph>
-NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Point point, unsigned int k)
+NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Point point)
 {
+	unsigned int k = deformation_graph.getNumberOfInterpolationNeighbors();
 	std::vector<vertex_descriptor> nearest_deformation_nodes = deformation_graph.getKNearestNodes(point, k + 1);
 	//std::vector<vertex_descriptor> nearest_deformation_nodes = deformation_graph.getKNearestNodesTest(point, k + 1);
 	// calculate weights
@@ -230,7 +231,6 @@ class DeformedMesh
 private:
 	const DeformationGraph & _deformation_graph;
 	SurfaceMesh _mesh;
-	unsigned int _k; // number of interpolated deformation graph nodes per vertex
 public:
 	CGAL::Iterator_range<SurfaceMesh::Vertex_iterator> vertices() const;
 	uint32_t number_of_vertices() const;
@@ -243,8 +243,7 @@ public:
 	SurfaceMesh deformPoints();
 public:
 	DeformedMesh(const SurfaceMesh & mesh, 
-				 const DeformationGraph & deformation_graph, 
-				 unsigned int number_of_interpolation_neighbors);
+				 const DeformationGraph & deformation_graph);
 };
 
 
@@ -318,19 +317,17 @@ SurfaceMesh DeformedMesh<DeformationGraph>::deformPoints()
 
 
 template <typename DeformationGraph>
-DeformedMesh<DeformationGraph>::DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph, unsigned int number_of_interpolation_neighbors)
+DeformedMesh<DeformationGraph>::DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph)
 	: _mesh(mesh)
 	, _deformation_graph(deformation_graph)
-	, _k(number_of_interpolation_neighbors)
 {
 	SurfaceMesh::Property_map<vertex_descriptor, NearestNodes> nearest_nodes;
 	bool created;
 	boost::tie(nearest_nodes, created) = _mesh.add_property_map<vertex_descriptor, NearestNodes>("v:nearest_nodes", NearestNodes());
-	//assert(created);
 
 	for (auto & v : _mesh.vertices()) {
 		auto point = _mesh.point(v);
-		nearest_nodes[v] = createNearestNodes(_deformation_graph, point, _k);
+		nearest_nodes[v] = createNearestNodes(_deformation_graph, point);
 	}
 }
 

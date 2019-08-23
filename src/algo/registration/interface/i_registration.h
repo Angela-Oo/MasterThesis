@@ -11,10 +11,12 @@ namespace Registration {
 struct DeformationGraphOptions
 {
 	double  edge_length;
+	unsigned int levels; // only used for refinement
 	unsigned int number_of_interpolation_neighbors;
 
 	DeformationGraphOptions()
 		: edge_length(0.05)
+		, levels(4)
 		, number_of_interpolation_neighbors(4)
 	{}
 };
