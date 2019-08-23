@@ -18,7 +18,8 @@ public:
 	SurfaceMesh deformationGraphMesh();
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh);
 public:
-	RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation, unsigned int number_of_interpolation_neighbors = 4);
+	RigidBeforeNonRigidDeformMesh(const RigidBeforeNonRigidDeformation<NonRigidDeformation> & deformation, 
+								  unsigned int number_of_interpolation_neighbors);
 };
 
 template <typename NonRigidDeformation, typename DeformMesh>

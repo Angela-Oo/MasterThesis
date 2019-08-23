@@ -31,7 +31,9 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 	double d_max = 1.;
 
 	auto radius_map = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:radius");
-	if (false) { //radius_map.second) {
+	if (false) { // wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
+		// with ri equal to value in v:radius
+
 		// calculate weight per deformation node
 		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
 		
@@ -41,8 +43,8 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 			Point node_point = deformation_graph.getDeformation(v).position();
 
 			double distance = CGAL::squared_distance(point, node_point);
-			double radius = pow((radius_map.first[v] * 2.), 2);
-			//double radius = pow((radius_map.first[v]), 2);
+			//double radius = pow((radius_map.first[v] * 2.), 2);
+			double radius = pow((radius_map.first[v]), 2);
 			double weight = 1. - (distance / radius);
 			weight = std::pow(weight, 3);
 			weight = std::max(0., weight);
@@ -50,7 +52,7 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 			sum += weight;
 		}
 	}
-	else if (false) { // radius equal to d_max of other paper
+	else if (false) { // radius ri equal to d_max of other paper
 		// calculate weight per deformation node
 		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
 		auto v_max = nearest_deformation_nodes.back();
@@ -80,7 +82,7 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 			sum += weight;
 		}
 	}
-	else if (true) {
+	else if (true) { // ri depending on ring one neighbor vertices
 		// calculate weight per deformation node
 		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
 
@@ -92,12 +94,16 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 			double distance = CGAL::squared_distance(point, node_point);
 
 			double radius = 0.;
+			int j = 0;
 			for (auto & nv : deformation_graph._mesh.vertices_around_target(deformation_graph._mesh.halfedge(v)))
 			{
 				auto n_point = deformation_graph._mesh.point(nv);
 				double d = CGAL::squared_distance(n_point, node_point);
-				radius = std::max(radius, d);
+				radius += d;
+				++j;
+				//radius = std::max(radius, d);
 			}
+			radius /= j;
 
 			double weight = 1. - (distance / radius);
 			weight = std::pow(weight, 3);
@@ -236,7 +242,9 @@ public:
 	const SurfaceMesh & getSourceMesh();
 	SurfaceMesh deformPoints();
 public:
-	DeformedMesh(const SurfaceMesh & mesh, const DeformationGraph & deformation_graph, unsigned int number_of_interpolation_neighbors);
+	DeformedMesh(const SurfaceMesh & mesh, 
+				 const DeformationGraph & deformation_graph, 
+				 unsigned int number_of_interpolation_neighbors);
 };
 
 

@@ -16,7 +16,8 @@ public:
 	SurfaceMesh deformationGraphMesh();
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh);
 public:
-	RefinementDeformMesh(const RefineDeformationGraphDeformation<Deformation> & deformation, unsigned int number_of_interpolation_neighbors = 4);
+	RefinementDeformMesh(const RefineDeformationGraphDeformation<Deformation> & deformation, 
+						 unsigned int number_of_interpolation_neighbors);
 };
 
 template <typename Deformation, typename DeformMesh>

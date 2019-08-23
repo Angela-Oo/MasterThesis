@@ -21,5 +21,6 @@ public:
 	size_t size() override;
 	bool processAllFrames();
 public:
-	HierarchicalDeformationGraphReader(std::shared_ptr<MeshReader> reader);
+	HierarchicalDeformationGraphReader(std::shared_ptr<MeshReader> reader,
+									   unsigned int number_of_interpolation_neighbors);
 };

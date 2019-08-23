@@ -28,14 +28,15 @@ size_t HierarchicalDeformationGraphReader::size()
 	return _meshes.size();
 }
 
-HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shared_ptr<MeshReader> reader)
+HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shared_ptr<MeshReader> reader,
+																	   unsigned int number_of_interpolation_neighbors)
 	: _reader(reader)
 	, _radius(0.05)
 {
 	_reader->processFrame();
 	_mesh = _reader->getMesh(0);
 
-	_hierarchical_mesh = generateHierarchicalMesh(_mesh, _radius, 4);
+	_hierarchical_mesh = generateHierarchicalMesh(_mesh, _radius, number_of_interpolation_neighbors);
 	for (unsigned int i = 0; i < _hierarchical_mesh.size(); ++i)
 		_meshes.emplace_back(_hierarchical_mesh.getMesh(i));
 	auto mesh_to_refine = _hierarchical_mesh.getInitMesh();

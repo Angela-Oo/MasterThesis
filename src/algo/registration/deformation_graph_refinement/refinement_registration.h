@@ -22,6 +22,7 @@ private:
 private:
 	Deformation _deformation;
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
+	RegistrationOptions _options;
 	bool _is_refined;
 	int _number_of_refinements;
 	unsigned int _current_iteration;
@@ -42,7 +43,7 @@ public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	bool shouldBeSavedAsImage() override;
 public:
-	RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration, HierarchicalMesh hierarchical_mesh);
+	//RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration, HierarchicalMesh hierarchical_mesh);
 
 	RefineDeformationGraphRegistration(const SurfaceMesh& source,
 									   const SurfaceMesh& target,
@@ -107,7 +108,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	}
 	else if(_is_refined == false) {
 		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
-		_deformation.non_rigid_deformation = refineHierarchicalMesh(_deformation);
+		_deformation.non_rigid_deformation = refineHierarchicalMesh(_deformation, _options.dg_options.number_of_interpolation_neighbors);
 		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
 		_number_of_refinements++;
 		if(_number_of_refinements > 4)
@@ -163,16 +164,16 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsIm
 	return _non_rigid_registration->shouldBeSavedAsImage();
 }
 
-template<typename NonRigidRegistration>
-RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration, HierarchicalMesh hierarchical_mesh)
-	: _non_rigid_registration(std::move(non_rigid_registration))
-	, _is_refined(false)
-	, _finished(false)
-	, _number_of_refinements(0)
-	, _current_iteration(0)
-	, _deformation(std::move(hierarchical_mesh))
-{
-}
+//template<typename NonRigidRegistration>
+//RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration, HierarchicalMesh hierarchical_mesh)
+//	: _non_rigid_registration(std::move(non_rigid_registration))
+//	, _is_refined(false)
+//	, _finished(false)
+//	, _number_of_refinements(0)
+//	, _current_iteration(0)
+//	, _deformation(std::move(hierarchical_mesh))
+//{
+//}
 
 
 template<typename NonRigidRegistration>
@@ -185,8 +186,9 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 	, _finished(false)
 	, _number_of_refinements(0)
 	, _current_iteration(0)
+	, _options(options)
 {
-	auto hierarchical_mesh = generateHierarchicalMesh(source, options.dg_options.edge_length, 4);
+	auto hierarchical_mesh = generateHierarchicalMesh(source, options.dg_options.edge_length, options.dg_options.number_of_interpolation_neighbors);
 	auto global = createGlobalDeformation<typename NonRigidRegistration::PositionDeformation>(source);
 	auto deformation_graph = createDeformationGraphFromMesh<typename NonRigidRegistration::PositionDeformation>(hierarchical_mesh.getInitMesh(), global);
 
@@ -206,6 +208,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 	, _number_of_refinements(0)
 	, _current_iteration(0)
 	, _deformation(deformation)
+	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, _deformation.non_rigid_deformation, ceres_option, options, logger);
 };

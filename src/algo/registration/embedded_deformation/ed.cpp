@@ -25,7 +25,7 @@ SurfaceMesh EmbeddedDeformation::getDeformedPoints()
 SurfaceMesh EmbeddedDeformation::getInverseDeformedPoints()
 {
 	auto inverse_deformation = _deformation_graph.invertDeformation();
-	DeformedMesh<Deformation> deformed(_target, inverse_deformation, 4); // todo
+	DeformedMesh<Deformation> deformed(_target, inverse_deformation, _options.dg_options.number_of_interpolation_neighbors);
 	return deformed.deformPoints();
 }
 
@@ -343,7 +343,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	a_smooth = 10.;
 	a_fit = 10.;
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, 4); // todo
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _options.dg_options.number_of_interpolation_neighbors);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
@@ -366,7 +366,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	setParameters();
 
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, 4); // todo
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _options.dg_options.number_of_interpolation_neighbors);
 }
 
 
@@ -386,7 +386,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 {
 	setParameters();
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, _find_max_distance, _find_max_angle_deviation, 10.);
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, 4); // todo
+	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph, _options.dg_options.number_of_interpolation_neighbors);
 }
 
 

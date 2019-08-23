@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mesh/mesh_definition.h" // todo move to mesh folder
+#include "mesh/mesh_definition.h"
 #include <vector>
 
 class IMeshReader

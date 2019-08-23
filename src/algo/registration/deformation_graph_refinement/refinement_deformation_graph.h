@@ -10,7 +10,8 @@ std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh, double
 
 
 template <typename PositionDeformation>
-DeformationGraph<PositionDeformation> refineHierarchicalMesh(const RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation)
+DeformationGraph<PositionDeformation> refineHierarchicalMesh(const RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation,
+															 unsigned int number_of_interpolation_neighbors)
 {
 	auto refined_mesh = deformation.non_rigid_deformation._mesh;
 	auto edges = getEdgesToRefine(refined_mesh, 0.01, 0.9);
@@ -19,11 +20,12 @@ DeformationGraph<PositionDeformation> refineHierarchicalMesh(const RefineDeforma
 	auto new_vertices = mesh_refiner.refine(edges, refined_mesh);
 
 
-	auto & deformation_property_map = refined_mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation").first; // TODO
+	auto & deformation_property_map = refined_mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation").first;
 	for (auto v : new_vertices) {
 		if (refined_mesh.is_valid(v)) {
-			int k = 4; // todo
-			NearestNodes kNN = createNearestNodes<DeformationGraph<PositionDeformation>>(deformation.non_rigid_deformation, refined_mesh.point(v), k);
+			NearestNodes kNN = createNearestNodes<DeformationGraph<PositionDeformation>>(deformation.non_rigid_deformation, 
+																						 refined_mesh.point(v),
+																						 number_of_interpolation_neighbors);
 
 			std::vector<std::pair<PositionDeformation, double>> deformation_weights_vector;
 			for (auto n_w : kNN.node_weight_vector)
