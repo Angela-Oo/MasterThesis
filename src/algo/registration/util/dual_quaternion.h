@@ -12,32 +12,32 @@ struct Quaternion
 	{
 		double tr = _rot(0, 0)+_rot(1, 1)+_rot(2, 2);
 		if (tr > 0) {
-			double s = sqrtf(tr + 1.0f) * 2;
-			q0.w = s*0.25f;
+			double s = sqrt(tr + 1.0) * 2;
+			q0.w = s*0.25;
 			q0.x = (_rot(2, 1) - _rot(1, 2))/s;
 			q0.y = (_rot(0, 2) - _rot(2, 0))/s;
 			q0.z = (_rot(1, 0) - _rot(0, 1))/s;
 		}
 		else if ((_rot(0, 0) > _rot(1, 1)) && (_rot(0, 0) > _rot(2, 2))) {
-			double s = sqrtf(1.0f+_rot(0, 0)-_rot(1, 1)-_rot(2, 2))*2;
+			double s = sqrt(1.0+_rot(0, 0)-_rot(1, 1)-_rot(2, 2))*2;
 			q0.w = (_rot(2, 1) - _rot(1, 2))/s;
-			q0.x = 0.25f*s;
+			q0.x = 0.25*s;
 			q0.y = (_rot(0, 1) + _rot(1, 0))/s;
 			q0.z = (_rot(0, 2) + _rot(2, 0))/s;
 		}
 		else if (_rot(1, 1) > _rot(2, 2)) {
-			double s = sqrtf(1.0f+_rot(1, 1)-_rot(0, 0)-_rot(2, 2))*2;
+			double s = sqrt(1.0+_rot(1, 1)-_rot(0, 0)-_rot(2, 2))*2;
 			q0.w = (_rot(0, 2) - _rot(2, 0))/s;
 			q0.x = (_rot(0, 1) + _rot(1, 0))/s;
-			q0.y = 0.25f*s;
+			q0.y = 0.25*s;
 			q0.z = (_rot(1, 2) + _rot(2, 1))/s;
 		}
 		else {
-			double s = sqrtf(1.0f+_rot(2, 2)-_rot(0, 0)-_rot(1, 1))*2;
+			double s = sqrt(1.0+_rot(2, 2)-_rot(0, 0)-_rot(1, 1))*2;
 			q0.w = (_rot(1, 0) - _rot(0, 1))/s;
 			q0.x = (_rot(0, 2) + _rot(2, 0))/s;
 			q0.y = (_rot(1, 2) + _rot(2, 1))/s;
-			q0.z = 0.25f*s;
+			q0.z = 0.25*s;
 		}
 	}
 
