@@ -1,7 +1,7 @@
 #pragma once
 
 #include "arap_smooth_cost_adaptive_rigidity.h"
-#include "arap_cost.h"
+#include "arap_cost_functions.h"
 
 namespace Registration
 {
@@ -22,7 +22,16 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCost(ceres::Proble
 			smooth = edge_rigidity.first[mesh.edge(e)];
 		}
 
-		auto residual_id = Registration::asRigidAsPossibleCost(problem, smooth, deformation_graph, mesh.source(e), mesh.target(e));
+		auto source = mesh.source(e);
+		auto target = mesh.target(e);
+
+		auto deformations = deformation_graph._mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
+
+		ceres::CostFunction* cost_function = AsRigidAsPossibleCostFunction::Create(deformation_graph._mesh.point(mesh.source(e)),
+																				   deformation_graph._mesh.point(mesh.target(e)));
+		auto loss_function = new ceres::ScaledLoss(NULL, loss_weighting, ceres::TAKE_OWNERSHIP);
+		auto residual_id = problem.AddResidualBlock(cost_function, loss_function,
+										deformations[source].d(), deformations[target].d());
 
 		auto edge = deformation_graph._mesh.edge(e);
 		residual_ids[edge].push_back(residual_id);

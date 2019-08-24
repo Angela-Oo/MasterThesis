@@ -44,8 +44,8 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 			Point node_point = deformation_graph.getDeformation(v).position();
 
 			double distance = CGAL::squared_distance(point, node_point);
-			//double radius = pow((radius_map.first[v] * 2.), 2);
-			double radius = pow((radius_map.first[v] * 1.5), 2);
+			double radius = pow((radius_map.first[v]), 2);
+			//double radius = pow((radius_map.first[v] * 1.5), 2);
 			double weight = 1. - (distance / radius);
 			weight = std::pow(weight, 3);
 			weight = std::max(0., weight);

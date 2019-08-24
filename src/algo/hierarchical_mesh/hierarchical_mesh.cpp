@@ -188,6 +188,25 @@ std::vector<vertex_descriptor> HierarchicalMeshRefinement::refine(std::vector<ed
 	triangulate(mesh);
 	CGAL::Polygon_mesh_processing::remove_isolated_vertices(mesh);
 
+	// update radius
+	/*double d = 0;
+	int i = 0;
+	for (auto & e : mesh.edges())
+	{
+		auto source = mesh.point(mesh.source(e.halfedge()));
+		auto target = mesh.point(mesh.target(e.halfedge()));
+		auto distance = std::sqrt(CGAL::squared_distance(source, target));
+		d += distance;
+		++i;
+	}
+	d /= i;
+
+	auto radius_map = mesh.property_map<vertex_descriptor, double>("v:radius").first;
+	for (auto & v : mesh.vertices())
+	{
+		radius_map[v] = d;
+	}*/
+
 	return new_vertices;
 }
 

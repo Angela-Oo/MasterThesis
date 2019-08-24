@@ -8,10 +8,11 @@
 
 SurfaceMesh HierarchicalMeshLevelCreator::create_mesh()
 {
+	double radius = 1.5 * _radius; // radius used for calculating interpolation weights
 	SurfaceMesh mesh;
 	mesh.add_property_map<vertex_descriptor, Vector>("v:normal", Vector(0., 0., 0.)).first;
 	mesh.add_property_map<vertex_descriptor, MeshLevel>("v:level", MeshLevel(_level)).first;
-	mesh.add_property_map<vertex_descriptor, double>("v:radius", _radius).first;
+	mesh.add_property_map<vertex_descriptor, double>("v:radius", radius).first;
 	return mesh;
 }
 
@@ -38,12 +39,33 @@ SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radiu
 	SurfaceMeshPoissonDiskSampling poisson_disk_sampling(mesh, radius);
 	SurfaceMesh hierarchical_mesh = poisson_disk_sampling.create(HierarchicalMeshLevelCreator(level, radius));
 
+	
+
 	Construct construct(hierarchical_mesh);
 	CGAL::advancing_front_surface_reconstruction(hierarchical_mesh.points().begin(),
 												 hierarchical_mesh.points().end(),
 												 construct);
 
 	CGAL::Polygon_mesh_processing::remove_isolated_vertices(hierarchical_mesh);
+
+	/*double d = 0;
+	int i = 0;
+	for (auto & e : hierarchical_mesh.edges())
+	{
+		auto source = hierarchical_mesh.point(hierarchical_mesh.source(e.halfedge()));
+		auto target = hierarchical_mesh.point(hierarchical_mesh.target(e.halfedge()));
+		auto distance = std::sqrt(CGAL::squared_distance(source, target));
+		d += distance;
+		++i;
+	}
+	if(i > 0)
+		d /= i;
+
+	auto radius_map = hierarchical_mesh.property_map<vertex_descriptor, double>("v:radius").first;
+	for (auto & v : hierarchical_mesh.vertices())
+	{
+		radius_map[v] = d;
+	}*/
 	return hierarchical_mesh;
 }
 
