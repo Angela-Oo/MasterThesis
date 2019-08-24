@@ -149,16 +149,16 @@ struct AdaptableRigidityWeightCostFunction {
 	template <typename T>
 	bool operator()(const T* const weight, T* residuals) const {
 
-		T max{ 100. };
-		T zero{ 0. };
-		T value = max - weight[0];
-		if (value < zero)
-			value = zero;
-		value = value * 0.01;
-		residuals[0] = pow(value, 3);
+		//T max{ 100. };
+		//T zero{ 0. };
+		//T value = max - weight[0];
+		//if (value < zero)
+		//	value = zero;
+		//value = value * 0.01;
+		//residuals[0] = pow(value, 3);
 
-		//T scale{ 0.1 };
-		//residuals[0] = exp(scale * weight[0]);
+		T scale{ -0.1 };
+		residuals[0] = exp(scale * weight[0]);
 		return true;
 	}
 };

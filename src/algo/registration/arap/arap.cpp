@@ -178,7 +178,7 @@ void AsRigidAsPossible::init()
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
 	//_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>(_registration_options.smooth);
-	_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_registration_options.smooth, 0.1);
+	_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_registration_options.smooth, 0.05);
 }
 
 

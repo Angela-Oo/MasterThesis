@@ -155,10 +155,11 @@ void setEdgeColorToRigidityValue(SurfaceMesh & mesh)
 		double reference_cost = mean * 10.;
 		for (auto & e : mesh.edges())
 		{
-			double error = std::max(0., (100. - rigidity.first[e]));
-			error = error * 0.01;
-			error = pow(error, 3);
-			error = std::min(1., error);
+			//double error = std::max(0., (100. - rigidity.first[e]));
+			//error = error * 0.01;
+			//error = pow(error, 3);
+			//error = std::min(1., error);
+			double error = exp(-0.1 * rigidity.first[e]);
 			edge_colors.first[e] = errorToRGB(error);
 		}
 	}
