@@ -2,9 +2,19 @@
 
 #include "arap_smooth_cost.h"
 #include "arap_cost.h"
+#include "algo/registration/util/ceres_residual_evaluation.h"
 
 namespace Registration
 {
+
+void AsRigidAsPossibleSmoothCost::evaluateResiduals(ceres::Problem &problem, SurfaceMesh & mesh, CeresIterationLoggerGuard & logger)
+{
+	auto smooth_cost = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
+	if (smooth_cost.second) {
+		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _arap_residual_ids, smooth_cost.first, _smooth_factor);
+		logger.write(" max smooth cost: " + std::to_string(max_and_mean_cost.first) + " reference smooth " + std::to_string(max_and_mean_cost.second * 10.), false);
+	}
+}
 
 AsRigidAsPossibleSmoothCost::EdgeResidualIds
 AsRigidAsPossibleSmoothCost::asRigidAsPossibleCost(ceres::Problem &problem,
@@ -31,6 +41,9 @@ AsRigidAsPossibleSmoothCost::asRigidAsPossibleCost(ceres::Problem &problem,
 	return residual_ids;
 }
 
+AsRigidAsPossibleSmoothCost::AsRigidAsPossibleSmoothCost(double smooth_factor)
+	: _smooth_factor(smooth_factor)
+{ }
 
 
 }

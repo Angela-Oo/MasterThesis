@@ -5,6 +5,15 @@
 namespace Registration {
 
 
+void AsRigidAsPossibleFitCost::evaluateResiduals(ceres::Problem &problem, SurfaceMesh & mesh, CeresIterationLoggerGuard & logger)
+{
+	//auto fit_cost = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
+	//if (fit_cost.second) {
+	//	auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _fit_residual_ids, fit_cost.first, _options.fit);
+	//	logger.write(" max fit cost: " + std::to_string(max_and_mean_cost.first), false);
+	//}
+}
+
 bool AsRigidAsPossibleFitCost::useVertex(vertex_descriptor & v, DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh)
 {
 	bool use_vertex = true;

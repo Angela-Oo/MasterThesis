@@ -128,11 +128,37 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 
 		substract(vj_t, vi_t, transformed_edge);
 
-		//normalize(rotated_edge, rotated_edge);
-		//normalize(transformed_edge, transformed_edge);
-
 		substract(rotated_edge, transformed_edge, residuals);
-		scalar_multiply(residuals, w, residuals);
+		scalar_multiply(residuals, w[0], residuals);
+		return true;
+	}
+};
+
+
+
+struct AdaptableRigidityWeightCostFunction {
+
+	AdaptableRigidityWeightCostFunction()
+	{ }
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create() {
+		return (new ceres::AutoDiffCostFunction<AdaptableRigidityWeightCostFunction, 1, 1>(new AdaptableRigidityWeightCostFunction()));
+	}
+
+	template <typename T>
+	bool operator()(const T* const weight, T* residuals) const {
+
+		T max{ 100. };
+		T zero{ 0. };
+		T value = max - weight[0];
+		if (value < zero)
+			value = zero;
+		value = value * 0.01;
+		residuals[0] = pow(value, 3);
+
+		//T scale{ 0.1 };
+		//residuals[0] = exp(scale * weight[0]);
 		return true;
 	}
 };

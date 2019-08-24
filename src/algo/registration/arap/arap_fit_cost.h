@@ -10,6 +10,7 @@
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include <ceres/ceres.h>
 #include <ceres/problem.h>
+#include "algo/registration/util/ceres_iteration_logger.h"
 
 namespace Registration
 {
@@ -17,6 +18,7 @@ namespace Registration
 class AsRigidAsPossibleFitCost : public IAsRigidAsPossibleFitCost
 {
 private:
+	std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> _fit_residual_ids;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 	std::vector<vertex_descriptor> _subset_of_vertices_to_fit;
 	RegistrationOptions _options;
@@ -28,6 +30,7 @@ private:
 						  DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh, 
 						  VertexResidualIds &residual_ids);
 public:
+	void evaluateResiduals(ceres::Problem &problem, SurfaceMesh & mesh, CeresIterationLoggerGuard & logger);
 	VertexResidualIds addFitCost(ceres::Problem &problem,
 								 DeformationGraph<ARAPDeformation> & deformation_graph,
 								 DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,

@@ -77,7 +77,7 @@ bool AsRigidAsPossible::solveIteration()
 
 		// evaluate
 		if (_registration_options.evaluate_residuals) {
-			evaluateResidual(problem, arap_residual_ids, logger);
+			_smooth_cost->evaluateResiduals(problem, _deformation_graph._mesh, (*logger));
 		}
 
 		_last_cost = _current_cost;
@@ -129,22 +129,6 @@ bool AsRigidAsPossible::finished()
 	return (_solve_iteration >= _registration_options.max_iterations) || (solved && _solve_iteration > 2);
 }
 
-void AsRigidAsPossible::evaluateResidual(ceres::Problem & problem,
-										 std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
-										 std::unique_ptr<CeresIterationLoggerGuard>& logger)
-{
-	// smooth
-	auto smooth_cost = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:smooth_cost");
-	if (smooth_cost.second) {
-		auto max_and_mean_cost = evaluateResiduals(_deformation_graph._mesh, problem, arap_residual_block_ids, smooth_cost.first, _registration_options.smooth);
-		logger->write("max smooth: " + std::to_string(max_and_mean_cost.first) + " reference smooth " + std::to_string(max_and_mean_cost.second * 10.), false);
-	}	
-	// fit
-	//auto fit_cost = _deformation_graph._mesh.property_map<vertex_descriptor, double>("v:fit_cost");
-	//if(fit_cost.second)
-	//	evaluateResiduals(_deformation_graph._mesh, problem, fit_residual_block_ids, fit_cost.first, a_fit);
-}
-
 void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
 {
 	_current_cost = 1.;
@@ -193,7 +177,8 @@ void AsRigidAsPossible::init()
 {
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
-	_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>();
+	//_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>(_registration_options.smooth);
+	_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_registration_options.smooth, 0.1);
 }
 
 

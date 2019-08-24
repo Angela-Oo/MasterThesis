@@ -44,10 +44,7 @@ private:
 	CeresLogger _ceres_logger;
 private:
 	void init();
-	std::vector<vertex_descriptor> subsetOfVerticesToFit();	
-	void evaluateResidual(ceres::Problem & problem,
-						  std::map<edge_descriptor, ResidualIds> & arap_residual_block_ids,
-						  std::unique_ptr<CeresIterationLoggerGuard>& logger);
+	std::vector<vertex_descriptor> subsetOfVerticesToFit();
 public:
 	bool finished() override;
 	bool solveIteration() override;
