@@ -2,6 +2,7 @@
 
 #include "deformation_graph.h"
 #include "mesh/mesh_definition.h"
+#include "algo/surface_mesh/mesh_operations.h"
 
 namespace Registration
 {
@@ -17,6 +18,92 @@ SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_g
 	return mesh;
 }
 
+
+
+
+template <typename DeformationGraph>
+std::vector<std::pair<vertex_descriptor, double>> findNearestNodesWithRadiusOfInfluence(const DeformationGraph & deformation_graph, Point point)
+{
+	vertex_descriptor nearest_deformation_node = deformation_graph.getNearestNodes(point);
+	std::set<vertex_descriptor> two_ring_neighbors = twoRingNeighborhood(deformation_graph._mesh, nearest_deformation_node);
+
+	auto radius_map = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:radius").first;
+
+	std::vector<std::pair<vertex_descriptor, double>> node_distance;
+	for (auto n : two_ring_neighbors)
+	{
+		//auto distance = CGAL::squared_distance(point, deformation_graph._mesh.point(n));
+		//auto radius_of_influence = std::pow(radius_map[n], 2);
+		auto distance = std::sqrt(CGAL::squared_distance(point, deformation_graph._mesh.point(n)));
+		auto radius_of_influence = radius_map[n];
+		auto influence_distance = distance / radius_of_influence;
+		node_distance.push_back(std::make_pair(n, influence_distance));
+	}
+
+	std::sort(node_distance.begin(), node_distance.end(),
+			  [](const auto & rhs, const auto & lhs) { return rhs.second < lhs.second; });
+
+	return node_distance;
+}
+
+
+template <typename DeformationGraph>
+NearestNodes createNearestNodesRadiusOfInfluence(const DeformationGraph & deformation_graph, Point point)
+{
+	// paper two:  wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
+	// with ri equal to value in v:radius
+
+	// find nearest nodes
+	auto nearest_deformation_nodes = findNearestNodesWithRadiusOfInfluence(deformation_graph, point);
+	//auto radius_map = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:radius");
+
+	unsigned int k = deformation_graph.getNumberOfInterpolationNeighbors();
+	if (nearest_deformation_nodes.size() < k)
+		throw std::exception("not enought nearest nodes found");
+
+	nearest_deformation_nodes.erase(std::remove_if(nearest_deformation_nodes.begin() + k, nearest_deformation_nodes.end(),
+												   [](const auto & n) { return n.second > 1.; }),
+									nearest_deformation_nodes.end());
+
+	// calculate weights
+	std::vector<std::pair<vertex_descriptor, double>> vertex_weight_vector;
+	double sum = 0.;
+	for (size_t i = 0; i < nearest_deformation_nodes.size(); ++i)
+	{
+		vertex_descriptor v = nearest_deformation_nodes[i].first;
+		//Point node_point = deformation_graph.getDeformation(v).position();
+		//double distance = CGAL::squared_distance(point, node_point);
+		//double radius = pow((radius_map.first[v]), 2);
+		//double radius = pow((radius_map.first[v] * 1.5), 2);
+		//double weight = 1. - (distance / radius);
+		double weight = 1. - nearest_deformation_nodes[i].second;
+		weight = std::pow(weight, 3);
+		weight = std::max(0., weight);
+		vertex_weight_vector.push_back(std::make_pair(v, weight));
+		sum += weight;
+	}	
+
+	// hack to not destroy interpolation....
+	if (sum <= 0.000000000001) {
+		sum = 0.;
+		for (auto & v : vertex_weight_vector) {
+			v.second = 1.;
+			sum += 1.;
+		}
+	}
+
+	// normalize weights by dividing through the sum of all weights
+	std::for_each(vertex_weight_vector.begin(), vertex_weight_vector.end(), [sum](std::pair<vertex_descriptor, double> & v_w) { v_w.second = v_w.second / sum; });
+
+	if (vertex_weight_vector.size() < k) {
+		std::cout << "not enought nodes found" << std::endl;
+	}
+	//if (vertex_weight_vector.size() != k)
+	//{
+	//	std::cout << "more vertices than expected " << k << std::endl;
+	//}
+	return NearestNodes(point, vertex_weight_vector);
+}
 
 
 template <typename DeformationGraph>
@@ -328,7 +415,8 @@ DeformedMesh<DeformationGraph>::DeformedMesh(const SurfaceMesh & mesh, const Def
 
 	for (auto & v : _mesh.vertices()) {
 		auto point = _mesh.point(v);
-		nearest_nodes[v] = createNearestNodes(_deformation_graph, point);
+		//nearest_nodes[v] = createNearestNodes(_deformation_graph, point);
+		nearest_nodes[v] = createNearestNodesRadiusOfInfluence(_deformation_graph, point);
 	}
 }
 
