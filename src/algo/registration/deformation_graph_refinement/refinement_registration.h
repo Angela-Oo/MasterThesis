@@ -169,7 +169,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 														                                     const SurfaceMesh& target,
 														                                     ceres::Solver::Options ceres_option,
 														                                     const RegistrationOptions & options,
-														                                     std::shared_ptr<FileWriter> logger = nullptr)
+														                                     std::shared_ptr<FileWriter> logger)
 	: _is_refined(false)
 	, _finished(false)
 	, _number_of_refinements(0)
@@ -190,7 +190,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 								                                                             const RefineDeformationGraphDeformation<typename NonRigidRegistration::Deformation> & deformation,
 								                                                             ceres::Solver::Options ceres_option,
 								                                                             const RegistrationOptions & options,
-								                                                             std::shared_ptr<FileWriter> logger = nullptr)
+								                                                             std::shared_ptr<FileWriter> logger)
 	: _is_refined(false)
 	, _finished(false)
 	, _number_of_refinements(0)
@@ -209,7 +209,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 																							 const RefineDeformationGraphDeformation<typename NonRigidRegistration::Deformation> & deformation,
 																							 ceres::Solver::Options ceres_option,
 																							 const RegistrationOptions & options,
-																							 std::shared_ptr<FileWriter> logger = nullptr)
+																							 std::shared_ptr<FileWriter> logger)
 	: RefineDeformationGraphRegistration(source, target, deformation, ceres_option, options, logger)
 { };
 

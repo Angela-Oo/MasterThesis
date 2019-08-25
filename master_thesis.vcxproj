@@ -257,6 +257,7 @@
     <ClInclude Include="src\algo\registration\interface\i_registration.h" />
     <ClInclude Include="src\algo\registration\interface\i_sequence_registration.h" />
     <ClInclude Include="src\algo\registration\interface\registration.h" />
+    <ClInclude Include="src\algo\registration\interface\registration_options.h" />
     <ClInclude Include="src\algo\registration\interface\registration_type.h" />
     <ClInclude Include="src\algo\registration\options\ceres_option.h" />
     <ClInclude Include="src\algo\registration\rigid_before_non_rigid_registration\rigid_before_non_rigid_deformation.h" />
@@ -300,6 +301,7 @@
     <ClInclude Include="src\mesh\mesh_definition.h" />
     <ClInclude Include="src\mLibInclude.h" />
     <ClInclude Include="src\stdafx.h" />
+    <ClInclude Include="src\util\ceres_include.h" />
     <ClInclude Include="src\util\file_writer.h" />
     <ClInclude Include="src\visualize\constantBuffer.h" />
     <ClInclude Include="src\visualize\i_showData.h" />

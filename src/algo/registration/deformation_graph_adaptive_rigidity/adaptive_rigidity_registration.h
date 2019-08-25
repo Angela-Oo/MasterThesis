@@ -2,9 +2,9 @@
 
 #include "adaptive_rigidity.h"
 #include "algo/registration/interface/i_registration.h"
+#include "algo/registration/interface/registration_options.h"
 #include "mesh/mesh_definition.h"
 #include "util/file_writer.h"
-#include <ceres/solver.h>
 #include <memory>
 
 

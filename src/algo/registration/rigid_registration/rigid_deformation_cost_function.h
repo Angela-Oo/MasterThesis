@@ -1,10 +1,11 @@
 #pragma once
 
-#include <ceres/ceres.h>
-#include <ceres/rotation.h>
-#include <functional>
+
 #include "algo/registration/util/ceres_math.h"
 #include "mesh/mesh_definition.h"
+#include "util/ceres_include.h"
+#include <ceres/rotation.h>
+#include <functional>
 
 namespace Registration {
 

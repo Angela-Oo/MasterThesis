@@ -4,8 +4,7 @@
 #include "arap_deformation.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
-
-#include <ceres/problem.h>
+#include "util/ceres_include.h"
 
 namespace Registration
 {

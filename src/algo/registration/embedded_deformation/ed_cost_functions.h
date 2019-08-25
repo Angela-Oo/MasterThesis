@@ -2,7 +2,7 @@
 
 #include "algo/registration/util/ceres_math.h"
 #include <vector>
-#include <ceres/ceres.h>
+#include "util/ceres_include.h"
 #include <ceres/rotation.h>
 
 namespace Registration {

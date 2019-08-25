@@ -1,11 +1,12 @@
 #pragma once
 
 #include "i_registration.h"
+#include "registration_options.h"
 #include "i_sequence_registration.h"
 #include "registration_type.h"
 #include "util/file_writer.h"
 #include "input_reader/mesh_reader.h"
-#include <ceres/ceres.h>
+#include "util/ceres_include.h"
 
 typedef ml::TriMeshf Mesh;
 namespace Registration {

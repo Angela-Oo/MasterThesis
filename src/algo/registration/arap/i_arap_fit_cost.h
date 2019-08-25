@@ -1,17 +1,10 @@
 #pragma once
 
-
-#ifndef GLOG_NO_ABBREVIATED_SEVERITIES
-#define GLOG_NO_ABBREVIATED_SEVERITIES
-#endif // !GLOG_NO_ABBREVIATED_SEVERITIES
-
-#include "glog/logging.h"
-
 #include "arap_deformation.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
-#include <ceres/problem.h>
+#include "util/ceres_include.h"
 
 namespace Registration
 {

@@ -5,11 +5,12 @@
 #include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
 #include "algo/registration/interface/i_registration.h"
+#include "algo/registration/interface/registration_options.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include "util/file_writer.h"
 #include <vector>
-#include <ceres/ceres.h>
+#include "util/ceres_include.h"
 
 namespace Registration {
 

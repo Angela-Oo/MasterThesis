@@ -53,7 +53,7 @@ struct Quaternion
 	
 	Quaternion conjugate() const { return Quaternion(q0.w, -q0.x, -q0.y, -q0.z); }
 	double square_norm() const { return q0.w*q0.w + q0.x*q0.x + q0.y*q0.y + q0.z*q0.z; }
-	double norm() const { return sqrtf(square_norm()); }
+	double norm() const { return std::sqrt(square_norm()); }
 	double dot(const Quaternion &_quat) const { return q0.w*_quat.w() + q0.x*_quat.x() + q0.y*_quat.y() + q0.z*_quat.z(); }
 	void normalize() { q0 = q0.getNormalized(); }
 	Quaternion normalized() const { Quaternion q(*this); q.normalize(); return q; }
@@ -118,12 +118,12 @@ struct DualNumber {
 
 	DualNumber reciprocal() const
 	{
-		return{ 1.0f/q0, -q1/(q0*q0) };
+		return{ 1.0/q0, -q1/(q0*q0) };
 	}
 
 	DualNumber sqrt() const
 	{
-		return{ sqrtf(q0), q1/(2*sqrtf(q0)) };
+		return{ std::sqrt(q0), q1/(2*std::sqrt(q0)) };
 	}
 
 	double q0, q1;
@@ -200,8 +200,8 @@ struct DualQuaternion {
 
 	DualNumber norm() const
 	{
-		float a0 = q0.norm();
-		float a1 = q0.dot(q1)/q0.norm();
+		double a0 = q0.norm();
+		double a1 = q0.dot(q1)/q0.norm();
 		return{ a0, a1 };
 	}
 

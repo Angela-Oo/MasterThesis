@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mesh/mesh_definition.h"
+#include <string>
 
 namespace Registration {
 

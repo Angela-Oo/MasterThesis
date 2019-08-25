@@ -1,7 +1,9 @@
 #pragma once
 
-#include "mesh/mesh_definition.h"
 #include "refinement_deformation.h"
+#include "algo/registration/deformation_graph/deformation_graph.h"
+#include "mesh/mesh_definition.h"
+
 
 namespace Registration {
 

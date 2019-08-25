@@ -3,14 +3,15 @@
 #include "i_arap_fit_cost.h"
 #include "arap_deformation.h"
 #include "i_arap_smooth_cost.h"
-#include "util/file_writer.h"
 #include "algo/registration/interface/i_registration.h"
+#include "algo/registration/interface/registration_options.h"
 #include "mesh/mesh_definition.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "algo/registration/deformation_graph/deformation_graph_deform_mesh.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
-#include <ceres/ceres.h>
+#include "util/file_writer.h"
+#include "util/ceres_include.h"
 #include <memory>
 
 namespace Registration {
@@ -28,14 +29,14 @@ public:
 private:
 	SurfaceMesh _source;
 	SurfaceMesh _target;
-	ceres::Solver::Options _options;
+	ceres::Solver::Options _ceres_options;
 	DeformationGraph<ARAPDeformation> _deformation_graph;
 	std::unique_ptr<DeformedMesh<Deformation>> _deformed_mesh;
 private:
 	std::unique_ptr<IAsRigidAsPossibleFitCost> _fit_cost;
 	std::unique_ptr<IAsRigidAsPossibleSmoothCost> _smooth_cost;
 private:
-	RegistrationOptions _registration_options;
+	RegistrationOptions _options;
 	bool _with_icp = true;
 	double _current_cost = 1.;
 	double _last_cost = 2.;

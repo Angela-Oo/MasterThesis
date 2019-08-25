@@ -1,7 +1,7 @@
 #pragma once
 
 #include "mesh/mesh_definition.h"
-#include <ceres/ceres.h>
+#include "util/ceres_include.h"
 #include <vector>
 
 using ResidualIds = std::vector<ceres::ResidualBlockId>;

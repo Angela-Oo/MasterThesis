@@ -749,6 +749,12 @@
     <ClInclude Include="src\algo\registration\util\math.h">
       <Filter>2 algo\4 registration\2 util</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\interface\registration_options.h">
+      <Filter>2 algo\4 registration\0 interface</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util\ceres_include.h">
+      <Filter>0 util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />

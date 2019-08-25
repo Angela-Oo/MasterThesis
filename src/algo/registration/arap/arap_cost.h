@@ -1,12 +1,5 @@
 #pragma once
 
-
-#ifndef GLOG_NO_ABBREVIATED_SEVERITIES
-#define GLOG_NO_ABBREVIATED_SEVERITIES
-#endif // !GLOG_NO_ABBREVIATED_SEVERITIES
-
-#include "glog/logging.h"
-
 #include "algo/registration/interface/i_registration.h"
 #include "mesh/mesh_definition.h"
 #include "arap_deformation.h"
@@ -14,8 +7,7 @@
 #include "algo/registration/deformation_graph/deformed_mesh.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
-#include <ceres/ceres.h>
-#include <ceres/problem.h>
+#include "util/ceres_include.h"
 
 namespace Registration
 {

@@ -3,12 +3,13 @@
 #include "rigid_deformation.h"
 #include "rigid_deformed_mesh.h"
 #include "algo/registration/interface/i_registration.h"
-#include "util/file_writer.h"
+#include "algo/registration/interface/registration_options.h"
 #include "algo/registration/find_corresponding_points/find_corresponding_points.h"
-#include "mesh/mesh_definition.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
+#include "mesh/mesh_definition.h"
+#include "util/file_writer.h"
+#include "util/ceres_include.h"
 #include "boost/optional.hpp"
-#include <ceres/ceres.h>
 
 namespace Registration {
 

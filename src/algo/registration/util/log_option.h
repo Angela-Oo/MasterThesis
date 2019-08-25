@@ -1,8 +1,10 @@
 #pragma once
 
-#include "util/file_writer.h"
+
 #include "algo/registration/interface/i_registration.h"
-#include <ceres/ceres.h>
+#include "algo/registration/interface/registration_options.h"
+#include "util/file_writer.h"
+#include "util/ceres_include.h"
 
 namespace Registration {
 

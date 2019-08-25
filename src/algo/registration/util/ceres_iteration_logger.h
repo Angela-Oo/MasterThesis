@@ -1,6 +1,6 @@
 #pragma once
 #include "util/file_writer.h"
-#include <ceres/ceres.h>
+#include "util/ceres_include.h"
 #include <chrono>
 #include <string>
 
