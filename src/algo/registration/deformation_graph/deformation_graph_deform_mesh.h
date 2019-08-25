@@ -15,7 +15,7 @@ public:
 	SurfaceMesh deformationGraphMesh();
 	SurfaceMesh deformedMesh(const SurfaceMesh & mesh);
 public:
-	DeformationGraphDeformMesh(const DeformationGraph & deformation_graph, unsigned int number_of_interpolation_neighbors = 4); // todo
+	DeformationGraphDeformMesh(const DeformationGraph & deformation_graph); // todo
 };
 
 template <typename DeformationGraph>
@@ -32,7 +32,7 @@ SurfaceMesh DeformationGraphDeformMesh<DeformationGraph>::deformedMesh(const Sur
 }
 
 template <typename DeformationGraph>
-DeformationGraphDeformMesh<DeformationGraph>::DeformationGraphDeformMesh(const DeformationGraph & deformation, unsigned int number_of_interpolation_neighbors) // todo
+DeformationGraphDeformMesh<DeformationGraph>::DeformationGraphDeformMesh(const DeformationGraph & deformation)
 	: _deformation(deformation)
 {}
 

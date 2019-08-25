@@ -28,4 +28,11 @@ void flipEdges(std::vector<edge_descriptor> & edges, SurfaceMesh & mesh);
 
 void splitFaces(const std::map<face_descriptor, std::vector<vertex_descriptor>> & face_vertices_to_split_map, SurfaceMesh & mesh);
 
+
+
+
+std::set<vertex_descriptor> oneRingNeighborhood(const SurfaceMesh & mesh, vertex_descriptor v);
+
+std::set<vertex_descriptor> twoRingNeighborhood(const SurfaceMesh & mesh, vertex_descriptor v);
+
 }

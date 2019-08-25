@@ -26,7 +26,8 @@ public:
 public:
 	unsigned int getNumberOfInterpolationNeighbors() const { return _k; }
 public:
-	std::vector<vertex_descriptor> DeformationGraph::getKNearestNodes(const Point & point, unsigned int k) const;
+	vertex_descriptor getNearestNodes(const Point & point) const;
+	std::vector<vertex_descriptor> getKNearestNodes(const Point & point, unsigned int k) const;
 	Point deformPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 	Point deformDLBPoint(const Point & point, const NearestNodes & nearest_nodes) const;
 	Vector deformNormal(const Vector & normal, const NearestNodes & nearest_nodes) const;
@@ -47,6 +48,14 @@ public:
 	DeformationGraph<PositionDeformation> & operator=(DeformationGraph<PositionDeformation> other);
 };
 
+
+template <typename PositionDeformation>
+vertex_descriptor DeformationGraph<PositionDeformation>::getNearestNodes(const Point & point) const
+{
+	Neighbor_search search = _knn_search->search(point);
+	vertex_descriptor nearest_node_index = search.begin()->first;
+	return nearest_node_index;
+}
 
 template <typename PositionDeformation>
 std::vector<vertex_descriptor> DeformationGraph<PositionDeformation>::getKNearestNodes(const Point & point, unsigned int k) const

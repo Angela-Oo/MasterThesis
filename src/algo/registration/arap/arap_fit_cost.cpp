@@ -44,13 +44,13 @@ bool AsRigidAsPossibleFitCost::addFitCostVertex(ceres::Problem & problem,
 		double point_to_point_weighting = _options.fit * 0.1;
 		double point_to_plane_weighting = _options.fit * 0.9;
 
-		auto residual_id_point_to_point = pointToPointCost(problem, point_to_point_weighting, _options.dg_options.number_of_interpolation_neighbors,
+		auto residual_id_point_to_point = pointToPointCost(problem, point_to_point_weighting,
 														   deformation_graph, deformed_mesh, v,
 														   target_point);
 		residual_ids[v].push_back(residual_id_point_to_point);
 
 		assert(target_normal.squared_length() > 0.);
-		auto residual_id_point_to_plane = pointToPlaneCost(problem, point_to_plane_weighting, _options.dg_options.number_of_interpolation_neighbors,
+		auto residual_id_point_to_plane = pointToPlaneCost(problem, point_to_plane_weighting,
 														   deformation_graph, deformed_mesh, v,
 														   target_point, target_normal);
 		residual_ids[v].push_back(residual_id_point_to_plane);

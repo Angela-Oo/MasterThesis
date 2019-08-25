@@ -124,7 +124,7 @@ std::vector<vertex_descriptor> HierarchicalMeshRefinement::refineVertex(vertex_d
 	auto radius = mesh.property_map<vertex_descriptor, double>("v:radius").first;
 
 	auto mesh_level = levels[v];
-	if (!refined[v] && _hierarchical_mesh.validLevel(mesh_level.level)) {
+	if (!refined[v] && _hierarchical_mesh.validLevel(mesh_level.level + 1)) {
 		refined[v] = true;
 		auto & child_mesh = _hierarchical_mesh.getMesh(mesh_level.level + 1);
 		auto child_radius = child_mesh.property_map<vertex_descriptor, double>("v:radius").first;

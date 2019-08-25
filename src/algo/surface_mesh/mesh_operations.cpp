@@ -118,28 +118,7 @@ void splitFaceAtEdge(face_descriptor f, SurfaceMesh & mesh)
 	CGAL::Euler::split_face(new_he_0, new_he_1, mesh);
 	CGAL::Euler::split_face(new_he_1, new_he_2, mesh);
 	CGAL::Euler::split_face(new_he_2, new_he_0, mesh);
-
-	//if (!mesh.is_border(mesh.edge(he_0))) {
-	//	auto ohe_0 = mesh.opposite(new_he_0);
-	//	auto split_0_he0 = mesh.next(ohe_0);
-	//	auto split_0_he1 = mesh.prev(ohe_0);
-	//	CGAL::Euler::split_face(split_0_he0, split_0_he1, mesh);
-	//}
-	//if (!mesh.is_border(mesh.edge(he_1))) {
-	//	auto ohe_1 = mesh.opposite(new_he_1);
-	//	auto split_1_he0 = mesh.next(ohe_1);
-	//	auto split_1_he1 = mesh.prev(ohe_1);
-	//	CGAL::Euler::split_face(split_1_he0, split_1_he1, mesh);
-	//}
-	//if (!mesh.is_border(mesh.edge(he_2))) {
-	//	auto ohe_2 = mesh.opposite(new_he_2);
-	//	auto split_2_he0 = mesh.next(ohe_2);
-	//	auto split_2_he1 = mesh.prev(ohe_2);
-	//	CGAL::Euler::split_face(split_2_he0, split_2_he1, mesh);
-	//}
 }
-
-
 
 
 vertex_descriptor splitFace(face_descriptor f, SurfaceMesh & mesh)
@@ -155,6 +134,30 @@ void flipEdges(std::vector<edge_descriptor> & edges, SurfaceMesh & mesh)
 	for (auto e : edges) {
 		CGAL::Euler::flip_edge(mesh.halfedge(e), mesh);
 	}
+}
+
+
+
+
+std::set<vertex_descriptor> oneRingNeighborhood(const SurfaceMesh & mesh, vertex_descriptor v)
+{
+	std::set<vertex_descriptor> neighbors;
+	for (auto & n : mesh.vertices_around_target(mesh.halfedge(v))) {
+		neighbors.insert(n);
+	}
+	return neighbors;
+}
+
+std::set<vertex_descriptor> twoRingNeighborhood(const SurfaceMesh & mesh, vertex_descriptor v)
+{
+	std::set<vertex_descriptor> neighbors = oneRingNeighborhood(mesh, v);
+
+	for (auto n : neighbors) {
+		std::set<vertex_descriptor> nn = oneRingNeighborhood(mesh, n);
+		neighbors.insert(nn.begin(), nn.end());
+	}
+	neighbors.erase(v);
+	return neighbors;
 }
 
 }
