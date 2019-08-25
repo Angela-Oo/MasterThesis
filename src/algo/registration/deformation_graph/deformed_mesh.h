@@ -106,9 +106,8 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 {
 	unsigned int k = deformation_graph.getNumberOfInterpolationNeighbors();
 	std::vector<vertex_descriptor> nearest_deformation_nodes = deformation_graph.getKNearestNodes(point, k + 1);
-	//std::vector<vertex_descriptor> nearest_deformation_nodes = deformation_graph.getKNearestNodesTest(point, k + 1);
-	// calculate weights
 
+	// calculate weights
 	std::vector<std::pair<vertex_descriptor, double>> vertex_weight_vector;
 	double sum = 0.;
 	double d_max = 1.;
@@ -116,7 +115,6 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 	auto radius_map = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:radius");
 	if (true) { // paper two:  wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
 		// with ri equal to value in v:radius
-
 		// calculate weight per deformation node
 		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
 		
@@ -134,37 +132,7 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 			vertex_weight_vector.push_back(std::make_pair(v, weight));
 			sum += weight;
 		}
-	}
-	else if (false) { // radius ri equal to d_max of other paper
-		// calculate weight per deformation node
-		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
-		auto v_max = nearest_deformation_nodes.back();
-		auto p_max = deformation_graph.getDeformation(v_max).position();
-
-		double d_max = 0.;
-		for (size_t i = 0; i < nearest_deformation_nodes.size() - 1; ++i)
-		{
-			vertex_descriptor v = nearest_deformation_nodes[i];
-			Point node_point = deformation_graph.getDeformation(v).position();
-			double distance = CGAL::squared_distance(p_max, node_point);
-			if (distance > d_max)
-				d_max = distance;
-		}
-
-		for (size_t i = 0; i < nearest_deformation_nodes.size() - 1; ++i)
-		{
-			vertex_descriptor v = nearest_deformation_nodes[i];
-			Point node_point = deformation_graph.getDeformation(v).position();
-
-			double distance = CGAL::squared_distance(point, node_point);
-			double radius = std::pow((std::sqrt(d_max) / 2.), 2);
-			double weight = 1. - (distance / radius);
-			weight = std::pow(weight, 3);
-			weight = std::max(0., weight);
-			vertex_weight_vector.push_back(std::make_pair(v, weight));
-			sum += weight;
-		}
-	}
+	}	
 	else if (false) { // ri depending on ring one neighbor vertices
 		// calculate weight per deformation node
 		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
@@ -194,70 +162,7 @@ NearestNodes createNearestNodes(const DeformationGraph & deformation_graph, Poin
 			vertex_weight_vector.push_back(std::make_pair(v, weight));
 			sum += weight;
 		}
-	}
-	else if (false) { //radius_map.second) {
-		// calculate weight per deformation node
-		// wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
-		std::vector<double> distances;
-		std::vector<Point> points;
-		for (size_t i = 0; i < nearest_deformation_nodes.size() - 1; ++i)
-		{
-			vertex_descriptor v = nearest_deformation_nodes[i];
-			Point node_point = deformation_graph.getDeformation(v).position();
-			double distance = CGAL::squared_distance(point, node_point);
-			distances.push_back(distance);
-			points.push_back(node_point);
-		}
-		double radius = 0.1;// *std::max_element(distances.begin(), distances.end());
-		
-		//for (size_t i = 0; i < points.size() - 1; ++i)
-		//{
-		//	double d = CGAL::squared_distance(points[i], points[i+1]);
-		//	if (d > radius)
-		//		radius = d;
-		//}
-
-		//radius = *std::max_element(distances.begin(), distances.end());
-
-		for (size_t i = 0; i < distances.size(); ++i)
-		{
-			auto v = nearest_deformation_nodes[i];
-
-			//Point node_point = deformation_graph.getDeformation(v).position();
-			//std::vector<vertex_descriptor> nn = deformation_graph.getKNearestNodesTest(node_point, 2);
-			//Point nearest_node_point = deformation_graph.getDeformation(nn[1]).position();
-			//double radius = std::sqrt(CGAL::squared_distance(node_point, nearest_node_point));
-			//radius = 1.5 * radius;
-			//radius = pow(radius, 2);
-
-			//Point node_point = deformation_graph.getDeformation(v).position();
-			//double radius = INFINITY;
-			//for (auto & n : nearest_deformation_nodes) {
-			//	if (n != v) {
-			//		Point nearest_node_point = deformation_graph.getDeformation(n).position();
-			//		double r = std::sqrt(CGAL::squared_distance(node_point, nearest_node_point));
-			//		if (r < radius)
-			//			radius = r;
-			//	}
-			//}
-			//radius = pow(radius, 2);
-			//std::vector<vertex_descriptor> nn = deformation_graph.getKNearestNodesTest(node_point, 2);
-			//Point nearest_node_point = deformation_graph.getDeformation(nn[1]).position();
-			//double radius = std::sqrt(CGAL::squared_distance(node_point, nearest_node_point));
-			//radius = 1.5 * radius;
-			//radius = pow(radius, 2);
-
-			double radius = 1.5 * radius_map.first[v];
-			radius = pow(radius, 2);			
-
-			double weight = 1. - (distances[i] / radius);
-			weight = std::pow(weight, 3);
-			weight = std::max(0., weight);
-			vertex_weight_vector.push_back(std::make_pair(v, weight));
-			sum += weight;
-		}
-
-	}
+	}	
 	else {
 		// max distance d_max distance to the k+1 node
 		vertex_descriptor last_node_descriptor = nearest_deformation_nodes.back();

@@ -50,7 +50,8 @@ private:
 	std::vector<vertex_descriptor> refineEdge(edge_descriptor edge, SurfaceMesh & mesh);
 	void triangulate(SurfaceMesh & mesh);
 public:
-	std::vector<vertex_descriptor> refine(std::vector<edge_descriptor> edges, SurfaceMesh & mesh);
+	std::vector<vertex_descriptor> refine(std::vector<vertex_descriptor> vertices, SurfaceMesh & mesh);
+	std::vector<vertex_descriptor> refine(std::vector<edge_descriptor> edges, SurfaceMesh & mesh);	
 public:
 	HierarchicalMeshRefinement(const HierarchicalMesh & hierarchical_mesh);
 };

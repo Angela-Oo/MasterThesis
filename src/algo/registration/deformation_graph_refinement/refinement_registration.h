@@ -43,8 +43,6 @@ public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	bool shouldBeSavedAsImage() override;
 public:
-	//RefineDeformationGraphRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration, HierarchicalMesh hierarchical_mesh);
-
 	RefineDeformationGraphRegistration(const SurfaceMesh& source,
 									   const SurfaceMesh& target,
 									   ceres::Solver::Options option,

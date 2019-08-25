@@ -48,7 +48,9 @@ HierarchicalDeformationGraphReader::HierarchicalDeformationGraphReader(std::shar
 	_meshes.push_back(mesh_to_refine);
 
 	HierarchicalMeshRefinement mesh_refinement(_hierarchical_mesh);
-	auto vertices = mesh_refinement.refine({ edge }, mesh_to_refine);
+
+	std::vector<edge_descriptor> one_edge{ edge };
+	auto vertices = mesh_refinement.refine(one_edge, mesh_to_refine);
 
 	_meshes.push_back(mesh_to_refine);
 

@@ -10,22 +10,29 @@ namespace Registration {
 
 std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh, double min_smooth_cost = 0.01, double percentage_max_smooth_cost = 0.9);
 
+std::vector<vertex_descriptor> getVerticesToRefine(SurfaceMesh & refined_mesh, double min_smooth_cost, double percentage_max_smooth_cost);
+
 
 template <typename PositionDeformation>
 DeformationGraph<PositionDeformation> refineHierarchicalMesh(const RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation)
 {
 	auto refined_mesh = deformation.non_rigid_deformation._mesh;
-	auto edges = getEdgesToRefine(refined_mesh, 0.01, 0.9);
-
 	HierarchicalMeshRefinement mesh_refiner(deformation.hierarchical_mesh);
-	auto new_vertices = mesh_refiner.refine(edges, refined_mesh);
 
+	//auto edges = getEdgesToRefine(refined_mesh, 0.01, 0.9);
+	//auto new_vertices = mesh_refiner.refine(edges, refined_mesh);
 
+	auto vertices = getVerticesToRefine(refined_mesh, 1., 0.8);	
+	auto new_vertices = mesh_refiner.refine(vertices, refined_mesh);
+
+	// interpolate deformations of new nodes
 	auto & deformation_property_map = refined_mesh.property_map<vertex_descriptor, PositionDeformation>("v:node_deformation").first;
 	for (auto v : new_vertices) {
 		if (refined_mesh.is_valid(v)) {
-			NearestNodes kNN = createNearestNodes<DeformationGraph<PositionDeformation>>(deformation.non_rigid_deformation, 
-																						 refined_mesh.point(v));
+			//NearestNodes kNN = createNearestNodes<DeformationGraph<PositionDeformation>>(deformation.non_rigid_deformation, 
+			//																			 refined_mesh.point(v));
+			NearestNodes kNN = createNearestNodesRadiusOfInfluence<DeformationGraph<PositionDeformation>>(deformation.non_rigid_deformation,
+																					   refined_mesh.point(v));
 
 			std::vector<std::pair<PositionDeformation, double>> deformation_weights_vector;
 			for (auto n_w : kNN.node_weight_vector)

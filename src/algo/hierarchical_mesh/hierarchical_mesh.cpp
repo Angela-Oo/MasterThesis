@@ -178,6 +178,19 @@ void HierarchicalMeshRefinement::triangulate(SurfaceMesh & mesh)
 
 }
 
+std::vector<vertex_descriptor> HierarchicalMeshRefinement::refine(std::vector<vertex_descriptor> vertices, SurfaceMesh & mesh)
+{
+	std::vector<vertex_descriptor> new_vertices;
+	for (auto & v : vertices) {
+		auto vs = refineVertex(v, mesh);
+		new_vertices.insert(new_vertices.end(), vs.begin(), vs.end());
+	}
+	triangulate(mesh);
+	CGAL::Polygon_mesh_processing::remove_isolated_vertices(mesh);
+
+	return new_vertices;
+}
+
 std::vector<vertex_descriptor> HierarchicalMeshRefinement::refine(std::vector<edge_descriptor> edges, SurfaceMesh & mesh)
 {
 	std::vector<vertex_descriptor> new_vertices;
