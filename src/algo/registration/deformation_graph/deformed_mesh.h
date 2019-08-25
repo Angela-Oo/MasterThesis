@@ -26,16 +26,17 @@ std::vector<std::pair<vertex_descriptor, double>> findNearestNodesWithRadiusOfIn
 {
 	vertex_descriptor nearest_deformation_node = deformation_graph.getNearestNodes(point);
 	std::set<vertex_descriptor> two_ring_neighbors = twoRingNeighborhood(deformation_graph._mesh, nearest_deformation_node);
+	two_ring_neighbors.insert(nearest_deformation_node);
 
 	auto radius_map = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:radius").first;
 
 	std::vector<std::pair<vertex_descriptor, double>> node_distance;
 	for (auto n : two_ring_neighbors)
 	{
-		//auto distance = CGAL::squared_distance(point, deformation_graph._mesh.point(n));
-		//auto radius_of_influence = std::pow(radius_map[n], 2);
-		auto distance = std::sqrt(CGAL::squared_distance(point, deformation_graph._mesh.point(n)));
-		auto radius_of_influence = radius_map[n];
+		auto distance = CGAL::squared_distance(point, deformation_graph._mesh.point(n));
+		auto radius_of_influence = std::pow(radius_map[n], 2);
+		//auto distance = std::sqrt(CGAL::squared_distance(point, deformation_graph._mesh.point(n)));
+		//auto radius_of_influence = radius_map[n];
 		auto influence_distance = distance / radius_of_influence;
 		node_distance.push_back(std::make_pair(n, influence_distance));
 	}
@@ -53,7 +54,6 @@ NearestNodes createNearestNodesRadiusOfInfluence(const DeformationGraph & deform
 	// paper two:  wj(point, vi, ri) = max(0., (1 -  d(vi, point)^2 / ri)^3)
 	// with ri equal to value in v:radius
 
-	// find nearest nodes
 	auto nearest_deformation_nodes = findNearestNodesWithRadiusOfInfluence(deformation_graph, point);
 	//auto radius_map = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:radius");
 
@@ -68,16 +68,12 @@ NearestNodes createNearestNodesRadiusOfInfluence(const DeformationGraph & deform
 	// calculate weights
 	std::vector<std::pair<vertex_descriptor, double>> vertex_weight_vector;
 	double sum = 0.;
-	for (size_t i = 0; i < nearest_deformation_nodes.size(); ++i)
+	for (size_t i = 0; i < nearest_deformation_nodes.size() && i < 5; ++i)
 	{
 		vertex_descriptor v = nearest_deformation_nodes[i].first;
-		//Point node_point = deformation_graph.getDeformation(v).position();
-		//double distance = CGAL::squared_distance(point, node_point);
-		//double radius = pow((radius_map.first[v]), 2);
-		//double radius = pow((radius_map.first[v] * 1.5), 2);
-		//double weight = 1. - (distance / radius);
 		double weight = 1. - nearest_deformation_nodes[i].second;
-		weight = std::pow(weight, 3);
+		//weight = std::pow(weight, 3);
+		weight = exp(weight);
 		weight = std::max(0., weight);
 		vertex_weight_vector.push_back(std::make_pair(v, weight));
 		sum += weight;
