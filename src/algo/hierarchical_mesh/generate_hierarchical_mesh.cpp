@@ -48,7 +48,7 @@ SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radiu
 
 	CGAL::Polygon_mesh_processing::remove_isolated_vertices(hierarchical_mesh);
 
-	/*double d = 0;
+	double d = 0;
 	int i = 0;
 	for (auto & e : hierarchical_mesh.edges())
 	{
@@ -65,7 +65,7 @@ SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radiu
 	for (auto & v : hierarchical_mesh.vertices())
 	{
 		radius_map[v] = d;
-	}*/
+	}
 	return hierarchical_mesh;
 }
 
@@ -82,6 +82,8 @@ HierarchicalMesh generateHierarchicalMesh(const SurfaceMesh & mesh, double min_r
 		double radius = min_radius * pow(2, meshes.size());
 		auto level = levels - i - 1;
 		meshes.push_back(generateHierarchicalMeshLevel(meshes.back(), radius, level));
+		if (meshes.back().number_of_vertices() < 3)
+			throw std::exception("initial edge length to big");
 	}
 	std::reverse(meshes.begin(), meshes.end());
 	HierarchicalMesh hierarchical_mesh(meshes);

@@ -68,12 +68,11 @@ NearestNodes createNearestNodesRadiusOfInfluence(const DeformationGraph & deform
 	// calculate weights
 	std::vector<std::pair<vertex_descriptor, double>> vertex_weight_vector;
 	double sum = 0.;
-	for (size_t i = 0; i < nearest_deformation_nodes.size() && i < 5; ++i)
+	for (size_t i = 0; i < nearest_deformation_nodes.size() && i < 6; ++i)
 	{
 		vertex_descriptor v = nearest_deformation_nodes[i].first;
 		double weight = 1. - nearest_deformation_nodes[i].second;
-		//weight = std::pow(weight, 3);
-		weight = exp(weight);
+		weight = std::pow(weight, 3);
 		weight = std::max(0., weight);
 		vertex_weight_vector.push_back(std::make_pair(v, weight));
 		sum += weight;

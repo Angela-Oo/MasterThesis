@@ -156,8 +156,10 @@ ceres::ResidualBlockId pointToPointCost(ceres::Problem & problem,
 			return pointToPointCost4NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point);
 		else if (n_w_vector.size() == 5)
 			return pointToPointCost5NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point);
+		else if (n_w_vector.size() == 6)
+			return pointToPointCost6NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point);
 		else
-			return pointToPointCost5NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point);
+			return pointToPointCost6NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point);
 	}
 	else {
 		unsigned int k_neighbors = deformation_graph.getNumberOfInterpolationNeighbors();
@@ -311,9 +313,11 @@ ceres::ResidualBlockId pointToPlaneCost(ceres::Problem & problem,
 			return pointToPlaneCost4NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point, target_normal);
 		else if (n_w_vector.size() == 5)
 			return pointToPlaneCost5NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point, target_normal);
+		else if (n_w_vector.size() == 6)
+			return pointToPlaneCost6NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point, target_normal);
 		else {
 			std::cout << "number of nearest nodes " << n_w_vector.size() << std::endl;
-			return pointToPlaneCost5NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point, target_normal);
+			return pointToPlaneCost6NN(problem, loss_weighting, deformation_graph, deformed_mesh, v, target_point, target_normal);
 		}
 	}
 	else {
