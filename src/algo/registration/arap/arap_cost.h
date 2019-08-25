@@ -36,9 +36,15 @@ ceres::ResidualBlockId pointToPointCost4NN(ceres::Problem & problem,
 										   const vertex_descriptor &v,
 										   const Point & target_point);
 
+ceres::ResidualBlockId pointToPointCost5NN(ceres::Problem & problem,
+										   double loss_weighting,
+										   DeformationGraph<ARAPDeformation> & deformation_graph,
+										   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										   const vertex_descriptor &v,
+										   const Point & target_point);
+
 ceres::ResidualBlockId pointToPointCost(ceres::Problem & problem,
 										double loss_weighting,
-										double k_neighbors,
 										DeformationGraph<ARAPDeformation> & deformation_graph,
 										DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
 										const vertex_descriptor &v,
@@ -62,9 +68,16 @@ ceres::ResidualBlockId pointToPlaneCost4NN(ceres::Problem & problem,
 										   const Point & target_point,
 										   const Vector & target_normal);
 
+ceres::ResidualBlockId pointToPlaneCost5NN(ceres::Problem & problem,
+										   double loss_weighting,
+										   DeformationGraph<ARAPDeformation> & deformation_graph,
+										   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										   const vertex_descriptor &v,
+										   const Point & target_point,
+										   const Vector & target_normal);
+
 ceres::ResidualBlockId pointToPlaneCost(ceres::Problem & problem,
 										double loss_weighting,
-										double k_neighbors,
 										DeformationGraph<ARAPDeformation> & deformation_graph,
 										DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
 										const vertex_descriptor &v,
