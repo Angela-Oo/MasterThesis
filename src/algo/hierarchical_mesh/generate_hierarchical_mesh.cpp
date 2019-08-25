@@ -29,7 +29,6 @@ Point HierarchicalMeshLevelCreator::add_vertex(const SurfaceMesh & original_mesh
 	level[v].cluster_v = v;
 	level[v].cluster_v_finer_level = v_original_mesh;
 	normals[v] = original_mesh_normals[v_original_mesh];
-	//cluster[v] = v;
 	return point;
 }
 
@@ -48,24 +47,25 @@ SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radiu
 
 	CGAL::Polygon_mesh_processing::remove_isolated_vertices(hierarchical_mesh);
 
-	double d = 0;
-	int i = 0;
-	for (auto & e : hierarchical_mesh.edges())
-	{
-		auto source = hierarchical_mesh.point(hierarchical_mesh.source(e.halfedge()));
-		auto target = hierarchical_mesh.point(hierarchical_mesh.target(e.halfedge()));
-		auto distance = std::sqrt(CGAL::squared_distance(source, target));
-		d += distance;
-		++i;
-	}
-	if(i > 0)
-		d /= i;
+	//double d = 0;
+	//int i = 0;
+	//for (auto & e : hierarchical_mesh.edges())
+	//{
+	//	auto source = hierarchical_mesh.point(hierarchical_mesh.source(e.halfedge()));
+	//	auto target = hierarchical_mesh.point(hierarchical_mesh.target(e.halfedge()));
+	//	auto distance = std::sqrt(CGAL::squared_distance(source, target));
+	//	d += distance;
+	//	++i;
+	//}
+	//if(i > 0)
+	//	d /= i;
 
-	auto radius_map = hierarchical_mesh.property_map<vertex_descriptor, double>("v:radius").first;
-	for (auto & v : hierarchical_mesh.vertices())
-	{
-		radius_map[v] = d;
-	}
+	//auto radius_map = hierarchical_mesh.property_map<vertex_descriptor, double>("v:radius").first;
+	//for (auto & v : hierarchical_mesh.vertices())
+	//{
+	//	radius_map[v] = d;
+	//}
+
 	return hierarchical_mesh;
 }
 

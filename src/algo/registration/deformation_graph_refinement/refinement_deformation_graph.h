@@ -36,6 +36,11 @@ DeformationGraph<PositionDeformation> refineHierarchicalMesh(const RefineDeforma
 		}
 	}
 
+	// test by resetting deformation graph
+	//for (auto v : refined_mesh.vertices()) {
+	//	deformation_property_map[v] = PositionDeformation(refined_mesh.point(v));
+	//}
+	
 	return DeformationGraph<PositionDeformation>(refined_mesh, 
 												 deformation.non_rigid_deformation._global, 
 												 deformation.non_rigid_deformation.getNumberOfInterpolationNeighbors());
