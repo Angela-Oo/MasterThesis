@@ -217,6 +217,56 @@ void deform_point_at_node(const T * const point, const Point & node_pos, const T
 	deform_point_at_node(point, node, deformation, T(weight), result);
 }
 
+
+template<typename T>
+void defom_point(const T* const point,
+				 const Point & global_pos,
+				 const T* const global_deformation,
+				 const Point & n1_pos,
+				 const T* const n1_deformation,
+				 double n1_weight,
+				 const Point & n2_pos,
+				 const T* const n2_deformation,
+				 double n2_weight,
+				 const Point & n3_pos,
+				 const T* const n3_deformation,
+				 double n3_weight,
+				 const Point & n4_pos,
+				 const T* const n4_deformation,
+				 double n4_weight,
+				 const Point & n5_pos,
+				 const T* const n5_deformation,
+				 double n5_weight,
+				 const Point & n6_pos,
+				 const T* const n6_deformation,
+				 double n6_weight,
+				 T* result)
+{
+	T deformed_point[3];
+	T weighted_deformed_point[3];
+
+	// local deformation of node position
+	deform_point_at_node(point, n1_pos, n1_deformation, n1_weight, deformed_point);
+
+	deform_point_at_node(point, n2_pos, n2_deformation, n2_weight, weighted_deformed_point);
+	addition(deformed_point, weighted_deformed_point, deformed_point);
+
+	deform_point_at_node(point, n3_pos, n3_deformation, n3_weight, weighted_deformed_point);
+	addition(deformed_point, weighted_deformed_point, deformed_point);
+
+	deform_point_at_node(point, n4_pos, n4_deformation, n4_weight, weighted_deformed_point);
+	addition(deformed_point, weighted_deformed_point, deformed_point);
+
+	deform_point_at_node(point, n5_pos, n5_deformation, n5_weight, weighted_deformed_point);
+	addition(deformed_point, weighted_deformed_point, deformed_point);
+
+	deform_point_at_node(point, n6_pos, n6_deformation, n6_weight, weighted_deformed_point);
+	addition(deformed_point, weighted_deformed_point, deformed_point);
+
+	// global deformation of position
+	deform_point_at_node(deformed_point, global_pos, global_deformation, result);
+}
+
 template<typename T>
 void defom_point(const T* const point,
 				 const Point & global_pos,
@@ -340,11 +390,21 @@ struct FitStarPointToPointAngleAxisCostFunction {
 	const Point _n3_pos;
 	Point _n4_pos;
 	Point _n5_pos;
+	Point _n6_pos;
 	const double _n1_weight;
 	const double _n2_weight;
 	const double _n3_weight;
 	double _n4_weight;
 	double _n5_weight;
+	double _n6_weight;
+
+	FitStarPointToPointAngleAxisCostFunction(const Point &target, const Point &source, const Point &global_pos,
+											 const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos, const Point n6_pos,
+											 double n1_weight, double n2_weight, double n3_weight, double n4_weight, double n5_weight, double n6_weight)
+		: _target(target), _source(source), _global_pos(global_pos)
+		, _n1_pos(n1_pos), _n2_pos(n2_pos), _n3_pos(n3_pos), _n4_pos(n4_pos), _n5_pos(n5_pos), _n6_pos(n6_pos)
+		, _n1_weight(n1_weight), _n2_weight(n2_weight), _n3_weight(n3_weight), _n4_weight(n4_weight), _n5_weight(n5_weight), _n6_weight(n6_weight)
+	{ }
 
 	FitStarPointToPointAngleAxisCostFunction(const Point &target, const Point &source, const Point &global_pos,
 											 const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos,
@@ -372,6 +432,14 @@ struct FitStarPointToPointAngleAxisCostFunction {
 
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create(const Point &target, const Point &source, const Point &global_pos,
+									   const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos, const Point n6_pos,
+									   double n1_weight, double n2_weight, double n3_weight, double n4_weight, double n5_weight, double n6_weight) {
+		return (new ceres::AutoDiffCostFunction<FitStarPointToPointAngleAxisCostFunction, 3, 6, 6, 6, 6, 6, 6, 6>(
+			new FitStarPointToPointAngleAxisCostFunction(target, source, global_pos, n1_pos, n2_pos, n3_pos, n4_pos, n5_pos, n6_pos, n1_weight, n2_weight, n3_weight, n4_weight, n5_weight, n6_weight)));
+	}
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(const Point &target, const Point &source, const Point &global_pos,
 									   const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos,
 									   double n1_weight, double n2_weight, double n3_weight, double n4_weight, double n5_weight) {
 		return (new ceres::AutoDiffCostFunction<FitStarPointToPointAngleAxisCostFunction, 3, 6, 6, 6, 6, 6, 6>(
@@ -392,6 +460,38 @@ struct FitStarPointToPointAngleAxisCostFunction {
 									   double n1_weight, double n2_weight, double n3_weight) {
 		return (new ceres::AutoDiffCostFunction<FitStarPointToPointAngleAxisCostFunction, 3, 6, 6, 6, 6>(
 			new FitStarPointToPointAngleAxisCostFunction(target, source, global_pos, n1_pos, n2_pos, n3_pos, n1_weight, n2_weight, n3_weight)));
+	}
+
+	template <typename T>
+	bool operator()(const T* const global_deformation,
+					const T* const n1_deformation,
+					const T* const n2_deformation,
+					const T* const n3_deformation,
+					const T* const n4_deformation,
+					const T* const n5_deformation,
+					const T* const n6_deformation,
+					T* residuals) const
+	{
+		T source[3];
+		T target[3];
+		point_to_T(_source, source);
+		point_to_T(_target, target);
+
+		T deformed_point[3];
+		defom_point(source,
+					_global_pos, global_deformation,
+					_n1_pos, n1_deformation, _n1_weight,
+					_n2_pos, n2_deformation, _n2_weight,
+					_n3_pos, n3_deformation, _n3_weight,
+					_n4_pos, n4_deformation, _n4_weight,
+					_n5_pos, n5_deformation, _n5_weight,
+					_n6_pos, n6_deformation, _n6_weight,
+					deformed_point);
+
+		// The error is the difference between the deformed source position and the target position multiplied with the weight
+		substract(deformed_point, target, residuals);
+		//scalar_multiply(residuals, w[0], residuals);
+		return true;
 	}
 
 	template <typename T>
@@ -492,11 +592,24 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 	const Point _n3_pos;
 	Point _n4_pos;
 	Point _n5_pos;
+	Point _n6_pos;
 	const double _n1_weight;
 	const double _n2_weight;
 	const double _n3_weight;
 	double _n4_weight;
 	double _n5_weight;
+	double _n6_weight;
+
+
+	FitStarPointToPlaneAngleAxisCostFunction(const Point& target_pos, const Vector & target_normal,
+											 const Point& source_pos, const Point &global_pos,
+											 const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos, const Point n6_pos,
+											 double n1_weight, double n2_weight, double n3_weight, double n4_weight, double n5_weight, double n6_weight)
+		: _target_pos(target_pos), _target_normal(target_normal)
+		, _source_pos(source_pos), _global_pos(global_pos)
+		, _n1_pos(n1_pos), _n2_pos(n2_pos), _n3_pos(n3_pos), _n4_pos(n4_pos), _n5_pos(n5_pos), _n6_pos(n6_pos)
+		, _n1_weight(n1_weight), _n2_weight(n2_weight), _n3_weight(n3_weight), _n4_weight(n4_weight), _n5_weight(n5_weight), _n6_weight(n6_weight)
+	{ }
 
 	FitStarPointToPlaneAngleAxisCostFunction(const Point& target_pos, const Vector & target_normal,
 											 const Point& source_pos, const Point &global_pos,
@@ -531,11 +644,21 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create(const Point& target_pos, const Vector & target_normal,
 									   const Point& source_pos, const Point &global_pos,
+									   const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos, const Point n6_pos,
+									   double n1_weight, double n2_weight, double n3_weight, double n4_weight, double n5_weight, double n6_weight)
+	{
+		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneAngleAxisCostFunction, 1, 6, 6, 6, 6, 6, 6, 6>(
+			new FitStarPointToPlaneAngleAxisCostFunction(target_pos, target_normal, source_pos, global_pos, n1_pos, n2_pos, n3_pos, n4_pos, n5_pos, n6_pos, n1_weight, n2_weight, n3_weight, n4_weight, n5_weight, n6_weight)));
+	}
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(const Point& target_pos, const Vector & target_normal,
+									   const Point& source_pos, const Point &global_pos,
 									   const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos,
 									   double n1_weight, double n2_weight, double n3_weight, double n4_weight, double n5_weight)
 	{
 		return (new ceres::AutoDiffCostFunction<FitStarPointToPlaneAngleAxisCostFunction, 1, 6, 6, 6, 6, 6, 6>(
-			new FitStarPointToPlaneAngleAxisCostFunction(target_pos, target_normal, source_pos, global_pos, n1_pos, n2_pos, n3_pos, n4_pos, n4_pos, n1_weight, n2_weight, n3_weight, n4_weight, n5_weight)));
+			new FitStarPointToPlaneAngleAxisCostFunction(target_pos, target_normal, source_pos, global_pos, n1_pos, n2_pos, n3_pos, n4_pos, n5_pos, n1_weight, n2_weight, n3_weight, n4_weight, n5_weight)));
 	}
 
 	// Factory to hide the construction of the CostFunction object from the client code.
@@ -558,6 +681,44 @@ struct FitStarPointToPlaneAngleAxisCostFunction {
 			new FitStarPointToPlaneAngleAxisCostFunction(target_pos, target_normal, source_pos, global_pos, n1_pos, n2_pos, n3_pos, n1_weight, n2_weight, n3_weight)));
 	}
 
+
+
+	template <typename T>
+	bool operator()(const T* const global_deformation,
+					const T* const n1_deformation,
+					const T* const n2_deformation,
+					const T* const n3_deformation,
+					const T* const n4_deformation,
+					const T* const n5_deformation,
+					const T* const n6_deformation,
+					T* residuals) const
+	{
+		T source_pos[3];
+		T target_pos[3];
+		T target_normal[3];
+
+		point_to_T(_source_pos, source_pos);
+		point_to_T(_target_pos, target_pos);
+		point_to_T(_target_normal, target_normal);
+
+		T deformed_point[3];
+		defom_point(source_pos,
+					_global_pos, global_deformation,
+					_n1_pos, n1_deformation, _n1_weight,
+					_n2_pos, n2_deformation, _n2_weight,
+					_n3_pos, n3_deformation, _n3_weight,
+					_n4_pos, n4_deformation, _n4_weight,
+					_n5_pos, n5_deformation, _n5_weight,
+					_n6_pos, n6_deformation, _n6_weight,
+					deformed_point);
+
+		// Point to plane error = dot((deformed position - target_point), target_normal 
+		T difference[3];
+		substract(deformed_point, target_pos, difference);
+		residuals[0] = dot(difference, target_normal);// *w[0];
+
+		return true;
+	}
 
 	template <typename T>
 	bool operator()(const T* const global_deformation,

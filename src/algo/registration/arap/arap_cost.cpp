@@ -100,6 +100,47 @@ ceres::ResidualBlockId pointToPointCost5NN(ceres::Problem & problem,
 
 
 
+ceres::ResidualBlockId pointToPointCost6NN(ceres::Problem & problem,
+										   double loss_weighting,
+										   DeformationGraph<ARAPDeformation> & deformation_graph,
+										   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										   const vertex_descriptor &v,
+										   const Point & target_point)
+{
+	auto n_w_vector = deformed_mesh.nearestNodes(v).node_weight_vector;
+	auto & global = deformation_graph._global;
+
+	assert(n_w_vector.size() == 6);
+	if (n_w_vector.size() < 6)
+		std::cout << "help nearest node is smaller than expected" << std::endl;
+
+	auto cost_function = FitStarPointToPointAngleAxisCostFunction::Create(target_point, deformed_mesh.point(v), global.position(),
+																		  deformation_graph.getDeformation(n_w_vector[0].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[1].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[2].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[3].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[4].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[5].first).position(),
+																		  n_w_vector[0].second, 
+																		  n_w_vector[1].second, 
+																		  n_w_vector[2].second, 
+																		  n_w_vector[3].second,
+																		  n_w_vector[4].second, 
+																		  n_w_vector[5].second);
+
+	auto loss_function = new ceres::ScaledLoss(NULL, loss_weighting, ceres::TAKE_OWNERSHIP);
+	return problem.AddResidualBlock(cost_function, loss_function,
+									global.d(),
+									deformation_graph.getDeformation(n_w_vector[0].first).d(),
+									deformation_graph.getDeformation(n_w_vector[1].first).d(),
+									deformation_graph.getDeformation(n_w_vector[2].first).d(),
+									deformation_graph.getDeformation(n_w_vector[3].first).d(),
+									deformation_graph.getDeformation(n_w_vector[4].first).d(),
+									deformation_graph.getDeformation(n_w_vector[5].first).d());
+}
+
+
+
 ceres::ResidualBlockId pointToPointCost(ceres::Problem & problem,
 										double loss_weighting,
 										DeformationGraph<ARAPDeformation> & deformation_graph,
@@ -214,6 +255,43 @@ ceres::ResidualBlockId pointToPlaneCost5NN(ceres::Problem & problem,
 									deformation_graph.getDeformation(n_w_vector[2].first).d(),
 									deformation_graph.getDeformation(n_w_vector[3].first).d(),
 									deformation_graph.getDeformation(n_w_vector[4].first).d());
+}
+
+
+ceres::ResidualBlockId pointToPlaneCost6NN(ceres::Problem & problem,
+										   double loss_weighting,
+										   DeformationGraph<ARAPDeformation> & deformation_graph,
+										   DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
+										   const vertex_descriptor &v,
+										   const Point & target_point,
+										   const Vector & target_normal)
+{
+	auto n_w_vector = deformed_mesh.nearestNodes(v).node_weight_vector;
+	auto & global = deformation_graph._global;
+	auto cost_function = FitStarPointToPlaneAngleAxisCostFunction::Create(target_point, target_normal,
+																		  deformed_mesh.point(v), global.position(),
+																		  deformation_graph.getDeformation(n_w_vector[0].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[1].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[2].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[3].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[4].first).position(),
+																		  deformation_graph.getDeformation(n_w_vector[5].first).position(),
+																		  n_w_vector[0].second, 
+																		  n_w_vector[1].second,
+																		  n_w_vector[2].second,
+																		  n_w_vector[3].second, 
+																		  n_w_vector[4].second,
+																		  n_w_vector[5].second);
+
+	auto loss_function = new ceres::ScaledLoss(NULL, loss_weighting, ceres::TAKE_OWNERSHIP);
+	return problem.AddResidualBlock(cost_function, loss_function,
+									global.d(),
+									deformation_graph.getDeformation(n_w_vector[0].first).d(),
+									deformation_graph.getDeformation(n_w_vector[1].first).d(),
+									deformation_graph.getDeformation(n_w_vector[2].first).d(),
+									deformation_graph.getDeformation(n_w_vector[3].first).d(),
+									deformation_graph.getDeformation(n_w_vector[4].first).d(),
+									deformation_graph.getDeformation(n_w_vector[5].first).d());
 }
 
 
