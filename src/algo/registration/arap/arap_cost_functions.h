@@ -100,7 +100,7 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 	// E_arap = sum_{i} sum_{j in N} |(vi-vj) - Ri(vi' - vj')|^2
 	// E_arap = sum_{i} sum_{j in N} |Ri(vj-vi) - ((vj + tj) - (vi + ti))|^2
 	template <typename T>
-	bool operator()(const T* const deformation_i, const T* const deformation_j,  const T* const w, T* residuals) const
+	bool operator()(const T* const deformation_i, const T* const deformation_j, const T* const w, T* residuals) const
 	{
 		T vi[3];
 		T vj[3];
@@ -129,7 +129,12 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 		substract(vj_t, vi_t, transformed_edge);
 
 		substract(rotated_edge, transformed_edge, residuals);
-		scalar_multiply(residuals, w[0], residuals);
+		T min{ 0.0001 };
+		T weight = w[0] * 100.;
+		if(weight < min)
+			scalar_multiply(residuals, min, residuals);
+		else
+			scalar_multiply(residuals, weight, residuals);
 		return true;
 	}
 };
@@ -149,16 +154,19 @@ struct AdaptableRigidityWeightCostFunction {
 	template <typename T>
 	bool operator()(const T* const weight, T* residuals) const {
 
-		//T max{ 100. };
-		//T zero{ 0. };
+		T max{ 1. };
+		T zero{ 0. };
 		//T value = max - weight[0];
 		//if (value < zero)
 		//	value = zero;
-		//value = value * 0.01;
-		//residuals[0] = pow(value, 3);
+		//value = value * 0.1;
+		//residuals[0] = pow(value, 2);
 
-		T scale{ -0.1 };
-		residuals[0] = exp(scale * weight[0]);
+		T scale{ -10. };
+		if (weight[0] > max)
+			residuals[0] = zero;
+		else
+			residuals[0] = exp(scale * weight[0]);
 		return true;
 	}
 };

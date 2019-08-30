@@ -13,15 +13,13 @@ void AsRigidAsPossibleSmoothCostAdaptiveRigidity::evaluateResiduals(ceres::Probl
 	auto smooth_cost = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
 	if (!_arap_residual_ids.empty() && smooth_cost.second) {
 		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _arap_residual_ids, smooth_cost.first, _smooth_factor);
-		logger.write(" max smooth cost: " + std::to_string(max_and_mean_cost.first) + " reference smooth " + std::to_string(max_and_mean_cost.second * 10.), false);
+		logger.write(" max smooth cost: " + std::to_string(max_and_mean_cost.first), false);
 	}
 
 	if (!_rigidity_residual_ids.empty()) {
 		auto rigidity_cost = mesh.add_property_map<edge_descriptor, double>("e:rigidity_cost", 0.);
-		//if (rigidity_cost.second) {
 		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _rigidity_residual_ids, rigidity_cost.first, _rigidity_factor);
 		logger.write(" max rigidity cost: " + std::to_string(max_and_mean_cost.first), false);
-		//}
 	}
 }
 
@@ -69,7 +67,7 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCost(ceres::Proble
 	_rigidity_residual_ids.clear();
 	auto & mesh = deformation_graph._mesh;
 
-	auto & edge_rigidity = mesh.add_property_map<edge_descriptor, double>("e:rigidity", 50.);
+	auto & edge_rigidity = mesh.add_property_map<edge_descriptor, double>("e:rigidity", 1.);
 	//if (!edge_rigidity.second) {
 		//throw std::exception("property map e:rigidity does not exist");
 	//}
