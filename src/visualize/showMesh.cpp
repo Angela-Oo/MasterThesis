@@ -45,18 +45,18 @@ void ShowMesh::nonRigidRegistration()
 		auto frame_b = _selected_frame_for_registration[1];
 		auto & source = _input_mesh->getMesh(frame_a);
 		auto & target = _input_mesh->getMesh(frame_b);
-		auto option = ceresOption();
+		auto ceres_option = ceresOption();
 
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
 
 
 		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) { // todo
-			_registration_options.smooth = 10.;
-			_registration_options.fit = 100.;
+			_options.smooth = 10.;
+			_options.fit = 100.;
 			_registration = createRegistrationNoICP(_registration_type, 
-													_registration_options, 
-													option, 
+													_options, 
+													ceres_option,
 													_logger,
 													source, 
 													target,
@@ -64,8 +64,8 @@ void ShowMesh::nonRigidRegistration()
 		}
 		else {
 			_registration = createRegistration(_registration_type,
-											   _registration_options,
-											   option,
+											   _options,
+											   ceres_option,
 											   _logger,
 											   source,
 											   target);
@@ -96,7 +96,7 @@ void ShowMesh::solveAllNonRigidRegistration()
 		_save_images_folder = getImageFolderName(_registration_type);
 		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
 
-		_register_sequence_of_frames = createSequenceRegistration(_registration_type, _registration_options, ceresOption(), _logger, _input_mesh);
+		_register_sequence_of_frames = createSequenceRegistration(_registration_type, _options, ceresOption(), _logger, _input_mesh);
 	}
 	else {
 		bool finished = _register_sequence_of_frames->finished();
@@ -347,40 +347,53 @@ void ShowMesh::init(ml::ApplicationData &app)
 	bool load_all_frames = false;
 	unsigned int number_of_frames_to_load = 10;
 	if (!test) {
-		_registration_options.evaluate_residuals = true;
-		_registration_options.dg_options.edge_length = 0.3;// 0.05;// 0.15;
-		_registration_options.dg_options.levels = 4;
-		_registration_options.ignore_deformation_graph_border_vertices = false;
-		_registration_options.use_adaptive_rigidity_cost = true;
-		_registration_options.dg_options.number_of_interpolation_neighbors = 3;// 4;
-		_registration_options.use_vertex_random_probability = 0.5;
-		_registration_options.max_iterations = 25;
-		_registration_options.smooth = 10.;
-		_registration_options.fit = 5.;
+		_options.evaluate_residuals = true;
+		_options.dg_options.edge_length = 0.4;// 0.15;#
+		_options.dg_options.number_of_interpolation_neighbors = 3;// min number of interpolation neighbors;
+
+		_options.ignore_deformation_graph_border_vertices = false;
+		_options.use_vertex_random_probability = 0.5;
+		_options.max_iterations = 25;
+		_options.smooth = 10.;
+		_options.fit = 5.;
+
+		// refine deformation graph
+		//_options.refinement.levels = 4;
+		//_options.refinement.min_edge_length = 0.05;
+		//_options.use_adaptive_rigidity_cost = false;
+		//_renderer->_dg_edge_color = Visualize::EdgeColor::SmoothCost;
+
+		// adaptive rigidity cost function
+		_options.use_adaptive_rigidity_cost = true;
+		_options.dg_options.edge_length = 0.3;
+		_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
+
+
+
 		// puppet
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 0);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);
-		//_registration_options.dg_options.edge_length = 0.3;
-		//_registration_options.use_vertex_random_probability = 0.25;
+		//_options.dg_options.edge_length = 0.3;
+		//_options.use_vertex_random_probability = 0.25;
 		//_data_name = "puppet";
 
 		// paperbag
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 1);
-		//_registration_options.dg_options.edge_length = 0.2;
+		//_options.dg_options.edge_length = 0.2;
 		//_data_name = "paperbag";
 
 		// head
 		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
 		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
 		_data_name = "head";
-		_registration_options.use_vertex_random_probability = 0.4;
+		_options.use_vertex_random_probability = 0.1;
 	
 		// hand
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
 		//_data_name = "hand";
-		//_registration_options.use_vertex_random_probability = 0.15;
+		//_options.use_vertex_random_probability = 0.15;
 
 		if (register_on_reference_mesh || load_compare_mesh) {
 			if (load_all_frames) {
@@ -413,14 +426,14 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_logger = std::make_shared<FileWriter>(_data_name + "_log.txt");
 	}
 	else {
-		//_registration_options.evaluate_residuals = true;
-		//_registration_options.dg_options.edge_length = 0.07;
-		//_registration_options.ignore_deformation_graph_border_vertices = false;
-		//_registration_options.dg_options.number_of_interpolation_neighbors = 4;
-		//_registration_options.use_vertex_random_probability = 1.;
-		//_registration_options.max_iterations = 50;
-		//_registration_options.smooth = 20.;
-		//_registration_options.fit = 10.;
+		//_options.evaluate_residuals = true;
+		//_options.dg_options.edge_length = 0.07;
+		//_options.ignore_deformation_graph_border_vertices = false;
+		//_options.dg_options.number_of_interpolation_neighbors = 4;
+		//_options.use_vertex_random_probability = 1.;
+		//_options.max_iterations = 50;
+		//_options.smooth = 20.;
+		//_options.fit = 10.;
 		//
 
 		//_input_mesh = std::make_shared<DeformationMeshFrames>();

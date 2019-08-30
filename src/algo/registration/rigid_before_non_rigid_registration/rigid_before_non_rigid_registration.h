@@ -22,8 +22,6 @@ private:
 	std::unique_ptr<RigidRegistration> _rigid_registration;
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
 	bool _finished_rigid_registration;
-private:
-	RegistrationOptions _registration_options;
 public:
 	bool finished() override;
 	bool solveIteration() override;

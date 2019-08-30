@@ -1,7 +1,5 @@
 #include "render_registration.h"
-
 #include "algo/registration_evaluation/evaluate_registration.h"
-#include "render_deformation_graph.h"
 
 std::string renderMeshModeToString(Render render_type)
 {
@@ -173,7 +171,7 @@ void RenderRegistration::renderTargetMesh(const SurfaceMesh & target, bool overr
 void RenderRegistration::renderDeformationGraph(SurfaceMesh & deformation_graph, bool debug_normals)
 {
 	if (_render_deformation_graph) {
-		Visualize::setDeformationGraphColor(deformation_graph, true);
+		Visualize::setDeformationGraphColor(deformation_graph, _dg_vertex_color, _dg_edge_color);
 		_point_renderer->insertMesh("deformation_graph", deformation_graph, 0.001f, debug_normals, true);
 	}
 	else {
@@ -308,4 +306,6 @@ RenderRegistration::RenderRegistration(ml::GraphicsDevice * graphics)
 	_last_rendered_current_frame = 0;
 	_last_rendered_reference_frame = 0;
 	_reigistration_finished = false;
+	_dg_edge_color = Visualize::EdgeColor::SmoothCost;
+	_dg_vertex_color = Visualize::VertexColor::Default;
 }

@@ -174,7 +174,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 	, _current_iteration(0)
 	, _options(options)
 {
-	auto hierarchical_mesh = generateHierarchicalMesh(source, options.dg_options.edge_length, options.dg_options.levels);
+	auto hierarchical_mesh = generateHierarchicalMesh(source, options.refinement.min_edge_length, options.refinement.levels);
 	auto global = createGlobalDeformation<typename NonRigidRegistration::PositionDeformation>(source);
 	auto deformation_graph = createDeformationGraphFromMesh<typename NonRigidRegistration::PositionDeformation>(hierarchical_mesh.getInitMesh(), global, options.dg_options.number_of_interpolation_neighbors);
 

@@ -5,6 +5,19 @@
 
 namespace Visualize {
 
-void setDeformationGraphColor(SurfaceMesh & mesh, bool use_only_smooth_cost);
+enum class VertexColor
+{
+	Default,
+	FitCost
+};
+
+enum class EdgeColor
+{
+	SmoothCost,
+	RigidityCost,
+	RigidityValue
+};
+
+void setDeformationGraphColor(SurfaceMesh & mesh, VertexColor vertex_color = VertexColor::Default, EdgeColor edge_color = EdgeColor::SmoothCost);
 
 }

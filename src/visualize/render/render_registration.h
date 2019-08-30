@@ -1,6 +1,7 @@
 #pragma once
 
 #include "mLibInclude.h"
+#include "render_deformation_graph.h"
 #include "pointsRenderer.h"
 #include "meshRenderer.h"
 #include "mesh/i_mesh_sequence.h"
@@ -35,6 +36,8 @@ public:
 	bool _render_reference_mesh;
 	bool _render_error;
 	bool _render_deformation_graph;
+	Visualize::VertexColor _dg_vertex_color;
+	Visualize::EdgeColor _dg_edge_color;
 private:
 	void renderDeformedSourceMesh(const SurfaceMesh & deformed_points, bool override = false, bool debug_normals = false);
 	void renderTargetMesh(const SurfaceMesh & target, bool override = false, bool debug_normals = false);

@@ -110,12 +110,12 @@ void setVertexColorBasedOnFitCost(SurfaceMesh & mesh)
 }
 
 
-void setVertexColor(SurfaceMesh & mesh, bool use_only_smooth_cost)
+void setVertexColor(SurfaceMesh & mesh, VertexColor dg_vertex_color)
 {
 	// add color property if not already exists
 	auto vertex_color = errorToRGB(0.);
 	auto colors = mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", vertex_color).first;
-	if (!use_only_smooth_cost) {
+	if (dg_vertex_color == VertexColor::FitCost) {
 		setVertexColorBasedOnFitCost(mesh);
 	}
 	setVertexColorOfUnusedVerticesToBlack(mesh);
@@ -194,12 +194,16 @@ void setEdgeColorToRigidityValue(SurfaceMesh & mesh)
 
 //-----------------------------------------------------------------------------
 
-void setDeformationGraphColor(SurfaceMesh & mesh, bool use_only_smooth_cost)
+void setDeformationGraphColor(SurfaceMesh & mesh, VertexColor vertex_color, EdgeColor edge_color)
 {
-	setVertexColor(mesh, use_only_smooth_cost);
-	setEdgeColorToRigidityValue(mesh);
-	//setEdgeColorToRigidityCost(mesh);
-	//setEdgeColorToSmoothCost(mesh);
+	setVertexColor(mesh, vertex_color);
+
+	if(edge_color == EdgeColor::SmoothCost)
+		setEdgeColorToSmoothCost(mesh);
+	else if(edge_color == EdgeColor::RigidityCost)
+		setEdgeColorToRigidityCost(mesh);
+	else
+		setEdgeColorToRigidityValue(mesh);	
 }
 
 }

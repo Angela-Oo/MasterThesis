@@ -7,16 +7,23 @@
 
 namespace Registration {
 
+struct RefinementOptions
+{
+	double min_edge_length;
+	unsigned int levels;
+	RefinementOptions()
+		: min_edge_length(0.05)
+		, levels(4)
+	{}
+};
 
 struct DeformationGraphOptions
 {
-	double  edge_length;
-	unsigned int levels; // only used for refinement
+	double edge_length;
 	unsigned int number_of_interpolation_neighbors;
 
 	DeformationGraphOptions()
 		: edge_length(0.05)
-		, levels(4)
 		, number_of_interpolation_neighbors(4)
 	{}
 };
@@ -48,6 +55,7 @@ struct RegistrationOptions
 	double use_vertex_random_probability; // value between 0. and 1.
 	SequenceRegistrationOptions sequence_options;
 	DeformationGraphOptions dg_options;
+	RefinementOptions refinement;
 	ReduceMeshStrategy mesh_reduce_strategy;
 
 	RegistrationOptions()
