@@ -132,7 +132,29 @@ void setEdgeColorToSmoothCost(SurfaceMesh & mesh)
 	std::tie(valid, mean_smooth_cost, max_smooth_cost) = getMeanAndMaxEdgeValue(mesh, "e:smooth_cost");
 
 	if (valid && edge_colors.second && smooth_costs.second) {
-		double reference_cost = mean_smooth_cost * 10.;
+		double reference_cost = mean_smooth_cost * 5.;
+		for (auto & e : mesh.edges())
+		{
+			double error = (reference_cost > 0.) ? (smooth_costs.first[e] / reference_cost) : smooth_costs.first[e];
+			error = std::min(1., error);
+			edge_colors.first[e] = errorToRGB(error);
+		}
+	}
+}
+
+
+
+void setEdgeColorToRigidityCost(SurfaceMesh & mesh)
+{
+	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color");
+	auto smooth_costs = mesh.property_map<edge_descriptor, double>("e:rigidity_cost");
+	bool valid;
+	double mean_smooth_cost;
+	double max_smooth_cost;
+	std::tie(valid, mean_smooth_cost, max_smooth_cost) = getMeanAndMaxEdgeValue(mesh, "e:rigidity_cost");
+
+	if (valid && edge_colors.second && smooth_costs.second) {
+		double reference_cost = max_smooth_cost;// mean_smooth_cost * 2.;
 		for (auto & e : mesh.edges())
 		{
 			double error = (reference_cost > 0.) ? (smooth_costs.first[e] / reference_cost) : smooth_costs.first[e];
@@ -152,14 +174,19 @@ void setEdgeColorToRigidityValue(SurfaceMesh & mesh)
 	std::tie(valid, mean, max) = getMeanAndMaxEdgeValue(mesh, "e:rigidity");
 
 	if (valid && edge_colors.second && rigidity.second) {
-		double reference_cost = mean * 10.;
+		double min = *std::min_element(rigidity.first.begin(), rigidity.first.end());
+		std::cout << std::endl << "max rigidity: " << max << " mean rigidity " << mean << " min rigidity " << min;
+
+		double reference_cost = mean * 2.;
 		for (auto & e : mesh.edges())
 		{
-			//double error = std::max(0., (100. - rigidity.first[e]));
-			//error = error * 0.01;
+			double error = (max - rigidity.first[e]) / max;
+			error = std::min(1., error);
+			//double error = std::max(0., (10. - rigidity.first[e]));
+			//error = error * 0.1;
 			//error = pow(error, 3);
 			//error = std::min(1., error);
-			double error = exp(-0.1 * rigidity.first[e]);
+			//double error = exp(-0.1 * rigidity.first[e]);
 			edge_colors.first[e] = errorToRGB(error);
 		}
 	}
@@ -171,6 +198,7 @@ void setDeformationGraphColor(SurfaceMesh & mesh, bool use_only_smooth_cost)
 {
 	setVertexColor(mesh, use_only_smooth_cost);
 	setEdgeColorToRigidityValue(mesh);
+	//setEdgeColorToRigidityCost(mesh);
 	//setEdgeColorToSmoothCost(mesh);
 }
 

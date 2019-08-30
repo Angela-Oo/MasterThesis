@@ -117,29 +117,26 @@ void ShowMesh::solveAllNonRigidRegistration()
 
 void ShowMesh::renderError()
 {	
-	if (_registration && _calculate_error) {
+	if (_registration && _registration->finished() && _calculate_error) {
 		if (!_error_evaluation) {
-			if(_reference_registration_mesh->size() > _selected_frame_for_registration[1])
-				_error_evaluation = std::make_unique<ErrorEvaluation>(_reference_registration_mesh->getMesh(_selected_frame_for_registration[1]));
+			_error_evaluation = std::make_unique<ErrorEvaluation>(_registration->getTarget());
 		}
-
 		auto registered_points_a = _registration->getDeformedPoints();
 		auto nearest_reference_points = _error_evaluation->evaluate_error(registered_points_a);
 
 		auto distance_errors = evaluate_distance_error(nearest_reference_points);
-		/*float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
-		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
 
+		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
+		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
 		std::stringstream ss;
-		ss << "ground truth error: mean: " << average << " median: " << distance_errors[distance_errors.size() / 2] << " max: " << max;
+		ss << "error: mean " << average << ", median " << distance_errors[distance_errors.size() / 2] << ", max " << max << std::endl;
 		std::cout << ss.str();
 		if(_logger)
 			_logger->write(ss.str());
-		*/
+		
 		_renderer->renderError(nearest_reference_points);
 	}
 }
-
 
 
 void ShowMesh::renderCurrentMesh()
@@ -334,8 +331,9 @@ void ShowMesh::init(ml::ApplicationData &app)
 {
 	_solve_registration = false;
 	_registration_type = RegistrationType::ARAP;
-	_calculate_error = false;
+	_calculate_error = true;
 	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
+	_renderer->_render_error = true;
 	
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
@@ -350,9 +348,11 @@ void ShowMesh::init(ml::ApplicationData &app)
 	unsigned int number_of_frames_to_load = 10;
 	if (!test) {
 		_registration_options.evaluate_residuals = true;
-		_registration_options.dg_options.edge_length = 0.05;// 0.2;// 0.05;// 0.15;
+		_registration_options.dg_options.edge_length = 0.3;// 0.05;// 0.15;
+		_registration_options.dg_options.levels = 4;
 		_registration_options.ignore_deformation_graph_border_vertices = false;
-		_registration_options.dg_options.number_of_interpolation_neighbors = 4;
+		_registration_options.use_adaptive_rigidity_cost = true;
+		_registration_options.dg_options.number_of_interpolation_neighbors = 3;// 4;
 		_registration_options.use_vertex_random_probability = 0.5;
 		_registration_options.max_iterations = 25;
 		_registration_options.smooth = 10.;
@@ -360,8 +360,8 @@ void ShowMesh::init(ml::ApplicationData &app)
 		// puppet
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 0);
 		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);
-		//_registration_options.dg_options.edge_length = 0.2;
-		//_registration_options.use_vertex_random_probability = 0.5;
+		//_registration_options.dg_options.edge_length = 0.3;
+		//_registration_options.use_vertex_random_probability = 0.25;
 		//_data_name = "puppet";
 
 		// paperbag
@@ -374,9 +374,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
 		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
 		_data_name = "head";
-		_registration_options.smooth = 5.;
-		_registration_options.fit = 10.;
-		_registration_options.use_vertex_random_probability = 0.2;
+		_registration_options.use_vertex_random_probability = 0.4;
 	
 		// hand
 		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
@@ -433,7 +431,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_data_name = "test";
 
 		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
-		_input_mesh = std::make_shared<HierarchicalDeformationGraphReader>(reference_registration_mesh);
+		_input_mesh = std::make_shared<HierarchicalDeformationGraphReader>(reference_registration_mesh, 4);
 
 		_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
 		_renderer->_render_reference_mesh = false;
