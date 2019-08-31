@@ -348,10 +348,10 @@ void ShowMesh::init(ml::ApplicationData &app)
 	unsigned int number_of_frames_to_load = 10;
 	if (!test) {
 		_options.evaluate_residuals = true;
-		_options.dg_options.edge_length = 0.4;// 0.15;#
-		_options.dg_options.number_of_interpolation_neighbors = 3;// min number of interpolation neighbors;
+		_options.deformation_graph.edge_length = 0.4;// 0.15;#
+		_options.deformation_graph.number_of_interpolation_neighbors = 3;// min number of interpolation neighbors;
 
-		_options.ignore_deformation_graph_border_vertices = false;
+		_options.ignore_border_vertices = false;
 		_options.use_vertex_random_probability = 0.5;
 		_options.max_iterations = 25;
 		_options.smooth = 10.;
@@ -364,8 +364,9 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_renderer->_dg_edge_color = Visualize::EdgeColor::SmoothCost;
 
 		// adaptive rigidity cost function
-		_options.use_adaptive_rigidity_cost = true;
-		_options.dg_options.edge_length = 0.3;
+		_options.adaptive_rigidity.enable = true;
+		_options.adaptive_rigidity.adaptive_rigidity = AdaptiveRigidity::RIGIDITY_COST;
+		_options.deformation_graph.edge_length = 0.3;
 		_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
 
 

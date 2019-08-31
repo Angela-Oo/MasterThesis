@@ -17,10 +17,10 @@ void AsRigidAsPossibleFitCost::evaluateResiduals(ceres::Problem &problem, Surfac
 bool AsRigidAsPossibleFitCost::useVertex(vertex_descriptor & v, DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh)
 {
 	bool use_vertex = true;
-	if (_options.ignore_deformation_graph_border_vertices)
+	if (_options.ignore_border_vertices)
 		use_vertex = !deformed_mesh.getSourceMesh().is_border(v, true);
 
-	if (deformed_mesh.nearestNodes(v).node_weight_vector.size() < _options.dg_options.number_of_interpolation_neighbors)
+	if (deformed_mesh.nearestNodes(v).node_weight_vector.size() < _options.deformation_graph.number_of_interpolation_neighbors)
 		use_vertex = false;
 	return use_vertex;
 }
@@ -103,8 +103,8 @@ AsRigidAsPossibleFitCost::AsRigidAsPossibleFitCost(SurfaceMesh & target,
 	, _options(options)
 {
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(target,
-																		   _options.correspondence_max_distance,
-																		   _options.correspondence_max_angle_deviation,
+																		   _options.icp.correspondence_max_distance,
+																		   _options.icp.correspondence_max_angle_deviation,
 																		   10.);
 }
 

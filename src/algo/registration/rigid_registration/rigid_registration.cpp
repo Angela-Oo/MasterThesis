@@ -189,8 +189,8 @@ void RigidRegistration::init()
 {
 	_ceres_logger.write("start Rigid registration \n");
 	_find_correspondence_point = std::make_unique<FindCorrespondingPoints>(_target, 
-																		   _options.correspondence_max_distance,
-																		   _options.correspondence_max_angle_deviation,
+																		   _options.icp.correspondence_max_distance,
+																		   _options.icp.correspondence_max_angle_deviation,
 																		   10.);
 
 	if (_options.use_vertex_random_probability < 1.) {

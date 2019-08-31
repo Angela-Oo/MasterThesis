@@ -358,10 +358,10 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	, _ceres_logger(logger)
 	, _with_icp(true)
 {
-	auto reduced_mesh = createReducedMesh(source, _options.dg_options.edge_length, _options.mesh_reduce_strategy);
-	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", _options.dg_options.edge_length);
+	auto reduced_mesh = createReducedMesh(source, _options.deformation_graph.edge_length, _options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", _options.deformation_graph.edge_length);
 	auto global = createGlobalDeformation<EDDeformation>(_source);
-	_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, _options.dg_options.number_of_interpolation_neighbors);
+	_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, _options.deformation_graph.number_of_interpolation_neighbors);
 
 	setParameters();
 
@@ -409,10 +409,10 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 															   const RegistrationOptions & registration_options,
 															   std::shared_ptr<FileWriter> logger)
 {
-	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.dg_options.edge_length);
+	auto reduced_mesh = createReducedMesh(src, registration_options.deformation_graph.edge_length, registration_options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.deformation_graph.edge_length);
 	auto global = createGlobalDeformation<EDDeformation>(reduced_mesh);
-	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.deformation_graph.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(src, dst, fixed_positions, deformation_graph, option, registration_options, logger);
 }
 
@@ -423,10 +423,10 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 															   const RegistrationOptions & registration_options,
 															   std::shared_ptr<FileWriter> logger)
 {
-	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.dg_options.edge_length);
+	auto reduced_mesh = createReducedMesh(src, registration_options.deformation_graph.edge_length, registration_options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.deformation_graph.edge_length);
 	auto global = createGlobalDeformation<EDDeformation>(reduced_mesh);
-	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.deformation_graph.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options, logger);
 }
 
@@ -438,10 +438,10 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 										                       const RegistrationOptions & registration_options,
 										                       std::shared_ptr<FileWriter> logger)
 {
-	auto reduced_mesh = createReducedMesh(src, registration_options.dg_options.edge_length, registration_options.mesh_reduce_strategy);
-	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.dg_options.edge_length);
+	auto reduced_mesh = createReducedMesh(src, registration_options.deformation_graph.edge_length, registration_options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.deformation_graph.edge_length);
 	auto global = createGlobalEDDeformationFromRigidDeformation(rigid_deformation);
-	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
+	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, registration_options.deformation_graph.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(src, dst, deformation_graph, option, registration_options, logger);
 }
 
@@ -455,7 +455,7 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 										                       std::shared_ptr<FileWriter> logger)
 {
 	auto global = createGlobalEDDeformationFromRigidDeformation(rigid_deformation);
-	auto new_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(deformation_graph._mesh, global, registration_options.dg_options.number_of_interpolation_neighbors);
+	auto new_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(deformation_graph._mesh, global, registration_options.deformation_graph.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(src, dst, new_deformation_graph, option, registration_options, logger);
 }
 

@@ -4,16 +4,64 @@
 #include "algo/registration/rigid_registration/rigid_deformation.h"
 #include "algo/remeshing/mesh_simplification.h"
 #include "mesh/mesh_definition.h"
+#include "registration_type.h"
 
 namespace Registration {
 
+enum class AdaptiveRigidity
+{
+	REDUCE_RIGIDITY,
+	RIGIDITY_COST
+};
+
+struct AdaptiveRigidityOptions
+{
+	bool enable;
+	AdaptiveRigidity adaptive_rigidity;
+	AdaptiveRigidityOptions()
+		: enable(false)
+		, adaptive_rigidity(AdaptiveRigidity::RIGIDITY_COST)
+	{}
+};
+
 struct RefinementOptions
 {
+	bool enable;
 	double min_edge_length;
 	unsigned int levels;
 	RefinementOptions()
-		: min_edge_length(0.05)
+		: enable(false)
+		, min_edge_length(0.05)
 		, levels(4)
+	{}
+};
+
+
+
+struct SequenceRegistrationOptions
+{
+	bool enable;
+	// if true init rigid deformation with non rigid global deformation else init rigid deformation with previouse rigid deformation
+	bool init_rigid_deformation_with_non_rigid_globale_deformation;
+	bool use_previouse_frame_for_rigid_registration;
+
+	SequenceRegistrationOptions()
+		: enable(false)
+		, init_rigid_deformation_with_non_rigid_globale_deformation(true)
+		, use_previouse_frame_for_rigid_registration(true)
+	{}
+};
+
+struct ICPOptions
+{
+	bool enable;
+	double correspondence_max_distance; // initial distance for corresponding finding 
+	double correspondence_max_angle_deviation; // 45 degree
+
+	ICPOptions()
+		: enable(true)
+		, correspondence_max_distance(0.1)
+		, correspondence_max_angle_deviation(45.)
 	{}
 };
 
@@ -28,45 +76,30 @@ struct DeformationGraphOptions
 	{}
 };
 
-struct SequenceRegistrationOptions
-{
-	// if true init rigid deformation with non rigid global deformation else init rigid deformation with previouse rigid deformation
-	bool init_rigid_deformation_with_non_rigid_globale_deformation;
-	bool use_previouse_frame_for_rigid_registration;
-
-	SequenceRegistrationOptions()
-		: init_rigid_deformation_with_non_rigid_globale_deformation(true)
-		, use_previouse_frame_for_rigid_registration(true)
-	{}
-};
-
-
 struct RegistrationOptions
 {
+	RegistrationType type;
+	DeformationGraphOptions deformation_graph;
 	double smooth;
-	double conf;
 	double fit;
-	double correspondence_max_distance; // initial distance for corresponding finding 
-	double correspondence_max_angle_deviation; // 45 degree
 	unsigned int max_iterations;
-	bool ignore_deformation_graph_border_vertices;
-	bool use_adaptive_rigidity_cost;
-	bool evaluate_residuals;
 	double use_vertex_random_probability; // value between 0. and 1.
-	SequenceRegistrationOptions sequence_options;
-	DeformationGraphOptions dg_options;
-	RefinementOptions refinement;
+	bool ignore_border_vertices;
+	bool evaluate_residuals;
 	ReduceMeshStrategy mesh_reduce_strategy;
 
+	bool rigid_and_non_rigid_registration;
+	SequenceRegistrationOptions sequence_options;
+	RefinementOptions refinement;
+	AdaptiveRigidityOptions adaptive_rigidity;
+	ICPOptions icp;
+
 	RegistrationOptions()
-		: smooth(10.)
-		, conf(10.)
+		: type(RegistrationType::ARAP)
+		, smooth(10.)
 		, fit(10.)
-		, correspondence_max_distance(0.1)
-		, correspondence_max_angle_deviation(45.)
 		, max_iterations(25)
-		, ignore_deformation_graph_border_vertices(true)
-		, use_adaptive_rigidity_cost(false)
+		, ignore_border_vertices(true)
 		, evaluate_residuals(true)
 		, use_vertex_random_probability(0.5)
 		, mesh_reduce_strategy(ReduceMeshStrategy::ISOTROPIC)

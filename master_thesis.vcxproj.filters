@@ -755,6 +755,7 @@
     <ClInclude Include="src\util\ceres_include.h">
       <Filter>0 util</Filter>
     </ClInclude>
+    <ClInclude Include="src\parser.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -933,6 +934,7 @@
     <ClCompile Include="src\algo\registration\util\dual_quaternion.cpp">
       <Filter>2 algo\4 registration\2 util</Filter>
     </ClCompile>
+    <ClCompile Include="src\parser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\pointCloud.hlsl">
