@@ -5,6 +5,7 @@
 #include "algo/remeshing/mesh_simplification.h"
 #include "mesh/mesh_definition.h"
 #include "registration_type.h"
+#include "util/ceres_include.h"
 
 namespace Registration {
 
@@ -71,7 +72,7 @@ struct DeformationGraphOptions
 	unsigned int number_of_interpolation_neighbors;
 
 	DeformationGraphOptions()
-		: edge_length(0.05)
+		: edge_length(0.3)
 		, number_of_interpolation_neighbors(4)
 	{}
 };
@@ -82,19 +83,23 @@ struct Input
 	std::string file_name;	
 	size_t start_index;
 	std::string output_folder_name;
+	int number_of_frames_to_load; // to load all frames set to -1
 
 	Input()
 		: file_path("../input_data/HaoLi/head/finalRegistration/")
 		, file_name("meshOfFrame")
 		, start_index(1)
 		, output_folder_name("head")
+		, number_of_frames_to_load(-1)
 	{}
 };
 
 struct RegistrationOptions
 {
+	Input input_mesh_sequence;
 	RegistrationType type;
 	DeformationGraphOptions deformation_graph;
+	ceres::Solver::Options ceres_options;
 	double smooth;
 	double fit;
 	unsigned int max_iterations;

@@ -6,18 +6,32 @@
 #include "visualize/showRegisterTwoRigideFrames.h"
 #include "visualize/showSensData.h"
 #include "visualize/showMesh.h"
+#include "visualize/appRegistration.h"
+#include "visualize/parser.h"
 
 using namespace ml;
 
-
-void AppShowKinectData::init(ml::ApplicationData &app)
+AppShowKinectData::AppShowKinectData()
 {
-	last_time_key_was_pressed = std::chrono::system_clock::now();
 	m_render_data = std::make_unique<ShowMesh>();
+}
+
+AppShowKinectData::AppShowKinectData(int argc, char* argv[])
+{
+	auto options = parse(argc, argv);
+	m_render_data = std::make_unique<AppRegistration>(options);
+
+	//m_render_data = std::make_unique<ShowMesh>();
 	//m_render_data = std::make_unique<ShowRGBDImageData>();
 	//m_render_data = std::make_unique<ShowTwoRigideRegisteredFrames>();
 	//m_render_data = std::make_unique<ShowSensData>();
 	//m_render_data = std::make_unique<ShowKinectData>();
+}
+
+void AppShowKinectData::init(ml::ApplicationData &app)
+{
+	last_time_key_was_pressed = std::chrono::system_clock::now();
+
 	m_render_data->init(app);
 
 	ml::vec3f eye(-0.5f, -0.5f, 1.5f);

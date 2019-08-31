@@ -2,6 +2,7 @@
 #include "main.h"
 #include "appShowKinectData.h"
 
+
 int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLine, int nCmdShow)
 {
 	AppShowKinectData callback;
@@ -11,9 +12,9 @@ int PASCAL WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdLi
 	return EXIT_SUCCESS;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-	AppShowKinectData callback;
+	AppShowKinectData callback(argc, argv);
 	ml::ApplicationWin32 app(nullptr, 1600, 900, "Test", ml::GraphicsDeviceTypeD3D11, callback, 100, 200);
     app.messageLoop();
 

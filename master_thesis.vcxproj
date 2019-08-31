@@ -300,12 +300,14 @@
     <ClInclude Include="src\mesh\i_mesh_sequence.h" />
     <ClInclude Include="src\mesh\mesh_definition.h" />
     <ClInclude Include="src\mLibInclude.h" />
-    <ClInclude Include="src\parser.h" />
     <ClInclude Include="src\stdafx.h" />
     <ClInclude Include="src\util\ceres_include.h" />
     <ClInclude Include="src\util\file_writer.h" />
+    <ClInclude Include="src\visualize\appRegistration.h" />
     <ClInclude Include="src\visualize\constantBuffer.h" />
+    <ClInclude Include="src\visualize\image_folder_name.h" />
     <ClInclude Include="src\visualize\i_showData.h" />
+    <ClInclude Include="src\visualize\parser.h" />
     <ClInclude Include="src\visualize\render\meshRenderer.h" />
     <ClInclude Include="src\visualize\render\pointsRenderer.h" />
     <ClInclude Include="src\visualize\render\render_deformation_graph.h" />
@@ -371,12 +373,14 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="src\parser.cpp" />
     <ClCompile Include="src\stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\util\file_writer.cpp" />
+    <ClCompile Include="src\visualize\appRegistration.cpp" />
+    <ClCompile Include="src\visualize\image_folder_name.cpp" />
+    <ClCompile Include="src\visualize\parser.cpp" />
     <ClCompile Include="src\visualize\render\meshRenderer.cpp" />
     <ClCompile Include="src\visualize\render\pointsRenderer.cpp" />
     <ClCompile Include="src\visualize\render\render_deformation_graph.cpp" />

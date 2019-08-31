@@ -6,6 +6,8 @@
 class AppShowKinectData : public ml::ApplicationCallback
 {
 public:
+	AppShowKinectData();
+	AppShowKinectData(int argc, char* argv[]);
 	void init(ml::ApplicationData &app) override;
 	void render(ml::ApplicationData &app) override;
 	void keyDown(ml::ApplicationData &app, UINT key) override;
