@@ -76,6 +76,21 @@ struct DeformationGraphOptions
 	{}
 };
 
+struct Input
+{
+	std::string file_path;
+	std::string file_name;	
+	size_t start_index;
+	std::string output_folder_name;
+
+	Input()
+		: file_path("../input_data/HaoLi/head/finalRegistration/")
+		, file_name("meshOfFrame")
+		, start_index(1)
+		, output_folder_name("head")
+	{}
+};
+
 struct RegistrationOptions
 {
 	RegistrationType type;
