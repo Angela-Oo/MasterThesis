@@ -13,7 +13,7 @@ void AppRegistration::registration()
 	else if (!_registration_visualizer->finished())
 	{
 		_registration_visualizer->registration();
-		_registration_visualizer->visualize(true);
+		_registration_visualizer->visualize(Visualizer::RegistrationRenderMode::ALL, true);
 	}
 }
 

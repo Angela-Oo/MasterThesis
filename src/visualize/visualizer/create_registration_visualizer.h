@@ -1,6 +1,6 @@
 #pragma once
 
-#include "i_visualizer.h"
+#include "i_registration_visualizer.h"
 #include "mesh/i_mesh_sequence.h"
 #include "visualize/render/renderer.h"
 #include "algo/registration/interface/registration_options.h"

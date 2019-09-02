@@ -3,7 +3,7 @@
 #include "i_showData.h"
 #include "input_reader/mesh_reader.h"
 #include "render/renderer.h"
-#include "visualizer/i_visualizer.h"
+#include "visualizer/i_registration_visualizer.h"
 #include "visualizer/mesh_visualizer.h"
 #include "algo/registration/interface/registration_options.h"
 
