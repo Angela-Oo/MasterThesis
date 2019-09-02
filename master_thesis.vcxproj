@@ -305,11 +305,11 @@
     <ClInclude Include="src\util\file_writer.h" />
     <ClInclude Include="src\visualize\appRegistration.h" />
     <ClInclude Include="src\visualize\constantBuffer.h" />
-    <ClInclude Include="src\visualize\image_folder_name.h" />
     <ClInclude Include="src\visualize\i_showData.h" />
     <ClInclude Include="src\visualize\parser.h" />
     <ClInclude Include="src\visualize\render\meshRenderer.h" />
     <ClInclude Include="src\visualize\render\pointsRenderer.h" />
+    <ClInclude Include="src\visualize\render\renderer.h" />
     <ClInclude Include="src\visualize\render\render_deformation_graph.h" />
     <ClInclude Include="src\visualize\render\render_registration.h" />
     <ClInclude Include="src\visualize\render\render_sequence_registration.h" />
@@ -318,6 +318,12 @@
     <ClInclude Include="src\visualize\showKinectData.h" />
     <ClInclude Include="src\visualize\showRGBDData.h" />
     <ClInclude Include="src\visualize\showSensData.h" />
+    <ClInclude Include="src\visualize\visualizer\create_registration_visualizer.h" />
+    <ClInclude Include="src\visualize\visualizer\image_folder_name.h" />
+    <ClInclude Include="src\visualize\visualizer\i_registration_visualizer.h" />
+    <ClInclude Include="src\visualize\visualizer\mesh_visualizer.h" />
+    <ClInclude Include="src\visualize\visualizer\registration_visualizer.h" />
+    <ClInclude Include="src\visualize\visualizer\sequence_visualizer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\algo\hierarchical_mesh\generate_hierarchical_mesh.cpp" />
@@ -379,10 +385,10 @@
     </ClCompile>
     <ClCompile Include="src\util\file_writer.cpp" />
     <ClCompile Include="src\visualize\appRegistration.cpp" />
-    <ClCompile Include="src\visualize\image_folder_name.cpp" />
     <ClCompile Include="src\visualize\parser.cpp" />
     <ClCompile Include="src\visualize\render\meshRenderer.cpp" />
     <ClCompile Include="src\visualize\render\pointsRenderer.cpp" />
+    <ClCompile Include="src\visualize\render\renderer.cpp" />
     <ClCompile Include="src\visualize\render\render_deformation_graph.cpp" />
     <ClCompile Include="src\visualize\render\render_registration.cpp" />
     <ClCompile Include="src\visualize\render\render_sequence_registration.cpp" />
@@ -391,6 +397,11 @@
     <ClCompile Include="src\visualize\showKinectData.cpp" />
     <ClCompile Include="src\visualize\showRGBDData.cpp" />
     <ClCompile Include="src\visualize\showSensData.cpp" />
+    <ClCompile Include="src\visualize\visualizer\create_registration_visualizer.cpp" />
+    <ClCompile Include="src\visualize\visualizer\image_folder_name.cpp" />
+    <ClCompile Include="src\visualize\visualizer\mesh_visualizer.cpp" />
+    <ClCompile Include="src\visualize\visualizer\registration_visualizer.cpp" />
+    <ClCompile Include="src\visualize\visualizer\sequence_visualizer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="shaders\pointCloud.hlsl">

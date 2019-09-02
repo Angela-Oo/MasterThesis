@@ -19,6 +19,7 @@ private:
 public:
 	void render(ml::Cameraf& camera);
 	void saveCurrentWindowAsImage(std::string folder, std::string filename);
+	void insertMesh(std::string id, const SurfaceMesh& mesh, bool override = true);
 	void insertMesh(std::string id, const SurfaceMesh& mesh, ml::vec4f color, bool override = true);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color);
 	void insertMesh(std::string id, const ml::TriMeshf& mesh);

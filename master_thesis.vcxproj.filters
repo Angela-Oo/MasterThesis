@@ -46,9 +46,6 @@
     <Filter Include="6 visualize">
       <UniqueIdentifier>{53d900cb-dbdf-49bc-99e2-f2dc6a70e268}</UniqueIdentifier>
     </Filter>
-    <Filter Include="6 visualize\render">
-      <UniqueIdentifier>{bfee125b-6f1b-4158-af15-6b56fc1354a8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="5 shaders">
       <UniqueIdentifier>{f1788b5b-0906-442e-b1f7-3760d1698a11}</UniqueIdentifier>
     </Filter>
@@ -114,6 +111,12 @@
     </Filter>
     <Filter Include="2 algo\4 registration\11 sequence registration">
       <UniqueIdentifier>{f6a805a5-5044-477b-8d98-558a67278b9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="6 visualize\1 render">
+      <UniqueIdentifier>{bfee125b-6f1b-4158-af15-6b56fc1354a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="6 visualize\2 visualizer">
+      <UniqueIdentifier>{73879849-56f9-4ed2-a576-446c048d1bc8}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -597,19 +600,19 @@
       <Filter>2 algo\4 registration\3 deformation graph</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\render\render_registration.h">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\render\render_sequence_registration.h">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\render\meshRenderer.h">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\render\pointsRenderer.h">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClInclude>
     <ClInclude Include="src\visualize\render\render_deformation_graph.h">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\extend_deformation_graph.h">
       <Filter>2 algo\4 registration\3 deformation graph</Filter>
@@ -761,8 +764,26 @@
     <ClInclude Include="src\visualize\parser.h">
       <Filter>6 visualize</Filter>
     </ClInclude>
-    <ClInclude Include="src\visualize\image_folder_name.h">
-      <Filter>6 visualize</Filter>
+    <ClInclude Include="src\visualize\render\renderer.h">
+      <Filter>6 visualize\1 render</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\visualizer\mesh_visualizer.h">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\visualizer\registration_visualizer.h">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\visualizer\sequence_visualizer.h">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\visualizer\create_registration_visualizer.h">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\visualizer\image_folder_name.h">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClInclude>
+    <ClInclude Include="src\visualize\visualizer\i_registration_visualizer.h">
+      <Filter>6 visualize\2 visualizer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -844,19 +865,19 @@
       <Filter>2 algo\4 registration\5 rigid registration</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\render_registration.cpp">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\render_sequence_registration.cpp">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\meshRenderer.cpp">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\pointsRenderer.cpp">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClCompile>
     <ClCompile Include="src\visualize\render\render_deformation_graph.cpp">
-      <Filter>6 visualize\render</Filter>
+      <Filter>6 visualize\1 render</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp">
       <Filter>2 algo\4 registration\3 deformation graph</Filter>
@@ -948,8 +969,23 @@
     <ClCompile Include="src\visualize\parser.cpp">
       <Filter>6 visualize</Filter>
     </ClCompile>
-    <ClCompile Include="src\visualize\image_folder_name.cpp">
-      <Filter>6 visualize</Filter>
+    <ClCompile Include="src\visualize\render\renderer.cpp">
+      <Filter>6 visualize\1 render</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\visualizer\mesh_visualizer.cpp">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\visualizer\registration_visualizer.cpp">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\visualizer\sequence_visualizer.cpp">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\visualizer\create_registration_visualizer.cpp">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\visualizer\image_folder_name.cpp">
+      <Filter>6 visualize\2 visualizer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

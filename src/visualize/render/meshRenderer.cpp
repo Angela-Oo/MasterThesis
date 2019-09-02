@@ -43,6 +43,13 @@ void MeshRenderer::saveCurrentWindowAsImage(std::string folder, std::string file
 	ml::FreeImageWrapper::saveImage(depth_folder + "/" + filename + "_depth.png", ml::ColorImageR32G32B32A32(depth));
 }
 
+void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, bool override)
+{
+	if (override || !keyExists(id)) {
+		insertMesh(id, convertToTriMesh(mesh));
+	}
+}
+
 void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color, bool override)
 {
 	if (override || !keyExists(id)) {

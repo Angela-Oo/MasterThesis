@@ -35,6 +35,31 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationTy
 	}
 }
 
+
+std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationOptions & options,
+																  std::shared_ptr<FileWriter> logger,
+																  std::shared_ptr<IMeshReader> mesh_sequence)
+{
+	logOptions(logger, options, options.ceres_options);
+	if (options.type == RegistrationType::ARAP_AllFrames) {
+		return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<AdaptiveRigidityRegistration<AsRigidAsPossible>>>>(mesh_sequence, options, logger);
+		//return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<AsRigidAsPossible>>>(mesh_sequence, options, logger);
+		//return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>>(mesh_sequence, options, logger);
+	}
+	else if (options.type == RegistrationType::ED_AllFrames) {
+		return std::make_unique<SequenceRegistration<RigidBeforeNonRigidRegistration<EmbeddedDeformation>>>(mesh_sequence, options, logger);
+	}
+	else if (options.type == RegistrationType::Rigid_AllFrames) {
+		return std::make_unique<SequenceRegistration<RigidRegistration>>(mesh_sequence, options, logger);
+	}
+	else {
+		throw("Registration type makes no sense in this configuration");
+		return nullptr;
+	}
+}
+
+
+
 std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 												  RegistrationOptions & options,
 												  ceres::Solver::Options & ceres_options,
@@ -61,6 +86,40 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
 	}
 	else if (type == RegistrationType::Rigid) {
 		return std::make_unique<RigidRegistration>(source, target, ceres_options, options, logger);
+	}
+	else {
+		throw("Registration type makes no sense in this configuration");
+		return nullptr;
+	}
+}
+
+
+
+
+std::unique_ptr<IRegistration> createRegistration(RegistrationOptions & options,
+												  std::shared_ptr<FileWriter> logger,
+												  const SurfaceMesh & source,
+												  const SurfaceMesh & target)
+{
+	logOptions(logger, options, options.ceres_options);
+	if (options.type == RegistrationType::ARAP) {
+		//return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>(source, target, ceres_options, options, logger);
+		//return std::make_unique<RefineDeformationGraphRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
+		return std::make_unique<AsRigidAsPossible>(source, target, options.ceres_options, options, logger);
+		//return std::make_unique<AdaptiveRigidityRegistration<AsRigidAsPossible>>(source, target, ceres_options, options, logger);
+	}
+	else if (options.type == RegistrationType::ED) {
+		return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<EmbeddedDeformation>>>(source, target, options.ceres_options, options, logger);
+		//return std::make_unique<RigidBeforeNonRigidRegistration<EmbeddedDeformation>>(source, target, ceres_options, options, logger);
+	}
+	else if (options.type == RegistrationType::ARAP_Without_RIGID) {
+		return std::make_unique<AsRigidAsPossible>(source, target, options.ceres_options, options, logger);
+	}
+	else if (options.type == RegistrationType::ED_Without_RIGID) {
+		return std::make_unique<EmbeddedDeformation>(source, target, options.ceres_options, options, logger);
+	}
+	else if (options.type == RegistrationType::Rigid) {
+		return std::make_unique<RigidRegistration>(source, target, options.ceres_options, options, logger);
 	}
 	else {
 		throw("Registration type makes no sense in this configuration");
