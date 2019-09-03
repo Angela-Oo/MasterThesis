@@ -12,7 +12,7 @@ class MeshVisualizer
 private:
 	std::shared_ptr<Renderer> _renderer;
 	std::shared_ptr<IMeshReader> _mesh_reader;
-	std::set<unsigned int> _visible_frames;
+	std::map<unsigned int, ml::RGBColor> _visible_frames;
 public:
 	void visualize(std::pair<unsigned int, ml::RGBColor> frame, bool visible);
 	void visualize(std::vector<std::pair<unsigned int, ml::RGBColor>> frames, bool visible);
