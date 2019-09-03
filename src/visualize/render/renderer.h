@@ -1,8 +1,8 @@
 #pragma once
 
 #include "mLibInclude.h"
-#include "pointsRenderer.h"
-#include "meshRenderer.h"
+#include "points_renderer.h"
+#include "mesh_renderer.h"
 #include <memory>
 #include <set>
 

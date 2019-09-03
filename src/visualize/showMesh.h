@@ -1,10 +1,7 @@
 #pragma once
 #include "../mLibInclude.h"
 #include "i_showData.h"
-#include "input_reader/i_reader.h"
-#include "render/render_registration.h"
 #include "input_reader/mesh_reader.h"
-
 #include "util/file_writer.h"
 #include "algo/registration/interface/registration_options.h"
 #include "visualizer/mesh_visualizer.h"
@@ -16,8 +13,7 @@ class ShowMesh : public IShowData
 private:
 	std::shared_ptr<FileWriter> _logger;
 	std::shared_ptr<IMeshReader> _input_mesh;
-	RegistrationOptions _options;
-		
+	Registration::RegistrationOptions _options;		
 	std::shared_ptr<Renderer> _renderer;
 	std::shared_ptr<Visualizer::MeshVisualizer> _mesh_visualizer;	
 	std::shared_ptr<Visualizer::IRegistrationVisualizer> _registration_visualizer;

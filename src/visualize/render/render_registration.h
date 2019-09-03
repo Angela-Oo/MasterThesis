@@ -1,59 +1,21 @@
 #pragma once
 
-#include "mLibInclude.h"
-#include "render_deformation_graph.h"
-#include "pointsRenderer.h"
-#include "meshRenderer.h"
-#include "mesh/i_mesh_sequence.h"
-#include "algo/registration/interface/i_registration.h"
-#include "algo/registration/interface/i_sequence_registration.h"
+#include "visualize/visualizer/i_registration_visualizer.h"
+#include "visualize/render/renderer.h"
 #include <memory>
 
-using namespace Registration;
+namespace Visualizer {
 
-enum Render
-{
-	NONE,
-	ONLY_DEFORMATION_GRAPH,
-	DEFORMATION,
-	TARGET,
-	ALL
+class RendererRegistration {
+private:
+	std::shared_ptr<Renderer> _renderer;
+public:
+	void renderDeformedSourceMesh(const SurfaceMesh & deformed_points, RegistrationRenderMode mode);
+	void renderTargetMesh(const SurfaceMesh & target, RegistrationRenderMode mode);
+	void renderDeformationGraph(const SurfaceMesh & deformation_graph, RegistrationRenderMode mode);
+public:
+	RendererRegistration(std::shared_ptr<Renderer> renderer);
 };
 
-std::string renderMeshModeToString(Render render_type);
 
-class RenderRegistration {
-	std::unique_ptr<PointsRenderer> _point_renderer;
-	std::unique_ptr<MeshRenderer> _mesh_renderer;
-private:
-	unsigned int _last_rendered_current_frame;
-	unsigned int _last_rendered_reference_frame;
-	bool _reigistration_finished;
-public:
-	unsigned int _current_frame;
-	bool _render_points = true;
-	Render _render_mesh = Render::ALL;
-	bool _render_reference_mesh;
-	bool _render_error;
-	bool _render_deformation_graph;
-	Visualize::VertexColor _dg_vertex_color;
-	Visualize::EdgeColor _dg_edge_color;
-private:
-	void renderDeformedSourceMesh(const SurfaceMesh & deformed_points, bool override = false, bool debug_normals = false);
-	void renderTargetMesh(const SurfaceMesh & target, bool override = false, bool debug_normals = false);
-	void renderDeformationGraph(SurfaceMesh & deformation_graph, bool debug_normals = false);
-public:
-	Render nextRenderMeshMode();
-	void saveCurrentWindowAsImage(std::string folder, std::string filename);
-public:
-	void render(ml::Cameraf& camera);
-	void renderMesh(std::string id, SurfaceMesh & mesh, ml::RGBColor color);
-	void renderCurrentFrame(std::shared_ptr<IMeshReader> mesh_reader, bool visible);
-	void renderSelectedFrames(std::shared_ptr<IMeshReader> mesh_reader, std::vector<unsigned int> selected_frames);
-	void renderReference(std::shared_ptr<IMeshReader> mesh_reader);
-	void renderRegistration(std::shared_ptr<IRegistration> registration);
-	void renderRegistrationSequence(std::shared_ptr<ISequenceRegistration> registration);
-	void renderError(std::vector<std::pair<Point, Point>> error_points);
-public:
-	RenderRegistration(ml::GraphicsDevice * graphics);
-};
+}

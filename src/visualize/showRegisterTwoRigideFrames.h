@@ -3,7 +3,7 @@
 #include "i_showData.h"
 #include "input_reader/i_reader.h"
 #include "algo/registration/interface/i_registration.h"
-#include "render/pointsRenderer.h"
+#include "render/points_renderer.h"
 
 class ShowTwoRigideRegisteredFrames : public IShowData
 {

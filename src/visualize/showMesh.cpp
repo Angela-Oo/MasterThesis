@@ -2,21 +2,11 @@
 #include "showMesh.h"
 #include "algo/registration/options/ceres_option.h"
 #include "algo/registration/interface/registration.h"
-#include "algo/surface_mesh/mesh_convertion.h"
-#include "input_reader/hierarchical_deformation_graph_reader.h"
-#include <chrono>  // chrono::system_clock
-#include <ctime>   // localtime
-#include <iomanip> // put_time
-#include <algorithm>
-#include <cmath>
-
-
 #include "visualizer/image_folder_name.h"
 #include "visualizer/sequence_visualizer.h"
 #include "visualizer/registration_visualizer.h"
-
 #include "parser.h"
-
+#include <algorithm>
 
 void ShowMesh::createRegistration()
 {
@@ -29,10 +19,8 @@ void ShowMesh::createRegistration()
 			_registration_visualizer = std::make_shared<Visualizer::SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), _renderer, save_images_folder, logger);
 		}
 		else if (_selected_frame_for_registration.size() == 2) {
-			auto frame_a = _selected_frame_for_registration[0];
-			auto frame_b = _selected_frame_for_registration[1];
-			auto & source = _input_mesh->getMesh(frame_a);
-			auto & target = _input_mesh->getMesh(frame_b);
+			auto & source = _input_mesh->getMesh(_selected_frame_for_registration[0]);
+			auto & target = _input_mesh->getMesh(_selected_frame_for_registration[1]);
 
 			auto registration = Registration::createRegistration(_options, logger, source, target);
 			_registration_visualizer = std::make_shared<Visualizer::RegistrationVisualizer>(std::move(registration), _renderer, save_images_folder, logger);
@@ -132,23 +120,23 @@ void ShowMesh::key(UINT key)
 			if (!_registration_visualizer) {
 				if (key == KEY_O) {
 					std::cout << "init rigid registration between the two selected frames" << std::endl;
-					_options.type = RegistrationType::Rigid;
+					_options.type = Registration::RegistrationType::Rigid;
 				}
 				else if (key == KEY_V) {
 					std::cout << "init embedded deformation non rigid registration between the two selected frames" << std::endl;
-					_options.type = RegistrationType::ED;
+					_options.type = Registration::RegistrationType::ED;
 				}
 				else if (key == KEY_B) {
 					std::cout << "init embedded deformation non rigid registration without icp between the two selected frames" << std::endl;
-					_options.type = RegistrationType::ED_WithoutICP;
+					_options.type = Registration::RegistrationType::ED_WithoutICP;
 				}
 				else if (key == KEY_N) {
 					std::cout << "init as rigid as possible non rigid registration between the two selected frames" << std::endl;
-					_options.type = RegistrationType::ARAP;
+					_options.type = Registration::RegistrationType::ARAP;
 				}
 				else if (key == KEY_M) {
 					std::cout << "init as rigid as possible non rigid registration without icpbetween the two selected frames" << std::endl;
-					_options.type = RegistrationType::ARAP_WithoutICP;
+					_options.type = Registration::RegistrationType::ARAP_WithoutICP;
 				}
 				createRegistration();
 			}
@@ -162,17 +150,17 @@ void ShowMesh::key(UINT key)
 		if (!_registration_visualizer) {
 			if (key == KEY_7) {
 				std::cout << "register all frames with rigid registration " << std::endl;
-				_options.type = RegistrationType::Rigid_AllFrames;
+				_options.type = Registration::RegistrationType::Rigid_AllFrames;
 			}
 			else if (key == KEY_U)
 			{
 				std::cout << "register all frames as rigid as possible " << std::endl;				
-				_options.type = RegistrationType::ARAP_AllFrames;
+				_options.type = Registration::RegistrationType::ARAP_AllFrames;
 			}
 			else if (key == KEY_P)
 			{
 				std::cout << "register all frames embdedded deformation " << std::endl;
-				_options.type = RegistrationType::ED_AllFrames;
+				_options.type = Registration::RegistrationType::ED_AllFrames;
 			}
 			_current_frame = 0;
 			createRegistration();
@@ -283,7 +271,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		// adaptive rigidity cost function
 		_options.adaptive_rigidity.enable = true;
-		_options.adaptive_rigidity.adaptive_rigidity = AdaptiveRigidity::RIGIDITY_COST;
+		_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::RIGIDITY_COST;
 		_options.deformation_graph.edge_length = 0.3;
 		//_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
 		_options.use_vertex_random_probability = 0.1;

@@ -1,7 +1,7 @@
 #pragma once
 #include "mLibInclude.h"
 #include "i_showData.h"
-#include "render/pointsRenderer.h"
+#include "render/points_renderer.h"
 #include "kinect/PrimeSenseSensor.h"
 #include "kinect/SensorDataWrapper.h"
 #include "input_reader/i_reader.h"

@@ -5,7 +5,7 @@
 #include <memory>
 #include "algo/registration/interface/i_sequence_registration.h"
 
-#include "visualize/render/render_sequence_registration.h"
+#include "visualize/render/render_registration.h"
 #include "util/file_writer.h"
 
 namespace Visualizer {

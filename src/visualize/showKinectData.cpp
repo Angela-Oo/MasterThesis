@@ -31,8 +31,8 @@ void ShowKinectData::renderRegisteredPoints()
 
 	// render point clouds
 	//_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue);
-	_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Orange);
-	_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
+	_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Orange, true);
+	_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green, true);
 }
 
 void ShowKinectData::render(ml::Cameraf& camera)

@@ -29,7 +29,7 @@ void SequenceRegistrationVisualizer::renderRegistration(Render mode)
 				auto inverse_deformed_points = _registration->getInverseDeformedMesh(_current_frame);
 				_renderer->insert("inverse_mesh", inverse_deformed_points,  ml::RGBColor::Cyan, false);
 				auto source = _registration->getMesh(0);
-				_renderer->insertMesh("mesh_source", source, ml::RGBColor::Yellow.toVec4f(), false);
+				_renderer->insertMesh("mesh_source", source, ml::RGBColor::Yellow, false);
 			}	*/		
 		}
 		else {

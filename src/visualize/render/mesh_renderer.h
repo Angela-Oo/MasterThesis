@@ -19,10 +19,10 @@ private:
 public:
 	void render(ml::Cameraf& camera);
 	void saveCurrentWindowAsImage(std::string folder, std::string filename);
-	void insertMesh(std::string id, const SurfaceMesh& mesh, bool override = true);
-	void insertMesh(std::string id, const SurfaceMesh& mesh, ml::vec4f color, bool override = true);
-	void insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color);
-	void insertMesh(std::string id, const ml::TriMeshf& mesh);
+	void insertMesh(std::string id, const SurfaceMesh& mesh, bool replace = true);
+	void insertMesh(std::string id, const SurfaceMesh& mesh, ml::RGBColor color, bool replace = true);
+	//void insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color);
+	//void insertMesh(std::string id, const ml::TriMeshf& mesh);
 	bool keyExists(std::string id);
 	void removeMesh(std::string id);
 	void clear();

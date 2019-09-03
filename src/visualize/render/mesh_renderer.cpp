@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "meshRenderer.h"
+#include "mesh_renderer.h"
 #include "algo/surface_mesh/mesh_convertion.h"
 #include "ext-freeimage/freeImageWrapper.h"
 #include <experimental/filesystem>
@@ -43,44 +43,34 @@ void MeshRenderer::saveCurrentWindowAsImage(std::string folder, std::string file
 	ml::FreeImageWrapper::saveImage(depth_folder + "/" + filename + "_depth.png", ml::ColorImageR32G32B32A32(depth));
 }
 
-void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, bool override)
+void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, bool replace)
 {
-	if (override || !keyExists(id)) {
-		insertMesh(id, convertToTriMesh(mesh));
+	if (replace || !keyExists(id)) {
+		auto tri_mesh = convertToTriMesh(mesh);
+		_meshes[id] = D3D11MeshAndBuffer();
+
+		std::vector<ml::vec4f> bufferData(tri_mesh.getVertices().size());
+		for (size_t i = 0; i < tri_mesh.getVertices().size(); i++) {
+			bufferData[i] = tri_mesh.getVertices()[i].color;
+		}
+		_meshes[id].mesh.init(*_graphics, tri_mesh);
+		_meshes[id].buffer.init(*_graphics, bufferData);
 	}
 }
 
-void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::vec4f color, bool override)
+void MeshRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, bool replace)
 {
-	if (override || !keyExists(id)) {
-		insertMesh(id, convertToTriMesh(mesh), color);
+	if (replace || !keyExists(id)) {
+		auto tri_mesh = convertToTriMesh(mesh);
+		_meshes[id] = D3D11MeshAndBuffer();
+
+		std::vector<ml::vec4f> bufferData(tri_mesh.getVertices().size());
+		for (size_t i = 0; i < tri_mesh.getVertices().size(); i++) {
+			bufferData[i] = color.toVec4f();
+		}
+		_meshes[id].mesh.init(*_graphics, tri_mesh);
+		_meshes[id].buffer.init(*_graphics, bufferData);
 	}
-}
-
-
-void MeshRenderer::insertMesh(std::string id, const ml::TriMeshf& mesh, ml::vec4f color)
-{
-	_meshes[id] = D3D11MeshAndBuffer();
-	
-	std::vector<ml::vec4f> bufferData(mesh.getVertices().size());
-	for (size_t i = 0; i < mesh.getVertices().size(); i++) {
-		bufferData[i] = color;
-	}
-	_meshes[id].mesh.init(*_graphics, mesh);
-	_meshes[id].buffer.init(*_graphics, bufferData);
-}
-
-
-void MeshRenderer::insertMesh(std::string id, const ml::TriMeshf& mesh)
-{
-	_meshes[id] = D3D11MeshAndBuffer();
-
-	std::vector<ml::vec4f> bufferData(mesh.getVertices().size());
-	for (size_t i = 0; i < mesh.getVertices().size(); i++) {
-		bufferData[i] = mesh.getVertices()[i].color;
-	}
-	_meshes[id].mesh.init(*_graphics, mesh);
-	_meshes[id].buffer.init(*_graphics, bufferData);
 }
 
 bool MeshRenderer::keyExists(std::string id)

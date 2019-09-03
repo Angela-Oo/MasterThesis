@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "pointsRenderer.h"
+#include "points_renderer.h"
 #include "algo/registration/util/hsv_to_rgb.h"
 using namespace ml;
 
@@ -101,9 +101,9 @@ TriMeshf PointsRenderer::createNormalTriMesh(const SurfaceMesh & mesh, ml::RGBCo
 	return ml::meshutil::createUnifiedMesh(meshes);
 }
 
-void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, float point_size, bool draw_normals, bool override)
+void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, bool replace, float point_size, bool draw_normals)
 {
-	if (override || !keyExists(id)) {
+	if (replace || !keyExists(id)) {
 		std::vector<TriMeshf> meshes;
 		// draw edges
 		meshes.push_back(createLineTriMesh(mesh, point_size));
@@ -119,14 +119,9 @@ void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, float 
 	}
 }
 
-void PointsRenderer::insertMesh(std::string id,
-								const SurfaceMesh & mesh,
-								ml::RGBColor color,
-								float point_size, 
-								bool draw_normals,
-								bool override)
+void PointsRenderer::insertMesh(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, bool replace,	float point_size, bool draw_normals)
 {
-	if (override || !keyExists(id)) {
+	if (replace || !keyExists(id)) {
 		std::vector<TriMeshf> meshes;
 		// draw edges
 		meshes.push_back(createLineTriMesh(mesh, color, point_size));
@@ -138,21 +133,21 @@ void PointsRenderer::insertMesh(std::string id,
 	}
 }
 
-void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, float point_size, bool override)
+void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, bool replace, float point_size)
 {
-	if (override || !keyExists(id)) {
+	if (replace || !keyExists(id)) {
 		_pointClouds[id].init(*_graphics, createPointTriMesh(mesh, point_size));
 	}
 }
 
-void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, float point_size, bool override)
+void PointsRenderer::insertPoints(std::string id, const SurfaceMesh & mesh, ml::RGBColor color, bool replace, float point_size)
 {
-	if (override || !keyExists(id)) {
+	if (replace || !keyExists(id)) {
 		_pointClouds[id].init(*_graphics, createPointTriMesh(mesh, color, point_size));
 	}
 }
 
-void PointsRenderer::insertPoints(std::string id, std::vector<Point> points, ml::RGBColor color, float point_size)
+void PointsRenderer::insertPoints(std::string id, const std::vector<Point> & points, ml::RGBColor color, float point_size)
 {
 	std::vector<ml::vec3f> positions;
 	for (auto & p : points) {
@@ -163,82 +158,12 @@ void PointsRenderer::insertPoints(std::string id, std::vector<Point> points, ml:
 	_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), positions, color_frame));
 }
 
-void PointsRenderer::insertPoints(std::string id, std::vector<ml::vec3f> points, ml::RGBColor color, float point_size)
+void PointsRenderer::insertPoints(std::string id, const std::vector<ml::vec3f> & points, ml::RGBColor color, float point_size)
 {
 	// render point clouds
 	std::vector<ml::vec4f> color_frame(points.size());
 	std::fill(color_frame.begin(), color_frame.end(), color);
 	_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), points, color_frame));
-}
-//
-//void PointsRenderer::insertLine(std::string id, std::vector<ml::vec3f> points1, std::vector<ml::vec3f> points2, ml::RGBColor color, float point_size)
-//{
-//	// render point clouds
-//	std::vector<TriMeshf> meshes;
-//	for (int i = 0; i < points1.size(); i++) {
-//		meshes.push_back(ml::Shapesf::line(points1[i], points2[i], color, point_size));
-//	}
-//	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
-//}
-//
-void PointsRenderer::insertLine(std::string id, std::vector<Edge> edges, float point_size)
-{
-	std::vector<TriMeshf> meshes;
-	for (auto & e : edges) {
-		auto cost = e.cost;
-		auto color = errorToRGB(cost);
-		meshes.push_back(ml::Shapesf::line(e.source_point, e.target_point, color, point_size));
-	}
-	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
-}
-
-void PointsRenderer::insertPoints(std::string id, const TriMeshf & points, float point_size, bool draw_normals)
-{
-	std::vector<ml::vec4f> color_frame;
-	std::vector<ml::vec3f> vertices;
-	for (auto & p : points.m_vertices)
-	{
-		color_frame.push_back(p.color);
-		vertices.push_back(p.position);
-	}	
-
-	if (!draw_normals) {
-		_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame));
-	}
-	else {
-		auto mesh = ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame);
-
-		std::vector<TriMeshf> meshes;
-		meshes.push_back(mesh);
-		std::vector<ml::vec3f> normals;
-		for (auto & p : points.getVertices()) {
-			meshes.push_back(ml::Shapesf::line(p.position, p.position + p.normal * 0.02f, p.color, point_size * 0.2f));
-		}
-		_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
-	}
-}
-
-void PointsRenderer::insertPoints(std::string id, const ml::TriMeshf & points, ml::RGBColor color, float point_size, bool draw_normals)
-{
-	std::vector<ml::vec4f> color_frame;
-	std::vector<ml::vec3f> vertices;
-	for (auto & p : points.m_vertices)
-	{
-		color_frame.push_back(color);
-		vertices.push_back(p.position);
-	}
-	
-	_pointClouds[id].init(*_graphics, ml::meshutil::createPointCloudTemplate(ml::Shapesf::box(point_size), vertices, color_frame));
-}
-
-void PointsRenderer::insertLine(std::string id, const TriMeshf & points1, const TriMeshf & points2, ml::RGBColor color, float point_size)
-{
-	// render point clouds
-	std::vector<TriMeshf> meshes;
-	for (int i = 0; i < points1.getVertices().size(); i++) {
-		meshes.push_back(ml::Shapesf::line(points1.getVertices()[i].position, points2.getVertices()[i].position, color, point_size));
-	}
-	_pointClouds[id].init(*_graphics, ml::meshutil::createUnifiedMesh(meshes));
 }
 
 bool PointsRenderer::keyExists(std::string id)

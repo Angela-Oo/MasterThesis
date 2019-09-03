@@ -17,8 +17,8 @@ void ShowTwoRigideRegisteredFrames::renderPoints()
 
 	// render point clouds
 	//_point_renderer->insertPoints("frame_deformation_graph", render_points_dg, ml::RGBColor::Blue, 0.002f);
-	_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Orange);
-	_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green);
+	_point_renderer->insertPoints("frame_registered_A", render_points_a, ml::RGBColor::Orange, true);
+	_point_renderer->insertPoints("frame_registered_B", render_points_b, ml::RGBColor::Green, true);
 }
 
 void ShowTwoRigideRegisteredFrames::initRegistration()
@@ -29,8 +29,8 @@ void ShowTwoRigideRegisteredFrames::initRegistration()
 	auto points_a = _reader->getPoints(0);
 	auto points_b = _reader->getPoints(4);
 
-	_point_renderer->insertPoints("frame_A", points_a, ml::RGBColor::Orange);
-	_point_renderer->insertPoints("frame_B", points_b, ml::RGBColor::Green);
+	_point_renderer->insertPoints("frame_A", points_a, ml::RGBColor::Orange, true);
+	_point_renderer->insertPoints("frame_B", points_b, ml::RGBColor::Green, true);
 	
 	auto translation = ml::mat4f::translation({ 1.f, 0., 0. });
 	std::for_each(points_a.begin(), points_a.end(), [&](ml::vec3f & p) { p = translation * p; });

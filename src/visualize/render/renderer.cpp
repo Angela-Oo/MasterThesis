@@ -19,7 +19,7 @@ void Renderer::saveCurrentWindowAsImage(std::string folder, std::string filename
 void Renderer::insert(std::string id, const SurfaceMesh & mesh, RenderMode mode, ml::RGBColor color, bool replace, float thickness)
 {
 	if (mode == RenderMode::MESH) {
-		_mesh_renderer->insertMesh(id, mesh, color.toVec4f(), replace);
+		_mesh_renderer->insertMesh(id, mesh, color, replace);
 		_mesh_ids.insert(id);
 	}
 	else if (mode == RenderMode::EDGE) {

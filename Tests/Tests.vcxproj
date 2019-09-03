@@ -125,7 +125,7 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <AdditionalLibraryDirectories>$(SolutionDir)mLibExternal\lib;$(SolutionDir)\$(PlatformTarget)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;glog.lib;gflags.lib;ceres.lib;OpenNI2.lib;FW1FontWrapper.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;FreeImage.lib;CGAL_Core-vc140-mt-4.13.lib;CGAL_ImageIO-vc140-mt-4.13.lib;CGAL-vc140-mt-4.13.lib;refine_deformation_graph.obj;mesh_operations.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libgmp-10.lib;libmpfr-4.lib;glog.lib;gflags.lib;ceres.lib;OpenNI2.lib;FW1FontWrapper.lib;d3d11.lib;d3dx11.lib;D3DCompiler.lib;kernel32.lib;user32.lib;gdi32.lib;zlib64.lib;FreeImage.lib;CGAL_Core-vc140-mt-4.13.lib;CGAL_ImageIO-vc140-mt-4.13.lib;CGAL-vc140-mt-4.13.lib;mesh_operations.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
