@@ -16,28 +16,14 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationOp
 																  std::shared_ptr<FileWriter> logger,
 																  std::shared_ptr<IMeshReader> mesh_sequence);
 
-std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationType type,
-																  RegistrationOptions & options,
-																  ceres::Solver::Options & ceres_options,
-																  std::shared_ptr<FileWriter> logger,
-																  std::shared_ptr<IMeshReader> mesh_sequence);
 
 std::unique_ptr<IRegistration> createRegistration(RegistrationOptions & options,
 												  std::shared_ptr<FileWriter> logger,
 												  const SurfaceMesh & source,
 												  const SurfaceMesh & target);
 
-std::unique_ptr<IRegistration> createRegistration(RegistrationType type,
-												  RegistrationOptions & options,
-												  ceres::Solver::Options & ceres_options,
-												  std::shared_ptr<FileWriter> logger,
-												  const SurfaceMesh & source,
-												  const SurfaceMesh & target);
 
-
-std::unique_ptr<INonRigidRegistration> createRegistrationNoICP(RegistrationType type,
-															   RegistrationOptions & options,
-															   ceres::Solver::Options & ceres_options,
+std::unique_ptr<INonRigidRegistration> createRegistrationNoICP(RegistrationOptions & options,
 															   std::shared_ptr<FileWriter> logger,
 															   const SurfaceMesh & source,
 															   const SurfaceMesh & target,

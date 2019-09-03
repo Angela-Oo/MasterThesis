@@ -176,19 +176,18 @@ void AsRigidAsPossible::init()
 }
 
 
-AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
-									 const SurfaceMesh& dst,
+AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
+									 const SurfaceMesh& target,
 									 std::vector<vertex_descriptor> fixed_positions,
 									 const Deformation & deformation_graph,
-									 ceres::Solver::Options ceres_option,
-									 const RegistrationOptions & registration_options,
+									 const RegistrationOptions & options,
 									 std::shared_ptr<FileWriter> logger)
-	: _source(src)
-	, _target(dst)
-	, _ceres_options(ceres_option)
+	: _source(source)
+	, _target(target)
+	, _ceres_options(options.ceres_options)
 	, _deformation_graph(deformation_graph)
 	, _ceres_logger(logger)
-	, _options(registration_options)
+	, _options(options)
 	, _with_icp(false)
 {
 	init();
@@ -198,14 +197,13 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 									 const SurfaceMesh& target,
-									 ceres::Solver::Options ceres_option,
-									 const RegistrationOptions & registration_options,
+									 const RegistrationOptions & options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
 	, _target(target)
-	, _ceres_options(ceres_option)
+	, _ceres_options(options.ceres_options)
 	, _ceres_logger(logger)
-	, _options(registration_options)
+	, _options(options)
 {
 	auto reduced_mesh = createReducedMesh(source, _options.deformation_graph.edge_length, _options.mesh_reduce_strategy);
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", _options.deformation_graph.edge_length);
@@ -219,15 +217,14 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 									 const SurfaceMesh& dst,
 									 const Deformation & deformation_graph,
-									 ceres::Solver::Options ceres_option,
-									 const RegistrationOptions & registration_options,
+									 const RegistrationOptions & options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(src)
 	, _target(dst)
-	, _ceres_options(ceres_option)
+	, _ceres_options(options.ceres_options)
 	, _deformation_graph(deformation_graph)
 	, _ceres_logger(logger)
-	, _options(registration_options)
+	, _options(options)
 {
 	init();
 	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_target, subsetOfVerticesToFit(), _options);
@@ -252,15 +249,14 @@ ARAPDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformati
 std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
 										                   const SurfaceMesh& dst,
 										                   std::vector<vertex_descriptor> fixed_positions,
-										                   ceres::Solver::Options ceres_option,
-										                   const RegistrationOptions & registration_options,
+										                   const RegistrationOptions & options,
 										                   std::shared_ptr<FileWriter> logger)
 {
-	auto reduced_mesh = createReducedMesh(src, registration_options.deformation_graph.edge_length, registration_options.mesh_reduce_strategy);
-	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", registration_options.deformation_graph.edge_length);
+	auto reduced_mesh = createReducedMesh(src, options.deformation_graph.edge_length, options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", options.deformation_graph.edge_length);
 	auto global = createGlobalDeformation<ARAPDeformation>(reduced_mesh);
-	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, registration_options.deformation_graph.number_of_interpolation_neighbors);
-	return std::make_unique<AsRigidAsPossible>(src, dst, fixed_positions, deformation_graph, ceres_option, registration_options, logger);
+	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, options.deformation_graph.number_of_interpolation_neighbors);
+	return std::make_unique<AsRigidAsPossible>(src, dst, fixed_positions, deformation_graph, options, logger);
 }
 
 

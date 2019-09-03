@@ -45,23 +45,20 @@ public:
 public:
 	RefineDeformationGraphRegistration(const SurfaceMesh& source,
 									   const SurfaceMesh& target,
-									   ceres::Solver::Options option,
-									   const RegistrationOptions & registration_options,
+									   const RegistrationOptions & options,
 									   std::shared_ptr<FileWriter> logger = nullptr);
 
 	RefineDeformationGraphRegistration(const SurfaceMesh& source,
 					                   const SurfaceMesh& target,
 					                   const Deformation & deformation_graph,
-					                   ceres::Solver::Options option,
-					                   const RegistrationOptions & registration_options,
+					                   const RegistrationOptions & options,
 					                   std::shared_ptr<FileWriter> logger = nullptr);
 
 	RefineDeformationGraphRegistration(const SurfaceMesh& source,
 									   const SurfaceMesh& target,
 									   const SurfaceMesh & previous_mesh,
 									   const Deformation & deformation_graph,
-									   ceres::Solver::Options option,
-									   const RegistrationOptions & registration_options,
+									   const RegistrationOptions & options,
 									   std::shared_ptr<FileWriter> logger = nullptr);
 };
 
@@ -165,7 +162,6 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsIm
 template<typename NonRigidRegistration>
 RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(const SurfaceMesh& source,
 														                                     const SurfaceMesh& target,
-														                                     ceres::Solver::Options ceres_option,
 														                                     const RegistrationOptions & options,
 														                                     std::shared_ptr<FileWriter> logger)
 	: _is_refined(false)
@@ -178,7 +174,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 	auto global = createGlobalDeformation<typename NonRigidRegistration::PositionDeformation>(source);
 	auto deformation_graph = createDeformationGraphFromMesh<typename NonRigidRegistration::PositionDeformation>(hierarchical_mesh.getInitMesh(), global, options.deformation_graph.number_of_interpolation_neighbors);
 
-	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation_graph, ceres_option, options, logger);
+	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation_graph, options, logger);
 	_deformation.hierarchical_mesh = hierarchical_mesh;
 }
 
@@ -186,7 +182,6 @@ template<typename NonRigidRegistration>
 RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraphRegistration(const SurfaceMesh& source,
 								                                                             const SurfaceMesh& target,
 								                                                             const RefineDeformationGraphDeformation<typename NonRigidRegistration::Deformation> & deformation,
-								                                                             ceres::Solver::Options ceres_option,
 								                                                             const RegistrationOptions & options,
 								                                                             std::shared_ptr<FileWriter> logger)
 	: _is_refined(false)
@@ -196,7 +191,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 	, _deformation(deformation)
 	, _options(options)
 {
-	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, _deformation.non_rigid_deformation, ceres_option, options, logger);
+	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, _deformation.non_rigid_deformation, options, logger);
 };
 
 
@@ -205,10 +200,9 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 																							 const SurfaceMesh& target,
 																							 const SurfaceMesh& previouse_mesh,
 																							 const RefineDeformationGraphDeformation<typename NonRigidRegistration::Deformation> & deformation,
-																							 ceres::Solver::Options ceres_option,
 																							 const RegistrationOptions & options,
 																							 std::shared_ptr<FileWriter> logger)
-	: RefineDeformationGraphRegistration(source, target, deformation, ceres_option, options, logger)
+	: RefineDeformationGraphRegistration(source, target, deformation, options, logger)
 { };
 
 }

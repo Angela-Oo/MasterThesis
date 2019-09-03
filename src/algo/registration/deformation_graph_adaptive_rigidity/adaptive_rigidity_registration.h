@@ -43,23 +43,20 @@ public:
 
 	AdaptiveRigidityRegistration(const SurfaceMesh& source,
 								 const SurfaceMesh& target,
-								 ceres::Solver::Options option,
-								 const RegistrationOptions & registration_options,
+								 const RegistrationOptions & options,
 								 std::shared_ptr<FileWriter> logger = nullptr);
 
 	AdaptiveRigidityRegistration(const SurfaceMesh& source,
 					             const SurfaceMesh& target,
 					             const Deformation & deformation,
-					             ceres::Solver::Options option,
-					             const RegistrationOptions & registration_options,
+					             const RegistrationOptions & options,
 					             std::shared_ptr<FileWriter> logger = nullptr);
 
 	AdaptiveRigidityRegistration(const SurfaceMesh& source,
 								 const SurfaceMesh& target,
 								 const SurfaceMesh & previous_mesh,
 								 const Deformation & deformation,
-								 ceres::Solver::Options option,
-								 const RegistrationOptions & registration_options,
+								 const RegistrationOptions & options,
 								 std::shared_ptr<FileWriter> logger = nullptr);
 };
 
@@ -177,7 +174,6 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 template<typename NonRigidRegistration>
 AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration(const SurfaceMesh& source,
 														                         const SurfaceMesh& target,
-														                         ceres::Solver::Options ceres_option,
 														                         const RegistrationOptions & options,
 														                         std::shared_ptr<FileWriter> logger)
 	: _is_refined(false)
@@ -185,14 +181,13 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _number_of_refinements(0)
 	, _current_iteration(0)
 {
-	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, ceres_option, options, logger);
+	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, options, logger);
 }
 
 template<typename NonRigidRegistration>
 AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration(const SurfaceMesh& source,
 								                                                 const SurfaceMesh& target,
 								                                                 const typename NonRigidRegistration::Deformation & deformation,
-								                                                 ceres::Solver::Options ceres_option,
 								                                                 const RegistrationOptions & options,
 								                                                 std::shared_ptr<FileWriter> logger)
 	: _is_refined(false)
@@ -200,7 +195,7 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _number_of_refinements(0)
 	, _current_iteration(0)
 {
-	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation, ceres_option, options, logger);
+	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation, options, logger);
 };
 
 
@@ -209,7 +204,6 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 																				 const SurfaceMesh& target,
 																				 const SurfaceMesh& previouse_mesh,
 																				 const typename NonRigidRegistration::Deformation & deformation,
-																				 ceres::Solver::Options ceres_option,
 																				 const RegistrationOptions & options,
 																				 std::shared_ptr<FileWriter> logger)
 	: _is_refined(false)
@@ -217,7 +211,7 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _number_of_refinements(0)
 	, _current_iteration(0)
 {
-	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, previouse_mesh, deformation, ceres_option, options, logger);
+	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, previouse_mesh, deformation, options, logger);
 };
 
 }

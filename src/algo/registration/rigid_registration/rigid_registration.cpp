@@ -131,7 +131,7 @@ bool RigidRegistration::solveIteration()
 		else
 			fit_residual_ids = addFitCostWithoutICP(problem);
 
-		ceres::Solve(_ceres_options, &problem, &summary);
+		ceres::Solve(_options.ceres_options, &problem, &summary);
 
 		// evaluate		
 		evaluateResidual(problem, fit_residual_ids, logger);
@@ -161,7 +161,7 @@ bool RigidRegistration::solve()
 
 bool RigidRegistration::finished()
 {
-	auto tol = _ceres_options.function_tolerance;
+	auto tol = _options.ceres_options.function_tolerance;
 
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
@@ -216,12 +216,10 @@ void RigidRegistration::init()
 
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
-									 ceres::Solver::Options ceres_option,
 									 RegistrationOptions options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
 	, _target(target)
-	, _ceres_options(ceres_option)
 	, _options(options)
 	, _ceres_logger(logger)
 {
@@ -232,13 +230,11 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
 									 RigidDeformation rigid_deformation,
-									 ceres::Solver::Options ceres_option,
 									 RegistrationOptions options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(source)
 	, _target(target)
 	, _deformation(rigid_deformation)
-	, _ceres_options(ceres_option)
 	, _options(options)
 	, _ceres_logger(logger)
 {
@@ -249,14 +245,12 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 const SurfaceMesh & target,
 									 const SurfaceMesh & previous_mesh,
 									 RigidDeformation rigid_deformation,
-									 ceres::Solver::Options ceres_option,
 									 RegistrationOptions options,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(previous_mesh)
 	, _target(target)
 	, _previouse_deformation(boost::optional<RigidDeformation>(rigid_deformation))
 	, _true_source(boost::optional<SurfaceMesh>(source))
-	, _ceres_options(ceres_option)
 	, _options(options)
 	, _ceres_logger(logger)
 {

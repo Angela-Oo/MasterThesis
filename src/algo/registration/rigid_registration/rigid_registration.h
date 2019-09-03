@@ -24,7 +24,6 @@ public:
 private:
 	SurfaceMesh _source;
 	SurfaceMesh _target;
-	ceres::Solver::Options _ceres_options;
 	boost::optional<RigidDeformation> _previouse_deformation;
 	boost::optional<SurfaceMesh> _true_source;
 	RigidDeformation _deformation;
@@ -66,14 +65,12 @@ private:
 public:
 	RigidRegistration(const SurfaceMesh & source,
 					  const SurfaceMesh & target,
-					  ceres::Solver::Options ceres_option,
 					  RegistrationOptions options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 
 	RigidRegistration(const SurfaceMesh & source,
 					  const SurfaceMesh & target,
 					  RigidDeformation rigid_deformation,
-					  ceres::Solver::Options ceres_option,
 					  RegistrationOptions options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 
@@ -81,7 +78,6 @@ public:
 					  const SurfaceMesh & target,
 					  const SurfaceMesh & previous_mesh,
 					  RigidDeformation rigid_deformation,
-					  ceres::Solver::Options ceres_option,
 					  RegistrationOptions options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 };

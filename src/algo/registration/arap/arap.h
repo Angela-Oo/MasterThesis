@@ -66,27 +66,24 @@ public:
 	bool shouldBeSavedAsImage() override;
 public:
 	// without icp
-	AsRigidAsPossible(const SurfaceMesh& src,
-					  const SurfaceMesh& dst,
+	AsRigidAsPossible(const SurfaceMesh& source,
+					  const SurfaceMesh& target,
 					  std::vector<vertex_descriptor> fixed_positions,
 					  const Deformation & deformation_graph,
-					  ceres::Solver::Options option,
-					  const RegistrationOptions & registration_options,
+					  const RegistrationOptions & options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 
 	// generate deformation graph
-	AsRigidAsPossible(const SurfaceMesh& src,
-					  const SurfaceMesh& dst,
-					  ceres::Solver::Options option,
-					  const RegistrationOptions & registration_options,
+	AsRigidAsPossible(const SurfaceMesh& source,
+					  const SurfaceMesh& target,
+					  const RegistrationOptions & options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 
 	// with icp
-	AsRigidAsPossible(const SurfaceMesh& src,
-					  const SurfaceMesh& dst,
+	AsRigidAsPossible(const SurfaceMesh& source,
+					  const SurfaceMesh& target,
 					  const Deformation & deformation_graph,
-					  ceres::Solver::Options option,
-					  const RegistrationOptions & registration_options,
+					  const RegistrationOptions & options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
 };
 
@@ -100,8 +97,7 @@ ARAPDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformati
 std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
 										  const SurfaceMesh& dst,
 										  std::vector<vertex_descriptor> fixed_positions,
-										  ceres::Solver::Options option,
-										  const RegistrationOptions & registration_options,
+										  const RegistrationOptions & options,
 										  std::shared_ptr<FileWriter> logger);
 
 }

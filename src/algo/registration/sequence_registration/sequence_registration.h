@@ -25,7 +25,6 @@ private:
 	bool _use_previouse_frame_for_rigid_registration;
 	std::unique_ptr<CeresLogger> _ceres_logger;
 private:
-	ceres::Solver::Options _ceres_options;
 	RegistrationOptions _options;
 	std::shared_ptr<FileWriter> _logger;
 public:
@@ -106,10 +105,10 @@ void SequenceRegistration<RegistrationType>::nextFrame()
 
 	if (_use_previouse_frame_for_rigid_registration) {
 		auto & prev_mesh = _mesh_sequence->getMesh(_current - 1);
-		_registration = std::make_unique<RegistrationType>(source, target, prev_mesh, _deformation[_current - 1], _ceres_options, _options, _logger);
+		_registration = std::make_unique<RegistrationType>(source, target, prev_mesh, _deformation[_current - 1], _options, _logger);
 	}
 	else {
-		_registration = std::make_unique<RegistrationType>(source, target, _deformation[_current - 1], _ceres_options, _options, _logger);
+		_registration = std::make_unique<RegistrationType>(source, target, _deformation[_current - 1], _options, _logger);
 	}
 	_deformation[_current] = _registration->getDeformation();
 }
@@ -161,7 +160,6 @@ SequenceRegistration<RegistrationType>::SequenceRegistration(std::shared_ptr<IMe
 														 const RegistrationOptions & options,
 														 std::shared_ptr<FileWriter> logger)
 	: _mesh_sequence(mesh_sequence)
-	, _ceres_options(ceresOption())
 	, _options(options)
 	, _logger(logger)
 	, _ceres_logger(std::make_unique<CeresLogger>(logger))
@@ -174,7 +172,7 @@ SequenceRegistration<RegistrationType>::SequenceRegistration(std::shared_ptr<IMe
 
 	auto & source = _mesh_sequence->getMesh(0);
 	auto & target = _mesh_sequence->getMesh(_current);
-	_registration = std::make_unique<RegistrationType>(source, target, _ceres_options, _options, _logger);
+	_registration = std::make_unique<RegistrationType>(source, target, _options, _logger);
 
 	_deformation[0] = _registration->getDeformation();
 	_deformed_meshes[0] = source;

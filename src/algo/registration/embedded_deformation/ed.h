@@ -27,7 +27,6 @@ public:
 private:
 	SurfaceMesh _source;
 	SurfaceMesh _target;
-	ceres::Solver::Options _ceres_option;
 	RegistrationOptions _options;
 	DeformationGraph<EDDeformation> _deformation_graph;
 	std::unique_ptr<DeformedMesh<Deformation>> _deformed_mesh;
@@ -86,20 +85,17 @@ public:
 						const SurfaceMesh& target,
 						std::vector<vertex_descriptor> fixed_positions,
 						const DeformationGraph<EDDeformation> & deformation_graph,
-						ceres::Solver::Options ceres_option,
 						const RegistrationOptions & options,
 						std::shared_ptr<FileWriter> logger);
 
 	EmbeddedDeformation(const SurfaceMesh& source,
 						const SurfaceMesh& target,
-						ceres::Solver::Options ceres_option,
 						const RegistrationOptions & options,
 						std::shared_ptr<FileWriter> logger);
 	// with icp
 	EmbeddedDeformation(const SurfaceMesh& source,
 						const SurfaceMesh& target,
 						const DeformationGraph<EDDeformation> & deformation_graph,
-						ceres::Solver::Options ceres_option,
 						const RegistrationOptions & options,
 						std::shared_ptr<FileWriter> logger = nullptr);
 };
@@ -113,13 +109,11 @@ EDDeformation createGlobalEDDeformationFromRigidDeformation(const RigidDeformati
 std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
 															   const SurfaceMesh& dst,
 															   std::vector<vertex_descriptor> fixed_positions,
-															   ceres::Solver::Options option,
 															   const RegistrationOptions & registration_options,
 															   std::shared_ptr<FileWriter> logger = nullptr);
 
 std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
 															   const SurfaceMesh& dst,
-															   ceres::Solver::Options option,
 															   const RegistrationOptions & registration_options,
 															   std::shared_ptr<FileWriter> logger = nullptr);
 
@@ -127,7 +121,6 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
 															   const SurfaceMesh& dst,
 															   const RigidDeformation & rigid_deformation,
-															   ceres::Solver::Options option,
 															   const RegistrationOptions & registration_options,
 															   std::shared_ptr<FileWriter> logger = nullptr);
 
@@ -136,7 +129,6 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 															   const SurfaceMesh& dst,
 															   const RigidDeformation & rigid_deformation,
 															   const DeformationGraph<EDDeformation> & deformation_graph,
-															   ceres::Solver::Options option,
 															   const RegistrationOptions & registration_options,
 															   std::shared_ptr<FileWriter> logger = nullptr);
 

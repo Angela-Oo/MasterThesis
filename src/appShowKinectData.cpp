@@ -19,9 +19,9 @@ AppShowKinectData::AppShowKinectData()
 AppShowKinectData::AppShowKinectData(int argc, char* argv[])
 {
 	auto options = parse(argc, argv);
-	m_render_data = std::make_unique<AppRegistration>(options);
+	//m_render_data = std::make_unique<AppRegistration>(options);
 
-	//m_render_data = std::make_unique<ShowMesh>();
+	m_render_data = std::make_unique<ShowMesh>();
 	//m_render_data = std::make_unique<ShowRGBDImageData>();
 	//m_render_data = std::make_unique<ShowTwoRigideRegisteredFrames>();
 	//m_render_data = std::make_unique<ShowSensData>();
