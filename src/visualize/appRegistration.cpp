@@ -5,16 +5,18 @@
 
 void AppRegistration::registration()
 {
+	Visualizer::Render mode;
+	mode.mode = Visualizer::RegistrationRenderMode::ALL;
 	if (!_registration_visualizer)
 	{
 		_registration_visualizer = Visualizer::createRegistrationVisualizer(_renderer, _mesh_reader, _options);
-		_mesh_visualizer->visualize(false);
-		_registration_visualizer->visualize(Visualizer::RegistrationRenderMode::ALL, true);
+		_mesh_visualizer->clear();		
+		_registration_visualizer->visualize(mode);
 	}
 	else if (!_registration_visualizer->finished())
 	{
 		_registration_visualizer->registration();
-		_registration_visualizer->visualize(Visualizer::RegistrationRenderMode::ALL, true);
+		_registration_visualizer->visualize(mode);
 	}
 }
 
@@ -23,8 +25,7 @@ void AppRegistration::render(ml::Cameraf& camera)
 	registration();
 	_renderer->render(camera);
 
-	if (_registration_visualizer)
-	{
+	if (_registration_visualizer) {
 		_registration_visualizer->saveImage();
 	}
 }
@@ -62,7 +63,7 @@ void AppRegistration::init(ml::ApplicationData &app)
 	loadMeshReader();
 
 	_mesh_visualizer = std::make_shared<Visualizer::MeshVisualizer>(_renderer, _mesh_reader);
-	_mesh_visualizer->visualize(true);
+	_mesh_visualizer->visualize(std::make_pair(0, ml::RGBColor::White), true);
 }
 
 

@@ -1,6 +1,69 @@
 #include "parser.h"
 #include "cxxopts/cxxopts.hpp"
 
+
+
+Registration::Input inputById(std::string input_id)
+{
+	Registration::Input input;
+	if (input_id == "head") {
+		input.file_path = "../input_data/HaoLi/head/finalRegistration/";
+		input.file_name = "meshOfFrame";
+		input.start_index = 1;
+		input.output_folder_name = input_id;
+	}
+	else if (input_id == "head_scan") {
+		input.file_path = "../input_data/HaoLi/head/headInputScans/";
+		input.file_name = "meshOfFrame";
+		input.start_index = 0;
+		input.output_folder_name = input_id;
+	}
+	else if (input_id == "hand")
+	{
+		input.file_path = "../input_data/HaoLi/hand/hand1-registrationOutput/";
+		input.file_name = "meshOfFrame";
+		input.start_index = 1;
+		input.output_folder_name = input_id;
+	}
+	else if (input_id == "hand_scan")
+	{
+		input.file_path = "../input_data/HaoLi/hand/hand-inputScans/";
+		input.file_name = "meshOfFrame";
+		input.start_index = 0;
+		input.output_folder_name = input_id;
+	}
+	else if (input_id == "puppet")
+	{
+		input.file_path = "../input_data/HaoLi/puppet/finalRegistration/";
+		input.file_name = "mesh_1";
+		input.start_index = 0;
+		input.output_folder_name = input_id;
+	}
+	else if (input_id == "puppet_scan")
+	{
+		input.file_path = "../input_data/HaoLi/puppet/puppetInputScans/";
+		input.file_name = "meshOfFrame";
+		input.start_index = 0;
+		input.output_folder_name = input_id;
+	}
+	else if (input_id == "paperbag")
+	{
+		input.file_path = "../input_data/HaoLi/paperbag/finalregistration/";
+		input.file_name = "meshOfFrame";
+		input.start_index = 1;
+		input.output_folder_name = input_id;
+	}
+	else if (input_id == "paperbag_scan")
+	{
+		input.file_path = "../input_data/HaoLi/paperbag/inputscans/";
+		input.file_name = "meshOfFrame";
+		input.start_index = 1;
+		input.output_folder_name = input_id;
+	}
+	return input;
+}
+
+
 namespace {
 
 void parseSequence(cxxopts::ParseResult &result, Registration::RegistrationOptions &registration_options)

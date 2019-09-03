@@ -10,180 +10,218 @@
 #include <algorithm>
 #include <cmath>
 
-std::string ShowMesh::getImageFolderName(RegistrationType type)
+
+#include "visualizer/image_folder_name.h"
+#include "visualizer/sequence_visualizer.h"
+#include "visualizer/registration_visualizer.h"
+
+#include "parser.h"
+//
+//std::string ShowMesh::getImageFolderName(RegistrationType type)
+//{
+//	auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+//	std::stringstream ss;
+//	ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M");
+//	std::string folder_name = "registration_";
+//	if (type == RegistrationType::ARAP) {
+//		folder_name = "ARAP_";
+//	}
+//	else if (type == RegistrationType::ED) {
+//		folder_name = "ED_";
+//	}
+//	else if (type == RegistrationType::Rigid) {
+//		folder_name = "Rigid_";
+//	}
+//	else if (type == RegistrationType::ARAP_AllFrames) {
+//		folder_name = "ARAP_AllFrames_";
+//	}
+//	else if (type == RegistrationType::ED_AllFrames) {
+//		folder_name = "ED_AllFrames_";
+//	}
+//	else if (type == RegistrationType::Rigid_AllFrames) {
+//		folder_name = "Rigid_AllFrames_";
+//	}
+//	return "images/" + _data_name + "/" + folder_name + ss.str();
+//}
+//
+//
+//void ShowMesh::nonRigidRegistration()
+//{
+//	if (!_registration && _selected_frame_for_registration.size() == 2) {
+//		auto frame_a = _selected_frame_for_registration[0];
+//		auto frame_b = _selected_frame_for_registration[1];
+//		auto & source = _input_mesh->getMesh(frame_a);
+//		auto & target = _input_mesh->getMesh(frame_b);
+//		auto ceres_option = ceresOption();
+//
+//		_save_images_folder = getImageFolderName(_registration_type);
+//		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
+//
+//
+//		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) { // todo
+//			_options.smooth = 10.;
+//			_options.fit = 100.;
+//			_registration = createRegistrationNoICP(_registration_type, 
+//													_options, 
+//													ceres_option,
+//													_logger,
+//													source, 
+//													target,
+//													_input_mesh->getFixedPositions(frame_b));
+//		}
+//		else {
+//			_registration = createRegistration(_registration_type,
+//											   _options,
+//											   ceres_option,
+//											   _logger,
+//											   source,
+//											   target);
+//		}
+//
+//		renderRegistration();
+//		_image_name = "frame_" + std::to_string(_registration->currentIteration());
+//	}
+//	else {
+//		bool finished = _registration->finished();
+//		if (!finished) {
+//			_registration->solveIteration();
+//			_image_name = "frame_" + std::to_string(_registration->currentIteration());
+//		}
+//		else {
+//			_selected_frame_for_registration.clear();
+//			_solve_registration = false;
+//			std::cout << std::endl << "finished, select next two frames" << std::endl;
+//			_image_name = "frame_finished";
+//		}		
+//	}
+//}
+
+//
+//void ShowMesh::solveAllNonRigidRegistration()
+//{	
+//	if (!_register_sequence_of_frames) {
+//		_save_images_folder = getImageFolderName(_registration_type);
+//		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
+//
+//		_register_sequence_of_frames = createSequenceRegistration(_registration_type, _options, ceresOption(), _logger, _input_mesh);
+//	}
+//	else {
+//		bool finished = _register_sequence_of_frames->finished();
+//		if (!finished) {
+//			bool iteration_finished = _register_sequence_of_frames->solve();
+//			auto save_image = _register_sequence_of_frames->saveCurrentFrameAsImage();
+//			if (save_image.first)
+//				_image_name = "frame_" + save_image.second;// std::to_string(_register_sequence_of_frames->getCurrent());
+//		}
+//		else {		
+//			std::cout << std::endl << "finished registration" << std::endl;
+//			_solve_registration = false;
+//			_image_name = "frame_finished";
+//			_renderer->_render_mesh = Render::NONE;
+//		}
+//	}
+//}
+
+//void ShowMesh::renderError()
+//{	
+//	if (_registration && _registration->finished() && _calculate_error) {
+//		if (!_error_evaluation) {
+//			_error_evaluation = std::make_unique<ErrorEvaluation>(_registration->getTarget());
+//		}
+//		auto registered_points_a = _registration->getDeformedPoints();
+//		auto nearest_reference_points = _error_evaluation->evaluate_error(registered_points_a);
+//
+//		auto distance_errors = evaluate_distance_error(nearest_reference_points);
+//
+//		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
+//		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
+//		std::stringstream ss;
+//		ss << "error: mean " << average << ", median " << distance_errors[distance_errors.size() / 2] << ", max " << max << std::endl;
+//		std::cout << ss.str();
+//		if(_logger)
+//			_logger->write(ss.str());
+//		
+//		_renderer->renderError(nearest_reference_points);
+//	}
+//}
+
+void ShowMesh::createRegistration()
 {
-	auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-	std::stringstream ss;
-	ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M");
-	std::string folder_name = "registration_";
-	if (type == RegistrationType::ARAP) {
-		folder_name = "ARAP_";
-	}
-	else if (type == RegistrationType::ED) {
-		folder_name = "ED_";
-	}
-	else if (type == RegistrationType::Rigid) {
-		folder_name = "Rigid_";
-	}
-	else if (type == RegistrationType::ARAP_AllFrames) {
-		folder_name = "ARAP_AllFrames_";
-	}
-	else if (type == RegistrationType::ED_AllFrames) {
-		folder_name = "ED_AllFrames_";
-	}
-	else if (type == RegistrationType::Rigid_AllFrames) {
-		folder_name = "Rigid_AllFrames_";
-	}
-	return "images/" + _data_name + "/" + folder_name + ss.str();
-}
+	if (!_registration_visualizer) {
+		auto save_images_folder = imageFolderName(_options);
+		auto logger = std::make_shared<FileWriter>(save_images_folder + "/" + _options.input_mesh_sequence.output_folder_name + "_log.txt");
 
-
-void ShowMesh::nonRigidRegistration()
-{
-	if (!_registration && _selected_frame_for_registration.size() == 2) {
-		auto frame_a = _selected_frame_for_registration[0];
-		auto frame_b = _selected_frame_for_registration[1];
-		auto & source = _input_mesh->getMesh(frame_a);
-		auto & target = _input_mesh->getMesh(frame_b);
-		auto ceres_option = ceresOption();
-
-		_save_images_folder = getImageFolderName(_registration_type);
-		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
-
-
-		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) { // todo
-			_options.smooth = 10.;
-			_options.fit = 100.;
-			_registration = createRegistrationNoICP(_registration_type, 
-													_options, 
-													ceres_option,
-													_logger,
-													source, 
-													target,
-													_input_mesh->getFixedPositions(frame_b));
+		if (_options.sequence_options.enable) {
+			auto register_sequence_of_frames = Registration::createSequenceRegistration(_options, logger, _input_mesh);
+			_registration_visualizer = std::make_shared<Visualizer::SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), _renderer, save_images_folder, logger);
 		}
-		else {
-			_registration = createRegistration(_registration_type,
-											   _options,
-											   ceres_option,
-											   _logger,
-											   source,
-											   target);
-		}
+		else if (_selected_frame_for_registration.size() == 2) {
+			auto frame_a = _selected_frame_for_registration[0];
+			auto frame_b = _selected_frame_for_registration[1];
+			auto & source = _input_mesh->getMesh(frame_a);
+			auto & target = _input_mesh->getMesh(frame_b);
 
-		renderRegistration();
-		_image_name = "frame_" + std::to_string(_registration->currentIteration());
-	}
-	else {
-		bool finished = _registration->finished();
-		if (!finished) {
-			_registration->solveIteration();
-			_image_name = "frame_" + std::to_string(_registration->currentIteration());
-		}
-		else {
-			_selected_frame_for_registration.clear();
-			_solve_registration = false;
-			std::cout << std::endl << "finished, select next two frames" << std::endl;
-			_image_name = "frame_finished";
-		}		
-	}
-}
-
-
-void ShowMesh::solveAllNonRigidRegistration()
-{	
-	if (!_register_sequence_of_frames) {
-		_save_images_folder = getImageFolderName(_registration_type);
-		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
-
-		_register_sequence_of_frames = createSequenceRegistration(_registration_type, _options, ceresOption(), _logger, _input_mesh);
-	}
-	else {
-		bool finished = _register_sequence_of_frames->finished();
-		if (!finished) {
-			bool iteration_finished = _register_sequence_of_frames->solve();
-			auto save_image = _register_sequence_of_frames->saveCurrentFrameAsImage();
-			if (save_image.first)
-				_image_name = "frame_" + save_image.second;// std::to_string(_register_sequence_of_frames->getCurrent());
-		}
-		else {		
-			std::cout << std::endl << "finished registration" << std::endl;
-			_solve_registration = false;
-			_image_name = "frame_finished";
-			_renderer->_render_mesh = Render::NONE;
+			auto registration = Registration::createRegistration(_options, logger, source, target);
+			_registration_visualizer = std::make_shared<Visualizer::RegistrationVisualizer>(std::move(registration), _renderer, save_images_folder, logger);
+			//_image_name = "frame_" + std::to_string(registration->currentIteration());
 		}
 	}
-}
-
-void ShowMesh::renderError()
-{	
-	if (_registration && _registration->finished() && _calculate_error) {
-		if (!_error_evaluation) {
-			_error_evaluation = std::make_unique<ErrorEvaluation>(_registration->getTarget());
-		}
-		auto registered_points_a = _registration->getDeformedPoints();
-		auto nearest_reference_points = _error_evaluation->evaluate_error(registered_points_a);
-
-		auto distance_errors = evaluate_distance_error(nearest_reference_points);
-
-		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
-		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
-		std::stringstream ss;
-		ss << "error: mean " << average << ", median " << distance_errors[distance_errors.size() / 2] << ", max " << max << std::endl;
-		std::cout << ss.str();
-		if(_logger)
-			_logger->write(ss.str());
-		
-		_renderer->renderError(nearest_reference_points);
-	}
-}
-
-
-void ShowMesh::renderCurrentMesh()
-{
-	// current mesh	
-	bool render_current_frame = (!_registration && !_register_sequence_of_frames);
-	_renderer->renderCurrentFrame(_input_mesh, render_current_frame);
-
-	// selected frames
-	auto selected_frames = render_current_frame ? _selected_frame_for_registration : std::vector<unsigned int>();
-	_renderer->renderSelectedFrames(_input_mesh, selected_frames);	
-
-	// reference
-	_renderer->renderReference(_reference_registration_mesh);
 }
 
 void ShowMesh::renderRegistration()
 {
-	renderCurrentMesh();
-	_renderer->renderRegistration(_registration);
-	_renderer->renderRegistrationSequence(_register_sequence_of_frames);
-	renderError();
+	if (_registration_visualizer)
+	{
+		_registration_visualizer->visualize(_render_mode);
+	}
 }
+
+void ShowMesh::renderCurrentMesh()
+{
+	// selected frames
+	if (_selected_frame_for_registration.size() == 2) {
+		std::vector<std::pair<unsigned int, ml::RGBColor>> frames;
+		frames.push_back(std::make_pair(_selected_frame_for_registration[0], ml::RGBColor::Cyan));
+		frames.push_back(std::make_pair(_selected_frame_for_registration[0], ml::RGBColor::Green));
+		_mesh_visualizer->visualize(frames, true);
+	}
+	else {
+		// current mesh	
+		_mesh_visualizer->visualize(std::make_pair(_current_frame, ml::RGBColor::White), true);
+	}
+	
+	// reference
+	//_renderer->renderReference(_reference_registration_mesh);
+}
+
 
 void ShowMesh::registration()
 {
-	if (_register_sequence_of_frames) {
-		solveAllNonRigidRegistration();
-		_renderer->_current_frame = _register_sequence_of_frames->getCurrent();
-	}
-	else if (_registration && _selected_frame_for_registration.size() == 2) {
-		nonRigidRegistration();
+	if (_registration_visualizer && !_registration_visualizer->finished())
+	{
+		_registration_visualizer->registration();
+		_registration_visualizer->visualize(_render_mode);
 	}
 }
 
-
 void ShowMesh::render(ml::Cameraf& camera)
 {
-	if (_solve_registration) {
+	if (_registration_visualizer) {
 		registration();
-		renderRegistration();
 	}
+	else {
+		renderCurrentMesh();
+	}
+
 	_renderer->render(camera);
-	if (_image_name != "") {
-		_renderer->saveCurrentWindowAsImage(_save_images_folder, _image_name);
-		_image_name = "";
+
+	if (_registration_visualizer) {
+		_registration_visualizer->saveImage();
 	}
+	//if (_image_name != "") {
+	//	_renderer->saveCurrentWindowAsImage(_save_images_folder, _image_name);
+	//	_image_name = "";
+	//}
 }
 
 
@@ -191,138 +229,130 @@ void ShowMesh::key(UINT key)
 {
 	if (key == KEY_2)
 	{
-		_renderer->_current_frame++;
-		if (_renderer->_current_frame >= _input_mesh->size())
-			_renderer->_current_frame = 0;
-		renderRegistration();
+		_current_frame++;
+		if (_current_frame >= _input_mesh->size())
+			_current_frame = 0;
+		renderCurrentMesh();
 	}
 	else if (key == KEY_1)
 	{
-		if (_renderer->_current_frame == 0)
-			_renderer->_current_frame = _input_mesh->size() - 1;
+		if (_current_frame == 0)
+			_current_frame = _input_mesh->size() - 1;
 		else
-			_renderer->_current_frame--;
-		renderRegistration();
+			_current_frame--;
+		renderCurrentMesh();
 	}
 	else if (key == KEY_I)
 	{
 		if (_selected_frame_for_registration.size() < 2) {
-			if (_selected_frame_for_registration.empty())
-				_registration.reset();
-			if (_selected_frame_for_registration.empty() || (_selected_frame_for_registration.size() == 1 && _selected_frame_for_registration[0] != _renderer->_current_frame)) {
-				std::cout << "select frame " << _renderer->_current_frame << " for registration" << std::endl;
-				_selected_frame_for_registration.push_back(_renderer->_current_frame);
+			if (_selected_frame_for_registration.empty() || 
+				(_selected_frame_for_registration.size() == 1 && _selected_frame_for_registration[0] != _current_frame)) {
+				std::cout << "select frame " << _current_frame << " for registration" << std::endl;
+				_selected_frame_for_registration.push_back(_current_frame);
 			}
 		}
 	}
 	else if (key == KEY_O || key == KEY_V || key == KEY_B || key == KEY_N || key == KEY_M)
 	{
 		if (_selected_frame_for_registration.size() == 2) {
-			if (!_registration) {
+			if (!_registration_visualizer) {
 				if (key == KEY_O) {
 					std::cout << "init rigid registration between the two selected frames" << std::endl;
-					_registration_type = RegistrationType::Rigid;
+					_options.type = RegistrationType::Rigid;
 				}
 				else if (key == KEY_V) {
 					std::cout << "init embedded deformation non rigid registration between the two selected frames" << std::endl;
-					_registration_type = RegistrationType::ED;
+					_options.type = RegistrationType::ED;
 				}
 				else if (key == KEY_B) {
 					std::cout << "init embedded deformation non rigid registration without icp between the two selected frames" << std::endl;
-					_registration_type = RegistrationType::ED_WithoutICP;
+					_options.type = RegistrationType::ED_WithoutICP;
 				}
 				else if (key == KEY_N) {
 					std::cout << "init as rigid as possible non rigid registration between the two selected frames" << std::endl;
-					_registration_type = RegistrationType::ARAP;
+					_options.type = RegistrationType::ARAP;
 				}
 				else if (key == KEY_M) {
 					std::cout << "init as rigid as possible non rigid registration without icpbetween the two selected frames" << std::endl;
-					_registration_type = RegistrationType::ARAP_WithoutICP;
+					_options.type = RegistrationType::ARAP_WithoutICP;
 				}
-				nonRigidRegistration();
+				createRegistration();
 			}
 			else {				
 				_solve_registration = true;
 			}
 		}
 	}
-	else if (key == KEY_7)
+	else if (key == KEY_7 || key == KEY_U)
 	{		
-		if (!_register_sequence_of_frames) {
-			std::cout << "register all frames with rigid registration " << std::endl;
-			_renderer->_current_frame = 0;
-			_registration_type = RegistrationType::Rigid_AllFrames;
-			solveAllNonRigidRegistration();
-			_solve_registration = true;
-		}
-	}
-	else if (key == KEY_U)
-	{		
-		if (!_register_sequence_of_frames) {
-			std::cout << "register all frames as rigid as possible " << std::endl;
-			_renderer->_current_frame = 0;
-			_registration_type = RegistrationType::ARAP_AllFrames;
-			solveAllNonRigidRegistration();			
-			_solve_registration = true;
-		}
-	}
-	else if (key == KEY_P)
-	{	
-		if (!_register_sequence_of_frames) {
-			std::cout << "register all frames embdedded deformation " << std::endl;
-			_renderer->_current_frame = 0;
-			_registration_type = RegistrationType::ED_AllFrames;
-			solveAllNonRigidRegistration();
-			_solve_registration = true;
-		}
-	}
-	else if (key == KEY_T)
-	{		
-		if (!_registration) {
-			std::cout << "test registration " << std::endl;
-			_renderer->_current_frame = 1;
-			_selected_frame_for_registration.push_back(0);
-			_selected_frame_for_registration.push_back(1);
-
-			//_registration_type = RegistrationType::ED_WithoutICP;
-			_registration_type = RegistrationType::ARAP_WithoutICP;
-			nonRigidRegistration();
+		if (!_registration_visualizer) {
+			if (key == KEY_7) {
+				std::cout << "register all frames with rigid registration " << std::endl;
+				_options.type = RegistrationType::Rigid_AllFrames;
+			}
+			else if (key == KEY_U)
+			{
+				std::cout << "register all frames as rigid as possible " << std::endl;				
+				_options.type = RegistrationType::ARAP_AllFrames;
+			}
+			else if (key == KEY_P)
+			{
+				std::cout << "register all frames embdedded deformation " << std::endl;
+				_options.type = RegistrationType::ED_AllFrames;
+			}
+			_current_frame = 0;
+			createRegistration();
 			_solve_registration = true;
 		}
 	}
 	else if (key == KEY_G)
 	{
-		_renderer->_render_deformation_graph = !_renderer->_render_deformation_graph;
-		std::string visible = (_renderer->_render_deformation_graph) ? "show" : "hide";
+		_render_mode.show_deformation_graph = !_render_mode.show_deformation_graph;
+		std::string visible = (_render_mode.show_deformation_graph) ? "show" : "hide";
 		std::cout << visible << " deformation graph" << std::endl;
 		renderRegistration();
 	}
 	else if (key == KEY_H)
 	{
-		auto mode = _renderer->nextRenderMeshMode();
-		std::cout << "render mesh mode: " << renderMeshModeToString(_renderer->_render_mesh) << std::endl;
-		//_mesh_renderer->clear();
+		if (_render_mode.mode == Visualizer::RegistrationRenderMode::ALL)
+			_render_mode.mode = Visualizer::RegistrationRenderMode::DEFORMATION;
+		else if (_render_mode.mode == Visualizer::RegistrationRenderMode::DEFORMATION)
+			_render_mode.mode = Visualizer::RegistrationRenderMode::TARGET;
+		else if (_render_mode.mode == Visualizer::RegistrationRenderMode::TARGET)
+			_render_mode.mode = Visualizer::RegistrationRenderMode::ONLY_DEFORMATION_GRAPH;
+		else if (_render_mode.mode == Visualizer::RegistrationRenderMode::ONLY_DEFORMATION_GRAPH)
+			_render_mode.mode = Visualizer::RegistrationRenderMode::NONE;
+		else
+			_render_mode.mode = Visualizer::RegistrationRenderMode::ALL;
+		
+		std::string mode = "";
+		if (_render_mode.mode == Visualizer::RegistrationRenderMode::ALL)
+			mode = "ALL";
+		else if (_render_mode.mode == Visualizer::RegistrationRenderMode::DEFORMATION)
+			mode = "DEFORMATION";
+		else if (_render_mode.mode == Visualizer::RegistrationRenderMode::TARGET)
+			mode = "TARGET";
+		else if (_render_mode.mode == Visualizer::RegistrationRenderMode::ONLY_DEFORMATION_GRAPH)
+			mode = "ONLY_DEFORMATION_GRAPH";
+		else if (_render_mode.mode == Visualizer::RegistrationRenderMode::NONE)
+			mode = "NONE";
+		std::cout << "render mesh mode: " << mode << std::endl;
+
 		renderRegistration();
 	}
 	else if (key == KEY_J)
 	{
-		_renderer->_render_reference_mesh = !_renderer->_render_reference_mesh;
-		std::string visible = (_renderer->_render_reference_mesh) ? "show" : "hide";
+		_render_mode.show_reference = !_render_mode.show_reference;
+		std::string visible = (_render_mode.show_reference) ? "show" : "hide";
 		std::cout << visible << " reference mesh" << std::endl;
 		renderRegistration();
 	}
 	else if (key == KEY_K)
 	{
-		_renderer->_render_error = !_renderer->_render_error;
-		std::string visible = (_renderer->_render_error) ? "show" : "hide";
-		std::cout << visible << " error to reference mesh" << std::endl;
+		_render_mode.show_error = !_render_mode.show_error;
+		std::string visible = (_render_mode.show_error) ? "enable" : "disable";
+		std::cout << visible << " error evaluation" << std::endl;
 		renderRegistration();
-	}
-	else if (key == KEY_L)
-	{
-		_calculate_error = !_calculate_error;
-		std::string enabled = (_calculate_error) ? "enable" : "disable";
-		std::cout << enabled << " error evaluation" << std::endl;
 	}
 }
 
@@ -330,11 +360,7 @@ void ShowMesh::key(UINT key)
 void ShowMesh::init(ml::ApplicationData &app)
 {
 	_solve_registration = false;
-	_registration_type = RegistrationType::ARAP;
-	_calculate_error = true;
-	_renderer = std::make_unique<RenderRegistration>(&app.graphics);
-	_renderer->_render_error = true;
-	
+		
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
 	ml::mat4f transform = ml::mat4f::translation({ -0.5f, 3.5f, 1.5f });
@@ -367,8 +393,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_options.adaptive_rigidity.enable = true;
 		_options.adaptive_rigidity.adaptive_rigidity = AdaptiveRigidity::RIGIDITY_COST;
 		_options.deformation_graph.edge_length = 0.3;
-		_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
-
+		//_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
 
 
 		// puppet
@@ -385,9 +410,8 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_data_name = "paperbag";
 
 		// head
-		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
-		auto input_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/headInputScans/", "meshOfFrame", transformation, 0);
-		_data_name = "head";
+		_options.input_mesh_sequence = inputById("head");
+		auto input_mesh = std::make_shared<MeshReader>(_options.input_mesh_sequence.file_path, _options.input_mesh_sequence.file_name, transformation, _options.input_mesh_sequence.start_index);
 		_options.use_vertex_random_probability = 0.1;
 	
 		// hand
@@ -396,34 +420,15 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_data_name = "hand";
 		//_options.use_vertex_random_probability = 0.15;
 
-		if (register_on_reference_mesh || load_compare_mesh) {
-			if (load_all_frames) {
-				reference_registration_mesh->processAllFrames();
-			}
-			else {
-				for (unsigned int i = 0; i < number_of_frames_to_load; i++) {
-					reference_registration_mesh->processFrame();
-				}
-			}
-		}
-		if (!register_on_reference_mesh || load_compare_mesh) {
-			if (load_all_frames) {
-				input_mesh->processAllFrames();
-			}
-			else {
-				for (unsigned int i = 0; i < number_of_frames_to_load; i++) {
-					input_mesh->processFrame();
-				}
-			}
-		}
-		if (register_on_reference_mesh) {
-			_input_mesh = std::move(reference_registration_mesh);
-			_reference_registration_mesh = std::move(input_mesh);
+		if (load_all_frames) {
+			input_mesh->processAllFrames();
 		}
 		else {
-			_input_mesh = std::move(input_mesh);
-			_reference_registration_mesh = std::move(reference_registration_mesh);
-		}
+			for (unsigned int i = 0; i < number_of_frames_to_load; i++) {
+				input_mesh->processFrame();
+			}
+		}		
+		_input_mesh = std::move(input_mesh);
 		//_logger = std::make_shared<FileWriter>(_data_name + "_log.txt");
 	}
 	else {
@@ -437,23 +442,23 @@ void ShowMesh::init(ml::ApplicationData &app)
 		//_options.fit = 10.;
 		//
 
-		//_input_mesh = std::make_shared<DeformationMeshFrames>();
-		//_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
+		_input_mesh = std::make_shared<DeformationMeshFrames>();
+		//auto reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
 		//_renderer->_render_reference_mesh = false;
 		//_calculate_error = false;
 		//_renderer->_render_deformation_graph = true;
 		//_data_name = "test";
 
-		auto reference_registration_mesh = std::make_shared<MeshReader>("../input_data/HaoLi/head/finalRegistration/", "meshOfFrame", transformation, 1);
-		_input_mesh = std::make_shared<HierarchicalDeformationGraphReader>(reference_registration_mesh, 4);
+		//_input_mesh = std::make_shared<HierarchicalDeformationGraphReader>(reference_registration_mesh, 4);
+		_render_mode.mode = Visualizer::RegistrationRenderMode::ONLY_DEFORMATION_GRAPH;
 
-		_reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
-		_renderer->_render_reference_mesh = false;
-		_renderer->_render_mesh = Render::ONLY_DEFORMATION_GRAPH;
-		_calculate_error = false;
-		_renderer->_render_deformation_graph = true;
-		_data_name = "test";
+		_options.input_mesh_sequence.output_folder_name = "test";
 	}
+
+
+	_renderer = std::make_unique<Renderer>(&app.graphics);
+	_mesh_visualizer = std::make_shared<Visualizer::MeshVisualizer>(_renderer, _input_mesh);
+	_mesh_visualizer->visualize(std::make_pair(0, ml::RGBColor::White), true);
 	renderRegistration();
 
 

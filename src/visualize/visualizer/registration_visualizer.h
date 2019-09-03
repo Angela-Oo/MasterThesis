@@ -23,10 +23,10 @@ private:
 	bool _finished{ false };
 private:
 	void renderError();
-	void renderRegistration(RegistrationRenderMode mode);
+	void renderRegistration(Render mode);
 public:
 	void registration() override;
-	void visualize(RegistrationRenderMode mode, bool visible) override;
+	void visualize(Render mode) override;
 	bool finished() override;
 	void saveImage() override;
 public:

@@ -29,21 +29,21 @@ void RegistrationVisualizer::renderError()
 	}
 }
 
-void RegistrationVisualizer::renderRegistration(RegistrationRenderMode mode)
+void RegistrationVisualizer::renderRegistration(Render mode)
 {
 	if (_registration)
 	{
 		auto deformed_points = _registration->getDeformedPoints();
 		// defomed mesh
-		_render_registration->renderDeformedSourceMesh(_registration->getDeformedPoints(), mode);
-		_render_registration->renderTargetMesh(_registration->getTarget(), mode);
+		_render_registration->renderDeformedSourceMesh(_registration->getDeformedPoints(), mode.mode);
+		_render_registration->renderTargetMesh(_registration->getTarget(), mode.mode);
 
 		auto non_rigid_registration = dynamic_cast<INonRigidRegistration*>(_registration.get()); // todo .... maybe external polymorthis
 		if (non_rigid_registration) {
 			// deformation graph
 			auto deformation_graph = non_rigid_registration->getDeformationGraphMesh();
 			Visualize::setDeformationGraphColor(deformation_graph, Visualize::VertexColor::Default, Visualize::EdgeColor::SmoothCost);
-			_render_registration->renderDeformationGraph(deformation_graph, mode);
+			_render_registration->renderDeformationGraph(deformation_graph, mode.mode);
 		}
 	}
 }
@@ -64,7 +64,7 @@ void RegistrationVisualizer::registration()
 	}
 }
 
-void RegistrationVisualizer::visualize(RegistrationRenderMode mode, bool visible)
+void RegistrationVisualizer::visualize(Render mode)
 {
 	if (!_finished) {
 		renderRegistration(mode);

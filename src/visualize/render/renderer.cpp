@@ -39,7 +39,7 @@ void Renderer::insert(std::string id, const SurfaceMesh & mesh, RenderMode mode,
 		_mesh_ids.insert(id);
 	}
 	else if (mode == RenderMode::EDGE) {
-		_point_renderer->insertMesh(id, mesh, thickness, replace);
+		_point_renderer->insertMesh(id, mesh, thickness, false, replace);
 		_point_ids.insert(id);
 	}
 	else {

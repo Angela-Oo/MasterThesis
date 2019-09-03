@@ -10,7 +10,7 @@ void SequenceRegistrationVisualizer::renderError()
 {
 }
 
-void SequenceRegistrationVisualizer::renderRegistration(RegistrationRenderMode mode)
+void SequenceRegistrationVisualizer::renderRegistration(Render mode)
 {
 	if (_registration) {
 		auto current = _registration->getCurrent();
@@ -21,9 +21,9 @@ void SequenceRegistrationVisualizer::renderRegistration(RegistrationRenderMode m
 			//_renderer->remove("inverse_mesh");
 			//_renderer->remove("mesh_source");
 		
-			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(_current_frame), mode);
-			_render_registration->renderTargetMesh(_registration->getMesh(_current_frame), mode);
-			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(_current_frame), mode);
+			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(_current_frame), mode.mode);
+			_render_registration->renderTargetMesh(_registration->getMesh(_current_frame), mode.mode);
+			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(_current_frame), mode.mode);
 
 /*			if (_mode == Render::DEFORMATION) {
 				auto inverse_deformed_points = _registration->getInverseDeformedMesh(_current_frame);
@@ -35,14 +35,14 @@ void SequenceRegistrationVisualizer::renderRegistration(RegistrationRenderMode m
 		else {
 			_finished = _registration->finished();
 
-			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(_current_frame), mode);
-			_render_registration->renderTargetMesh(_registration->getMesh(_current_frame), mode);
-			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(_current_frame), mode);
+			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(_current_frame), mode.mode);
+			_render_registration->renderTargetMesh(_registration->getMesh(_current_frame), mode.mode);
+			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(_current_frame), mode.mode);
 		}
 	}
 }
 
-void SequenceRegistrationVisualizer::visualize(RegistrationRenderMode mode, bool visible)
+void SequenceRegistrationVisualizer::visualize(Render mode)
 {
 	if (!_finished) {
 		renderRegistration(mode);
