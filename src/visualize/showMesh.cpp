@@ -16,134 +16,7 @@
 #include "visualizer/registration_visualizer.h"
 
 #include "parser.h"
-//
-//std::string ShowMesh::getImageFolderName(RegistrationType type)
-//{
-//	auto in_time_t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-//	std::stringstream ss;
-//	ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M");
-//	std::string folder_name = "registration_";
-//	if (type == RegistrationType::ARAP) {
-//		folder_name = "ARAP_";
-//	}
-//	else if (type == RegistrationType::ED) {
-//		folder_name = "ED_";
-//	}
-//	else if (type == RegistrationType::Rigid) {
-//		folder_name = "Rigid_";
-//	}
-//	else if (type == RegistrationType::ARAP_AllFrames) {
-//		folder_name = "ARAP_AllFrames_";
-//	}
-//	else if (type == RegistrationType::ED_AllFrames) {
-//		folder_name = "ED_AllFrames_";
-//	}
-//	else if (type == RegistrationType::Rigid_AllFrames) {
-//		folder_name = "Rigid_AllFrames_";
-//	}
-//	return "images/" + _data_name + "/" + folder_name + ss.str();
-//}
-//
-//
-//void ShowMesh::nonRigidRegistration()
-//{
-//	if (!_registration && _selected_frame_for_registration.size() == 2) {
-//		auto frame_a = _selected_frame_for_registration[0];
-//		auto frame_b = _selected_frame_for_registration[1];
-//		auto & source = _input_mesh->getMesh(frame_a);
-//		auto & target = _input_mesh->getMesh(frame_b);
-//		auto ceres_option = ceresOption();
-//
-//		_save_images_folder = getImageFolderName(_registration_type);
-//		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
-//
-//
-//		if (_registration_type == RegistrationType::ARAP_WithoutICP || _registration_type == RegistrationType::ED_WithoutICP) { // todo
-//			_options.smooth = 10.;
-//			_options.fit = 100.;
-//			_registration = createRegistrationNoICP(_registration_type, 
-//													_options, 
-//													ceres_option,
-//													_logger,
-//													source, 
-//													target,
-//													_input_mesh->getFixedPositions(frame_b));
-//		}
-//		else {
-//			_registration = createRegistration(_registration_type,
-//											   _options,
-//											   ceres_option,
-//											   _logger,
-//											   source,
-//											   target);
-//		}
-//
-//		renderRegistration();
-//		_image_name = "frame_" + std::to_string(_registration->currentIteration());
-//	}
-//	else {
-//		bool finished = _registration->finished();
-//		if (!finished) {
-//			_registration->solveIteration();
-//			_image_name = "frame_" + std::to_string(_registration->currentIteration());
-//		}
-//		else {
-//			_selected_frame_for_registration.clear();
-//			_solve_registration = false;
-//			std::cout << std::endl << "finished, select next two frames" << std::endl;
-//			_image_name = "frame_finished";
-//		}		
-//	}
-//}
 
-//
-//void ShowMesh::solveAllNonRigidRegistration()
-//{	
-//	if (!_register_sequence_of_frames) {
-//		_save_images_folder = getImageFolderName(_registration_type);
-//		_logger = std::make_shared<FileWriter>(_save_images_folder + "/" + _data_name + "_log.txt");
-//
-//		_register_sequence_of_frames = createSequenceRegistration(_registration_type, _options, ceresOption(), _logger, _input_mesh);
-//	}
-//	else {
-//		bool finished = _register_sequence_of_frames->finished();
-//		if (!finished) {
-//			bool iteration_finished = _register_sequence_of_frames->solve();
-//			auto save_image = _register_sequence_of_frames->saveCurrentFrameAsImage();
-//			if (save_image.first)
-//				_image_name = "frame_" + save_image.second;// std::to_string(_register_sequence_of_frames->getCurrent());
-//		}
-//		else {		
-//			std::cout << std::endl << "finished registration" << std::endl;
-//			_solve_registration = false;
-//			_image_name = "frame_finished";
-//			_renderer->_render_mesh = Render::NONE;
-//		}
-//	}
-//}
-
-//void ShowMesh::renderError()
-//{	
-//	if (_registration && _registration->finished() && _calculate_error) {
-//		if (!_error_evaluation) {
-//			_error_evaluation = std::make_unique<ErrorEvaluation>(_registration->getTarget());
-//		}
-//		auto registered_points_a = _registration->getDeformedPoints();
-//		auto nearest_reference_points = _error_evaluation->evaluate_error(registered_points_a);
-//
-//		auto distance_errors = evaluate_distance_error(nearest_reference_points);
-//
-//		float average = std::accumulate(distance_errors.begin(), distance_errors.end(), 0.0) / distance_errors.size();
-//		float max = *std::max_element(distance_errors.begin(), distance_errors.end());
-//		std::stringstream ss;
-//		ss << "error: mean " << average << ", median " << distance_errors[distance_errors.size() / 2] << ", max " << max << std::endl;
-//		std::cout << ss.str();
-//		if(_logger)
-//			_logger->write(ss.str());
-//		
-//		_renderer->renderError(nearest_reference_points);
-//	}
-//}
 
 void ShowMesh::createRegistration()
 {
@@ -163,8 +36,9 @@ void ShowMesh::createRegistration()
 
 			auto registration = Registration::createRegistration(_options, logger, source, target);
 			_registration_visualizer = std::make_shared<Visualizer::RegistrationVisualizer>(std::move(registration), _renderer, save_images_folder, logger);
-			//_image_name = "frame_" + std::to_string(registration->currentIteration());
 		}
+
+		_mesh_visualizer->clear();
 	}
 }
 
@@ -177,29 +51,33 @@ void ShowMesh::renderRegistration()
 }
 
 void ShowMesh::renderCurrentMesh()
-{
-	// selected frames
-	if (_selected_frame_for_registration.size() == 2) {
-		std::vector<std::pair<unsigned int, ml::RGBColor>> frames;
-		frames.push_back(std::make_pair(_selected_frame_for_registration[0], ml::RGBColor::Cyan));
-		frames.push_back(std::make_pair(_selected_frame_for_registration[0], ml::RGBColor::Green));
-		_mesh_visualizer->visualize(frames, true);
-	}
-	else {
+{	
+	std::vector<std::pair<unsigned int, ml::RGBColor>> frames;
+	if (_selected_frame_for_registration.empty())
+	{
 		// current mesh	
-		_mesh_visualizer->visualize(std::make_pair(_current_frame, ml::RGBColor::White), true);
+		frames.push_back(std::make_pair(_current_frame, ml::RGBColor::White));
+	}
+	// selected frames
+	else if (_selected_frame_for_registration.size() == 1) {
+		frames.push_back(std::make_pair(_current_frame, ml::RGBColor::White));
+		frames.push_back(std::make_pair(_selected_frame_for_registration[0], ml::RGBColor::Cyan));
+	}
+	else if (_selected_frame_for_registration.size() >= 2) {
+		frames.push_back(std::make_pair(_selected_frame_for_registration[0], ml::RGBColor::Cyan));
+		frames.push_back(std::make_pair(_selected_frame_for_registration[1], ml::RGBColor::Green));
 	}
 	
-	// reference
-	//_renderer->renderReference(_reference_registration_mesh);
+	_mesh_visualizer->visualize(frames, true);	
 }
 
 
 void ShowMesh::registration()
 {
-	if (_registration_visualizer && !_registration_visualizer->finished())
+	if (_registration_visualizer)
 	{
-		_registration_visualizer->registration();
+		if(_solve_registration && !_registration_visualizer->finished())
+			_registration_visualizer->registration();
 		_registration_visualizer->visualize(_render_mode);
 	}
 }
@@ -218,10 +96,6 @@ void ShowMesh::render(ml::Cameraf& camera)
 	if (_registration_visualizer) {
 		_registration_visualizer->saveImage();
 	}
-	//if (_image_name != "") {
-	//	_renderer->saveCurrentWindowAsImage(_save_images_folder, _image_name);
-	//	_image_name = "";
-	//}
 }
 
 
@@ -363,16 +237,34 @@ void ShowMesh::init(ml::ApplicationData &app)
 		
 	ml::mat4f scale = ml::mat4f::scale(0.01);
 	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
-	ml::mat4f transform = ml::mat4f::translation({ -0.5f, 3.5f, 1.5f });
-	ml::mat4f transform2 = ml::mat4f::translation({ 0.f, -10.f, 0.0f });
-	ml::mat4f transformation = transform2 * transform * rotation * scale;
+	ml::mat4f transform = ml::mat4f::translation({ -0.45f, -5.f, 1.05f });
+	ml::mat4f transformation = transform * rotation * scale;
+
+	_render_mode.mode = Visualizer::RegistrationRenderMode::ALL;
 
 	bool test = false;
-	bool register_on_reference_mesh = true;
-	bool load_compare_mesh = false;
+
 	bool load_all_frames = false;
 	unsigned int number_of_frames_to_load = 10;
 	if (!test) {
+		//_options.input_mesh_sequence = inputById("puppet");
+		//_options.input_mesh_sequence = inputById("paperbag");
+		//_options.input_mesh_sequence = inputById("hand");
+		_options.input_mesh_sequence = inputById("head");
+
+		auto input_mesh = std::make_shared<MeshReader>(_options.input_mesh_sequence.file_path, _options.input_mesh_sequence.file_name, transformation, _options.input_mesh_sequence.start_index);
+		if (load_all_frames) {
+			input_mesh->processAllFrames();
+		}
+		else {
+			for (unsigned int i = 0; i < number_of_frames_to_load; i++) {
+				input_mesh->processFrame();
+			}
+		}
+		_input_mesh = std::move(input_mesh);
+
+
+		// options
 		_options.evaluate_residuals = true;
 		_options.deformation_graph.edge_length = 0.4;// 0.15;#
 		_options.deformation_graph.number_of_interpolation_neighbors = 3;// min number of interpolation neighbors;
@@ -394,73 +286,20 @@ void ShowMesh::init(ml::ApplicationData &app)
 		_options.adaptive_rigidity.adaptive_rigidity = AdaptiveRigidity::RIGIDITY_COST;
 		_options.deformation_graph.edge_length = 0.3;
 		//_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
-
-
-		// puppet
-		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/finalRegistration/", "mesh_1",  transformation, 0);
-		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/puppet/puppetInputScans/", "meshOfFrame", transformation, 0);
-		//_options.dg_options.edge_length = 0.3;
-		//_options.use_vertex_random_probability = 0.25;
-		//_data_name = "puppet";
-
-		// paperbag
-		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/finalregistration/", "meshOfFrame", transformation, 1);
-		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/paperbag/inputscans/", "meshOfFrame", transformation, 1);
-		//_options.dg_options.edge_length = 0.2;
-		//_data_name = "paperbag";
-
-		// head
-		_options.input_mesh_sequence = inputById("head");
-		auto input_mesh = std::make_shared<MeshReader>(_options.input_mesh_sequence.file_path, _options.input_mesh_sequence.file_name, transformation, _options.input_mesh_sequence.start_index);
 		_options.use_vertex_random_probability = 0.1;
 	
-		// hand
-		//auto reference_registration_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand1-registrationOutput/", "meshOfFrame", transformation, 1);
-		//auto input_mesh = std::make_unique<MeshReader>("../input_data/HaoLi/hand/hand-inputScans/", "meshOfFrame", transformation, 0);		
-		//_data_name = "hand";
-		//_options.use_vertex_random_probability = 0.15;
-
-		if (load_all_frames) {
-			input_mesh->processAllFrames();
-		}
-		else {
-			for (unsigned int i = 0; i < number_of_frames_to_load; i++) {
-				input_mesh->processFrame();
-			}
-		}		
-		_input_mesh = std::move(input_mesh);
-		//_logger = std::make_shared<FileWriter>(_data_name + "_log.txt");
 	}
 	else {
-		//_options.evaluate_residuals = true;
-		//_options.dg_options.edge_length = 0.07;
-		//_options.ignore_deformation_graph_border_vertices = false;
-		//_options.dg_options.number_of_interpolation_neighbors = 4;
-		//_options.use_vertex_random_probability = 1.;
-		//_options.max_iterations = 50;
-		//_options.smooth = 20.;
-		//_options.fit = 10.;
-		//
-
 		_input_mesh = std::make_shared<DeformationMeshFrames>();
 		//auto reference_registration_mesh = std::make_shared<DeformationMeshFrames>();
-		//_renderer->_render_reference_mesh = false;
-		//_calculate_error = false;
-		//_renderer->_render_deformation_graph = true;
-		//_data_name = "test";
-
 		//_input_mesh = std::make_shared<HierarchicalDeformationGraphReader>(reference_registration_mesh, 4);
 		_render_mode.mode = Visualizer::RegistrationRenderMode::ONLY_DEFORMATION_GRAPH;
 
 		_options.input_mesh_sequence.output_folder_name = "test";
-	}
-
-
+	}	
 	_renderer = std::make_unique<Renderer>(&app.graphics);
 	_mesh_visualizer = std::make_shared<Visualizer::MeshVisualizer>(_renderer, _input_mesh);
-	_mesh_visualizer->visualize(std::make_pair(0, ml::RGBColor::White), true);
-	renderRegistration();
-
+	_mesh_visualizer->visualize(std::make_pair(_current_frame, ml::RGBColor::White), true);
 
 	std::cout << "controls:" << std::endl;
 	std::cout << "    show / hide deformation graph:                 KEY_G" << std::endl;
