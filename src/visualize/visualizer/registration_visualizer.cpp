@@ -40,7 +40,6 @@ void RegistrationVisualizer::renderRegistration(RegistrationRenderMode mode)
 
 		auto non_rigid_registration = dynamic_cast<INonRigidRegistration*>(_registration.get()); // todo .... maybe external polymorthis
 		if (non_rigid_registration) {
-
 			// deformation graph
 			auto deformation_graph = non_rigid_registration->getDeformationGraphMesh();
 			Visualize::setDeformationGraphColor(deformation_graph, Visualize::VertexColor::Default, Visualize::EdgeColor::SmoothCost);
@@ -89,9 +88,11 @@ void RegistrationVisualizer::saveImage()
 
 RegistrationVisualizer::RegistrationVisualizer(std::unique_ptr<IRegistration> registration,
 											   std::shared_ptr<Renderer> renderer,
+											   std::string image_folder_name,
 											   std::shared_ptr<FileWriter> logger)
 	: _registration(std::move(registration))
 	, _renderer(renderer)
+	, _save_images_folder(image_folder_name)
 	, _logger(logger)
 {
 	_render_registration = std::make_unique<RendererRegistration>(_renderer);

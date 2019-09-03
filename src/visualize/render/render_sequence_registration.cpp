@@ -16,7 +16,7 @@ void RendererRegistration::renderDeformedSourceMesh(const SurfaceMesh & deformed
 		if (mode == RegistrationRenderMode::NONE) { // only render target as points
 			render_mode = RenderMode::POINT;
 		}
-		_renderer->insert(deformed_id, deformed_mesh, render_mode, ml::RGBColor::Cyan, 0.001f, true);
+		_renderer->insert(deformed_id, deformed_mesh, render_mode, ml::RGBColor::Cyan, true, 0.001f);
 	}
 }
 
@@ -31,17 +31,18 @@ void RendererRegistration::renderTargetMesh(const SurfaceMesh & target, Registra
 		if (mode == RegistrationRenderMode::NONE || mode == RegistrationRenderMode::DEFORMATION) { // only render target as points
 			render_mode = RenderMode::POINT;
 		}
-		_renderer->insert(target_id, target, render_mode, ml::RGBColor::Green, 0.001f, true);
+		_renderer->insert(target_id, target, render_mode, ml::RGBColor::Green, true, 0.001f);
 	}
 }
 
 void RendererRegistration::renderDeformationGraph(const SurfaceMesh & deformation_graph, RegistrationRenderMode mode)
 {
+	std::string deformation_graph_id = "deformation_graph";
 	if (true) {
-		_renderer->insert("deformation_graph", deformation_graph, RenderMode::EDGE, 0.001f, true);
+		_renderer->insert(deformation_graph_id, deformation_graph, RenderMode::EDGE, true, 0.001f);
 	}
 	else {
-		_renderer->remove("deformation_graph");
+		_renderer->remove(deformation_graph_id);
 	}
 }
 

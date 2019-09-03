@@ -32,6 +32,7 @@ public:
 public:
 	RegistrationVisualizer(std::unique_ptr<Registration::IRegistration> registration,
 						   std::shared_ptr<Renderer> renderer,
+						   std::string image_folder_name,
 						   std::shared_ptr<FileWriter> logger);
 };
 

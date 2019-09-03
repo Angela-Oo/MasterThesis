@@ -188,26 +188,11 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			registration_options.adaptive_rigidity.enable = result["a"].as<bool>();
 		}
 
-		if (result.count("max_iterations"))
-		{
-			registration_options.max_iterations = result["max_iterations"].as<unsigned int>();
-		}
-		if (result.count("p"))
-		{
-			registration_options.use_vertex_random_probability = result["p"].as<double>();
-		}
-		if (result.count("smooth"))
-		{
-			registration_options.smooth = result["smooth"].as<double>();
-		}
-		if (result.count("fit"))
-		{
-			registration_options.fit = result["fit"].as<double>();
-		}
-		if (result.count("ignore_border_vertices"))
-		{
-			registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
-		}
+		registration_options.max_iterations = result["max_iterations"].as<unsigned int>();
+		registration_options.use_vertex_random_probability = result["p"].as<double>();
+		registration_options.smooth = result["smooth"].as<double>();
+		registration_options.fit = result["fit"].as<double>();
+		registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
 
 		std::cout << "Arguments remain = " << argc << std::endl;
 

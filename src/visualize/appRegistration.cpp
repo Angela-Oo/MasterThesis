@@ -9,6 +9,7 @@ void AppRegistration::registration()
 	{
 		_registration_visualizer = Visualizer::createRegistrationVisualizer(_renderer, _mesh_reader, _options);
 		_mesh_visualizer->visualize(false);
+		_registration_visualizer->visualize(Visualizer::RegistrationRenderMode::ALL, true);
 	}
 	else if (!_registration_visualizer->finished())
 	{

@@ -23,11 +23,11 @@ void Renderer::insert(std::string id, const SurfaceMesh & mesh, RenderMode mode,
 		_mesh_ids.insert(id);
 	}
 	else if (mode == RenderMode::EDGE) {
-		_point_renderer->insertMesh(id, mesh, color, replace);
+		_point_renderer->insertMesh(id, mesh, color, thickness, false, replace);
 		_point_ids.insert(id);
 	}
 	else {
-		_point_renderer->insertPoints(id, mesh, color, replace);
+		_point_renderer->insertPoints(id, mesh, color, thickness, replace);
 		_point_ids.insert(id);
 	}
 }
@@ -39,11 +39,11 @@ void Renderer::insert(std::string id, const SurfaceMesh & mesh, RenderMode mode,
 		_mesh_ids.insert(id);
 	}
 	else if (mode == RenderMode::EDGE) {
-		_point_renderer->insertMesh(id, mesh, replace);
+		_point_renderer->insertMesh(id, mesh, thickness, replace);
 		_point_ids.insert(id);
 	}
 	else {
-		_point_renderer->insertPoints(id, mesh, replace);
+		_point_renderer->insertPoints(id, mesh, thickness, replace);
 		_point_ids.insert(id);
 	}
 }

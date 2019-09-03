@@ -85,9 +85,11 @@ void SequenceRegistrationVisualizer::saveImage()
 
 SequenceRegistrationVisualizer::SequenceRegistrationVisualizer(std::unique_ptr<Registration::ISequenceRegistration> registration,
 															   std::shared_ptr<Renderer> renderer,
+															   std::string image_folder_name,
 															   std::shared_ptr<FileWriter> logger)
 	: _registration(std::move(registration))
 	, _renderer(renderer)
+	, _save_images_folder(image_folder_name)
 	, _logger(logger)
 {
 	_render_registration = std::make_unique<RendererRegistration>(_renderer);

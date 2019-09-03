@@ -36,6 +36,7 @@ public:
 public:
 	SequenceRegistrationVisualizer(std::unique_ptr<Registration::ISequenceRegistration> registration,
 								   std::shared_ptr<Renderer> renderer,
+								   std::string image_folder_name,
 								   std::shared_ptr<FileWriter> logger);
 };
 
