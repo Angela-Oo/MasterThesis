@@ -127,6 +127,8 @@ void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
 
 	_deformation_graph = deformation_graph;
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
+
+	_ceres_logger.write("Number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()));
 }
 
 void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)

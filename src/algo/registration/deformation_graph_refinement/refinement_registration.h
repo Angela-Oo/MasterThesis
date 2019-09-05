@@ -27,6 +27,7 @@ private:
 	int _number_of_refinements;
 	unsigned int _current_iteration;
 	bool _finished;
+	bool _save_image;
 public:
 	bool finished() override;
 	bool solveIteration() override;
@@ -111,6 +112,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 			number_of_refinements = refineHierarchicalMeshAtEdges(_deformation);
 		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
 		_number_of_refinements++;
+		_save_image = true;
 		if(number_of_refinements == 0)
 			_is_refined = true;
 	}
@@ -158,10 +160,9 @@ void RefineDeformationGraphRegistration<NonRigidRegistration>::setRigidDeformati
 template<typename NonRigidRegistration>
 bool RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
 {
-	//bool save = _non_rigid_registration->shouldBeSavedAsImage();
-	//bool registration_finished = _non_rigid_registration->finished();
-	//return (save && registration_finished);
-	return _non_rigid_registration->shouldBeSavedAsImage();
+	auto save = _save_image || _non_rigid_registration->shouldBeSavedAsImage();
+	_save_image = false;
+	return save;
 }
 
 template<typename NonRigidRegistration>
