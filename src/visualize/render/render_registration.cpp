@@ -29,7 +29,7 @@ void RendererRegistration::renderDeformedSourceMesh(const SurfaceMesh & deformed
 void RendererRegistration::renderTargetMesh(const SurfaceMesh & target, RegistrationRenderMode mode)
 {
 	std::string target_id = "target_id";
-	if (mode == RegistrationRenderMode::ONLY_DEFORMATION_GRAPH) { // no target
+	if (mode == RegistrationRenderMode::ONLY_DEFORMATION_GRAPH || mode == RegistrationRenderMode::DEFORMATION) { // no target
 		_renderer->remove(target_id);
 	}
 	else {

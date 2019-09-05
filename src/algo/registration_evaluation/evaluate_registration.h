@@ -5,12 +5,30 @@
 
 std::vector<double> evaluate_distance_error(std::vector<std::pair<Point, Point>> nearest_points);
 
-double mean(const std::vector<double> & values);
-double variance(const std::vector<double> & values);
-double median(const std::vector<double> & values);
-double max(const std::vector<double> & values);
-double min(const std::vector<double> & values);
+double calculateVariance(const std::vector<double> & values, double mean);
 
+class RegistrationError
+{
+private:
+	double _mean{ 0. };
+	double _variance{0.};
+	double _median{ 0. };
+	double _min{INFINITY};
+	double _max{0.};
+	std::vector<vertex_descriptor> _v_ids;
+	std::vector<double> _errors;
+public:
+	size_t size() const;
+	vertex_descriptor v(size_t i) const;
+	double error(size_t i) const;
+	double mean() const;
+	double variance() const;
+	double median() const;
+	double min() const;
+	double max() const;	
+public:	
+	RegistrationError(std::vector<vertex_descriptor> v_ids, std::vector<double> errors);
+};
 
 class ErrorEvaluation
 {
@@ -22,7 +40,7 @@ private:
 	Point getNearestPointOnSurface(SurfaceMesh::Point & point);
 public:
 	std::vector<std::pair<Point, Point>> evaluate_error(const SurfaceMesh & mesh);
-	std::pair<std::vector<vertex_descriptor>, std::vector<double>> errorEvaluation(const SurfaceMesh & mesh);
+	RegistrationError errorEvaluation(const SurfaceMesh & mesh);
 public:
 	ErrorEvaluation(const SurfaceMesh & reference_mesh);
 };

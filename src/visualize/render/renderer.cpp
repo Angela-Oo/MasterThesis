@@ -19,15 +19,18 @@ void Renderer::saveCurrentWindowAsImage(std::string folder, std::string filename
 void Renderer::insert(std::string id, const SurfaceMesh & mesh, RenderMode mode, ml::RGBColor color, bool replace, float thickness)
 {
 	if (mode == RenderMode::MESH) {
+		removeFromPointRenderer(id);
 		_mesh_renderer->insertMesh(id, mesh, color, replace);
 		_mesh_ids.insert(id);
 	}
 	else if (mode == RenderMode::EDGE) {
-		_point_renderer->insertMesh(id, mesh, color, thickness, false, replace);
+		removeFromMeshRenderer(id);
+		_point_renderer->insertMesh(id, mesh, color, replace, thickness, false);
 		_point_ids.insert(id);
 	}
 	else {
-		_point_renderer->insertPoints(id, mesh, color, thickness, replace);
+		removeFromMeshRenderer(id);
+		_point_renderer->insertPoints(id, mesh, color, replace, thickness);
 		_point_ids.insert(id);
 	}
 }
@@ -35,29 +38,46 @@ void Renderer::insert(std::string id, const SurfaceMesh & mesh, RenderMode mode,
 void Renderer::insert(std::string id, const SurfaceMesh & mesh, RenderMode mode, bool replace, float thickness)
 {
 	if (mode == RenderMode::MESH) {
+		removeFromPointRenderer(id);
 		_mesh_renderer->insertMesh(id, mesh);
 		_mesh_ids.insert(id);
 	}
 	else if (mode == RenderMode::EDGE) {
-		_point_renderer->insertMesh(id, mesh, thickness, false, replace);
+		removeFromMeshRenderer(id);
+		_point_renderer->insertMesh(id, mesh, replace, thickness, false);
 		_point_ids.insert(id);
 	}
 	else {
-		_point_renderer->insertPoints(id, mesh, thickness, replace);
+		removeFromMeshRenderer(id);
+		_point_renderer->insertPoints(id, mesh, replace, thickness);
 		_point_ids.insert(id);
 	}
 }
 
-void Renderer::remove(std::string id)
+bool Renderer::removeFromMeshRenderer(std::string id)
+{
+	if (_mesh_ids.find(id) != _mesh_ids.end()) {
+		_mesh_renderer->removeMesh(id);
+		_mesh_ids.erase(id);
+		return true;
+	}
+	return false;
+}
+
+bool Renderer::removeFromPointRenderer(std::string id)
 {
 	if (_point_ids.find(id) != _point_ids.end()) {
 		_point_renderer->removePoints(id);
 		_point_ids.erase(id);
+		return true;
 	}
-	else if (_mesh_ids.find(id) != _mesh_ids.end()) {
-		_mesh_renderer->removeMesh(id);
-		_mesh_ids.erase(id);
-	}
+	return false;
+}
+
+void Renderer::remove(std::string id)
+{
+	removeFromMeshRenderer(id);
+	removeFromPointRenderer(id);
 }
 
 

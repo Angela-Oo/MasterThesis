@@ -14,12 +14,12 @@ private:
 	ml::D3D11ConstantBuffer<ConstantBuffer> _constants;
 	ml::GraphicsDevice * _graphics;
 private:
-	ml::TriMeshf createPointTriMesh(const SurfaceMesh & mesh, float point_size = 0.01f);
-	ml::TriMeshf createPointTriMesh(const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.01f);
-	ml::TriMeshf createLineTriMesh(const SurfaceMesh & mesh, float point_size = 0.01f);
-	ml::TriMeshf createLineTriMesh(const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.01f);
-	ml::TriMeshf createNormalTriMesh(const SurfaceMesh & mesh, float point_size = 0.01f);
-	ml::TriMeshf createNormalTriMesh(const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.01f);
+	ml::TriMeshf createPointTriMesh(const SurfaceMesh & mesh, float point_size = 0.001f);
+	ml::TriMeshf createPointTriMesh(const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.001f);
+	ml::TriMeshf createLineTriMesh(const SurfaceMesh & mesh, float point_size = 0.001f);
+	ml::TriMeshf createLineTriMesh(const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.001f);
+	ml::TriMeshf createNormalTriMesh(const SurfaceMesh & mesh, float point_size = 0.001f);
+	ml::TriMeshf createNormalTriMesh(const SurfaceMesh & mesh, ml::RGBColor color, float point_size = 0.001f);
 public:
 	void render(ml::Cameraf& camera);
 	

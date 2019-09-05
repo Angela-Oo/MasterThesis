@@ -19,13 +19,15 @@ class Renderer {
 
 	std::set<std::string> _point_ids;
 	std::set<std::string> _mesh_ids;
+private:
+	bool removeFromMeshRenderer(std::string id);
+	bool removeFromPointRenderer(std::string id);
 public:
 	void saveCurrentWindowAsImage(std::string folder, std::string filename);
 public:
 	void insert(std::string id, const SurfaceMesh & mesh, RenderMode mode, ml::RGBColor color, bool replace, float thickness = 0.005f);
 	void insert(std::string id, const SurfaceMesh & mesh, RenderMode mode, bool replace, float thickness = 0.005f);
 	void remove(std::string id);
-
 	void render(ml::Cameraf& camera);
 public:
 	Renderer(ml::GraphicsDevice * graphics);

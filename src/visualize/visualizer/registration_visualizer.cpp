@@ -15,20 +15,20 @@ void RegistrationVisualizer::renderError(Render mode)
 			_error_evaluation = std::make_unique<ErrorEvaluation>(_registration->getTarget());
 		}
 		auto deformed_points = _registration->getDeformedPoints();
-		auto distance_errors = _error_evaluation->errorEvaluation(deformed_points);
+		auto errors = _error_evaluation->errorEvaluation(deformed_points);
 
 		auto vertex_colors = deformed_points.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-		double max_error = max(distance_errors.second);
-		for(int i = 0; i < distance_errors.first.size(); ++i)
+		double max_error = errors.max();
+		for(size_t i = 0; i < errors.size(); ++i)
 		{
-			vertex_colors[distance_errors.first[i]] = errorToRGB(distance_errors.second[i] / max_error);
+			vertex_colors[errors.v(i)] = errorToRGB(errors.error(i) / max_error);
 		}
 
 		std::stringstream ss;
-		ss << "error: mean " << mean(distance_errors.second)
-			<< ", variance " << variance(distance_errors.second)
-			<< ", median " << median(distance_errors.second)
-			<< ", max " << max(distance_errors.second) << std::endl;
+		ss << "error: mean " << errors.mean()
+			<< ", variance " << errors.variance()
+			<< ", median " << errors.median()
+			<< ", max " << errors.max() << std::endl;
 		std::cout << ss.str();
 		if (_logger)
 			_logger->write(ss.str());

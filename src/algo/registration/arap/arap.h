@@ -37,7 +37,6 @@ private:
 	std::unique_ptr<IAsRigidAsPossibleSmoothCost> _smooth_cost;
 private:
 	RegistrationOptions _options;
-	bool _with_icp = true;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
@@ -46,10 +45,10 @@ private:
 private:
 	void init();
 	std::vector<vertex_descriptor> subsetOfVerticesToFit();
+	void updateSmoothFactor();
 public:
 	bool finished() override;
-	bool solveIteration() override;
-	void updateSmoothFactor();
+	bool solveIteration() override;	
 	size_t currentIteration() override;
 	bool solve() override;
 public:

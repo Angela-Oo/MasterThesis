@@ -188,7 +188,6 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 	, _deformation_graph(deformation_graph)
 	, _ceres_logger(logger)
 	, _options(options)
-	, _with_icp(false)
 {
 	init();
 	_fit_cost = std::make_unique<AsRigidAsPossibleFitCostWithoutICP>(_target, fixed_positions, subsetOfVerticesToFit(), _options);

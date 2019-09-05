@@ -38,12 +38,19 @@ Mesh convertToTriMesh(const SurfaceMesh& mesh) {
 
 	ml::MeshDataf mData;
 	mData.m_Vertices.resize(mesh.number_of_vertices());
+	
 	std::map<vertex_descriptor, int> cgal_vertex_handle_to_mesh_vertex_handle;
 
+	auto mesh_color_property_map = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color");
+	if(mesh_color_property_map.second)
+		mData.m_Colors.resize(mesh.number_of_vertices());
 	int i = 0;
 	for (auto vertex_it = mesh.vertices_begin(); vertex_it != mesh.vertices_end(); ++vertex_it, ++i) {
 		const auto & point = mesh.point(*vertex_it);
 		mData.m_Vertices[i] = ml::vec3f(point.x(), point.y(), point.z());
+		if (mesh_color_property_map.second) {
+			mData.m_Colors[i] = mesh_color_property_map.first[*vertex_it];
+		}
 		cgal_vertex_handle_to_mesh_vertex_handle[*vertex_it] = i;
 	}
 
