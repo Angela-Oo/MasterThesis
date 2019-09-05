@@ -21,8 +21,6 @@ private:
 	std::string _save_images_folder;
 	std::string _image_name;
 	bool _finished{ false };
-private:
-	void renderRegistration(Render mode);
 public:
 	void registration() override;
 	void visualize(Render mode) override;

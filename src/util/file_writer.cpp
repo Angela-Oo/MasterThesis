@@ -10,9 +10,10 @@ void FileWriter::write(std::string text)
 		file.open(_file_path, std::ios_base::app);
 		file << text;
 		file.close();
+		std::cout << text;
 	}
 	catch (...) {
-
+		std::cout << "could not write to file" << std::endl;
 	}
 }
 

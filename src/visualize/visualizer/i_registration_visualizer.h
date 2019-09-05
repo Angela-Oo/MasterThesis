@@ -23,6 +23,7 @@ struct Render
 class IRegistrationVisualizer
 {
 public:
+	virtual ~IRegistrationVisualizer() = default;
 	virtual void registration() = 0;
 	virtual void visualize(Render mode) = 0;
 	virtual bool finished() = 0;

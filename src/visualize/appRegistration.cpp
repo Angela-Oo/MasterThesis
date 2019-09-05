@@ -27,6 +27,10 @@ void AppRegistration::render(ml::Cameraf& camera)
 
 	if (_registration_visualizer) {
 		_registration_visualizer->saveImage();
+		if(_registration_visualizer->finished())
+		{
+			term();
+		}
 	}
 }
 
@@ -66,6 +70,10 @@ void AppRegistration::init(ml::ApplicationData &app)
 	_mesh_visualizer->visualize(std::make_pair(0, ml::RGBColor::White), true);
 }
 
+void AppRegistration::term()
+{
+	ExitProcess(0);
+}
 
 AppRegistration::AppRegistration(const Registration::RegistrationOptions & options)
 	: _options(options)

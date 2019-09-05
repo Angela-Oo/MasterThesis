@@ -77,9 +77,7 @@ void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 		}
 
 		std::stringstream ss;
-		ss << "error: mean " << errors.mean() << ", variance " << errors.variance() << ", median " << errors.median() << ", max " << errors.max() << std::endl;
-		std::cout << ss.str();
-
+		ss << " error: mean " << errors.mean() << ", variance " << errors.variance() << ", median " << errors.median() << ", max " << errors.max() << std::endl;
 		if (_logger)
 			_logger->write(ss.str());
 	}

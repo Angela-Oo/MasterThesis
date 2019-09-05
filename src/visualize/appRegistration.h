@@ -19,7 +19,8 @@ private:
 private:
 	void loadMeshReader();
 	void registration();
-public:	
+public:
+	void term();
 	void render(ml::Cameraf& camera) override;	
 	void key(UINT key) override;
 	void init(ml::ApplicationData &app) override;

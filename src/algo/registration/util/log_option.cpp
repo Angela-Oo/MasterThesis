@@ -2,20 +2,65 @@
 
 namespace Registration {
 
-void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const RegistrationOptions & registration_options)
+void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const RegistrationOptions & options)
 {
 	std::stringstream ss;
-	ss << std::endl << "Registration Options: " << std::endl
-		<< " cost function weights: " << " smooth: " << registration_options.smooth
-		<< ", fit: " << registration_options.fit
-		<< " deformation graph " << "edge length: " << registration_options.deformation_graph.edge_length << std::endl
-		<< " number of interpolated neighbors (k): " << registration_options.deformation_graph.number_of_interpolation_neighbors << std::endl
-		<< " max iterations: " << registration_options.max_iterations << std::endl
-		<< " ignore border vertices: " << std::boolalpha << registration_options.ignore_border_vertices << std::endl
-		<< " random probability to use a corresponding vertex: " << registration_options.use_vertex_random_probability << std::endl
-		<< " correspondence finding" << " max distance: " << registration_options.icp.correspondence_max_distance
-		<< ", max angle: " << registration_options.icp.correspondence_max_angle_deviation << std::endl
-		<< " evaluate residuals: " << std::boolalpha << registration_options.evaluate_residuals << std::endl;
+
+	ss << std::endl << "Options: " << std::endl;
+
+	ss << "Input " << options.input_mesh_sequence.output_folder_name
+		<< " file path " << options.input_mesh_sequence.file_path
+		<< " file name " << options.input_mesh_sequence.file_name
+		<< " number of frames to load: " << options.input_mesh_sequence.number_of_frames_to_load << std::endl;
+
+	if (options.sequence_options.enable) {
+		ss << "Sequence registration: "
+		<< " init rigid with non rigid deformation " << std::boolalpha << options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation
+		<< " use previous frame for rigid registration " << std::boolalpha << options.sequence_options.use_previouse_frame_for_rigid_registration << std::endl;
+	}
+
+	ss << "Registration Type: ";
+	if (options.type == RegistrationType::ARAP)
+		ss << "ARAP";
+	else if (options.type == RegistrationType::ED)
+		ss << "Embedded Deformation";
+	else if (options.type == RegistrationType::Rigid)
+		ss << "Rigid";
+	else
+		ss << "other type";
+	ss << std::endl;
+	
+	ss << "Deformation Graph: ";
+	ss << "edge length: " << options.deformation_graph.edge_length << std::endl;
+	
+	if (options.rigid_and_non_rigid_registration)
+		ss << "Rigid and non Rigid registration " << std::endl;
+
+	if(options.refinement.enable)
+	{
+		ss << "Deformation Graph Refinement: "
+			<< " levels " << options.refinement.levels
+			<< " min edge length " << options.refinement.min_edge_length << std::endl;
+	}
+
+	if (options.adaptive_rigidity.enable)
+	{
+		if (options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY)
+			ss << "Adaptive Rigidity by reducing" << std::endl;
+		else
+			ss << "Adaptive Rigidity by cost function" << std::endl;
+	}
+
+	ss << "Max iterations: " << options.max_iterations << std::endl;
+	ss << "Random probability to use a vertex: " << options.use_vertex_random_probability << std::endl;
+	
+	ss << "Smooth cost weight: " << options.smooth << " Fit cost weight: " << options.fit << std::endl;
+
+	ss << "Ignore border vertices: " << std::boolalpha << options.ignore_border_vertices << std::endl;
+
+	ss << "Correspondence find criteria: " << " max distance: " << options.icp.correspondence_max_distance
+		<< ", max angle: " << options.icp.correspondence_max_angle_deviation << std::endl;
+	
 	logger->write(ss.str());
 }
 
@@ -70,10 +115,10 @@ void logCeresOptions(std::shared_ptr<FileWriter> logger, const ceres::Solver::Op
 }
 
 
-void logOptions(std::shared_ptr<FileWriter> logger, const RegistrationOptions & registration_options, const ceres::Solver::Options & ceres_options)
+void logOptions(std::shared_ptr<FileWriter> logger, const RegistrationOptions & registration_options)
 {
 	logRegistrationOptions(logger, registration_options);
-	logCeresOptions(logger, ceres_options);
+	logCeresOptions(logger, registration_options.ceres_options);
 }
 
 }

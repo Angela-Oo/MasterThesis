@@ -7,13 +7,14 @@
 #include "visualizer/registration_visualizer.h"
 #include "parser.h"
 #include <algorithm>
+#include "algo/registration/util/log_option.h"
 
 void ShowMesh::createRegistration()
 {
 	if (!_registration_visualizer) {
 		auto save_images_folder = imageFolderName(_options);
 		auto logger = std::make_shared<FileWriter>(save_images_folder + "/" + _options.input_mesh_sequence.output_folder_name + "_log.txt");
-
+		Registration::logOptions(logger, _options);
 		if (_options.sequence_options.enable) {
 			auto register_sequence_of_frames = Registration::createSequenceRegistration(_options, logger, _input_mesh);
 			_registration_visualizer = std::make_shared<Visualizer::SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), _renderer, save_images_folder, logger);

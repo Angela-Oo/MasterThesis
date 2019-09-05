@@ -75,7 +75,6 @@ CeresIterationLoggerGuard::~CeresIterationLoggerGuard()
 	ss << "  " << _log_info << " ";
 	if(_logger)
 		_logger->write(ss.str());
-	std::cout << ss.str();
 }
 
 
@@ -90,7 +89,6 @@ void CeresLogger::write(std::string text, bool log_time)
 	ss << text;
 	if (_logger)
 		_logger->write(ss.str());
-	std::cout << ss.str();
 }
 
 std::unique_ptr<CeresIterationLoggerGuard> CeresLogger::CreateCeresIterationLogger(const ceres::Solver::Summary& summary)
