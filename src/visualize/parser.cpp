@@ -215,8 +215,11 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 
 		options.add_options()
 			("rigid_and_non_rigid", "Rigid before Non-Rigid Refinement (default true)", cxxopts::value<bool>()->default_value("true"))
-			("r,refine_deformation_graph", "Deformation Graph Refinement")
 			("a,adaptive_rigidity", "Adaptive Rigidity: REDUCE_RIGIDITY, RIGIDITY_COST", cxxopts::value<std::string>());
+
+		options.add_options()
+			("r,refine_deformation_graph", "Deformation Graph Refinement")
+			("refine_at_edge", "Refine Deformation Graph At Edge (default is Vertex)");
 
 		options.add_options()
 			("max_iterations", "Max Iterations", cxxopts::value<unsigned int>()->default_value("25"))
@@ -245,6 +248,10 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		if (result.count("r"))
 		{
 			registration_options.refinement.enable = result["r"].as<bool>();
+			if(result["refine_at_edge"].as<bool>())
+				registration_options.refinement.refine = RefinementOptions::Refinement::EDGE;
+			else
+				registration_options.refinement.refine = RefinementOptions::Refinement::VERTEX;
 		}
 		if (result.count("a"))
 		{

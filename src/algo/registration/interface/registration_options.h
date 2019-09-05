@@ -27,14 +27,16 @@ struct AdaptiveRigidityOptions
 
 struct RefinementOptions
 {
-	bool enable;
-	double min_edge_length;
-	unsigned int levels;
-	RefinementOptions()
-		: enable(false)
-		, min_edge_length(0.05)
-		, levels(4)
-	{}
+	enum class Refinement
+	{
+		EDGE,
+		VERTEX
+	};
+
+	bool enable{ false };
+	double min_edge_length {0.05};
+	unsigned int levels {4};
+	Refinement refine {Refinement::VERTEX};
 };
 
 

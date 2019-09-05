@@ -92,7 +92,7 @@ void AsRigidAsPossible::updateSmoothFactor()
 			(_options.smooth > 0.005))// && a_conf > 0.05))
 		{
 			_options.smooth /= 2.;
-			std::cout << std::endl << "scale factor: smooth " ;
+			std::cout << std::endl << "scale factor: smooth " << _options.smooth;
 		}
 	}
 }

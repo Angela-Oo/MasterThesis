@@ -35,7 +35,7 @@ void SequenceRegistrationVisualizer::renderRegistration(Render mode)
 		else {
 			_finished = _registration->finished();
 
-			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(_current_frame), mode.mode, false);
+			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(_current_frame), mode.mode, true);
 			_render_registration->renderTargetMesh(_registration->getMesh(_current_frame), mode.mode);
 			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(_current_frame), mode.mode);
 		}

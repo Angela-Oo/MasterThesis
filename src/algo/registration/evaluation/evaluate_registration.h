@@ -21,6 +21,7 @@ private:
 	std::unique_ptr<ErrorEvaluation> _error_evaluation;
 	std::shared_ptr<FileWriter> _logger;
 	SurfaceMesh _deformed_points;
+	RegistrationOptions _options;
 private:
 	void errorEvaluation();
 public:
@@ -64,7 +65,10 @@ void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 	_deformed_points = _non_rigid_registration->getDeformedPoints();
 
 	auto vertex_colors = _deformed_points.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-	if (_non_rigid_registration->finished()) {
+
+	bool eval_error_each_iteration = !_options.sequence_options.enable;
+	bool eval_error = _non_rigid_registration->finished() || _non_rigid_registration->shouldBeSavedAsImage();
+	if (eval_error || eval_error_each_iteration) {
 		if (!_error_evaluation) {
 			_error_evaluation = std::make_unique<ErrorEvaluation>(_non_rigid_registration->getTarget());
 		}
@@ -77,7 +81,7 @@ void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 		}
 
 		std::stringstream ss;
-		ss << " error: mean " << errors.mean() << ", variance " << errors.variance() << ", median " << errors.median() << ", max " << errors.max() << std::endl;
+		ss << std::endl << "error: mean " << errors.mean() << ", variance " << errors.variance() << ", median " << errors.median() << ", max " << errors.max();
 		if (_logger)
 			_logger->write(ss.str());
 	}
@@ -172,6 +176,7 @@ EvaluateRegistration<NonRigidRegistration>::EvaluateRegistration(const SurfaceMe
 																 const RegistrationOptions & options,
 																 std::shared_ptr<FileWriter> logger)
 	: _logger(logger)
+	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, options, logger);
 	errorEvaluation();
@@ -184,6 +189,7 @@ EvaluateRegistration<NonRigidRegistration>::EvaluateRegistration(const SurfaceMe
 																 const RegistrationOptions & options,
 																 std::shared_ptr<FileWriter> logger)
 	: _logger(logger)
+	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation, options, logger);
 	errorEvaluation();
@@ -198,6 +204,7 @@ EvaluateRegistration<NonRigidRegistration>::EvaluateRegistration(const SurfaceMe
 																 const RegistrationOptions & options,
 																 std::shared_ptr<FileWriter> logger)
 	: _logger(logger)
+	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, previouse_mesh, deformation, options, logger);
 	errorEvaluation();

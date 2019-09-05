@@ -6,7 +6,7 @@
 void AppRegistration::registration()
 {
 	Visualizer::Render mode;
-	mode.mode = Visualizer::RegistrationRenderMode::ALL;
+	mode.mode = Visualizer::RegistrationRenderMode::DEFORMATION;
 	if (!_registration_visualizer)
 	{
 		_registration_visualizer = Visualizer::createRegistrationVisualizer(_renderer, _mesh_reader, _options);

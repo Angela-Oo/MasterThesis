@@ -16,6 +16,7 @@ std::shared_ptr<IRegistrationVisualizer> createRegistrationVisualizer(std::share
 {
 	auto save_images_folder = imageFolderName(options);
 	auto logger = std::make_shared<FileWriter>(save_images_folder + "/" + options.input_mesh_sequence.output_folder_name + "_log.txt");
+	logger->write("Save image folder: " + save_images_folder);
 	logOptions(logger, options);
 	
 	if (options.sequence_options.enable) {
@@ -28,7 +29,6 @@ std::shared_ptr<IRegistrationVisualizer> createRegistrationVisualizer(std::share
 
 		auto registration = Registration::createRegistration(options, logger, source, target);
 		return std::make_shared<RegistrationVisualizer>(std::move(registration), renderer, save_images_folder, logger);
-		//_image_name = "frame_" + std::to_string(registration->currentIteration());
 	}
 }
 
