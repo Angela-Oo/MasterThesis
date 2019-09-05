@@ -27,6 +27,8 @@ void ShowMesh::createRegistration()
 		}
 
 		_mesh_visualizer->clear();
+
+		renderRegistration();
 	}
 }
 
@@ -64,9 +66,10 @@ void ShowMesh::registration()
 {
 	if (_registration_visualizer)
 	{
-		if(_solve_registration && !_registration_visualizer->finished())
+		if (_solve_registration && !_registration_visualizer->finished()) {
 			_registration_visualizer->registration();
-		_registration_visualizer->visualize(_render_mode);
+			renderRegistration();
+		}
 	}
 }
 
@@ -142,6 +145,7 @@ void ShowMesh::key(UINT key)
 			}
 			else {				
 				_solve_registration = true;
+				renderRegistration();
 			}
 		}
 	}
@@ -165,6 +169,7 @@ void ShowMesh::key(UINT key)
 			_current_frame = 0;
 			createRegistration();
 			_solve_registration = true;
+			renderRegistration();
 		}
 	}
 	else if (key == KEY_G)
@@ -271,7 +276,8 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		// adaptive rigidity cost function
 		_options.adaptive_rigidity.enable = true;
-		_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::RIGIDITY_COST;
+		//_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::RIGIDITY_COST;
+		_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::REDUCE_RIGIDITY;
 		_options.deformation_graph.edge_length = 0.3;
 		//_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
 		_options.use_vertex_random_probability = 0.1;

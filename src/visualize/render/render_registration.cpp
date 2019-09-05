@@ -37,7 +37,7 @@ void RendererRegistration::renderTargetMesh(const SurfaceMesh & target, Registra
 		if (mode == RegistrationRenderMode::NONE || mode == RegistrationRenderMode::DEFORMATION) { // only render target as points
 			render_mode = RenderMode::POINT;
 		}
-		_renderer->insert(target_id, target, render_mode, ml::RGBColor::Green, true, 0.001f);
+		_renderer->insert(target_id, target, render_mode, ml::RGBColor::Green, false, 0.001f);
 	}
 }
 

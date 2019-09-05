@@ -116,7 +116,7 @@ ml::vec4f errorToRGB(double error_between_0_and_1, double s)
 	hsv color_hsv;
 	color_hsv.h = hue;
 	color_hsv.s = std::max(0., std::min(s, 1.));
-	color_hsv.v = 0.7;
+	color_hsv.v = 1.0;
 	auto rgb = hsv2rgb(color_hsv);
 	return ml::vec4f(rgb.r, rgb.g, rgb.b, 1.);
 }

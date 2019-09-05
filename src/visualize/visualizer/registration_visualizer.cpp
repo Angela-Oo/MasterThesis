@@ -7,53 +7,20 @@ namespace Visualizer {
 using namespace Registration;
 
 
-	
-void RegistrationVisualizer::renderError(Render mode)
-{
-	if (_registration) {// && _registration->finished()) {
-		if (!_error_evaluation) {
-			_error_evaluation = std::make_unique<ErrorEvaluation>(_registration->getTarget());
-		}
-		auto deformed_points = _registration->getDeformedPoints();
-		auto errors = _error_evaluation->errorEvaluation(deformed_points);
-
-		auto vertex_colors = deformed_points.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
-		double max_error = errors.max();
-		for(size_t i = 0; i < errors.size(); ++i)
-		{
-			vertex_colors[errors.v(i)] = errorToRGB(errors.error(i) / max_error, 0.9);
-		}
-
-		std::stringstream ss;
-		ss << "error: mean " << errors.mean()
-			<< ", variance " << errors.variance()
-			<< ", median " << errors.median()
-			<< ", max " << errors.max() << std::endl;
-		std::cout << ss.str();
-		if (_logger)
-			_logger->write(ss.str());
-
-		//_renderer->renderError(nearest_reference_points);
-		_render_registration->renderDeformedSourceMesh(deformed_points, mode.mode, true);
-	}
-}
-
 void RegistrationVisualizer::renderRegistration(Render mode)
 {
 	if (_registration)
 	{
 		auto deformed_points = _registration->getDeformedPoints();
 		// defomed mesh
-		//_render_registration->renderDeformedSourceMesh(_registration->getDeformedPoints(), mode.mode);
-		renderError(mode);
-		
+		_render_registration->renderDeformedSourceMesh(_registration->getDeformedPoints(), mode.mode, true);
 		_render_registration->renderTargetMesh(_registration->getTarget(), mode.mode);
 
 		auto non_rigid_registration = dynamic_cast<INonRigidRegistration*>(_registration.get()); // todo .... maybe external polymorthis
 		if (non_rigid_registration) {
 			// deformation graph
 			auto deformation_graph = non_rigid_registration->getDeformationGraphMesh();
-			Visualize::setDeformationGraphColor(deformation_graph, Visualize::VertexColor::Default, Visualize::EdgeColor::SmoothCost);
+			setDeformationGraphColor(deformation_graph, Visualize::VertexColor::Default, Visualize::EdgeColor::SmoothCost);
 			_render_registration->renderDeformationGraph(deformation_graph, mode.mode);
 		}
 	}

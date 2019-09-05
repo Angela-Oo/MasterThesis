@@ -254,6 +254,7 @@
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h" />
     <ClInclude Include="src\algo\registration\evaluation\barycentric_coordinates.h" />
+    <ClInclude Include="src\algo\registration\evaluation\error_evaluation.h" />
     <ClInclude Include="src\algo\registration\evaluation\evaluate_registration.h" />
     <ClInclude Include="src\algo\registration\evaluation\registration_error.h" />
     <ClInclude Include="src\algo\registration\find_corresponding_points\find_corresponding_points.h" />
@@ -344,7 +345,7 @@
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp" />
     <ClCompile Include="src\algo\registration\evaluation\barycentric_coordinates.cpp" />
-    <ClCompile Include="src\algo\registration\evaluation\evaluate_registration.cpp" />
+    <ClCompile Include="src\algo\registration\evaluation\error_evaluation.cpp" />
     <ClCompile Include="src\algo\registration\evaluation\registration_error.cpp" />
     <ClCompile Include="src\algo\registration\find_corresponding_points\find_corresponding_points.cpp" />
     <ClCompile Include="src\algo\registration\interface\registration.cpp" />

@@ -7,6 +7,7 @@
 #include "algo/registration/sequence_registration/sequence_registration.h"
 #include "algo/registration/deformation_graph_refinement/refinement_registration.h"
 #include "algo/registration/deformation_graph_adaptive_rigidity/adaptive_rigidity_registration.h"
+#include "algo/registration/evaluation/evaluate_registration.h"
 
 namespace Registration {
 
@@ -47,30 +48,31 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationOptions & options,
 
 	if (options.type == RegistrationType::ARAP)
 	{
+		using ARAP = EvaluateRegistration<AsRigidAsPossible>;
 		if (options.rigid_and_non_rigid_registration)
 		{
 			if (options.refinement.enable) 
 			{
-				return std::make_unique<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>(source, target, options, logger);
+				return std::make_unique<EvaluateRegistration<RigidBeforeNonRigidRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>>(source, target, options, logger);
 			}
 			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY)
 			{
-				return std::make_unique<RigidBeforeNonRigidRegistration<AdaptiveRigidityRegistration<AsRigidAsPossible>>>(source, target, options, logger);
+				return std::make_unique<EvaluateRegistration<RigidBeforeNonRigidRegistration<AdaptiveRigidityRegistration<AsRigidAsPossible>>>>(source, target, options, logger);
 			}
 		}
 		else
 		{
 			if (options.refinement.enable) 
 			{
-				return std::make_unique<RefineDeformationGraphRegistration<AsRigidAsPossible>>(source, target, options, logger);
+				return std::make_unique<EvaluateRegistration<RefineDeformationGraphRegistration<AsRigidAsPossible>>>(source, target, options, logger);
 			}
 			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY)
 			{
-				return std::make_unique<AdaptiveRigidityRegistration<AsRigidAsPossible>>(source, target, options, logger);
+				return std::make_unique<EvaluateRegistration<AdaptiveRigidityRegistration<AsRigidAsPossible>>>(source, target, options, logger);
 			}
 			else
 			{
-				return std::make_unique<AsRigidAsPossible>(source, target, options, logger);
+				return std::make_unique<EvaluateRegistration<AsRigidAsPossible>>(source, target, options, logger);
 			}
 		}
 	}

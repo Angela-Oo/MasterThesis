@@ -14,13 +14,13 @@ template<typename NonRigidRegistration>
 class RigidBeforeNonRigidRegistration : public INonRigidRegistration
 {
 public:	
-	using Deformation = typename RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation>;
-	using DeformMesh = typename RigidBeforeNonRigidDeformMesh<typename NonRigidRegistration::Deformation, typename NonRigidRegistration::DeformMesh>;
+	using Deformation = RigidBeforeNonRigidDeformation<typename NonRigidRegistration::Deformation>;
+	using DeformMesh = RigidBeforeNonRigidDeformMesh<typename NonRigidRegistration::Deformation, typename NonRigidRegistration::DeformMesh>;
 private:
 	Deformation _deformation;
 	std::unique_ptr<RigidRegistration> _rigid_registration;
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
-	bool _finished_rigid_registration;
+	bool _finished_rigid_registration {false};
 public:
 	bool finished() override;
 	bool solveIteration() override;
@@ -176,7 +176,6 @@ RigidBeforeNonRigidRegistration<NonRigidRegistration>::RigidBeforeNonRigidRegist
 																					   std::unique_ptr<NonRigidRegistration> non_rigid_registration)
 	: _rigid_registration(std::move(rigid_registration))
 	, _non_rigid_registration(std::move(non_rigid_registration))
-	, _finished_rigid_registration(false)
 {
 	_deformation.rigid_deformation = _rigid_registration->getRigidDeformation();
 }

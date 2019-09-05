@@ -788,6 +788,9 @@
     <ClInclude Include="src\algo\registration\evaluation\barycentric_coordinates.h">
       <Filter>2 algo\4 registration\12 evaluation</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\evaluation\error_evaluation.h">
+      <Filter>2 algo\4 registration\12 evaluation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -984,13 +987,13 @@
     <ClCompile Include="src\visualize\render\render_registration.cpp">
       <Filter>6 visualize\1 render</Filter>
     </ClCompile>
-    <ClCompile Include="src\algo\registration\evaluation\evaluate_registration.cpp">
-      <Filter>2 algo\4 registration\12 evaluation</Filter>
-    </ClCompile>
     <ClCompile Include="src\algo\registration\evaluation\registration_error.cpp">
       <Filter>2 algo\4 registration\12 evaluation</Filter>
     </ClCompile>
     <ClCompile Include="src\algo\registration\evaluation\barycentric_coordinates.cpp">
+      <Filter>2 algo\4 registration\12 evaluation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\evaluation\error_evaluation.cpp">
       <Filter>2 algo\4 registration\12 evaluation</Filter>
     </ClCompile>
   </ItemGroup>
