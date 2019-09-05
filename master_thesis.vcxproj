@@ -253,6 +253,7 @@
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h" />
+    <ClInclude Include="src\algo\registration\evaluation\evaluate_registration.h" />
     <ClInclude Include="src\algo\registration\find_corresponding_points\find_corresponding_points.h" />
     <ClInclude Include="src\algo\registration\interface\i_registration.h" />
     <ClInclude Include="src\algo\registration\interface\i_sequence_registration.h" />
@@ -275,7 +276,6 @@
     <ClInclude Include="src\algo\registration\util\hsv_to_rgb.h" />
     <ClInclude Include="src\algo\registration\util\log_option.h" />
     <ClInclude Include="src\algo\registration\util\math.h" />
-    <ClInclude Include="src\algo\registration_evaluation\evaluate_registration.h" />
     <ClInclude Include="src\algo\remeshing\isotropic_remeshing.h" />
     <ClInclude Include="src\algo\remeshing\make_mesh_3_remeshing.h" />
     <ClInclude Include="src\algo\remeshing\mesh_simplification.h" />
@@ -341,6 +341,7 @@
     <ClCompile Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp" />
+    <ClCompile Include="src\algo\registration\evaluation\evaluate_registration.cpp" />
     <ClCompile Include="src\algo\registration\find_corresponding_points\find_corresponding_points.cpp" />
     <ClCompile Include="src\algo\registration\interface\registration.cpp" />
     <ClCompile Include="src\algo\registration\options\ceres_option.cpp" />
@@ -353,7 +354,6 @@
     <ClCompile Include="src\algo\registration\util\hsv_to_rgb.cpp" />
     <ClCompile Include="src\algo\registration\util\log_option.cpp" />
     <ClCompile Include="src\algo\registration\util\math.cpp" />
-    <ClCompile Include="src\algo\registration_evaluation\evaluate_registration.cpp" />
     <ClCompile Include="src\algo\remeshing\isotropic_remeshing.cpp" />
     <ClCompile Include="src\algo\remeshing\make_mesh_3_remeshing.cpp" />
     <ClCompile Include="src\algo\remeshing\mesh_simplification.cpp" />

@@ -21,7 +21,7 @@ void RegistrationVisualizer::renderError(Render mode)
 		double max_error = errors.max();
 		for(size_t i = 0; i < errors.size(); ++i)
 		{
-			vertex_colors[errors.v(i)] = errorToRGB(errors.error(i) / max_error);
+			vertex_colors[errors.v(i)] = errorToRGB(errors.error(i) / max_error, 0.9);
 		}
 
 		std::stringstream ss;
