@@ -27,9 +27,39 @@ SurfaceMesh::Point pointOnPlane(Plane plane, SurfaceMesh::Point point)
 }
 
 
-std::vector<float> evaluate_distance_error(std::vector<std::pair<Point, Point>> nearest_points)
+double mean(const std::vector<double> & values)
 {
-	std::vector<float> distances;
+	return std::accumulate(values.begin(), values.end(), 0.0) / values.size();
+}
+
+double variance(const std::vector<double> & values)
+{
+	double m = mean(values);
+	std::vector<double> diff(values.size());
+	std::transform(values.begin(), values.end(), diff.begin(), [m](double x) { return x - m; });
+	double sq_sum = std::inner_product(diff.begin(), diff.end(), diff.begin(), 0.0);
+	return std::sqrt(sq_sum / values.size());
+}
+
+double median(const std::vector<double> & values)
+{
+	return values[floor(values.size() / 2.)];
+}
+
+double max(const std::vector<double> & values)
+{
+	return *std::max_element(values.begin(), values.end());
+}
+
+double min(const std::vector<double> & values)
+{
+	return *std::min_element(values.begin(), values.end());
+}
+
+
+std::vector<double> evaluate_distance_error(std::vector<std::pair<Point, Point>> nearest_points)
+{
+	std::vector<double> distances;
 	for (auto p : nearest_points) {
 		auto vector = p.first - p.second;
 		double distance = sqrt(vector.squared_length());
@@ -117,6 +147,27 @@ std::vector<std::pair<Point, Point>> ErrorEvaluation::evaluate_error(const Surfa
 	}
 	return nearest_points;
 }
+
+std::pair<std::vector<vertex_descriptor>, std::vector<double>> ErrorEvaluation::errorEvaluation(const SurfaceMesh & mesh)
+{
+	std::vector<vertex_descriptor> v_ids;
+	std::vector<double> distances;
+	//std::vector<std::pair<Point, Point>> nearest_points;
+	for (auto p : mesh.vertices()) {
+		auto point = mesh.point(p);
+		auto nearest_point = getNearestPointOnSurface(point);
+		auto vector = point - nearest_point;
+		double distance = sqrt(vector.squared_length());
+		
+		if (isnan(distance) || isinf(distance))
+			std::cout << "bad" << std::endl;
+
+		v_ids.push_back(p);
+		distances.push_back(distance);
+	}
+	return std::make_pair(v_ids, distances);
+}
+
 
 ErrorEvaluation::ErrorEvaluation(const SurfaceMesh & reference_mesh)
 	: _reference_mesh(reference_mesh)

@@ -3,7 +3,7 @@
 namespace Visualizer {
 
 
-void RendererRegistration::renderDeformedSourceMesh(const SurfaceMesh & deformed_mesh, RegistrationRenderMode mode)
+void RendererRegistration::renderDeformedSourceMesh(const SurfaceMesh & deformed_mesh, RegistrationRenderMode mode, bool render_vertex_color)
 {
 	// render point clouds
 	std::string deformed_id = "deformed_id";
@@ -16,7 +16,13 @@ void RendererRegistration::renderDeformedSourceMesh(const SurfaceMesh & deformed
 		if (mode == RegistrationRenderMode::NONE) { // only render target as points
 			render_mode = RenderMode::POINT;
 		}
-		_renderer->insert(deformed_id, deformed_mesh, render_mode, ml::RGBColor::Cyan, true, 0.001f);
+		if(render_vertex_color)
+		{
+			_renderer->insert(deformed_id, deformed_mesh, render_mode, true, 0.001f);
+		}
+		else {
+			_renderer->insert(deformed_id, deformed_mesh, render_mode, ml::RGBColor::Cyan, true, 0.001f);
+		}
 	}
 }
 

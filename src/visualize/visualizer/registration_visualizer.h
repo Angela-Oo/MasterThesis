@@ -22,7 +22,7 @@ private:
 	std::string _image_name;
 	bool _finished{ false };
 private:
-	void renderError();
+	void renderError(Render mode);
 	void renderRegistration(Render mode);
 public:
 	void registration() override;

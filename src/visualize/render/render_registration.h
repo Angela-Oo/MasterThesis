@@ -10,7 +10,7 @@ class RendererRegistration {
 private:
 	std::shared_ptr<Renderer> _renderer;
 public:
-	void renderDeformedSourceMesh(const SurfaceMesh & deformed_points, RegistrationRenderMode mode);
+	void renderDeformedSourceMesh(const SurfaceMesh & deformed_points, RegistrationRenderMode mode, bool render_vertex_color);
 	void renderTargetMesh(const SurfaceMesh & target, RegistrationRenderMode mode);
 	void renderDeformationGraph(const SurfaceMesh & deformation_graph, RegistrationRenderMode mode);
 public:
