@@ -63,7 +63,7 @@ private:
 private:
 	void setParameters();
 public:
-	bool finished();
+	bool finished() override;
 	bool solveIteration() override;
 	size_t currentIteration() override;
 	bool solve() override;
@@ -74,7 +74,7 @@ public:
 	SurfaceMesh getInverseDeformedPoints() override;
 	SurfaceMesh getDeformationGraphMesh() override;
 public:
-	void setRigidDeformation(const RigidDeformation & rigid_deformation);
+	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	const DeformationGraph<EDDeformation> & getDeformation();
 	void setDeformation(const Deformation & deformation_graph);
 	std::vector<Point> getFixedPostions() override;
@@ -95,6 +95,13 @@ public:
 	// with icp
 	EmbeddedDeformation(const SurfaceMesh& source,
 						const SurfaceMesh& target,
+						const DeformationGraph<EDDeformation> & deformation_graph,
+						const RegistrationOptions & options,
+						std::shared_ptr<FileWriter> logger = nullptr);
+
+	EmbeddedDeformation(const SurfaceMesh& source,
+						const SurfaceMesh& target,
+						const SurfaceMesh& previous_mesh,
 						const DeformationGraph<EDDeformation> & deformation_graph,
 						const RegistrationOptions & options,
 						std::shared_ptr<FileWriter> logger = nullptr);

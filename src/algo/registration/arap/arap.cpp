@@ -230,6 +230,15 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 }
 
 
+AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
+									 const SurfaceMesh& target,
+									 const SurfaceMesh& previous_mesh,
+									 const Deformation & deformation_graph,
+									 const RegistrationOptions & options,
+									 std::shared_ptr<FileWriter> logger)
+	: AsRigidAsPossible(source, target, deformation_graph, options, logger)
+{}
+
 //-----------------------------------------------------------------------------
 
 ARAPDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)

@@ -84,6 +84,13 @@ public:
 					  const Deformation & deformation_graph,
 					  const RegistrationOptions & options,
 					  std::shared_ptr<FileWriter> logger = nullptr);
+
+	AsRigidAsPossible(const SurfaceMesh& source,
+					  const SurfaceMesh& target,
+					  const SurfaceMesh& previous_mesh,
+					  const Deformation & deformation_graph,
+					  const RegistrationOptions & options,
+					  std::shared_ptr<FileWriter> logger = nullptr);
 };
 
 

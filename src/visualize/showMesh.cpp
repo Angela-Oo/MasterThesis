@@ -150,22 +150,24 @@ void ShowMesh::key(UINT key)
 			}
 		}
 	}
-	else if (key == KEY_7 || key == KEY_U)
+	else if (key == KEY_7 || key == KEY_U || key == KEY_P)
 	{		
 		if (!_registration_visualizer) {
+			_options.sequence_options.enable = true;
 			if (key == KEY_7) {
 				std::cout << "register all frames with rigid registration " << std::endl;
-				_options.type = Registration::RegistrationType::Rigid_AllFrames;
+				
+				_options.type = Registration::RegistrationType::Rigid;
 			}
 			else if (key == KEY_U)
 			{
 				std::cout << "register all frames as rigid as possible " << std::endl;				
-				_options.type = Registration::RegistrationType::ARAP_AllFrames;
+				_options.type = Registration::RegistrationType::ARAP;
 			}
 			else if (key == KEY_P)
 			{
 				std::cout << "register all frames embdedded deformation " << std::endl;
-				_options.type = Registration::RegistrationType::ED_AllFrames;
+				_options.type = Registration::RegistrationType::ED;
 			}
 			_current_frame = 0;
 			createRegistration();

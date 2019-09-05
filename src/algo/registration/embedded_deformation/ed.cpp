@@ -383,7 +383,14 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 }
 
-
+EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
+										 const SurfaceMesh& target,
+										 const SurfaceMesh& previous_mesh,
+										 const Deformation & deformation_graph,
+										 const RegistrationOptions & options,
+										 std::shared_ptr<FileWriter> logger)
+	: EmbeddedDeformation(source, target, deformation_graph, options, logger)
+{}
 
 //-----------------------------------------------------------------------------
 
