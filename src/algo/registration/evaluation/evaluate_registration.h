@@ -85,9 +85,9 @@ void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 	}
 	else
 	{
-		for (size_t i = 0; i < errors.size(); ++i)
+		for (auto v : _deformed_points.vertices())
 		{
-			vertex_colors[errors.v(i)] = ml::RGBColor::Cyan.toVec4f();
+			vertex_colors[v] = ml::RGBColor::Cyan.toVec4f();
 		}
 	}
 }
