@@ -9,14 +9,14 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	ss << std::endl << "Options: " << std::endl;
 
 	ss << "Input " << options.input_mesh_sequence.output_folder_name
-		<< " file path " << options.input_mesh_sequence.file_path
-		<< " file name " << options.input_mesh_sequence.file_name
-		<< " number of frames to load: " << options.input_mesh_sequence.number_of_frames_to_load << std::endl << std::endl;
+		<< ", file path " << options.input_mesh_sequence.file_path
+		<< ", file name " << options.input_mesh_sequence.file_name
+		<< ", number of frames to load: " << options.input_mesh_sequence.number_of_frames_to_load << std::endl << std::endl;
 
 	if (options.sequence_options.enable) {
 		ss << "Sequence registration: "
-		<< " init rigid with non rigid deformation " << std::boolalpha << options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation
-		<< " use previous frame for rigid registration " << std::boolalpha << options.sequence_options.use_previouse_frame_for_rigid_registration << std::endl;
+		<< " init rigid with non rigid deformation: " << std::boolalpha << options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation
+		<< ", use previous frame for rigid registration: " << std::boolalpha << options.sequence_options.use_previouse_frame_for_rigid_registration << std::endl;
 	}
 
 	ss << "Registration Type: ";
@@ -40,12 +40,12 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	{
 		ss << "Deformation Graph Refinement: ";
 		if (options.refinement.refine == RefinementOptions::Refinement::EDGE)
-			ss << "refine at edge";
+			ss << "refine at edge,";
 		else
-			ss << "refine at vertex";
+			ss << "refine at vertex,";
 
 		ss << " levels " << options.refinement.levels
-			<< " min edge length " << options.refinement.min_edge_length << std::endl;
+			<< ", min edge length " << options.refinement.min_edge_length << std::endl;
 	}
 
 	if (options.adaptive_rigidity.enable)

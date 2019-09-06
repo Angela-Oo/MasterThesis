@@ -16,17 +16,11 @@ private:
 	std::unique_ptr<Registration::ISequenceRegistration> _registration;
 	std::shared_ptr<Renderer> _renderer;
 	std::shared_ptr<FileWriter> _logger;
-	//std::unique_ptr<ErrorEvaluation> _error_evaluation;
-
-
 	std::unique_ptr<RendererRegistration> _render_registration;
 	std::string _save_images_folder;
 	std::string _image_name;
 	bool _finished{ false };
 private:
-	unsigned int _current_frame;
-private:
-	void renderError();
 	void renderRegistration(Render mode);
 public:
 	void registration() override;

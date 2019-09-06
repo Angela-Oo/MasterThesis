@@ -6,38 +6,30 @@ namespace Visualizer {
 
 using namespace Registration;
 
-void SequenceRegistrationVisualizer::renderError()
-{
-}
 
 void SequenceRegistrationVisualizer::renderRegistration(Render mode)
 {
 	if (_registration) {
 		auto current = _registration->getCurrent();
 
-		if (_finished) {
-			//_renderer->remove("target");
-			//_renderer->remove("deformed");
-			//_renderer->remove("inverse_mesh");
-			//_renderer->remove("mesh_source");
-		
-			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(_current_frame), mode.mode, true);
-			_render_registration->renderTargetMesh(_registration->getMesh(_current_frame), mode.mode);
-			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(_current_frame), mode.mode);
-
-/*			if (_mode == Render::DEFORMATION) {
+		if (_finished) {		
+			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(current), mode.mode, true);
+			_render_registration->renderTargetMesh(_registration->getMesh(current), mode.mode);
+			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(current), mode.mode);
+			/*
+			if (_mode == Render::DEFORMATION) {
 				auto inverse_deformed_points = _registration->getInverseDeformedMesh(_current_frame);
 				_renderer->insert("inverse_mesh", inverse_deformed_points,  ml::RGBColor::Cyan, false);
 				auto source = _registration->getMesh(0);
 				_renderer->insertMesh("mesh_source", source, ml::RGBColor::Yellow, false);
-			}	*/		
+			}*/		
 		}
 		else {
 			_finished = _registration->finished();
 
-			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(_current_frame), mode.mode, true);
-			_render_registration->renderTargetMesh(_registration->getMesh(_current_frame), mode.mode);
-			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(_current_frame), mode.mode);
+			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(current), mode.mode, true);
+			_render_registration->renderTargetMesh(_registration->getMesh(current), mode.mode);
+			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(current), mode.mode);
 		}
 	}
 }
@@ -46,7 +38,6 @@ void SequenceRegistrationVisualizer::visualize(Render mode)
 {
 	if (!_finished) {
 		renderRegistration(mode);
-		renderError();
 	}
 }
 

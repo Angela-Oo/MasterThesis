@@ -64,7 +64,7 @@ std::vector<vertex_descriptor> getVerticesToRefine(SurfaceMesh & refined_mesh, d
 		}		
 	}
 
-	std::cout << std::endl << "Number of refined edges: " << refine_vertices.size() << ", max smooth cost " << max_smooth_cost << ", used refine cost" << refine_max_smooth_cost << std::endl;
+	std::cout << std::endl << "Number of refined vertices: " << refine_vertices.size() << ", max smooth cost " << max_smooth_cost << ", used refine cost" << refine_max_smooth_cost << std::endl;
 	return refine_vertices;
 }
 
