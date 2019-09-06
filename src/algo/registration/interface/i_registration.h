@@ -14,6 +14,7 @@ public:
 	virtual bool solveIteration() = 0;
 	virtual size_t currentIteration() = 0;
 	virtual bool solve() = 0;
+	virtual bool shouldBeSavedAsImage() = 0;
 public:
 	virtual const SurfaceMesh & getSource() = 0;
 	virtual const SurfaceMesh & getTarget() = 0;
@@ -30,7 +31,7 @@ public:
 	virtual void setRigidDeformation(const RigidDeformation & rigid_deformation) = 0;
 	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
 	virtual SurfaceMesh getDeformationGraphMesh() = 0;
-	virtual bool shouldBeSavedAsImage() = 0;
+	//virtual bool shouldBeSavedAsImage() = 0;
 public:
 	virtual ~INonRigidRegistration() = default;
 };

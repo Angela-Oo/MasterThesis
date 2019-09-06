@@ -8,7 +8,7 @@ namespace Registration
 {
 
 template <typename DeformationGraph>
-SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph, bool color_based_on_cost, bool smooth_cost = true, bool fit_cost = false)
+SurfaceMesh deformationGraphToSurfaceMesh(const DeformationGraph & deformation_graph)
 {
 	SurfaceMesh mesh = deformation_graph._mesh;
 	for (auto & v : mesh.vertices()) {

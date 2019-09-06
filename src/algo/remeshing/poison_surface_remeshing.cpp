@@ -51,7 +51,7 @@ SurfaceMesh poisonSurfaceRemeshing(const SurfaceMesh & mesh, double target_edge_
 	surface_mesh.add_property_map<vertex_descriptor, ml::vec4f>("v:color", ml::vec4f(1., 1., 1., 1.)).first;
 	surface_mesh.add_property_map<edge_descriptor, ml::vec4f>("e:color", ml::vec4f(1., 1., 1., 1.)).first;
 
-	std::cout << "count of surface mesh vertices " << surface_mesh.number_of_vertices() << std::endl;
+	std::cout << " count of surface mesh vertices " << surface_mesh.number_of_vertices() << std::endl;
 	return surface_mesh;
 }
 

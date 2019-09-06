@@ -207,6 +207,9 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("start_index", "Input Meshes Start File Index (has only effect if 'input' is not given)", cxxopts::value<unsigned int>()->default_value("1"))
 			("output_folder_name", "Output Folder Name (has only effect if 'input' is not given)", cxxopts::value<std::string>()->default_value("head"));
 
+		options.add_options()
+			("disable_error_evaluation", "Disable error evaluation for speedup");
+
 		options
 			.add_options()
 			("s,sequence", "Sequence Registration")
@@ -263,6 +266,10 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		registration_options.smooth = result["smooth"].as<double>();
 		registration_options.fit = result["fit"].as<double>();
 		registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
+
+		if (result["disable_error_evaluation"].as<bool>()) {
+			registration_options.error_evaluation = false;
+		}
 
 		std::cout << "Arguments remain = " << argc << std::endl;
 

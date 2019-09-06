@@ -59,7 +59,7 @@ public:
 	SurfaceMesh getInverseDeformedPoints() override;
 	RigidDeformation getRigidDeformation();
 	RigidDeformation getDeformation();
-	bool shouldBeSavedAsImage();
+	bool shouldBeSavedAsImage() override;
 private:
 	void init();
 public:

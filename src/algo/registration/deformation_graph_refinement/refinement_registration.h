@@ -100,7 +100,9 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	bool finished = _non_rigid_registration->finished();
 	if (finished == false) {
 		_current_iteration++;
-		_non_rigid_registration->solveIteration();
+		bool solved = _non_rigid_registration->solveIteration();
+		if (solved)
+			_save_image = true;
 	}
 	else if(_is_refined == false) {
 		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
@@ -111,8 +113,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 		else
 			number_of_refinements = refineHierarchicalMeshAtEdges(_deformation);
 		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
-		_number_of_refinements++;
-		_save_image = true;
+		_number_of_refinements++;		
 		if(number_of_refinements == 0)
 			_is_refined = true;
 	}

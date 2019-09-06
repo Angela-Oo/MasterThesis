@@ -166,9 +166,9 @@ void RigidBeforeNonRigidRegistration<NonRigidRegistration>::setRigidDeformation(
 template<typename NonRigidRegistration>
 bool RigidBeforeNonRigidRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
 {
-	bool rigid_registration_finished = (_rigid_registration->finished() && !_finished_rigid_registration && _non_rigid_registration->currentIteration() == 0);
-	bool non_rigid_finished = finished();
-	return rigid_registration_finished || non_rigid_finished;
+	bool save_rigid_registration = (_rigid_registration->finished() && !_finished_rigid_registration && _non_rigid_registration->currentIteration() == 0);
+	bool save_non_rigid_registration = (_finished_rigid_registration && _non_rigid_registration->shouldBeSavedAsImage());
+	return save_rigid_registration || save_non_rigid_registration;
 }
 
 template<typename NonRigidRegistration>

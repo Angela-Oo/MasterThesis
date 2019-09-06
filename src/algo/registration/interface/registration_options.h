@@ -108,6 +108,7 @@ struct RegistrationOptions
 	double use_vertex_random_probability; // value between 0. and 1.
 	bool ignore_border_vertices;
 	bool evaluate_residuals;
+	bool error_evaluation;
 	ReduceMeshStrategy mesh_reduce_strategy;
 
 	bool rigid_and_non_rigid_registration;
@@ -123,6 +124,7 @@ struct RegistrationOptions
 		, max_iterations(25)
 		, ignore_border_vertices(true)
 		, evaluate_residuals(true)
+		, error_evaluation(true)
 		, use_vertex_random_probability(0.5)
 		, mesh_reduce_strategy(ReduceMeshStrategy::ISOTROPIC)
 	{}

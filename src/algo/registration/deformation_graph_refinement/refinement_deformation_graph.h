@@ -43,7 +43,7 @@ size_t refineHierarchicalMeshAtEdges(RefineDeformationGraphDeformation<Deformati
 	SurfaceMesh refined_mesh = deformation.non_rigid_deformation._mesh;
 	HierarchicalMeshRefinement mesh_refiner(deformation.hierarchical_mesh);
 
-	auto edges = getEdgesToRefine(refined_mesh, 0.01, 0.9);
+	auto edges = getEdgesToRefine(refined_mesh, 0.1, 0.9);
 	auto new_vertices = mesh_refiner.refine(edges, refined_mesh);
 
 	interpolateNewNodeDeformations<PositionDeformation>(deformation, new_vertices, refined_mesh);

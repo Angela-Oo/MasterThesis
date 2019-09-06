@@ -57,7 +57,7 @@ void EmbeddedDeformation::setDeformation(const Deformation & deformation_graph)
 
 SurfaceMesh EmbeddedDeformation::getDeformationGraphMesh()
 {
-	return deformationGraphToSurfaceMesh(_deformation_graph, _options.evaluate_residuals);
+	return deformationGraphToSurfaceMesh(_deformation_graph);
 }
 
 ceres::ResidualBlockId EmbeddedDeformation::addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor v, const Point & target_point)

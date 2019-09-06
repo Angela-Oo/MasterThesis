@@ -21,7 +21,7 @@ public:
 template <typename DeformationGraph>
 SurfaceMesh DeformationGraphDeformMesh<DeformationGraph>::deformationGraphMesh()
 {
-	return deformationGraphToSurfaceMesh(_deformation, true);
+	return deformationGraphToSurfaceMesh(_deformation);
 }
 
 template <typename DeformationGraph>

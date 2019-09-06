@@ -11,7 +11,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	ss << "Input " << options.input_mesh_sequence.output_folder_name
 		<< " file path " << options.input_mesh_sequence.file_path
 		<< " file name " << options.input_mesh_sequence.file_name
-		<< " number of frames to load: " << options.input_mesh_sequence.number_of_frames_to_load << std::endl;
+		<< " number of frames to load: " << options.input_mesh_sequence.number_of_frames_to_load << std::endl << std::endl;
 
 	if (options.sequence_options.enable) {
 		ss << "Sequence registration: "
@@ -38,8 +38,13 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 
 	if(options.refinement.enable)
 	{
-		ss << "Deformation Graph Refinement: "
-			<< " levels " << options.refinement.levels
+		ss << "Deformation Graph Refinement: ";
+		if (options.refinement.refine == RefinementOptions::Refinement::EDGE)
+			ss << "refine at edge";
+		else
+			ss << "refine at vertex";
+
+		ss << " levels " << options.refinement.levels
 			<< " min edge length " << options.refinement.min_edge_length << std::endl;
 	}
 
@@ -50,7 +55,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 		else
 			ss << "Adaptive Rigidity by cost function" << std::endl;
 	}
-
+	ss << std::endl;
 	ss << "Max iterations: " << options.max_iterations << std::endl;
 	ss << "Random probability to use a vertex: " << options.use_vertex_random_probability << std::endl;
 	

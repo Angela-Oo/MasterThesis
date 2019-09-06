@@ -66,9 +66,8 @@ void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 
 	auto vertex_colors = _deformed_points.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
 
-	//bool eval_error_each_iteration = !_options.sequence_options.enable;
 	bool eval_error = _non_rigid_registration->finished() || _non_rigid_registration->shouldBeSavedAsImage();
-	if (eval_error) {// || eval_error_each_iteration) {
+	if (eval_error && _options.error_evaluation) {
 		if (!_error_evaluation) {
 			_error_evaluation = std::make_unique<ErrorEvaluation>(_non_rigid_registration->getTarget());
 		}
@@ -178,6 +177,11 @@ EvaluateRegistration<NonRigidRegistration>::EvaluateRegistration(const SurfaceMe
 	: _logger(logger)
 	, _options(options)
 {
+	auto vertex_colors = source.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+	for (auto v : source.vertices())
+	{
+		vertex_colors[v] = ml::RGBColor::Cyan.toVec4f();
+	}
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, options, logger);
 	errorEvaluation();
 }
@@ -191,6 +195,11 @@ EvaluateRegistration<NonRigidRegistration>::EvaluateRegistration(const SurfaceMe
 	: _logger(logger)
 	, _options(options)
 {
+	auto vertex_colors = source.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+	for (auto v : source.vertices())
+	{
+		vertex_colors[v] = ml::RGBColor::Cyan.toVec4f();
+	}
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation, options, logger);
 	errorEvaluation();
 };
@@ -206,6 +215,11 @@ EvaluateRegistration<NonRigidRegistration>::EvaluateRegistration(const SurfaceMe
 	: _logger(logger)
 	, _options(options)
 {
+	auto vertex_colors = source.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
+	for (auto v : source.vertices())
+	{
+		vertex_colors[v] = ml::RGBColor::Cyan.toVec4f();
+	}
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, previouse_mesh, deformation, options, logger);
 	errorEvaluation();
 };
