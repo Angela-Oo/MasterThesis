@@ -24,7 +24,11 @@ void ShowMesh::createRegistration()
 			auto & target = _input_mesh->getMesh(_selected_frame_for_registration[1]);
 
 			auto registration = Registration::createRegistration(_options, logger, source, target);
-			_registration_visualizer = std::make_shared<Visualizer::RegistrationVisualizer>(std::move(registration), _renderer, save_images_folder, logger);
+
+			auto edge_coloring = Visualize::EdgeColor::SmoothCost;
+			if (_options.adaptive_rigidity.enable)
+				edge_coloring = Visualize::EdgeColor::RigidityValue;
+			_registration_visualizer = std::make_shared<Visualizer::RegistrationVisualizer>(std::move(registration), _renderer, save_images_folder, logger, edge_coloring);
 		}
 
 		_mesh_visualizer->clear();

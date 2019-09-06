@@ -17,12 +17,10 @@ enum class AdaptiveRigidity
 
 struct AdaptiveRigidityOptions
 {
-	bool enable;
-	AdaptiveRigidity adaptive_rigidity;
-	AdaptiveRigidityOptions()
-		: enable(false)
-		, adaptive_rigidity(AdaptiveRigidity::RIGIDITY_COST)
-	{}
+	bool enable{ false };
+	AdaptiveRigidity adaptive_rigidity{ AdaptiveRigidity::RIGIDITY_COST };
+	double smooth_cost_threshold{ 0.01 };
+	double minimal_rigidity{ 0.1 };
 };
 
 struct RefinementOptions
@@ -37,6 +35,7 @@ struct RefinementOptions
 	double min_edge_length {0.05};
 	unsigned int levels {4};
 	Refinement refine {Refinement::VERTEX};
+	double smooth_cost_threshold{ 0.05 };
 };
 
 

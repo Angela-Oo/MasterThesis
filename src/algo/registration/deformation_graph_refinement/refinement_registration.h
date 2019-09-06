@@ -107,14 +107,14 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	else if(_is_refined == false) {
 		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
 		
-		size_t number_of_refinements = 0;
+		size_t refined_vertices_edges = 0;
 		if(_options.refinement.refine == RefinementOptions::Refinement::VERTEX)
-			number_of_refinements = refineHierarchicalMeshAtVertices(_deformation);
+			refined_vertices_edges = refineHierarchicalMeshAtVertices(_deformation, _options.refinement.smooth_cost_threshold);
 		else
-			number_of_refinements = refineHierarchicalMeshAtEdges(_deformation);
+			refined_vertices_edges = refineHierarchicalMeshAtEdges(_deformation, _options.refinement.smooth_cost_threshold);
 		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
-		_number_of_refinements++;		
-		if(number_of_refinements == 0)
+		refined_vertices_edges++;
+		if(refined_vertices_edges == 0 || _number_of_refinements > 20)
 			_is_refined = true;
 	}
 	else {

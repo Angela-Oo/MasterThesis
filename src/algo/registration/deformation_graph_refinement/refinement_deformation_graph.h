@@ -8,7 +8,7 @@
 namespace Registration {
 
 
-std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh, double min_smooth_cost = 0.01, double percentage_max_smooth_cost = 0.9);
+std::vector<edge_descriptor> getEdgesToRefine(SurfaceMesh & refined_mesh, double min_smooth_cost, double percentage_max_smooth_cost);
 
 std::vector<vertex_descriptor> getVerticesToRefine(SurfaceMesh & refined_mesh, double min_smooth_cost, double percentage_max_smooth_cost);
 
@@ -38,12 +38,12 @@ void interpolateNewNodeDeformations(RefineDeformationGraphDeformation<Deformatio
 }
 
 template <typename PositionDeformation>
-size_t refineHierarchicalMeshAtEdges(RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation)
+size_t refineHierarchicalMeshAtEdges(RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation, double refinment_smooth_cost_threshold)
 {
 	SurfaceMesh refined_mesh = deformation.non_rigid_deformation._mesh;
 	HierarchicalMeshRefinement mesh_refiner(deformation.hierarchical_mesh);
 
-	auto edges = getEdgesToRefine(refined_mesh, 0.1, 0.9);
+	auto edges = getEdgesToRefine(refined_mesh, refinment_smooth_cost_threshold, 0.8);
 	auto new_vertices = mesh_refiner.refine(edges, refined_mesh);
 
 	interpolateNewNodeDeformations<PositionDeformation>(deformation, new_vertices, refined_mesh);
@@ -55,12 +55,12 @@ size_t refineHierarchicalMeshAtEdges(RefineDeformationGraphDeformation<Deformati
 }
 
 template <typename PositionDeformation>
-size_t refineHierarchicalMeshAtVertices(RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation)
+size_t refineHierarchicalMeshAtVertices(RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation, double refinment_smooth_cost_threshold)
 {
 	SurfaceMesh refined_mesh = deformation.non_rigid_deformation._mesh;
 	HierarchicalMeshRefinement mesh_refiner(deformation.hierarchical_mesh);
 
-	auto vertices = getVerticesToRefine(refined_mesh, 0.1, 0.8);
+	auto vertices = getVerticesToRefine(refined_mesh, refinment_smooth_cost_threshold, 0.8);
 	auto new_vertices = mesh_refiner.refine(vertices, refined_mesh);
 
 	interpolateNewNodeDeformations<PositionDeformation>(deformation, new_vertices, refined_mesh);

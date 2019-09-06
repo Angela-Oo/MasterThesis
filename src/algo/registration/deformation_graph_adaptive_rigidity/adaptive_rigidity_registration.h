@@ -23,6 +23,7 @@ private:
 	int _number_of_refinements;
 	unsigned int _current_iteration;
 	bool _finished;
+	RegistrationOptions _options;
 public:
 	bool finished() override;
 	bool solveIteration() override;
@@ -96,7 +97,7 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 {	
 	if (!_non_rigid_registration->getDeformation()._mesh.property_map<edge_descriptor, double>("e:rigidity").second) {
 		auto deformation = _non_rigid_registration->getDeformation();
-		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 100.);
+		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 10.);
 		_non_rigid_registration->setDeformation(deformation);
 	}
 	bool finished = _non_rigid_registration->finished();
@@ -106,7 +107,9 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 	}
 	else if(_is_refined == false) {
 		auto deformation = _non_rigid_registration->getDeformation();
-		auto number_adapted_edges = adaptRigidity(deformation);
+		auto number_adapted_edges = adaptRigidity(deformation, 
+												  _options.adaptive_rigidity.smooth_cost_threshold,
+												  _options.adaptive_rigidity.minimal_rigidity);
 		_non_rigid_registration->setDeformation(deformation);
 		_number_of_refinements++;
 		if(number_adapted_edges == 0 || _number_of_refinements > 20)
@@ -180,6 +183,7 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _finished(false)
 	, _number_of_refinements(0)
 	, _current_iteration(0)
+	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, options, logger);
 }
@@ -194,6 +198,7 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _finished(false)
 	, _number_of_refinements(0)
 	, _current_iteration(0)
+	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation, options, logger);
 };
@@ -210,6 +215,7 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _finished(false)
 	, _number_of_refinements(0)
 	, _current_iteration(0)
+	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, previouse_mesh, deformation, options, logger);
 };

@@ -1,6 +1,5 @@
 #include "registration_visualizer.h"
 
-#include "visualize/render/render_deformation_graph.h"
 
 namespace Visualizer {
 
@@ -36,7 +35,7 @@ void RegistrationVisualizer::visualize(Render mode)
 		if (non_rigid_registration) {
 			// deformation graph
 			auto deformation_graph = non_rigid_registration->getDeformationGraphMesh();
-			setDeformationGraphColor(deformation_graph, Visualize::VertexColor::Default, Visualize::EdgeColor::SmoothCost);
+			setDeformationGraphColor(deformation_graph, Visualize::VertexColor::Default, _edge_color);
 			_render_registration->renderDeformationGraph(deformation_graph, mode.mode);
 		}
 	}
@@ -59,11 +58,13 @@ void RegistrationVisualizer::saveImage()
 RegistrationVisualizer::RegistrationVisualizer(std::unique_ptr<IRegistration> registration,
 											   std::shared_ptr<Renderer> renderer,
 											   std::string image_folder_name,
-											   std::shared_ptr<FileWriter> logger)
+											   std::shared_ptr<FileWriter> logger,
+											   Visualize::EdgeColor edge_coloring)
 	: _registration(std::move(registration))
 	, _renderer(renderer)
 	, _save_images_folder(image_folder_name)
 	, _logger(logger)
+	, _edge_color(edge_coloring)
 {
 	_render_registration = std::make_unique<RendererRegistration>(_renderer);
 }

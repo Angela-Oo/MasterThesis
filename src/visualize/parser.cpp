@@ -218,11 +218,14 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 
 		options.add_options()
 			("rigid_and_non_rigid", "Rigid before Non-Rigid Refinement (default true)", cxxopts::value<bool>()->default_value("true"))
-			("a,adaptive_rigidity", "Adaptive Rigidity: REDUCE_RIGIDITY, RIGIDITY_COST", cxxopts::value<std::string>());
+			("a,adaptive_rigidity", "Adaptive Rigidity: REDUCE_RIGIDITY, RIGIDITY_COST", cxxopts::value<std::string>())
+			("reduce_rigidity_smooth_cost_threshold", "If smooth cost is bigger than threshold -> reduce rigidity", cxxopts::value<double>()->default_value("0.01"))
+			("reduce_rigidity_minimal_rigidity", "Minimal rigidity value", cxxopts::value<double>()->default_value("0.1"));
 
 		options.add_options()
 			("r,refine_deformation_graph", "Deformation Graph Refinement")
-			("refine_at_edge", "Refine Deformation Graph At Edge (default is Vertex)");
+			("refine_at_edge", "Refine Deformation Graph At Edge (default is Vertex)")
+			("refinment_smooth_cost_threshold", "Refine Deformation Graph if smooth cost of at edge or vertex is bigger than threshold", cxxopts::value<double>()->default_value("0.05"));
 
 		options.add_options()
 			("max_iterations", "Max Iterations", cxxopts::value<unsigned int>()->default_value("25"))
@@ -255,10 +258,23 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 				registration_options.refinement.refine = RefinementOptions::Refinement::EDGE;
 			else
 				registration_options.refinement.refine = RefinementOptions::Refinement::VERTEX;
+			registration_options.refinement.smooth_cost_threshold = result["refinment_smooth_cost_threshold"].as<double>();
 		}
 		if (result.count("a"))
 		{
-			registration_options.adaptive_rigidity.enable = result["a"].as<bool>();
+			if (result["a"].as<std::string>() == "REDUCE_RIGIDITY") {
+				registration_options.adaptive_rigidity.enable = true;
+				registration_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::REDUCE_RIGIDITY;
+				registration_options.adaptive_rigidity.smooth_cost_threshold = result["reduce_rigidity_smooth_cost_threshold"].as<double>();
+				registration_options.adaptive_rigidity.minimal_rigidity = result["reduce_rigidity_minimal_rigidity"].as<double>();
+
+			}
+			else if (result["a"].as<std::string>() == "RIGIDITY_COST") {
+				registration_options.adaptive_rigidity.enable = true;
+				registration_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::RIGIDITY_COST;
+			}
+			else
+				std::cout << "a passed but no walid parameter given" << std::endl;
 		}
 
 		registration_options.max_iterations = result["max_iterations"].as<unsigned int>();

@@ -6,6 +6,7 @@
 #include "util/file_writer.h"
 #include "algo/registration/evaluation/evaluate_registration.h"
 #include "visualize/render/render_registration.h"
+#include "visualize/render/render_deformation_graph.h"
 #include <memory>
 
 namespace Visualizer {
@@ -21,6 +22,7 @@ private:
 	std::string _save_images_folder;
 	std::string _image_name;
 	bool _finished{ false };
+	Visualize::EdgeColor _edge_color{ Visualize::EdgeColor::SmoothCost };
 public:
 	void registration() override;
 	void visualize(Render mode) override;
@@ -30,7 +32,8 @@ public:
 	RegistrationVisualizer(std::unique_ptr<Registration::IRegistration> registration,
 						   std::shared_ptr<Renderer> renderer,
 						   std::string image_folder_name,
-						   std::shared_ptr<FileWriter> logger);
+						   std::shared_ptr<FileWriter> logger,
+						   Visualize::EdgeColor edge_coloring);
 };
 
 
