@@ -2,7 +2,6 @@
 #include "cxxopts/cxxopts.hpp"
 
 
-
 Registration::Input inputById(std::string input_id)
 {
 	Registration::Input input;
@@ -176,6 +175,16 @@ void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions 
 	}
 	
 	options.input_mesh_sequence.image_folder_name = result["image_folder_name"].as<std::string>();
+
+	auto render_mode = result["render_mode"].as<std::string>();
+	if (render_mode == "DEFORMATION")
+		options.input_mesh_sequence.render_mode = Visualizer::DEFORMATION;
+	else if(render_mode == "TARGET")
+		options.input_mesh_sequence.render_mode = Visualizer::TARGET;
+	else if(render_mode == "ALL")
+		options.input_mesh_sequence.render_mode = Visualizer::ALL;
+	else if (render_mode == "DEFORMATION_GRAPH")
+		options.input_mesh_sequence.render_mode = Visualizer::ONLY_DEFORMATION_GRAPH;
 }
 
 void parseRefinement(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
@@ -253,7 +262,10 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("file_name", "Input Meshes File Name (has only effect if 'input' is not given)", cxxopts::value<std::string>()->default_value("meshOfFrame"))
 			("start_index", "Input Meshes Start File Index (has only effect if 'input' is not given)", cxxopts::value<unsigned int>()->default_value("1"))
 			("output_folder_name", "Output Folder Name (has only effect if 'input' is not given)", cxxopts::value<std::string>()->default_value("head"))
-			("image_folder_name", "Image Folder Name", cxxopts::value<std::string>()->default_value("images"));
+			("image_folder_name", "Image Folder Name", cxxopts::value<std::string>()->default_value("images"))
+			("render_mode", 
+			 "Image Render Mode: DEFORMATION (deformation, deformation_graph), ALL (deformation, target, deformation_graph), TARGET (target, deformation_graph), DEFORMATION_GRAPH (deformation_graph)",
+			 cxxopts::value<std::string>()->default_value("DEFORMATION"));
 
 		options.add_options()
 			("disable_error_evaluation", "Disable error evaluation for speedup");

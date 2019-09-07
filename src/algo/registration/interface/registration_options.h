@@ -1,11 +1,10 @@
 #pragma once
 
 #include "algo/registration/deformation_graph/deformation_graph.h"
-#include "algo/registration/rigid_registration/rigid_deformation.h"
 #include "algo/remeshing/mesh_simplification.h"
-#include "mesh/mesh_definition.h"
 #include "registration_type.h"
 #include "util/ceres_include.h"
+#include "visualize/visualizer/i_registration_visualizer.h"
 
 namespace Registration {
 
@@ -80,21 +79,13 @@ struct DeformationGraphOptions
 
 struct Input
 {
-	std::string file_path;
-	std::string file_name;	
-	size_t start_index;
-	std::string output_folder_name;
-	std::string image_folder_name;
-	int number_of_frames_to_load; // to load all frames set to -1
-
-	Input()
-		: file_path("../input_data/HaoLi/head/finalRegistration/")
-		, file_name("meshOfFrame")
-		, start_index(1)
-		, output_folder_name("head")
-		, image_folder_name("images")
-		, number_of_frames_to_load(-1)
-	{}
+	std::string file_path{ "../input_data/HaoLi/head/finalRegistration/" };
+	std::string file_name { "meshOfFrame" };
+	size_t start_index{ 1 };
+	std::string output_folder_name{ "head" };
+	std::string image_folder_name{ "images" };
+	int number_of_frames_to_load{ -1 }; // to load all frames set to -1
+	Visualizer::RegistrationRenderMode render_mode{ Visualizer::RegistrationRenderMode::DEFORMATION };
 };
 
 struct RegistrationOptions
