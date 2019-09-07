@@ -18,11 +18,12 @@ public:
 	RigidDeformation getRigidDeformation() const;
 	RefineDeformationGraphDeformation<NonRigidDeformation> invertDeformation() const;
 public:	
-	RefineDeformationGraphDeformation();
+	RefineDeformationGraphDeformation() = default;
 	RefineDeformationGraphDeformation(HierarchicalMesh mesh);
-	RefineDeformationGraphDeformation(const NonRigidDeformation & non_rigid_deformation);
-	RefineDeformationGraphDeformation(const RefineDeformationGraphDeformation<NonRigidDeformation> & other);
-	RefineDeformationGraphDeformation<NonRigidDeformation> & operator=(const RefineDeformationGraphDeformation<NonRigidDeformation> & other);
+	RefineDeformationGraphDeformation(const RefineDeformationGraphDeformation<NonRigidDeformation> & other) = default;
+	RefineDeformationGraphDeformation<NonRigidDeformation> & operator=(const RefineDeformationGraphDeformation<NonRigidDeformation> & other) = default;
+	RefineDeformationGraphDeformation(RefineDeformationGraphDeformation<NonRigidDeformation> && other) = default;
+	RefineDeformationGraphDeformation<NonRigidDeformation> & operator=(RefineDeformationGraphDeformation<NonRigidDeformation> && other) = default;
 };
 
 template<typename NonRigidDeformation>
@@ -30,7 +31,6 @@ RigidDeformation RefineDeformationGraphDeformation<NonRigidDeformation>::getRigi
 {
 	return non_rigid_deformation.getRigidDeformation();
 }
-
 
 template<typename NonRigidDeformation>
 RefineDeformationGraphDeformation<NonRigidDeformation> RefineDeformationGraphDeformation<NonRigidDeformation>::invertDeformation() const
@@ -41,31 +41,8 @@ RefineDeformationGraphDeformation<NonRigidDeformation> RefineDeformationGraphDef
 }
 
 template<typename NonRigidDeformation>
-RefineDeformationGraphDeformation<NonRigidDeformation>::RefineDeformationGraphDeformation()
-{}
-
-template<typename NonRigidDeformation>
 RefineDeformationGraphDeformation<NonRigidDeformation>::RefineDeformationGraphDeformation(HierarchicalMesh mesh)
 	: hierarchical_mesh(std::move(mesh))
 {}
-
-template<typename NonRigidDeformation>
-RefineDeformationGraphDeformation<NonRigidDeformation>::RefineDeformationGraphDeformation(const NonRigidDeformation & non_rigid_deformation)
-	: non_rigid_deformation(non_rigid_deformation)
-{}
-
-template<typename NonRigidDeformation>
-RefineDeformationGraphDeformation<NonRigidDeformation>::RefineDeformationGraphDeformation(const RefineDeformationGraphDeformation<NonRigidDeformation> & other)
-	: non_rigid_deformation(other.non_rigid_deformation)
-{}
-
-template<typename NonRigidDeformation>
-RefineDeformationGraphDeformation<NonRigidDeformation> & RefineDeformationGraphDeformation<NonRigidDeformation>::operator=(const RefineDeformationGraphDeformation<NonRigidDeformation> & other)
-{
-	if (&other == this)
-		return *this;
-	non_rigid_deformation = other.non_rigid_deformation;
-	return *this;
-}
 
 }

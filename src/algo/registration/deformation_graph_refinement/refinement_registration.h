@@ -23,6 +23,7 @@ private:
 	Deformation _deformation;
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
 	RegistrationOptions _options;
+	std::shared_ptr<FileWriter> _logger;
 	bool _is_refined;
 	int _number_of_refinements;
 	unsigned int _current_iteration;
@@ -112,6 +113,10 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 			refined_vertices_edges = refineHierarchicalMeshAtVertices(_deformation, _options.refinement.smooth_cost_threshold);
 		else
 			refined_vertices_edges = refineHierarchicalMeshAtEdges(_deformation, _options.refinement.smooth_cost_threshold);
+		
+		if (_logger)
+			_logger->write("Number of new vertices: " + std::to_string(refined_vertices_edges));
+		
 		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
 		_number_of_refinements++;
 		if(refined_vertices_edges == 0 || _number_of_refinements > 20)
@@ -176,6 +181,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 	, _number_of_refinements(0)
 	, _current_iteration(0)
 	, _options(options)
+	, _logger(logger)
 {
 	auto hierarchical_mesh = generateHierarchicalMesh(source, options.refinement.min_edge_length, options.refinement.levels);
 	auto global = createGlobalDeformation<typename NonRigidRegistration::PositionDeformation>(source);
@@ -197,6 +203,7 @@ RefineDeformationGraphRegistration<NonRigidRegistration>::RefineDeformationGraph
 	, _current_iteration(0)
 	, _deformation(deformation)
 	, _options(options)
+	, _logger(logger)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, _deformation.non_rigid_deformation, options, logger);
 };
