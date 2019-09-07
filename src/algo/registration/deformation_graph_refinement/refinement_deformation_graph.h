@@ -51,7 +51,8 @@ size_t refineHierarchicalMeshAtEdges(RefineDeformationGraphDeformation<Deformati
 																			  deformation.non_rigid_deformation._global, 
 																			  deformation.non_rigid_deformation.getNumberOfInterpolationNeighbors());
 
-	return edges.size();
+	std::cout << std::endl << "Number of new vertices: " << new_vertices.size() << std::endl;
+	return new_vertices.size();
 }
 
 template <typename PositionDeformation>
@@ -72,7 +73,9 @@ size_t refineHierarchicalMeshAtVertices(RefineDeformationGraphDeformation<Deform
 	deformation.non_rigid_deformation = DeformationGraph<PositionDeformation>(refined_mesh,
 																			  deformation.non_rigid_deformation._global,
 																			  deformation.non_rigid_deformation.getNumberOfInterpolationNeighbors());
-	return vertices.size();
+
+	std::cout << std::endl << "Number of new vertices: " << new_vertices.size() << std::endl;
+	return new_vertices.size();
 }
 	
 }
