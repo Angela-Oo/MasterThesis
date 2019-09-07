@@ -138,7 +138,10 @@ void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_defor
 
 bool AsRigidAsPossible::shouldBeSavedAsImage()
 {
-	return finished();
+	if (_options.adaptive_rigidity.enable && _options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::RIGIDITY_COST)
+		return true;
+	else
+		return finished();
 }
 
 std::vector<vertex_descriptor> AsRigidAsPossible::subsetOfVerticesToFit()
