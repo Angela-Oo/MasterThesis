@@ -199,7 +199,7 @@ void parseRefinement(Registration::RegistrationOptions& registration_options, cx
 			registration_options.refinement.refine = Registration::RefinementOptions::Refinement::EDGE;
 		else
 			registration_options.refinement.refine = Registration::RefinementOptions::Refinement::VERTEX;
-		registration_options.refinement.smooth_cost_threshold = result["refinment_smooth_cost_threshold"].as<double>();
+		registration_options.refinement.smooth_cost_threshold = result["smooth_cost_threshold"].as<double>();
 	}
 }
 
@@ -216,7 +216,7 @@ void parseReduceRigidity(Registration::RegistrationOptions& registration_options
 {
 	if (result["reduce_rigidity"].as<bool>()) {
 		registration_options.reduce_rigidity.enable = true;
-		registration_options.reduce_rigidity.smooth_cost_threshold = result["smooth_cost_threshold"].as<double>();
+		registration_options.reduce_rigidity.rigidity_cost_threshold = result["rigidity_cost_threshold"].as<double>();
 		registration_options.reduce_rigidity.minimal_rigidity = result["minimal_rigidity"].as<double>();
 	}
 }
@@ -285,13 +285,13 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 
 		options.add_options()
 			("reduce_rigidity", "Reduce Rigidity")
-			("smooth_cost_threshold", "If smooth cost is bigger than threshold -> reduce rigidity", cxxopts::value<double>()->default_value("0.01"))
+			("rigidity_cost_threshold", "If smooth cost is bigger than threshold -> reduce rigidity", cxxopts::value<double>()->default_value("0.01"))
 			("minimal_rigidity", "Minimal rigidity value", cxxopts::value<double>()->default_value("0.1"));
 
 		options.add_options()
 			("r,refine_deformation_graph", "Deformation Graph Refinement")
 			("refine_at_edge", "Refine Deformation Graph At Edge (default is Vertex)")
-			("refinment_smooth_cost_threshold", "Refine Deformation Graph if smooth cost of at edge or vertex is bigger than threshold", cxxopts::value<double>()->default_value("0.05"));
+			("smooth_cost_threshold", "Refine Deformation Graph if smooth cost of at edge or vertex is bigger than threshold", cxxopts::value<double>()->default_value("0.05"));
 
 		options.add_options()
 			("max_iterations", "Max Iterations", cxxopts::value<unsigned int>()->default_value("25"))

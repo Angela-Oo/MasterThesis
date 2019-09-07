@@ -108,7 +108,7 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 	else if(_is_refined == false) {
 		auto deformation = _non_rigid_registration->getDeformation();
 		auto number_adapted_edges = adaptRigidity(deformation, 
-												  _options.reduce_rigidity.smooth_cost_threshold,
+												  _options.reduce_rigidity.rigidity_cost_threshold,
 												  _options.reduce_rigidity.minimal_rigidity);
 		_non_rigid_registration->setDeformation(deformation);
 		_number_of_refinements++;

@@ -138,9 +138,7 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 
 
 struct AdaptableRigidityWeightCostFunction {
-
-	AdaptableRigidityWeightCostFunction()
-	{ }
+	AdaptableRigidityWeightCostFunction() = default;
 
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create() {

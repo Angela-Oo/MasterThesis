@@ -18,7 +18,7 @@ struct AdaptiveRigidityOptions
 struct ReduceRigidityOptions
 {
 	bool enable{ false };
-	double smooth_cost_threshold{ 0.01 };
+	double rigidity_cost_threshold{ 0.01 };
 	double minimal_rigidity{ 0.1 };
 };
 
