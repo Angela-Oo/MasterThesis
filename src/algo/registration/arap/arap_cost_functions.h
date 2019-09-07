@@ -129,24 +129,7 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 		substract(vj_t, vi_t, transformed_edge);
 
 		substract(rotated_edge, transformed_edge, residuals);
-		//T min{ 0.0001 };
-		//T weight = w[0] * T{ 10. };
-		////weight = ceres::sqrt(weight);
-		//if (weight <= min) {
-		//	residuals[0] = T{0.};
-		//	residuals[1] = T{0.};
-		//	residuals[2] = T{0.};
-		//	//scalar_multiply(residuals, min, residuals);
-		//}			
-		//else
-		//	scalar_multiply(residuals, weight, residuals);
-
-		//T min{ 0.0001 };
-		//T weight = w[0] * 100.;
-		//if(weight < min)
-		//	scalar_multiply(residuals, min, residuals);
-		//else
-		//	scalar_multiply(residuals, weight, residuals);
+		
 		scalar_multiply(residuals, w[0], residuals);
 		return true;
 	}
@@ -172,14 +155,6 @@ struct AdaptableRigidityWeightCostFunction {
 		else {
 			residuals[0] = ceres::pow((T{ 1. } -(weight[0] / max)), T{ 3 });
 		}
-
-		//T max{ 1. };
-		//T zero{ 0. };
-		//T scale{ -10. };
-		//if (weight[0] > max)
-		//	residuals[0] = zero;
-		//else
-		//	residuals[0] = exp(scale * weight[0]);
 		return true;
 	}
 };
