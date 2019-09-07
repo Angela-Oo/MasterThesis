@@ -69,7 +69,6 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCost(ceres::Proble
 
 	if (!mesh.property_map<edge_descriptor, double>("e:rigidity").second)
 	{
-		//mesh.add_property_map<edge_descriptor, double>("e:rigidity", 5.);
 		mesh.add_property_map<edge_descriptor, double>("e:rigidity", 1.);
 	}
 	auto & edge_rigidity = mesh.property_map<edge_descriptor, double>("e:rigidity");

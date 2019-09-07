@@ -141,13 +141,13 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 		//else
 		//	scalar_multiply(residuals, weight, residuals);
 
-		T min{ 0.0001 };
-		T weight = w[0] * 100.;
-		if(weight < min)
-			scalar_multiply(residuals, min, residuals);
-		else
-			scalar_multiply(residuals, weight, residuals);
-		//scalar_multiply(residuals, w[0], residuals);
+		//T min{ 0.0001 };
+		//T weight = w[0] * 100.;
+		//if(weight < min)
+		//	scalar_multiply(residuals, min, residuals);
+		//else
+		//	scalar_multiply(residuals, weight, residuals);
+		scalar_multiply(residuals, w[0], residuals);
 		return true;
 	}
 };
@@ -166,16 +166,20 @@ struct AdaptableRigidityWeightCostFunction {
 
 	template <typename T>
 	bool operator()(const T* const weight, T* residuals) const {
-
 		T max{ 10. };
 		if (weight[0] > max)
 			residuals[0] = T{ 0 };
 		else {
-			//residuals[0] = max - (weight[0] * weight[0]);
-			//residuals[0] = ceres::pow((max - weight[0]), 2);
 			residuals[0] = ceres::pow((T{ 1. } -(weight[0] / max)), T{ 3 });
-			//residuals[0] = ceres::exp(scale * weight[0]);
 		}
+
+		//T max{ 1. };
+		//T zero{ 0. };
+		//T scale{ -10. };
+		//if (weight[0] > max)
+		//	residuals[0] = zero;
+		//else
+		//	residuals[0] = exp(scale * weight[0]);
 		return true;
 	}
 };
