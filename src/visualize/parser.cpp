@@ -94,7 +94,6 @@ void parseType(cxxopts::ParseResult &result, Registration::RegistrationOptions &
 		registration_options.deformation_graph.edge_length = result["e"].as<double>();
 	}
 }
-
 void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions &options)
 {
 	if (result.count("i"))
@@ -175,10 +174,58 @@ void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions 
 	{
 		options.input_mesh_sequence.number_of_frames_to_load = result["n"].as<int>();
 	}
+	
+	options.input_mesh_sequence.image_folder_name = result["image_folder_name"].as<std::string>();
+}
+
+void parseRefinement(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
+{
+	if (result.count("r"))
+	{
+		registration_options.refinement.enable = result["r"].as<bool>();
+		if(result["refine_at_edge"].as<bool>())
+			registration_options.refinement.refine = Registration::RefinementOptions::Refinement::EDGE;
+		else
+			registration_options.refinement.refine = Registration::RefinementOptions::Refinement::VERTEX;
+		registration_options.refinement.smooth_cost_threshold = result["refinment_smooth_cost_threshold"].as<double>();
+	}
 }
 
 }
 
+
+void parseAdaptiveRigidity(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
+{
+	if (result.count("a"))
+	{
+		if (result["a"].as<std::string>() == "REDUCE_RIGIDITY") {
+			registration_options.adaptive_rigidity.enable = true;
+			registration_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::REDUCE_RIGIDITY;
+			registration_options.adaptive_rigidity.smooth_cost_threshold = result["reduce_rigidity_smooth_cost_threshold"].as<double>();
+			registration_options.adaptive_rigidity.minimal_rigidity = result["reduce_rigidity_minimal_rigidity"].as<double>();
+
+		}
+		else if (result["a"].as<std::string>() == "RIGIDITY_COST") {
+			registration_options.adaptive_rigidity.enable = true;
+			registration_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::RIGIDITY_COST;
+		}
+		else
+			std::cout << "a passed but no walid parameter given" << std::endl;
+	}
+}
+
+void parseOptions(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
+{
+	registration_options.max_iterations = result["max_iterations"].as<unsigned int>();
+	registration_options.use_vertex_random_probability = result["p"].as<double>();
+	registration_options.smooth = result["smooth"].as<double>();
+	registration_options.fit = result["fit"].as<double>();
+	registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
+
+	if (result["disable_error_evaluation"].as<bool>()) {
+		registration_options.error_evaluation = false;
+	}
+}
 
 Registration::RegistrationOptions parse(int argc, char* argv[])
 {
@@ -205,7 +252,8 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("file_path", "Input Meshes File Path (has only effect if 'input' is not given)", cxxopts::value<std::string>()->default_value("../input_data/HaoLi/head/finalRegistration/"))
 			("file_name", "Input Meshes File Name (has only effect if 'input' is not given)", cxxopts::value<std::string>()->default_value("meshOfFrame"))
 			("start_index", "Input Meshes Start File Index (has only effect if 'input' is not given)", cxxopts::value<unsigned int>()->default_value("1"))
-			("output_folder_name", "Output Folder Name (has only effect if 'input' is not given)", cxxopts::value<std::string>()->default_value("head"));
+			("output_folder_name", "Output Folder Name (has only effect if 'input' is not given)", cxxopts::value<std::string>()->default_value("head"))
+			("image_folder_name", "Image Folder Name", cxxopts::value<std::string>()->default_value("images"));
 
 		options.add_options()
 			("disable_error_evaluation", "Disable error evaluation for speedup");
@@ -246,46 +294,15 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		parseSequence(result, registration_options);
 		parseInput(result, registration_options);
 
-
 		if (result.count("rigid_and_non_rigid"))
 		{
 			registration_options.rigid_and_non_rigid_registration = result["rigid_and_non_rigid"].as<bool>();
 		}
-		if (result.count("r"))
-		{
-			registration_options.refinement.enable = result["r"].as<bool>();
-			if(result["refine_at_edge"].as<bool>())
-				registration_options.refinement.refine = RefinementOptions::Refinement::EDGE;
-			else
-				registration_options.refinement.refine = RefinementOptions::Refinement::VERTEX;
-			registration_options.refinement.smooth_cost_threshold = result["refinment_smooth_cost_threshold"].as<double>();
-		}
-		if (result.count("a"))
-		{
-			if (result["a"].as<std::string>() == "REDUCE_RIGIDITY") {
-				registration_options.adaptive_rigidity.enable = true;
-				registration_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::REDUCE_RIGIDITY;
-				registration_options.adaptive_rigidity.smooth_cost_threshold = result["reduce_rigidity_smooth_cost_threshold"].as<double>();
-				registration_options.adaptive_rigidity.minimal_rigidity = result["reduce_rigidity_minimal_rigidity"].as<double>();
+		
+		parseRefinement(registration_options, result);
+		parseAdaptiveRigidity(registration_options, result);
 
-			}
-			else if (result["a"].as<std::string>() == "RIGIDITY_COST") {
-				registration_options.adaptive_rigidity.enable = true;
-				registration_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::RIGIDITY_COST;
-			}
-			else
-				std::cout << "a passed but no walid parameter given" << std::endl;
-		}
-
-		registration_options.max_iterations = result["max_iterations"].as<unsigned int>();
-		registration_options.use_vertex_random_probability = result["p"].as<double>();
-		registration_options.smooth = result["smooth"].as<double>();
-		registration_options.fit = result["fit"].as<double>();
-		registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
-
-		if (result["disable_error_evaluation"].as<bool>()) {
-			registration_options.error_evaluation = false;
-		}
+		parseOptions(registration_options, result);
 
 		std::cout << "Arguments remain = " << argc << std::endl;
 

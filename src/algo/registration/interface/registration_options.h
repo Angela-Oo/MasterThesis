@@ -84,6 +84,7 @@ struct Input
 	std::string file_name;	
 	size_t start_index;
 	std::string output_folder_name;
+	std::string image_folder_name;
 	int number_of_frames_to_load; // to load all frames set to -1
 
 	Input()
@@ -91,6 +92,7 @@ struct Input
 		, file_name("meshOfFrame")
 		, start_index(1)
 		, output_folder_name("head")
+		, image_folder_name("images")
 		, number_of_frames_to_load(-1)
 	{}
 };

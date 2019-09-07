@@ -49,5 +49,5 @@ std::string imageFolderName(Registration::RegistrationOptions options)
 	std::stringstream ss;
 	ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d_%H-%M");
 
-	return "images/" + options.input_mesh_sequence.output_folder_name + "/" + folder_name + ss.str();
+	return options.input_mesh_sequence.image_folder_name + "/" + options.input_mesh_sequence.output_folder_name + "/" + folder_name + ss.str();
 }
