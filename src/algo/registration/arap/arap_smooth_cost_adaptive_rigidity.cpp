@@ -67,7 +67,12 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCost(ceres::Proble
 	_rigidity_residual_ids.clear();
 	auto & mesh = deformation_graph._mesh;
 
-	auto & edge_rigidity = mesh.add_property_map<edge_descriptor, double>("e:rigidity", 1.);
+	if (mesh.property_map<edge_descriptor, double>("e:rigidity").second)
+	{
+		//mesh.add_property_map<edge_descriptor, double>("e:rigidity", 5.);
+		mesh.add_property_map<edge_descriptor, double>("e:rigidity", 1.);
+	}
+	auto & edge_rigidity = mesh.property_map<edge_descriptor, double>("e:rigidity");
 	//if (!edge_rigidity.second) {
 		//throw std::exception("property map e:rigidity does not exist");
 	//}
@@ -85,6 +90,9 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCost(ceres::Proble
 AsRigidAsPossibleSmoothCostAdaptiveRigidity::AsRigidAsPossibleSmoothCostAdaptiveRigidity(double smooth_factor, double rigidity_factor)
 	: _smooth_factor(smooth_factor)
 	, _rigidity_factor(rigidity_factor)
-{}
+{
+	std::cout << std::endl << " smooth factor " << _smooth_factor
+		<< ", rigidity factor " << _rigidity_factor << std::endl;
+}
 
 }
