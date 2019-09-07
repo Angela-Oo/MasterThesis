@@ -30,7 +30,7 @@ std::shared_ptr<IRegistrationVisualizer> createRegistrationVisualizer(std::share
 		auto registration = Registration::createRegistration(options, logger, source, target);
 
 		auto edge_coloring = Visualize::EdgeColor::SmoothCost;
-		if (options.adaptive_rigidity.enable)
+		if (options.adaptive_rigidity.enable || options.reduce_rigidity.enable || options.reduce_rigidity.enable)
 			edge_coloring = Visualize::EdgeColor::RigidityValue;
 		return std::make_shared<RegistrationVisualizer>(std::move(registration), renderer, save_images_folder, logger, edge_coloring);
 	}
