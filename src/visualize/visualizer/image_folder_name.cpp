@@ -33,10 +33,12 @@ std::string imageFolderName(Registration::RegistrationOptions options)
 
 	if (options.adaptive_rigidity.enable) 
 	{
-		if (options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY)
-			folder_name += "ReduceRigidity_";
-		else if(options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::RIGIDITY_COST)
-			folder_name += "RigidityCost_";
+		folder_name += "AdaptiveRigidity_";
+	}
+	
+	if (options.reduce_rigidity.enable) 
+	{
+		folder_name += "ReduceRigidity_";
 	}
 
 	if (options.refinement.enable)

@@ -16,7 +16,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	if (options.sequence_options.enable) {
 		ss << "Sequence registration: "
 		<< " init rigid with non rigid deformation: " << std::boolalpha << options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation
-		<< ", use previous frame for rigid registration: " << std::boolalpha << options.sequence_options.use_previouse_frame_for_rigid_registration << std::endl;
+		<< ", use previous frame for rigid registration: " << std::boolalpha << options.sequence_options.use_previous_frame_for_rigid_registration << std::endl;
 	}
 
 	ss << "Registration Type: ";
@@ -47,14 +47,15 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 			<< ", levels " << options.refinement.levels
 			<< ", min edge length " << options.refinement.min_edge_length << std::endl;
 	}
-
-	if (options.adaptive_rigidity.enable)
-	{
-		if (options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY)
-			ss << "Adaptive Rigidity by reducing" << std::endl;
-		else
-			ss << "Adaptive Rigidity by cost function" << std::endl;
+	if (options.adaptive_rigidity.enable) {
+		ss << "Adaptive Rigidity by cost function" << std::endl;
 	}
+
+	if (options.reduce_rigidity.enable)
+	{
+		ss << "Adaptive Rigidity by reducing" << std::endl;
+	}
+	
 	ss << std::endl;
 	ss << "Max iterations: " << options.max_iterations << std::endl;
 	ss << "Random probability to use a vertex: " << options.use_vertex_random_probability << std::endl;

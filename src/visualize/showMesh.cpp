@@ -283,8 +283,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		// adaptive rigidity cost function
 		_options.adaptive_rigidity.enable = true;
-		//_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::RIGIDITY_COST;
-		_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::REDUCE_RIGIDITY;
+		//_options.reduce_rigidity.enable = true;
 		_options.deformation_graph.edge_length = 0.3;
 		//_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
 		_options.use_vertex_random_probability = 0.1;

@@ -22,7 +22,7 @@ private:
 	std::vector<SurfaceMesh> _deformed_meshes;	
 	size_t _current;	
 	bool _finished;
-	bool _use_previouse_frame_for_rigid_registration;
+	bool _use_previous_frame_for_rigid_registration;
 	std::unique_ptr<CeresLogger> _ceres_logger;
 private:
 	RegistrationOptions _options;
@@ -103,7 +103,7 @@ void SequenceRegistration<RegistrationType>::nextFrame()
 	auto & source = _mesh_sequence->getMesh(0);
 	auto & target = _mesh_sequence->getMesh(_current);
 
-	if (_use_previouse_frame_for_rigid_registration) {
+	if (_use_previous_frame_for_rigid_registration) {
 		auto & prev_mesh = _mesh_sequence->getMesh(_current - 1);
 		_registration = std::make_unique<RegistrationType>(source, target, prev_mesh, _deformation[_current - 1], _options, _logger);
 	}
@@ -165,7 +165,7 @@ SequenceRegistration<RegistrationType>::SequenceRegistration(std::shared_ptr<IMe
 	, _ceres_logger(std::make_unique<CeresLogger>(logger))
 	, _current(1)
 	, _finished(false)
-	, _use_previouse_frame_for_rigid_registration(options.sequence_options.use_previouse_frame_for_rigid_registration)
+	, _use_previous_frame_for_rigid_registration(options.sequence_options.use_previous_frame_for_rigid_registration)
 {
 	_deformation.resize(_mesh_sequence->size());
 	_deformed_meshes.resize(_mesh_sequence->size());

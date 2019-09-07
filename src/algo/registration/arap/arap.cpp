@@ -138,7 +138,7 @@ void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_defor
 
 bool AsRigidAsPossible::shouldBeSavedAsImage()
 {
-	if (_options.adaptive_rigidity.enable && _options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::RIGIDITY_COST)
+	if (_options.adaptive_rigidity.enable)
 		return true;
 	else
 		return finished();
@@ -172,8 +172,8 @@ void AsRigidAsPossible::init()
 {
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
-	if(_options.adaptive_rigidity.enable && _options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::RIGIDITY_COST)
-		_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(1., 0.005);
+	if(_options.adaptive_rigidity.enable)
+		_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient);
 	else {
 		_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>(_options.smooth);
 	}

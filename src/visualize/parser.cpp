@@ -72,8 +72,8 @@ void parseSequence(cxxopts::ParseResult &result, Registration::RegistrationOptio
 		registration_options.sequence_options.enable = true;
 		if (result.count("init_rigid_deformation_with_non_rigid_globale_deformation"))
 			registration_options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation = result["init_rigid_with_non_rigid_deformation"].as<bool>();
-		if (result.count("use_previouse_frame"))
-			registration_options.sequence_options.use_previouse_frame_for_rigid_registration = result["use_previouse_frame"].as<bool>();
+		if (result.count("use_previous_frame"))
+			registration_options.sequence_options.use_previous_frame_for_rigid_registration = result["use_previouse_frame"].as<bool>();
 	}
 }
 
@@ -93,6 +93,7 @@ void parseType(cxxopts::ParseResult &result, Registration::RegistrationOptions &
 		registration_options.deformation_graph.edge_length = result["e"].as<double>();
 	}
 }
+	
 void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions &options)
 {
 	if (result.count("i"))
@@ -200,26 +201,21 @@ void parseRefinement(Registration::RegistrationOptions& registration_options, cx
 	}
 }
 
-}
-
 
 void parseAdaptiveRigidity(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
 {
-	if (result.count("a"))
-	{
-		if (result["a"].as<std::string>() == "REDUCE_RIGIDITY") {
-			registration_options.adaptive_rigidity.enable = true;
-			registration_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::REDUCE_RIGIDITY;
-			registration_options.adaptive_rigidity.smooth_cost_threshold = result["reduce_rigidity_smooth_cost_threshold"].as<double>();
-			registration_options.adaptive_rigidity.minimal_rigidity = result["reduce_rigidity_minimal_rigidity"].as<double>();
+	if (result["adaptive_rigidity"].as<bool>()) {
+		registration_options.adaptive_rigidity.enable = true;
+		registration_options.adaptive_rigidity.rigidity_cost_coefficient = result["rigidity_cost_coefficient"].as<double>();
+	}
+}
 
-		}
-		else if (result["a"].as<std::string>() == "RIGIDITY_COST") {
-			registration_options.adaptive_rigidity.enable = true;
-			registration_options.adaptive_rigidity.adaptive_rigidity = Registration::AdaptiveRigidity::RIGIDITY_COST;
-		}
-		else
-			std::cout << "a passed but no walid parameter given" << std::endl;
+void parseReduceRigidity(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
+{
+	if (result["reduce_rigidity"].as<bool>()) {
+		registration_options.reduce_rigidity.enable = true;
+		registration_options.reduce_rigidity.smooth_cost_threshold = result["smooth_cost_threshold"].as<double>();
+		registration_options.reduce_rigidity.minimal_rigidity = result["minimal_rigidity"].as<double>();
 	}
 }
 
@@ -235,6 +231,9 @@ void parseOptions(Registration::RegistrationOptions& registration_options, cxxop
 		registration_options.error_evaluation = false;
 	}
 }
+}
+
+
 
 Registration::RegistrationOptions parse(int argc, char* argv[])
 {
@@ -274,13 +273,19 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			.add_options()
 			("s,sequence", "Sequence Registration")
 			("init_rigid_with_non_rigid_deformation", "Init Rigid Deformation With Non Rigid Global Deformation (has only effect if 'sequence')", cxxopts::value<bool>()->default_value("true"))
-			("use_previouse_frame", "Use Previouse Frame for Rigid Registration (has only effect if 'sequence')", cxxopts::value<bool>()->default_value("true"));
+			("use_previous_frame", "Use Previous Frame for Rigid Registration (has only effect if 'sequence')", cxxopts::value<bool>()->default_value("true"));
 
 		options.add_options()
-			("rigid_and_non_rigid", "Rigid before Non-Rigid Refinement (default true)", cxxopts::value<bool>()->default_value("true"))
-			("a,adaptive_rigidity", "Adaptive Rigidity: REDUCE_RIGIDITY, RIGIDITY_COST", cxxopts::value<std::string>())
-			("reduce_rigidity_smooth_cost_threshold", "If smooth cost is bigger than threshold -> reduce rigidity", cxxopts::value<double>()->default_value("0.01"))
-			("reduce_rigidity_minimal_rigidity", "Minimal rigidity value", cxxopts::value<double>()->default_value("0.1"));
+			("rigid_and_non_rigid", "Rigid before Non-Rigid Refinement (default true)", cxxopts::value<bool>()->default_value("true"));
+
+		options.add_options()
+			("adaptive_rigidity", "Adaptive Rigidity")
+			("rigidity_cost_coefficient", "Adaptive Rigidity cost coefficient", cxxopts::value<double>()->default_value("0.005"));			
+
+		options.add_options()
+			("reduce_rigidity", "Reduce Rigidity")
+			("smooth_cost_threshold", "If smooth cost is bigger than threshold -> reduce rigidity", cxxopts::value<double>()->default_value("0.01"))
+			("minimal_rigidity", "Minimal rigidity value", cxxopts::value<double>()->default_value("0.1"));
 
 		options.add_options()
 			("r,refine_deformation_graph", "Deformation Graph Refinement")
@@ -313,6 +318,7 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		
 		parseRefinement(registration_options, result);
 		parseAdaptiveRigidity(registration_options, result);
+		parseReduceRigidity(registration_options, result);
 
 		parseOptions(registration_options, result);
 

@@ -40,7 +40,7 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationOp
 			if (options.refinement.enable) {
 				return std::make_unique<SequenceRegistration<RefineARAPRegistration>>(mesh_sequence, options, logger);
 			}
-			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY) {
+			else if (options.reduce_rigidity.enable) {
 				return std::make_unique<SequenceRegistration<AdaptiveARAPRegistration>>(mesh_sequence, options, logger);
 			}
 			else {
@@ -51,7 +51,7 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationOp
 			if (options.refinement.enable) {
 				return std::make_unique<SequenceRegistration<RefineARAPNonRigidRegistration>>(mesh_sequence, options, logger);
 			}
-			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY) {
+			else if (options.reduce_rigidity.enable) {
 				return std::make_unique<SequenceRegistration<AdaptiveARAPNonRigidRegistration>>(mesh_sequence, options, logger);
 			}
 			else {
@@ -64,7 +64,7 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationOp
 			if (options.refinement.enable) {
 				return std::make_unique<SequenceRegistration<RefineEDRegistration>>(mesh_sequence, options, logger);
 			}
-			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY) {
+			else if (options.reduce_rigidity.enable) {
 				return std::make_unique<SequenceRegistration<AdaptiveEDRegistration>>(mesh_sequence, options, logger);
 			}
 			else {
@@ -75,7 +75,7 @@ std::unique_ptr<ISequenceRegistration> createSequenceRegistration(RegistrationOp
 			if (options.refinement.enable) {
 				return std::make_unique<SequenceRegistration<RefineEDNonRigidRegistration>>(mesh_sequence, options, logger);
 			}
-			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY) {
+			else if (options.reduce_rigidity.enable) {
 				return std::make_unique<SequenceRegistration<AdaptiveEDNonRigidRegistration>>(mesh_sequence, options, logger);
 			}
 			else {
@@ -105,7 +105,7 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationOptions & options,
 			if (options.refinement.enable) {
 				return std::make_unique<RefineARAPRegistration>(source, target, options, logger);
 			}
-			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY) {
+			else if (options.reduce_rigidity.enable) {
 				return std::make_unique<AdaptiveARAPRegistration>(source, target, options, logger);
 			}
 			else {
@@ -116,7 +116,7 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationOptions & options,
 			if (options.refinement.enable) {
 				return std::make_unique<RefineARAPNonRigidRegistration>(source, target, options, logger);
 			}
-			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY) {
+			else if (options.reduce_rigidity.enable) {
 				return std::make_unique<AdaptiveARAPNonRigidRegistration>(source, target, options, logger);
 			}
 			else {
@@ -129,7 +129,7 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationOptions & options,
 			if (options.refinement.enable) {
 				return std::make_unique<RefineEDRegistration>(source, target, options, logger);
 			}
-			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY) {
+			else if (options.reduce_rigidity.enable) {
 				return std::make_unique<AdaptiveEDRegistration>(source, target, options, logger);
 			}
 			else {
@@ -140,7 +140,7 @@ std::unique_ptr<IRegistration> createRegistration(RegistrationOptions & options,
 			if (options.refinement.enable) {
 				return std::make_unique<RefineEDNonRigidRegistration>(source, target, options, logger);
 			}
-			else if (options.adaptive_rigidity.enable && options.adaptive_rigidity.adaptive_rigidity == AdaptiveRigidity::REDUCE_RIGIDITY) {
+			else if (options.reduce_rigidity.enable) {
 				return std::make_unique<AdaptiveEDNonRigidRegistration>(source, target, options, logger);
 			}
 			else {

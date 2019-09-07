@@ -8,16 +8,16 @@
 
 namespace Registration {
 
-enum class AdaptiveRigidity
-{
-	REDUCE_RIGIDITY,
-	RIGIDITY_COST
-};
 
 struct AdaptiveRigidityOptions
 {
 	bool enable{ false };
-	AdaptiveRigidity adaptive_rigidity{ AdaptiveRigidity::RIGIDITY_COST };
+	double rigidity_cost_coefficient{ 0.005 };
+};
+
+struct ReduceRigidityOptions
+{
+	bool enable{ false };
 	double smooth_cost_threshold{ 0.01 };
 	double minimal_rigidity{ 0.1 };
 };
@@ -44,12 +44,12 @@ struct SequenceRegistrationOptions
 	bool enable;
 	// if true init rigid deformation with non rigid global deformation else init rigid deformation with previouse rigid deformation
 	bool init_rigid_deformation_with_non_rigid_globale_deformation;
-	bool use_previouse_frame_for_rigid_registration;
+	bool use_previous_frame_for_rigid_registration;
 
 	SequenceRegistrationOptions()
 		: enable(false)
 		, init_rigid_deformation_with_non_rigid_globale_deformation(true)
-		, use_previouse_frame_for_rigid_registration(true)
+		, use_previous_frame_for_rigid_registration(true)
 	{}
 };
 
@@ -68,13 +68,8 @@ struct ICPOptions
 
 struct DeformationGraphOptions
 {
-	double edge_length;
-	unsigned int number_of_interpolation_neighbors;
-
-	DeformationGraphOptions()
-		: edge_length(0.3)
-		, number_of_interpolation_neighbors(4)
-	{}
+	double edge_length {0.3};
+	unsigned int number_of_interpolation_neighbors{4};
 };
 
 struct Input
@@ -91,35 +86,26 @@ struct Input
 struct RegistrationOptions
 {
 	Input input_mesh_sequence;
-	RegistrationType type;
+	
+	RegistrationType type{ RegistrationType::ARAP };
 	DeformationGraphOptions deformation_graph;
 	ceres::Solver::Options ceres_options;
-	double smooth;
-	double fit;
-	unsigned int max_iterations;
-	double use_vertex_random_probability; // value between 0. and 1.
-	bool ignore_border_vertices;
-	bool evaluate_residuals;
-	bool error_evaluation;
-	ReduceMeshStrategy mesh_reduce_strategy;
-
-	bool rigid_and_non_rigid_registration;
+	
+	double smooth { 1. };
+	double fit { 1. };
+	unsigned int max_iterations{ 25 };
+	double use_vertex_random_probability{ 0.2 }; // value between 0. and 1.
+	bool ignore_border_vertices{ true };
+	bool evaluate_residuals{ true };
+	bool error_evaluation{ true };
+	ReduceMeshStrategy mesh_reduce_strategy{ ReduceMeshStrategy::ISOTROPIC };
+	bool rigid_and_non_rigid_registration{ true };
+	
 	SequenceRegistrationOptions sequence_options;
 	RefinementOptions refinement;
 	AdaptiveRigidityOptions adaptive_rigidity;
+	ReduceRigidityOptions reduce_rigidity;
 	ICPOptions icp;
-
-	RegistrationOptions()
-		: type(RegistrationType::ARAP)
-		, smooth(10.)
-		, fit(10.)
-		, max_iterations(25)
-		, ignore_border_vertices(true)
-		, evaluate_residuals(true)
-		, error_evaluation(true)
-		, use_vertex_random_probability(0.5)
-		, mesh_reduce_strategy(ReduceMeshStrategy::ISOTROPIC)
-	{}
 };
 
 
