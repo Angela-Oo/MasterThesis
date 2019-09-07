@@ -27,7 +27,7 @@ void AppRegistration::render(ml::Cameraf& camera)
 
 	if (_registration_visualizer) {
 		_registration_visualizer->saveImage();
-		if(_registration_visualizer->finished())
+		if(_registration_visualizer->finished() && _options.input_mesh_sequence.term)
 		{
 			term();
 		}

@@ -186,6 +186,8 @@ void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions 
 		options.input_mesh_sequence.render_mode = Visualizer::ALL;
 	else if (render_mode == "DEFORMATION_GRAPH")
 		options.input_mesh_sequence.render_mode = Visualizer::ONLY_DEFORMATION_GRAPH;
+
+	options.input_mesh_sequence.term = result["term"].as<bool>();
 }
 
 void parseRefinement(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
@@ -227,9 +229,7 @@ void parseOptions(Registration::RegistrationOptions& registration_options, cxxop
 	registration_options.fit = result["fit"].as<double>();
 	registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
 
-	if (result["disable_error_evaluation"].as<bool>()) {
-		registration_options.error_evaluation = false;
-	}
+	registration_options.error_evaluation = result["error_evaluation"].as<bool>();
 }
 }
 
@@ -264,10 +264,11 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("image_folder_name", "Image Folder Name", cxxopts::value<std::string>()->default_value("images"))
 			("render_mode", 
 			 "Image Render Mode: DEFORMATION (deformation, deformation_graph), ALL (deformation, target, deformation_graph), TARGET (target, deformation_graph), DEFORMATION_GRAPH (deformation_graph)",
-			 cxxopts::value<std::string>()->default_value("DEFORMATION"));
+			 cxxopts::value<std::string>()->default_value("DEFORMATION"))
+			("term", "Terminates the application after the registration finished", cxxopts::value<bool>()->default_value("true"));
 
 		options.add_options()
-			("disable_error_evaluation", "Disable error evaluation for speedup");
+			("error_evaluation", "Enable disable error evaluation", cxxopts::value<bool>()->default_value("true"));
 
 		options
 			.add_options()

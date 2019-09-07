@@ -81,6 +81,7 @@ struct Input
 	std::string image_folder_name{ "images" };
 	int number_of_frames_to_load{ -1 }; // to load all frames set to -1
 	Visualizer::RegistrationRenderMode render_mode{ Visualizer::RegistrationRenderMode::DEFORMATION };
+	bool term{ true };
 };
 
 struct RegistrationOptions
