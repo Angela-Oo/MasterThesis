@@ -9,7 +9,7 @@ else:
     print("does not exists: " + exe_path)
 
 list_args= []
-base_args = [exe_path, "--image_folder_name", "images/rum_07_09"]
+base_args = [exe_path, "--image_folder_name", "images/run_07_09"]
 
 head_args = ["-i", "head", "-p", "0.1"]
 head_registration_args = base_args + head_args + ["-n", "10"]
