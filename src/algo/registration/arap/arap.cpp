@@ -138,7 +138,9 @@ void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_defor
 
 std::pair<bool, std::string> AsRigidAsPossible::shouldBeSavedAsImage()
 {
-	if (_options.adaptive_rigidity.enable || finished())
+	if (_options.adaptive_rigidity.enable && !_options.sequence_options.enable)
+		return std::make_pair(true, "arap_adaptive_" + std::to_string(currentIteration()));
+	else if (finished())
 		return std::make_pair(true, "arap_" + std::to_string(currentIteration()));
 	return std::make_pair(false, "");
 }

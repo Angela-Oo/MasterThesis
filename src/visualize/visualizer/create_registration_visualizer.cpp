@@ -18,20 +18,20 @@ std::shared_ptr<IRegistrationVisualizer> createRegistrationVisualizer(std::share
 	auto logger = std::make_shared<FileWriter>(save_images_folder + "/" + options.input_mesh_sequence.output_folder_name + "_log.txt");
 	logger->write("Save image folder: " + save_images_folder);
 	logOptions(logger, options);
+
+	auto edge_coloring = Visualize::EdgeColor::SmoothCost;
+	if (options.adaptive_rigidity.enable || options.reduce_rigidity.enable || options.reduce_rigidity.enable)
+		edge_coloring = Visualize::EdgeColor::RigidityValue;
 	
 	if (options.sequence_options.enable) {
 		auto register_sequence_of_frames = Registration::createSequenceRegistration(options, logger, mesh_reader);
-		return std::make_shared<SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), renderer, save_images_folder, logger);
+		return std::make_shared<SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), renderer, save_images_folder, logger, edge_coloring);
 	}
 	else {
 		auto & source = mesh_reader->getMesh(0);
 		auto & target = mesh_reader->getMesh(mesh_reader->size() - 1);
 
 		auto registration = Registration::createRegistration(options, logger, source, target);
-
-		auto edge_coloring = Visualize::EdgeColor::SmoothCost;
-		if (options.adaptive_rigidity.enable || options.reduce_rigidity.enable || options.reduce_rigidity.enable)
-			edge_coloring = Visualize::EdgeColor::RigidityValue;
 		return std::make_shared<RegistrationVisualizer>(std::move(registration), renderer, save_images_folder, logger, edge_coloring);
 	}
 }

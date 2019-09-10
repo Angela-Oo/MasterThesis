@@ -110,10 +110,18 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 		auto number_adapted_edges = adaptRigidity(deformation, 
 												  _options.reduce_rigidity.rigidity_cost_threshold,
 												  _options.reduce_rigidity.minimal_rigidity);
-		_non_rigid_registration->setDeformation(deformation);
-		_number_of_refinements++;
-		if(number_adapted_edges == 0 || _number_of_refinements > 20)
+
+		if (number_adapted_edges > 0) {
+			_non_rigid_registration->setDeformation(deformation);
+			_number_of_refinements++;
+
+			unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 2 : 20;
+			if (_number_of_refinements >= max_number_of_refinement)
+				_is_refined = true;
+		}
+		else {
 			_is_refined = true;
+		}
 	}
 	else {
 		_finished = true;
@@ -163,7 +171,7 @@ std::pair<bool, std::string> AdaptiveRigidityRegistration<NonRigidRegistration>:
 {
 	auto save_image = _non_rigid_registration->shouldBeSavedAsImage();
 	if (save_image.first) {
-		save_image.second = "reduce_" + std::to_string(_number_of_refinements) + save_image.second;
+		save_image.second = "reduce_" + std::to_string(_number_of_refinements) + "_" + save_image.second;
 	}
 	return save_image;
 }

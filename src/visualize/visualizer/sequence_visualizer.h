@@ -2,11 +2,11 @@
 
 #include "i_registration_visualizer.h"
 #include "visualize/render/renderer.h"
-#include <memory>
 #include "algo/registration/interface/i_sequence_registration.h"
-
 #include "visualize/render/render_registration.h"
+#include "visualize/render/render_deformation_graph.h"
 #include "util/file_writer.h"
+#include <memory>
 
 namespace Visualizer {
 
@@ -20,6 +20,7 @@ private:
 	std::string _save_images_folder;
 	std::string _image_name;
 	bool _finished{ false };
+	Visualize::EdgeColor _edge_coloring;
 private:
 	void renderRegistration(Render mode);
 public:
@@ -31,7 +32,8 @@ public:
 	SequenceRegistrationVisualizer(std::unique_ptr<Registration::ISequenceRegistration> registration,
 								   std::shared_ptr<Renderer> renderer,
 								   std::string image_folder_name,
-								   std::shared_ptr<FileWriter> logger);
+								   std::shared_ptr<FileWriter> logger,
+								   Visualize::EdgeColor edge_coloring);
 };
 
 

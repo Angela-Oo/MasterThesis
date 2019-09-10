@@ -29,7 +29,9 @@ void SequenceRegistrationVisualizer::renderRegistration(Render mode)
 
 			_render_registration->renderDeformedSourceMesh(_registration->getDeformedMesh(current), mode.mode, true);
 			_render_registration->renderTargetMesh(_registration->getMesh(current), mode.mode);
-			_render_registration->renderDeformationGraph(_registration->getDeformationGraphMesh(current), mode.mode);
+			auto deformation_graph = _registration->getDeformationGraphMesh(current);
+			setDeformationGraphColor(deformation_graph, Visualize::VertexColor::Default, _edge_coloring);
+			_render_registration->renderDeformationGraph(deformation_graph, mode.mode);
 		}
 	}
 }
@@ -77,11 +79,13 @@ void SequenceRegistrationVisualizer::saveImage()
 SequenceRegistrationVisualizer::SequenceRegistrationVisualizer(std::unique_ptr<Registration::ISequenceRegistration> registration,
 															   std::shared_ptr<Renderer> renderer,
 															   std::string image_folder_name,
-															   std::shared_ptr<FileWriter> logger)
+															   std::shared_ptr<FileWriter> logger,
+															   Visualize::EdgeColor edge_coloring)
 	: _registration(std::move(registration))
 	, _renderer(renderer)
 	, _save_images_folder(image_folder_name)
 	, _logger(logger)
+	, _edge_coloring(edge_coloring)
 {
 	_render_registration = std::make_unique<RendererRegistration>(_renderer);
 }
