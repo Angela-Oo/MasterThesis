@@ -208,8 +208,17 @@ struct ARAPAdaptiveRigidityVertexCostFunction
 
 		substract(rotated_edge, transformed_edge, residuals);
 
-		T weight = (w_i[0] + w_j[0]) * T{0.5};
+		T min{ 0.01 };
+		T wi = w_i[0];
+		if (wi < min)
+			wi = min;
+		T wj = w_j[0];
+		if (wj < min)
+			wj = min;
+		
+		T weight = (wi + wj) * T { 0.5 };
 		scalar_multiply(residuals, weight, residuals);
+		
 		return true;
 	}
 };
