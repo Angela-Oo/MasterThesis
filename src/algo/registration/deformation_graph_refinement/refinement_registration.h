@@ -43,7 +43,7 @@ public:
 	SurfaceMesh getDeformationGraphMesh() override;
 	const Deformation & getDeformation();
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
-	bool shouldBeSavedAsImage() override;
+	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 public:
 	RefineDeformationGraphRegistration(const SurfaceMesh& source,
 									   const SurfaceMesh& target,
@@ -116,11 +116,18 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 		
 		if (_logger)
 			_logger->write("Number of new vertices: " + std::to_string(refined_vertices_edges));
-		
-		_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
-		_number_of_refinements++;
-		if(refined_vertices_edges == 0 || _number_of_refinements > 20)
+
+		if (refined_vertices_edges > 0) {
+			_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
+			_number_of_refinements++;
+
+			unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 2 : 20;
+			if (_number_of_refinements >= max_number_of_refinement)
+				_is_refined = true;
+		}
+		else {
 			_is_refined = true;
+		}
 	}
 	else {
 		_finished = true;
@@ -164,11 +171,15 @@ void RefineDeformationGraphRegistration<NonRigidRegistration>::setRigidDeformati
 }
 
 template<typename NonRigidRegistration>
-bool RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
+std::pair<bool, std::string> RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
 {
-	auto save = _save_image || _non_rigid_registration->shouldBeSavedAsImage();
+	auto save_image = _non_rigid_registration->shouldBeSavedAsImage();
+	auto save = _save_image || save_image.first;
 	_save_image = false;
-	return save;
+	if (save)
+		return std::make_pair(true, "refine_" + std::to_string(currentIteration()) + "_" + save_image.second);
+	else
+		return std::make_pair(false, "");
 }
 
 template<typename NonRigidRegistration>

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "mLibCore.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
 #include "algo/remeshing/mesh_simplification.h"
 #include "registration_type.h"
@@ -69,7 +70,7 @@ struct ICPOptions
 struct DeformationGraphOptions
 {
 	double edge_length {0.3};
-	unsigned int number_of_interpolation_neighbors{4};
+	unsigned int number_of_interpolation_neighbors{3};
 };
 
 struct Input
@@ -77,6 +78,7 @@ struct Input
 	std::string file_path{ "../input_data/HaoLi/head/finalRegistration/" };
 	std::string file_name { "meshOfFrame" };
 	size_t start_index{ 1 };
+	ml::mat4f transformation { ml::mat4f::rotationX(-90.) *  ml::mat4f::scale(0.01) };
 	std::string output_folder_name{ "head" };
 	std::string image_folder_name{ "images" };
 	int number_of_frames_to_load{ -1 }; // to load all frames set to -1

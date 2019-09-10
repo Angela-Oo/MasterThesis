@@ -21,7 +21,7 @@ const SurfaceMesh & RigidRegistration::getTarget()
 
 SurfaceMesh RigidRegistration::getDeformedPoints()
 {
-	if (_deformed_points_returns_deformed_previouse_frame) {
+	if (_deformed_points_returns_deformed_previous_frame) {
 		RigidDeformedMesh deformed(_deformation);
 		return deformed.deformPoints(_source);
 	}
@@ -45,8 +45,8 @@ RigidDeformation RigidRegistration::getRigidDeformation()
 
 RigidDeformation RigidRegistration::getDeformation()
 {
-	if (_previouse_deformation) {
-		auto previouse_def = _previouse_deformation.get();
+	if (_previous_deformation) {
+		auto previouse_def = _previous_deformation.get();
 		auto deformaton = previouse_def + _deformation;
 		return deformaton;
 	}
@@ -161,16 +161,25 @@ bool RigidRegistration::solve()
 
 bool RigidRegistration::finished()
 {
+	if (_finished)
+		return true;
+	
 	auto tol = _options.ceres_options.function_tolerance;
-
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
-	return (_solve_iteration >= (_options.max_iterations * 2)) || (solved && _solve_iteration > 2);
+	_finished = (_solve_iteration >= (_options.max_iterations * 2)) || (solved && _solve_iteration > 2);
+	return _finished;
 }
 
-bool RigidRegistration::shouldBeSavedAsImage()
+std::pair<bool, std::string> RigidRegistration::shouldBeSavedAsImage()
 {
-	return finished();
+	bool solved = finished();
+	if (solved) {
+		return std::make_pair(true, "rigid_" + std::to_string(currentIteration()));
+	}
+	else {
+		return std::make_pair(false, "");
+	}
 }
 
 void RigidRegistration::evaluateResidual(ceres::Problem & problem,
@@ -249,7 +258,7 @@ RigidRegistration::RigidRegistration(const SurfaceMesh & source,
 									 std::shared_ptr<FileWriter> logger)
 	: _source(previous_mesh)
 	, _target(target)
-	, _previouse_deformation(boost::optional<RigidDeformation>(rigid_deformation))
+	, _previous_deformation(boost::optional<RigidDeformation>(rigid_deformation))
 	, _true_source(boost::optional<SurfaceMesh>(source))
 	, _options(options)
 	, _ceres_logger(logger)

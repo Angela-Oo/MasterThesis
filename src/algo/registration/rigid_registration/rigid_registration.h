@@ -24,7 +24,7 @@ public:
 private:
 	SurfaceMesh _source;
 	SurfaceMesh _target;
-	boost::optional<RigidDeformation> _previouse_deformation;
+	boost::optional<RigidDeformation> _previous_deformation;
 	boost::optional<SurfaceMesh> _true_source;
 	RigidDeformation _deformation;
 	Point _global_position;
@@ -32,11 +32,12 @@ private:
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 	std::vector<vertex_descriptor> _set_of_vertices_to_use;
 private:
-	bool _deformed_points_returns_deformed_previouse_frame = true;
-	bool _with_icp = true;
-	double _current_cost = 1.;
-	double _last_cost = 2.;
-	size_t _solve_iteration = 0;
+	bool _deformed_points_returns_deformed_previous_frame{ true };
+	bool _with_icp{ true };
+	double _current_cost { 1. };
+	double _last_cost{ 2. };
+	size_t _solve_iteration{ 0 };
+	bool _finished{ false };
 	RegistrationOptions _options;
 private:
 	void evaluateResidual(ceres::Problem & problem,
@@ -59,7 +60,7 @@ public:
 	SurfaceMesh getInverseDeformedPoints() override;
 	RigidDeformation getRigidDeformation();
 	RigidDeformation getDeformation();
-	bool shouldBeSavedAsImage() override;
+	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 private:
 	void init();
 public:

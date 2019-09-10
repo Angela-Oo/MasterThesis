@@ -40,13 +40,9 @@ void AppRegistration::key(UINT key)
 
 void AppRegistration::loadMeshReader()
 {
-	ml::mat4f scale = ml::mat4f::scale(0.01);
-	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
-	ml::mat4f transform = ml::mat4f::translation({ -0.45f, -5.f, 1.05f });
-	ml::mat4f transformation = transform * rotation * scale;
 	auto mesh_reader = std::make_unique<MeshReader>(_options.input_mesh_sequence.file_path,
 													_options.input_mesh_sequence.file_name,
-													transformation,
+													_options.input_mesh_sequence.transformation,
 													_options.input_mesh_sequence.start_index);
 
 	if (_options.input_mesh_sequence.number_of_frames_to_load == -1) {

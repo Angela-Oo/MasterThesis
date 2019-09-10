@@ -50,7 +50,7 @@ void SequenceRegistrationVisualizer::registration()
 			bool iteration_finished = _registration->solve();
 			auto save_image = _registration->saveCurrentFrameAsImage();
 			if (save_image.first)
-				_image_name = "frame_" + save_image.second;
+				_image_name = save_image.second;
 		}
 		else {
 			std::cout << std::endl << "finished registration" << std::endl;

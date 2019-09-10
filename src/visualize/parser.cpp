@@ -5,58 +5,67 @@
 Registration::Input inputById(std::string input_id)
 {
 	Registration::Input input;
-	if (input_id == "head") {
-		input.file_path = "../input_data/HaoLi/head/finalRegistration/";
-		input.file_name = "meshOfFrame";
-		input.start_index = 1;
+
+	ml::mat4f scale = ml::mat4f::scale(0.01);
+	ml::mat4f rotation = ml::mat4f::rotationX(-90.);
+
+	if (input_id == "head" || input_id == "head_scan") {
+		if (input_id == "head") {
+			input.file_path = "../input_data/HaoLi/head/finalRegistration/";
+			input.file_name = "meshOfFrame";
+			input.start_index = 1;
+		}
+		else {
+			input.file_path = "../input_data/HaoLi/head/headInputScans/";
+			input.file_name = "meshOfFrame";
+			input.start_index = 0;			
+		}
+		input.transformation = rotation * scale;
 		input.output_folder_name = input_id;
 	}
-	else if (input_id == "head_scan") {
-		input.file_path = "../input_data/HaoLi/head/headInputScans/";
-		input.file_name = "meshOfFrame";
-		input.start_index = 0;
+	else if (input_id == "hand" || input_id == "hand_scan") {
+		if (input_id == "hand") {
+			input.file_path = "../input_data/HaoLi/hand/hand1-registrationOutput/";
+			input.file_name = "meshOfFrame";
+			input.start_index = 1;
+		}
+		else {
+			input.file_path = "../input_data/HaoLi/hand/hand-inputScans/";
+			input.file_name = "meshOfFrame";
+			input.start_index = 0;			
+		}
+		ml::mat4f translation = ml::mat4f::translation(0.1, -1.5, 0.);
+		input.transformation = translation * rotation * scale;
 		input.output_folder_name = input_id;
 	}
-	else if (input_id == "hand")
-	{
-		input.file_path = "../input_data/HaoLi/hand/hand1-registrationOutput/";
-		input.file_name = "meshOfFrame";
-		input.start_index = 1;
+	else if (input_id == "puppet" || input_id == "puppet_scan") {
+		if (input_id == "puppet") {
+			input.file_path = "../input_data/HaoLi/puppet/finalRegistration/";
+			input.file_name = "mesh_1";
+			input.start_index = 0;
+		}
+		else {
+			input.file_path = "../input_data/HaoLi/puppet/puppetInputScans/";
+			input.file_name = "meshOfFrame";
+			input.start_index = 0;			
+		}
+		ml::mat4f translation = ml::mat4f::translation(1.0, -0.5, 0.4);
+		input.transformation = translation * rotation * scale;
 		input.output_folder_name = input_id;
 	}
-	else if (input_id == "hand_scan")
-	{
-		input.file_path = "../input_data/HaoLi/hand/hand-inputScans/";
-		input.file_name = "meshOfFrame";
-		input.start_index = 0;
-		input.output_folder_name = input_id;
-	}
-	else if (input_id == "puppet")
-	{
-		input.file_path = "../input_data/HaoLi/puppet/finalRegistration/";
-		input.file_name = "mesh_1";
-		input.start_index = 0;
-		input.output_folder_name = input_id;
-	}
-	else if (input_id == "puppet_scan")
-	{
-		input.file_path = "../input_data/HaoLi/puppet/puppetInputScans/";
-		input.file_name = "meshOfFrame";
-		input.start_index = 0;
-		input.output_folder_name = input_id;
-	}
-	else if (input_id == "paperbag")
-	{
-		input.file_path = "../input_data/HaoLi/paperbag/finalregistration/";
-		input.file_name = "meshOfFrame";
-		input.start_index = 1;
-		input.output_folder_name = input_id;
-	}
-	else if (input_id == "paperbag_scan")
-	{
-		input.file_path = "../input_data/HaoLi/paperbag/inputscans/";
-		input.file_name = "meshOfFrame";
-		input.start_index = 1;
+	else if (input_id == "paperbag" || input_id == "paperbag_scan") {
+		if (input_id == "paperbag") {
+			input.file_path = "../input_data/HaoLi/paperbag/finalregistration/";
+			input.file_name = "meshOfFrame";
+			input.start_index = 1;			
+		}
+		else {
+			input.file_path = "../input_data/HaoLi/paperbag/inputscans/";
+			input.file_name = "meshOfFrame";
+			input.start_index = 1;
+		}
+		ml::mat4f translation = ml::mat4f::translation(0.7, 0., -0.3);
+		input.transformation = translation * rotation * scale;
 		input.output_folder_name = input_id;
 	}
 	return input;
@@ -99,7 +108,9 @@ void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions 
 	if (result.count("i"))
 	{
 		auto input = result["i"].as<std::string>();
-		if (input == "head") {
+
+		options.input_mesh_sequence = inputById(input);
+		/*if (input == "head") {
 			options.input_mesh_sequence.file_path = "../input_data/HaoLi/head/finalRegistration/";
 			options.input_mesh_sequence.file_name = "meshOfFrame";
 			options.input_mesh_sequence.start_index = 1;
@@ -152,7 +163,7 @@ void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions 
 			options.input_mesh_sequence.file_name = "meshOfFrame";
 			options.input_mesh_sequence.start_index = 1;
 			options.input_mesh_sequence.output_folder_name = input;
-		}
+		}*/
 	}
 	else {
 		if (result.count("file_path") && result.count("file_name"))
@@ -200,6 +211,8 @@ void parseRefinement(Registration::RegistrationOptions& registration_options, cx
 		else
 			registration_options.refinement.refine = Registration::RefinementOptions::Refinement::VERTEX;
 		registration_options.refinement.smooth_cost_threshold = result["smooth_cost_threshold"].as<double>();
+		registration_options.refinement.min_edge_length = result["min_edge_length"].as<double>();
+		registration_options.refinement.levels = result["levels"].as<unsigned int>();
 	}
 }
 
@@ -291,7 +304,9 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		options.add_options()
 			("r,refine_deformation_graph", "Deformation Graph Refinement")
 			("refine_at_edge", "Refine Deformation Graph At Edge (default is Vertex)")
-			("smooth_cost_threshold", "Refine Deformation Graph if smooth cost of at edge or vertex is bigger than threshold", cxxopts::value<double>()->default_value("0.05"));
+			("smooth_cost_threshold", "Refine Deformation Graph if smooth cost of at edge or vertex is bigger than threshold", cxxopts::value<double>()->default_value("0.05"))
+			("min_edge_length", "Minimal Edge Length for Hierarchical Deformation Graph", cxxopts::value<double>()->default_value("0.05"))
+			("levels", "Number of Levels for Hierarchical Deformation Graph", cxxopts::value<unsigned int>()->default_value("4"));
 
 		options.add_options()
 			("max_iterations", "Max Iterations", cxxopts::value<unsigned int>()->default_value("25"))

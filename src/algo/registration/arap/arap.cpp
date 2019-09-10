@@ -136,12 +136,11 @@ void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_defor
 	_deformation_graph.setRigidDeformation(rigid_deformation);// createGlobalDeformationFromRigidDeformation(rigid_deformation));
 }
 
-bool AsRigidAsPossible::shouldBeSavedAsImage()
+std::pair<bool, std::string> AsRigidAsPossible::shouldBeSavedAsImage()
 {
-	if (_options.adaptive_rigidity.enable)
-		return true;
-	else
-		return finished();
+	if (_options.adaptive_rigidity.enable || finished())
+		return std::make_pair(true, "arap_" + std::to_string(currentIteration()));
+	return std::make_pair(false, "");
 }
 
 std::vector<vertex_descriptor> AsRigidAsPossible::subsetOfVerticesToFit()

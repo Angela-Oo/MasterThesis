@@ -34,7 +34,7 @@ void AppShowKinectData::init(ml::ApplicationData &app)
 
 	m_render_data->init(app);
 
-	ml::vec3f eye(-0.5f, -0.5f, 1.5f);
+	ml::vec3f eye(-0.3f, 4.0f, 0.4f);
 	m_camera = Cameraf(eye, vec3f::eY, vec3f::eZ, 60.0f, (float)app.window.getWidth() / app.window.getHeight(), 0.01f, 10.0f);
 
 	m_font.init(app.graphics, "Calibri");

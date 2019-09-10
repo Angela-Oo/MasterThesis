@@ -78,7 +78,7 @@ public:
 	const DeformationGraph<EDDeformation> & getDeformation();
 	void setDeformation(const Deformation & deformation_graph);
 	std::vector<Point> getFixedPostions() override;
-	bool shouldBeSavedAsImage() override;
+	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 public:
 	// without icp
 	EmbeddedDeformation(const SurfaceMesh& source,

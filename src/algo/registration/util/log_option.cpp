@@ -48,12 +48,15 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 			<< ", min edge length " << options.refinement.min_edge_length << std::endl;
 	}
 	if (options.adaptive_rigidity.enable) {
-		ss << "Adaptive Rigidity by cost function" << std::endl;
+		ss << "Adaptive Rigidity by cost function, "
+			<< "rigidity cost coefficient: " << options.adaptive_rigidity.rigidity_cost_coefficient << std::endl;
 	}
 
 	if (options.reduce_rigidity.enable)
 	{
-		ss << "Adaptive Rigidity by reducing" << std::endl;
+		ss << "Adaptive Rigidity by reducing"
+			<< ", minimal rigidity: " << options.reduce_rigidity.minimal_rigidity
+			<< ", rigidity cost threshold: " << options.reduce_rigidity.rigidity_cost_threshold << std::endl;
 	}
 	
 	ss << std::endl;

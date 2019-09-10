@@ -12,8 +12,9 @@ void RegistrationVisualizer::registration()
 		bool finished = _registration->finished();
 		if (!finished) {
 			_registration->solveIteration();
-			if(_registration->shouldBeSavedAsImage())
-				_image_name = "frame_" + std::to_string(_registration->currentIteration());
+			auto save_image = _registration->shouldBeSavedAsImage();
+			if(save_image.first)
+				_image_name = save_image.second;
 		}
 		else {
 			std::cout << std::endl << "finished, select next two frames" << std::endl;

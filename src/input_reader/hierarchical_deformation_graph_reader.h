@@ -22,5 +22,5 @@ public:
 	bool processAllFrames();
 public:
 	HierarchicalDeformationGraphReader(std::shared_ptr<MeshReader> reader,
-									   unsigned int number_of_interpolation_neighbors);
+									   unsigned int levels);
 };

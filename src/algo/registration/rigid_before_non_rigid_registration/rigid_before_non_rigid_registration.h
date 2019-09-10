@@ -35,7 +35,7 @@ public:
 	SurfaceMesh getDeformationGraphMesh() override;
 	const Deformation & getDeformation();
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
-	bool shouldBeSavedAsImage() override;
+	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 public:
 	// without icp
 	RigidBeforeNonRigidRegistration(std::unique_ptr<RigidRegistration> rigid_registration,
@@ -164,11 +164,19 @@ void RigidBeforeNonRigidRegistration<NonRigidRegistration>::setRigidDeformation(
 }
 
 template<typename NonRigidRegistration>
-bool RigidBeforeNonRigidRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
+std::pair<bool, std::string> RigidBeforeNonRigidRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
 {
-	bool save_rigid_registration = (_rigid_registration->finished() && !_finished_rigid_registration && _non_rigid_registration->currentIteration() == 0);
-	bool save_non_rigid_registration = (_finished_rigid_registration && _non_rigid_registration->shouldBeSavedAsImage());
-	return save_rigid_registration || save_non_rigid_registration;
+	if(!_finished_rigid_registration)
+	{
+		bool save_rigid_registration = (_rigid_registration->finished() && _non_rigid_registration->currentIteration() == 0);
+		if (save_rigid_registration)
+			return _rigid_registration->shouldBeSavedAsImage();
+	}
+	else
+	{
+		return _non_rigid_registration->shouldBeSavedAsImage();
+	}
+	return std::make_pair(false, "");
 }
 
 template<typename NonRigidRegistration>

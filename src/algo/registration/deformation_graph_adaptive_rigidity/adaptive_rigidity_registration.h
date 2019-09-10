@@ -38,7 +38,7 @@ public:
 	SurfaceMesh getDeformationGraphMesh() override;
 	const Deformation & getDeformation();
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
-	bool shouldBeSavedAsImage() override;
+	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 public:
 	AdaptiveRigidityRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration);
 
@@ -159,9 +159,13 @@ void AdaptiveRigidityRegistration<NonRigidRegistration>::setRigidDeformation(con
 }
 
 template<typename NonRigidRegistration>
-bool AdaptiveRigidityRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
+std::pair<bool, std::string> AdaptiveRigidityRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
 {
-	return _non_rigid_registration->shouldBeSavedAsImage();
+	auto save_image = _non_rigid_registration->shouldBeSavedAsImage();
+	if (save_image.first) {
+		save_image.second = "reduce_" + std::to_string(_number_of_refinements) + save_image.second;
+	}
+	return save_image;
 }
 
 template<typename NonRigidRegistration>

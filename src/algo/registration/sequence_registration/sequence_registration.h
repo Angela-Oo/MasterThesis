@@ -48,18 +48,16 @@ public:
 template<typename RegistrationType>
 std::pair<bool, std::string> SequenceRegistration<RegistrationType>::saveCurrentFrameAsImage()
 {
-	bool save_as_image = false;
 	std::string image_index = "";
 	if (_registration) {
-		save_as_image = _registration->shouldBeSavedAsImage();
-		if (save_as_image) {
-			image_index = std::to_string(getCurrent());
-			if (!_registration->finished()) {
-				image_index = image_index + "_arigid_" + std::to_string(_registration->currentIteration());
-			}
+		auto save_as_image = _registration->shouldBeSavedAsImage();
+		if (save_as_image.first) {
+			auto frame = "frame_" + std::to_string(getCurrent()) + "_";
+			save_as_image.second = frame + save_as_image.second;
+			return save_as_image;
 		}
 	}
-	return std::make_pair(save_as_image, image_index);
+	return std::make_pair(false, "");
 }
 
 

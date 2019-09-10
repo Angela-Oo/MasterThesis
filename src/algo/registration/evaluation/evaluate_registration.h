@@ -38,7 +38,7 @@ public:
 	SurfaceMesh getDeformationGraphMesh() override;
 	const Deformation & getDeformation();
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
-	bool shouldBeSavedAsImage() override;
+	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 public:
 	EvaluateRegistration(const SurfaceMesh& source,
 						 const SurfaceMesh& target,
@@ -66,7 +66,7 @@ void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 
 	auto vertex_colors = _deformed_points.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
 
-	bool eval_error = _non_rigid_registration->finished() || _non_rigid_registration->shouldBeSavedAsImage();
+	bool eval_error = _non_rigid_registration->finished() || _non_rigid_registration->shouldBeSavedAsImage().first;
 	if (eval_error && _options.error_evaluation) {
 		if (!_error_evaluation) {
 			_error_evaluation = std::make_unique<ErrorEvaluation>(_non_rigid_registration->getTarget());
@@ -164,7 +164,7 @@ void EvaluateRegistration<NonRigidRegistration>::setRigidDeformation(const Rigid
 }
 
 template<typename NonRigidRegistration>
-bool EvaluateRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
+std::pair<bool, std::string> EvaluateRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
 {
 	return _non_rigid_registration->shouldBeSavedAsImage();
 }

@@ -307,9 +307,9 @@ void EmbeddedDeformation::setRigidDeformation(const RigidDeformation & rigid_def
 }
 
 
-bool EmbeddedDeformation::shouldBeSavedAsImage()
+std::pair<bool, std::string> EmbeddedDeformation::shouldBeSavedAsImage()
 {
-	return finished();
+	return std::make_pair(finished(), "ed_" + std::to_string(currentIteration()));
 }
 
 void EmbeddedDeformation::setParameters()

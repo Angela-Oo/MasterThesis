@@ -62,7 +62,7 @@ public:
 	void setDeformation(const Deformation & deformation_graph);
 	const DeformationGraph<ARAPDeformation> & getDeformation();
 	std::vector<Point> getFixedPostions() override;
-	bool shouldBeSavedAsImage() override;
+	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 public:
 	// without icp
 	AsRigidAsPossible(const SurfaceMesh& source,
