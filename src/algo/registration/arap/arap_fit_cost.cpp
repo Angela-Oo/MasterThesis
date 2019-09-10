@@ -20,8 +20,8 @@ bool AsRigidAsPossibleFitCost::useVertex(vertex_descriptor & v, DeformedMesh<Def
 	if (_options.ignore_border_vertices)
 		use_vertex = !deformed_mesh.getSourceMesh().is_border(v, true);
 
-	if (deformed_mesh.nearestNodes(v).node_weight_vector.size() < _options.deformation_graph.number_of_interpolation_neighbors)
-		use_vertex = false;
+	//if (deformed_mesh.nearestNodes(v).node_weight_vector.size() < _options.deformation_graph.number_of_interpolation_neighbors)
+	//	use_vertex = false;
 	return use_vertex;
 }
 
