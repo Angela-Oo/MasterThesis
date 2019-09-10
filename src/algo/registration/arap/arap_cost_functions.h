@@ -158,6 +158,65 @@ struct AdaptableRigidityWeightCostFunction {
 };
 
 
+
+
+struct ARAPAdaptiveRigidityVertexCostFunction
+{
+	const Point _v_i; // vi
+	const Point _v_j; // vj
+
+	ARAPAdaptiveRigidityVertexCostFunction(const Point & v_i, const Point & v_j)
+		: _v_i(v_i)
+		, _v_j(v_j)
+	{}
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(const Point & v_i, const Point & v_j)
+	{
+		return (new ceres::AutoDiffCostFunction<ARAPAdaptiveRigidityVertexCostFunction, 3, 6, 6, 1, 1>(new ARAPAdaptiveRigidityVertexCostFunction(v_i, v_j)));
+	}
+
+	// E_arap = sum_{i} sum_{j in N} | w * [Ri(vj-vi) - ((vj + tj) - (vi + ti))] |^2
+	template <typename T>
+	bool operator()(const T* const deformation_i, const T* const deformation_j, const T* const w_i, const T* const w_j, T* residuals) const
+	{
+		T vi[3];
+		T vj[3];
+		point_to_T(_v_i, vi);
+		point_to_T(_v_j, vj);
+
+		T rotation_i[3];
+		rotation_vector_from_deformation(deformation_i, rotation_i);
+		T translation_i[3];
+		translation_vector_from_deformation(deformation_i, translation_i);
+		T translation_j[3];
+		translation_vector_from_deformation(deformation_j, translation_j);
+
+		T edge[3];
+		T rotated_edge[3];
+		T vi_t[3];
+		T vj_t[3];
+		T transformed_edge[3];
+
+		substract(vj, vi, edge);
+		ceres::AngleAxisRotatePoint(rotation_i, edge, rotated_edge);
+
+		addition(vi, translation_i, vi_t);
+		addition(vj, translation_j, vj_t);
+
+		substract(vj_t, vi_t, transformed_edge);
+
+		substract(rotated_edge, transformed_edge, residuals);
+
+		T weight = w_i[0] + w_j[0];
+		scalar_multiply(residuals, weight, residuals);
+		return true;
+	}
+};
+
+
+
+
 // deformation of vi at node j = (Rj(vi-gj) + gj + tj)
 template<typename T>
 void deform_point_at_node(const T * const point, const T * const node_pos, const T * const deformation, T* result)

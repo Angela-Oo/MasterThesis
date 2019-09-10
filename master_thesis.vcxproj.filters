@@ -791,6 +791,9 @@
     <ClInclude Include="src\algo\registration\evaluation\error_evaluation.h">
       <Filter>2 algo\4 registration\12 evaluation</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity_vertex.h">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -995,6 +998,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\evaluation\error_evaluation.cpp">
       <Filter>2 algo\4 registration\12 evaluation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity_vertex.cpp">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

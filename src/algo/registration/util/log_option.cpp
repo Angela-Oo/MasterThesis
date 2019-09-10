@@ -39,7 +39,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	if(options.refinement.enable)
 	{
 		ss << "Deformation Graph Refinement: ";
-		if (options.refinement.refine == RefinementOptions::Refinement::EDGE)
+		if (options.refinement.refine == Refinement::EDGE)
 			ss << "refine at edge,";
 		else
 			ss << "refine at vertex,";
@@ -49,7 +49,12 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	}
 	if (options.adaptive_rigidity.enable) {
 		ss << "Adaptive Rigidity by cost function, "
-			<< "rigidity cost coefficient: " << options.adaptive_rigidity.rigidity_cost_coefficient << std::endl;
+			<< "rigidity cost coefficient: " << options.adaptive_rigidity.rigidity_cost_coefficient;
+
+		if(options.adaptive_rigidity.refinement == Refinement::EDGE)
+			ss << ", edge " << std::endl;
+		else
+			ss << ", vertex " << std::endl;
 	}
 
 	if (options.reduce_rigidity.enable)

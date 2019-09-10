@@ -9,10 +9,16 @@
 
 namespace Registration {
 
-
+enum class Refinement
+{
+	EDGE,
+	VERTEX
+};
+	
 struct AdaptiveRigidityOptions
 {
 	bool enable{ false };
+	Refinement refinement{ Refinement::EDGE };
 	double rigidity_cost_coefficient{ 0.005 };
 };
 
@@ -25,19 +31,12 @@ struct ReduceRigidityOptions
 
 struct RefinementOptions
 {
-	enum class Refinement
-	{
-		EDGE,
-		VERTEX
-	};
-
 	bool enable{ false };
 	double min_edge_length {0.05};
 	unsigned int levels {4};
 	Refinement refine {Refinement::VERTEX};
 	double smooth_cost_threshold{ 0.05 };
 };
-
 
 
 struct SequenceRegistrationOptions

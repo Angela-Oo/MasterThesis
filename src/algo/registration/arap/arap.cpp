@@ -3,11 +3,10 @@
 #include "arap_fit_cost_without_icp.h"
 #include "arap_smooth_cost.h"
 #include "arap_smooth_cost_adaptive_rigidity.h"
+#include "arap_smooth_cost_adaptive_rigidity_vertex.h"
 #include "algo/registration/util/ceres_iteration_logger.h"
 #include "algo/remeshing/mesh_simplification.h"
 #include "algo/registration/util/ceres_residual_evaluation.h"
-
-
 #include <random>
 
 
@@ -84,7 +83,8 @@ bool AsRigidAsPossible::solveIteration()
 
 void AsRigidAsPossible::updateSmoothFactor()
 {
-	bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second;
+	bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second ||
+		_deformation_graph._mesh.property_map<vertex_descriptor, double>("v:rigidity").second;
 	if (!use_rigidity)
 	{
 		auto scale_factor_tol = 0.0001;// 0.00001;
@@ -173,8 +173,12 @@ void AsRigidAsPossible::init()
 {
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
-	if(_options.adaptive_rigidity.enable)
-		_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient);
+	if (_options.adaptive_rigidity.enable) {
+		if(_options.adaptive_rigidity.refinement == Refinement::VERTEX)
+			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient);
+		else
+			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient);
+	}
 	else {
 		_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>(_options.smooth);
 	}

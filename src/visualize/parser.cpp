@@ -207,9 +207,9 @@ void parseRefinement(Registration::RegistrationOptions& registration_options, cx
 	{
 		registration_options.refinement.enable = result["r"].as<bool>();
 		if(result["refine_at_edge"].as<bool>())
-			registration_options.refinement.refine = Registration::RefinementOptions::Refinement::EDGE;
+			registration_options.refinement.refine = Registration::Refinement::EDGE;
 		else
-			registration_options.refinement.refine = Registration::RefinementOptions::Refinement::VERTEX;
+			registration_options.refinement.refine = Registration::Refinement::VERTEX;
 		registration_options.refinement.smooth_cost_threshold = result["smooth_cost_threshold"].as<double>();
 		registration_options.refinement.min_edge_length = result["min_edge_length"].as<double>();
 		registration_options.refinement.levels = result["levels"].as<unsigned int>();
@@ -222,6 +222,10 @@ void parseAdaptiveRigidity(Registration::RegistrationOptions& registration_optio
 	if (result["adaptive_rigidity"].as<bool>()) {
 		registration_options.adaptive_rigidity.enable = true;
 		registration_options.adaptive_rigidity.rigidity_cost_coefficient = result["rigidity_cost_coefficient"].as<double>();
+		if (result["rigidity_coefficient_per_vertex"].as<bool>())
+			registration_options.adaptive_rigidity.refinement = Registration::Refinement::VERTEX;
+		else
+			registration_options.adaptive_rigidity.refinement = Registration::Refinement::EDGE;
 	}
 }
 
@@ -294,7 +298,8 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 
 		options.add_options()
 			("adaptive_rigidity", "Adaptive Rigidity")
-			("rigidity_cost_coefficient", "Adaptive Rigidity cost coefficient", cxxopts::value<double>()->default_value("0.005"));			
+			("rigidity_cost_coefficient", "Adaptive Rigidity cost coefficient", cxxopts::value<double>()->default_value("0.01"))
+			("rigidity_coefficient_per_vertex", "Adapt the rigid coefficient per Vertex (default per Edge)", cxxopts::value<bool>());
 
 		options.add_options()
 			("reduce_rigidity", "Reduce Rigidity")

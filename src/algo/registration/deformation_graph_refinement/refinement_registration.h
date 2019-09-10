@@ -109,7 +109,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
 		
 		size_t refined_vertices_edges{ 0 };
-		if(_options.refinement.refine == RefinementOptions::Refinement::VERTEX)
+		if(_options.refinement.refine == Refinement::VERTEX)
 			refined_vertices_edges = refineHierarchicalMeshAtVertices(_deformation, _options.refinement.smooth_cost_threshold);
 		else
 			refined_vertices_edges = refineHierarchicalMeshAtEdges(_deformation, _options.refinement.smooth_cost_threshold);

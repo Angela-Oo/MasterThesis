@@ -167,23 +167,59 @@ void setEdgeColorToRigidityCost(SurfaceMesh & mesh)
 
 void setEdgeColorToRigidityValue(SurfaceMesh & mesh)
 {
-	auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color");
+	
 	auto rigidity = mesh.property_map<edge_descriptor, double>("e:rigidity");
-	bool valid;
-	double mean, max;
-	std::tie(valid, mean, max) = getMeanAndMaxEdgeValue(mesh, "e:rigidity");
+	auto rigidity_vertex = mesh.property_map<vertex_descriptor, double>("v:rigidity");
+	if (rigidity.second) {
+		auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color");
+		bool valid;
+		double mean, max;
+		std::tie(valid, mean, max) = getMeanAndMaxEdgeValue(mesh, "e:rigidity");
 
-	if (valid && edge_colors.second && rigidity.second) {
-		double min = *std::min_element(rigidity.first.begin(), rigidity.first.end());
-		std::cout << std::endl << "max rigidity: " << max << " mean rigidity " << mean << " min rigidity " << min;
+		if (valid && edge_colors.second) {
+			double min = *std::min_element(rigidity.first.begin(), rigidity.first.end());
+			std::cout << std::endl << "max rigidity: " << max << " mean rigidity " << mean << " min rigidity " << min;
 
-		double reference_cost = mean * 2.;
-		for (auto & e : mesh.edges())
-		{
-			//double error = (max - rigidity.first[e]) / max;
-			double r = std::min(1., std::max(0., rigidity.first[e])); // between 0 and 1.
-			double error = (1. - r);
-			edge_colors.first[e] = errorToRGB(error);
+			double reference_cost = mean * 2.;
+			for (auto & e : mesh.edges()) {
+				//double error = (max - rigidity.first[e]) / max;
+				double r = std::min(1., std::max(0., rigidity.first[e])); // between 0 and 1.
+				double error = (1. - r);
+				edge_colors.first[e] = errorToRGB(error);
+			}
+		}
+	}
+	else if(rigidity_vertex.second)
+	{
+		auto vertex_colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color");
+		auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color");
+		bool valid;
+		double mean, max;
+		std::tie(valid, mean, max) = getMeanAndMaxVertexCost(mesh, "v:rigidity");
+
+		if (valid && vertex_colors.second) {
+			double min = *std::min_element(rigidity_vertex.first.begin(), rigidity_vertex.first.end());
+			std::cout << std::endl << "max rigidity: " << max << " mean rigidity " << mean << " min rigidity " << min;
+
+			double reference_cost = mean * 2.;
+			for (auto & v : mesh.vertices()) {
+				//double error = (max - rigidity.first[e]) / max;
+				double r = std::min(1., std::max(0., rigidity_vertex.first[v])); // between 0 and 1.
+				double error = (1. - r);
+				vertex_colors.first[v] = errorToRGB(error);
+			}
+
+			for (auto & e : mesh.edges()) {
+				auto source = mesh.source(mesh.halfedge(e));
+				auto target = mesh.target(mesh.halfedge(e));
+				auto source_rigidity = rigidity_vertex.first[source];
+				auto target_rigidity = rigidity_vertex.first[target];
+				double rigidity = source_rigidity + target_rigidity;
+				
+				double r = std::min(1., std::max(0., rigidity)); // between 0 and 1.
+				double error = (1. - r);
+				edge_colors.first[e] = errorToRGB(error);
+			}
 		}
 	}
 }
