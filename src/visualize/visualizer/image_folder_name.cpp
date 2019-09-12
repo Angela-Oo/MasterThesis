@@ -34,6 +34,10 @@ std::string imageFolderName(Registration::RegistrationOptions options)
 	if (options.adaptive_rigidity.enable) 
 	{
 		folder_name += "AdaptiveRigidity_";
+		if (options.adaptive_rigidity.refinement == Refinement::VERTEX)
+			folder_name += "Vertex_";
+		else
+			folder_name += "Edge_";
 	}
 	
 	if (options.reduce_rigidity.enable) 
@@ -44,6 +48,10 @@ std::string imageFolderName(Registration::RegistrationOptions options)
 	if (options.refinement.enable)
 	{
 		folder_name += "Refinement_";
+		if (options.refinement.refine == Refinement::VERTEX)
+			folder_name += "Vertex_";
+		else
+			folder_name += "Edge_";
 	}
 	
 
