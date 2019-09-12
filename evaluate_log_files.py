@@ -33,6 +33,8 @@ def parseOptions(log):
     m = re.search('(\w*)_log.txt', log)
     if m:
         log_dict["name"] = m.group(1)
+
+
     m = re.search('Sequence registration', lines)
     log_dict["sequence"] = "Sequence" if m else ""
 
@@ -42,11 +44,20 @@ def parseOptions(log):
     m = re.search('Random probability to use a vertex: (\d+(\.\d*)?|\.\d+)', lines)
     log_dict["vertex probability"] = m.group(1) if m else "unknown"
 
+
+    log_dict["refine at"] = ""
     m = re.search('Deformation Graph Refinement', lines)
     log_dict["refinement"] = "Refine" if m else ""
+    if m:
+        m = re.search('refine at vertex', lines)
+        log_dict["refine at"] = "Vertex" if m else "Edge"
 
     m = re.search('Adaptive Rigidity by cost function', lines)
     log_dict["adaptive rigidity"] = "Adaptive" if m else ""
+    if m:
+        m = re.search(', edge', lines)
+        log_dict["refine at"] = "Edge" if m else "Vertex"
+
 
     m = re.search('rigidity cost coefficient: (\d+(\.\d*)?|\.\d+)', lines)
     log_dict["rigidity cost coef"] = m.group(1) if m else ""
@@ -54,9 +65,7 @@ def parseOptions(log):
     m = re.search('Adaptive Rigidity by reducing', lines)
     log_dict["reduce rigidity"] = "Reduce" if m else ""
 
-    m = re.search('refine at vertex', lines)
-    if m:
-        log_dict["refine at vertex"] = "True"
+
     return log_dict
 
 def parseError(log):
@@ -99,19 +108,27 @@ for log in log_files:
     dicts.append(log_dict)
 
 
-print("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}".format('Name', 'Sequence', 'Refinement', 'Adaptive', 'Reduce', 'Edge Length', 'Vertex prob', 'Error mean', 'median', 'variance'))
+header = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
+          .format('Name', 'Sequence', 'Refinement', 'Adaptive', 'Reduce', 'Vertex/Edge', 'Edge Length', 'Vertex prob', 'Error mean', 'median', 'variance'))
+
+file = open(path + "\\result.txt","w")
+file.write(header + '\n')
 for log_dict in dicts:
-    #for key in log_dict:
-    #    print(key + ": " + log_dict[key], end = ' ')
-    #print('')
-    print("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
+    table = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
           .format(log_dict['name'],
                   log_dict['sequence'],
                   log_dict['refinement'],
                   log_dict["adaptive rigidity"],
                   log_dict["reduce rigidity"],
+                  log_dict["refine at"],
                   log_dict['edge length'],
                   log_dict['vertex probability'],
                   log_dict['error mean'],
                   log_dict['error median'],
                   log_dict['error variance']))
+
+    print(table)
+    file.write(table + '\n')
+#file = open(path + "\\result.txt","a")
+#file.write(table)
+file.close()

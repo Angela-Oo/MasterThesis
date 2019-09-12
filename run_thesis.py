@@ -64,7 +64,7 @@ list_args.append(paperbag_sequence_args)
 list_args.append(puppet_args_sequence_args)
 list_args.append(head_sequence_args)
 '''
-
+'''
 list_args.append(hand_sequence_args + adaptive_rigidity_vertex_args)
 list_args.append(paperbag_sequence_args + adaptive_rigidity_vertex_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_vertex_args)
@@ -73,34 +73,25 @@ list_args.append(head_sequence_args + adaptive_rigidity_vertex_args)
 list_args.append(hand_sequence_args + adaptive_rigidity_args)
 list_args.append(paperbag_sequence_args + adaptive_rigidity_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_args)
-#list_args.append(head_sequence_args + adaptive_rigidity_args)
+list_args.append(head_sequence_args + adaptive_rigidity_args)
 
 list_args.append(hand_sequence_args + reduce_rigidity_args)
 list_args.append(paperbag_sequence_args + reduce_rigidity_args)
 list_args.append(puppet_args_sequence_args + reduce_rigidity_args)
-#list_args.append(head_sequence_args + reduce_rigidity_args)
+list_args.append(head_sequence_args + reduce_rigidity_args)
 
 list_args.append(hand_sequence_args + refinement_args)
 list_args.append(paperbag_sequence_args + refinement_args)
-list_args.append(puppet_args_sequence_args + refinement_args)
-#list_args.append(head_sequence_args + refinement_args)
-
+list_args.append(puppet_args_sequence_args + refinement_args)'''
+list_args.append(head_sequence_args + refinement_args)
+'''
 list_args.append(hand_sequence_args + refinement_args + ["--refine_at_edge"])
 list_args.append(paperbag_sequence_args + refinement_args + ["--refine_at_edge"])
 list_args.append(puppet_args_sequence_args + refinement_args + ["--refine_at_edge"])
-#list_args.append(head_sequence_args + refinement_args + ["--refine_at_edge"])
+list_args.append(head_sequence_args + refinement_args + ["--refine_at_edge"])
+'''
 
 
-#-n 10 --reduce_rigidity -e 0.35 -p 0.1 --fit 5.0 --smooth 1.0  --minimal_rigidity 0.01 --smooth_cost_threshold 0.01 --max_iterations 10 --error_evaluation="false" --term="false" --render_mode "ALL"
-
-#list_args.append([exe_path, "-i", "hand", "-p", "0.2", "-n", "10", "-r"])
-#list_args.append([exe_path, "-i", "hand", "-p", "0.2", "-n", "10", "-r", "--refine_at_edge"])
-#list_args.append([exe_path, "-i", "hand", "-p", "0.2", "-s", "-r"])
-#list_args.append([exe_path, "-i", "hand", "-p", "0.2", "-s", "-r", "--refine_at_edge"])
-#list_args.append([exe_path, '-n', '2'])
-
-# working adaptive rigidity hyperparameter
-#-n 10 --adaptive_rigidity -e 0.3 -p 0.1 --fit 5.0 --smooth 1.0  --rigidity_cost_coefficient 0.01 --max_iterations 50
 
 for  args in list_args:
     print("START REGISTRATION with args: " + ' '.join(args))
