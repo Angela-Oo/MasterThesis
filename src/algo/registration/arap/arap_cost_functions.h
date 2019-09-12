@@ -80,6 +80,52 @@ struct AsRigidAsPossibleCostFunction {
 
 
 
+struct AdaptableRigidityWeightCostFunction
+{
+	AdaptableRigidityWeightCostFunction() = default;
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create()
+	{
+		return (new ceres::AutoDiffCostFunction<AdaptableRigidityWeightCostFunction, 1, 1>(new AdaptableRigidityWeightCostFunction()));
+	}
+
+	template <typename T>
+	bool operator()(const T* const weight, T* residuals) const
+	{
+		T max{ 10. };
+		if (weight[0] > max)
+			residuals[0] = T{ 0 };
+		else {
+			residuals[0] = ceres::pow((T{ 1. } -(weight[0] / max)), T{ 3 });
+		}
+		return true;
+	}
+};
+
+
+struct RigidityWeightRegularizationCostFunction
+{
+	double _rigidity_weight;
+	RigidityWeightRegularizationCostFunction(double rigidity_weight)
+		: _rigidity_weight(rigidity_weight)
+	{}
+
+	// Factory to hide the construction of the CostFunction object from the client code.
+	static ceres::CostFunction* Create(double rigidity_weight)
+	{
+		return (new ceres::AutoDiffCostFunction<RigidityWeightRegularizationCostFunction, 1, 1>(new RigidityWeightRegularizationCostFunction(rigidity_weight)));
+	}
+
+	template <typename T>
+	bool operator()(const T* const weight, T* residuals) const
+	{
+		T expected{ _rigidity_weight };
+		residuals[0] = expected - weight[0];
+		return true;
+	}
+};
+
 
 
 
@@ -137,26 +183,6 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 
 
 
-struct AdaptableRigidityWeightCostFunction {
-	AdaptableRigidityWeightCostFunction() = default;
-
-	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create() {
-		return (new ceres::AutoDiffCostFunction<AdaptableRigidityWeightCostFunction, 1, 1>(new AdaptableRigidityWeightCostFunction()));
-	}
-
-	template <typename T>
-	bool operator()(const T* const weight, T* residuals) const {
-		T max{ 10. };
-		if (weight[0] > max)
-			residuals[0] = T{ 0 };
-		else {
-			residuals[0] = ceres::pow((T{ 1. } -(weight[0] / max)), T{ 3 });
-		}
-		return true;
-	}
-};
-
 
 
 
@@ -205,7 +231,6 @@ struct ARAPAdaptiveRigidityVertexCostFunction
 		addition(vj, translation_j, vj_t);
 
 		substract(vj_t, vi_t, transformed_edge);
-
 		substract(rotated_edge, transformed_edge, residuals);
 
 		T min{ 0.01 };
@@ -216,7 +241,7 @@ struct ARAPAdaptiveRigidityVertexCostFunction
 		if (wj < min)
 			wj = min;
 		
-		T weight = (wi + wj) * T { 0.5 };
+		T weight = ceres::sqrt((wi + wj) * T { 0.5 });
 		scalar_multiply(residuals, weight, residuals);
 		
 		return true;

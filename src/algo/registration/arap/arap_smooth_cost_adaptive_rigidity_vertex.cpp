@@ -45,7 +45,8 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::adaptiveRigidityCostEdge(cere
 																			DeformationGraph<ARAPDeformation> & deformation_graph)
 {
 	auto vertex_rigidity = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:rigidity").first;
-	ceres::CostFunction* cost_function = AdaptableRigidityWeightCostFunction::Create();
+	//ceres::CostFunction* cost_function = AdaptableRigidityWeightCostFunction::Create();
+	ceres::CostFunction* cost_function = RigidityWeightRegularizationCostFunction::Create(5.);
 	auto loss_function = new ceres::ScaledLoss(NULL, _rigidity_factor, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function, &vertex_rigidity[vertex]);
 }
