@@ -31,8 +31,7 @@ def parseOptions(log):
     lines = readLogFile(log, 20)
     log_dict = dict()
     m = re.search('(\w*)_log.txt', log)
-    if m:
-        log_dict["name"] = m.group(1)
+    log_dict["name"] = m.group(1) if m else log
 
 
     m = re.search('Sequence registration', lines)
@@ -69,7 +68,7 @@ def parseOptions(log):
     return log_dict
 
 def parseError(log):
-    lines = readLogFileEnd(log, 7)
+    lines = readLogFileEnd(log, 80)
     log_dict = dict()
     m = re.search('error: mean (\d+(\.\d*)?|\.\d+)', lines)
     log_dict["error mean"] = m.group(1) if m else "unknown"
@@ -80,6 +79,11 @@ def parseError(log):
     m = re.search('median (\d+(\.\d*)?|\.\d+)', lines)
     log_dict["error median"] = m.group(1) if m else "unknown"
 
+    m = re.search('number of deformation graph nodes (\d+(\.\d*)?|\.\d+)', lines)
+    log_dict["nodes"] = m.group(1) if m else ""
+
+    m = re.search('time: \(h:min:s\) (\d+:\d+:\d+)   \-   finished registration', lines)
+    log_dict["time"] = m.group(1) if m else ""
     return log_dict
 
 def parseLogFile(log):
@@ -108,19 +112,22 @@ for log in log_files:
     dicts.append(log_dict)
 
 
-header = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
-          .format('Name', 'Sequence', 'Refinement', 'Adaptive', 'Reduce', 'Vertex/Edge', 'Edge Length', 'Vertex prob', 'Error mean', 'median', 'variance'))
+header = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
+          .format('Name', 'Sequence', 'Refinement', 'Adaptive', 'Reduce', 'Vertex/Edge', 'Nodes', 'Time', 'Edge Length', 'Vertex prob', 'Error mean', 'median', 'variance'))
 
+print(header)
 file = open(path + "\\result.txt","w")
 file.write(header + '\n')
 for log_dict in dicts:
-    table = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
+    table = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
           .format(log_dict['name'],
                   log_dict['sequence'],
                   log_dict['refinement'],
                   log_dict["adaptive rigidity"],
                   log_dict["reduce rigidity"],
                   log_dict["refine at"],
+                  log_dict["nodes"],
+                  log_dict["time"],
                   log_dict['edge length'],
                   log_dict['vertex probability'],
                   log_dict['error mean'],
