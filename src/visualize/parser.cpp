@@ -203,9 +203,9 @@ void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions 
 
 void parseRefinement(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
 {
-	if (result.count("r"))
+	if (result.count("refine_deformation_graph"))
 	{
-		registration_options.refinement.enable = result["r"].as<bool>();
+		registration_options.refinement.enable = result["refine_deformation_graph"].as<bool>();
 		if(result["refine_at_edge"].as<bool>())
 			registration_options.refinement.refine = Registration::Refinement::EDGE;
 		else
@@ -307,7 +307,7 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("minimal_rigidity", "Minimal rigidity value", cxxopts::value<double>()->default_value("0.1"));
 
 		options.add_options()
-			("r,refine_deformation_graph", "Deformation Graph Refinement")
+			("refine_deformation_graph", "Deformation Graph Refinement")
 			("refine_at_edge", "Refine Deformation Graph At Edge (default is Vertex)")
 			("smooth_cost_threshold", "Refine Deformation Graph if smooth cost of at edge or vertex is bigger than threshold", cxxopts::value<double>()->default_value("0.05"))
 			("min_edge_length", "Minimal Edge Length for Hierarchical Deformation Graph", cxxopts::value<double>()->default_value("0.05"))
