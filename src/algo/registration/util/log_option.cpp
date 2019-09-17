@@ -43,7 +43,8 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 			ss << "refine at edge,";
 		else
 			ss << "refine at vertex,";
-		ss << " smooth cost threshold " << options.refinement.smooth_cost_threshold
+		ss << " smooth cost threshold: max(" << options.refinement.smooth_cost_threshold
+			<< ", " << options.refinement.smooth_cost_percentage_of_max << " * max_value)"
 			<< ", levels " << options.refinement.levels
 			<< ", min edge length " << options.refinement.min_edge_length << std::endl;
 	}

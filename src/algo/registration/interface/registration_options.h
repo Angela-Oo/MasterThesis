@@ -36,6 +36,7 @@ struct RefinementOptions
 	unsigned int levels {4};
 	Refinement refine {Refinement::VERTEX};
 	double smooth_cost_threshold{ 0.05 };
+	double smooth_cost_percentage_of_max{ 0.8 };
 };
 
 

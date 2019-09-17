@@ -211,6 +211,7 @@ void parseRefinement(Registration::RegistrationOptions& registration_options, cx
 		else
 			registration_options.refinement.refine = Registration::Refinement::VERTEX;
 		registration_options.refinement.smooth_cost_threshold = result["smooth_cost_threshold"].as<double>();
+		registration_options.refinement.smooth_cost_percentage_of_max = result["smooth_cost_percentage_of_max"].as<double>();
 		registration_options.refinement.min_edge_length = result["min_edge_length"].as<double>();
 		registration_options.refinement.levels = result["levels"].as<unsigned int>();
 	}
@@ -309,8 +310,9 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		options.add_options()
 			("refine_deformation_graph", "Deformation Graph Refinement")
 			("refine_at_edge", "Refine Deformation Graph At Edge (default is Vertex)")
-			("smooth_cost_threshold", "Refine Deformation Graph if smooth cost of at edge or vertex is bigger than threshold", cxxopts::value<double>()->default_value("0.05"))
-			("min_edge_length", "Minimal Edge Length for Hierarchical Deformation Graph", cxxopts::value<double>()->default_value("0.05"))
+			("smooth_cost_threshold", "Refine Deformation Graph if smooth cost at edge or vertex is bigger than threshold", cxxopts::value<double>()->default_value("0.05"))
+			("smooth_cost_percentage_of_max", "Refine Deformation Graph if smooth cost at edge or vertex is bigger than smooth cost percentage of max smooth cost", cxxopts::value<double>()->default_value("0.8"))
+			("min_edge_length", "Minimal Edge Length for Hierarchical Deformation Graph", cxxopts::value<double>()->default_value("0.05"))			
 			("levels", "Number of Levels for Hierarchical Deformation Graph", cxxopts::value<unsigned int>()->default_value("4"));
 
 		options.add_options()

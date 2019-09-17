@@ -110,9 +110,9 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 		
 		size_t refined_vertices_edges{ 0 };
 		if(_options.refinement.refine == Refinement::VERTEX)
-			refined_vertices_edges = refineHierarchicalMeshAtVertices(_deformation, _options.refinement.smooth_cost_threshold);
+			refined_vertices_edges = refineHierarchicalMeshAtVertices(_deformation, _options.refinement.smooth_cost_threshold, _options.refinement.smooth_cost_percentage_of_max);
 		else
-			refined_vertices_edges = refineHierarchicalMeshAtEdges(_deformation, _options.refinement.smooth_cost_threshold);
+			refined_vertices_edges = refineHierarchicalMeshAtEdges(_deformation, _options.refinement.smooth_cost_threshold, _options.refinement.smooth_cost_percentage_of_max);
 		
 		if (_logger)
 			_logger->write("Number of new vertices: " + std::to_string(refined_vertices_edges));
