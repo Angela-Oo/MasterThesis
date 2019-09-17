@@ -70,13 +70,15 @@ def parseOptions(log):
 def parseError(log):
     lines = readLogFileEnd(log, 80)
     log_dict = dict()
-    m = re.search('error: mean (\d+(\.\d*)?|\.\d+)', lines)
+
+    float_pattern = '[-+]?(?:(?:\d*\.\d+)|(?:\d+\.?))(?:[Ee][+-]?\d+)?'
+    m = re.search('error: mean (' + float_pattern + ')', lines)
     log_dict["error mean"] = m.group(1) if m else "unknown"
 
-    m = re.search('variance (\d+(\.\d*)?|\.\d+)', lines)
+    m = re.search('variance (' + float_pattern + ')', lines)
     log_dict["error variance"] = m.group(1) if m else "unknown"
 
-    m = re.search('median (\d+(\.\d*)?|\.\d+)', lines)
+    m = re.search('median (' + float_pattern + ')', lines)
     log_dict["error median"] = m.group(1) if m else "unknown"
 
     m = re.search('number of deformation graph nodes (\d+(\.\d*)?|\.\d+)', lines)
@@ -93,7 +95,7 @@ def parseLogFile(log):
     return log_dict
 
 
-path = "images/run_2019_09_10"
+path = "images/run_2019_09_13"
 
 log_files = []
 # r=root, d=directories, f = files

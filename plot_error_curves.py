@@ -82,7 +82,7 @@ def getAllLogFiles(path):
 
 
 
-path = "images/run_2019_09_10"
+path = "images/run_2019_09_13"
 log_files = getAllLogFiles(path)
 
 for x in log_files:
