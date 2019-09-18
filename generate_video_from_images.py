@@ -15,7 +15,7 @@ def generateVideo(path, output_name):
             try:
                 img = Image.open(complete_path)  # open the image file
                 img.verify()  # verify that it is, in fact an image
-                m = re.search('frame_(.*?)_', file)
+                m = re.search('frame_(\d*?)_', file)
                 if not m:
                     print("key not found")
                 else:
