@@ -13,13 +13,20 @@ void AsRigidAsPossibleSmoothCostAdaptiveRigidity::evaluateResiduals(ceres::Probl
 	auto smooth_cost = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
 	if (!_arap_residual_ids.empty() && smooth_cost.second) {
 		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _arap_residual_ids, smooth_cost.first, _smooth_factor);
-		logger.write(" max_smooth_cost: " + std::to_string(max_and_mean_cost.first), false);
+		logger.write(" max_smooth_cost: " + std::to_string(max_and_mean_cost.first) + " mean_smooth_cost: " + std::to_string(max_and_mean_cost.second), false);
 	}
 
 	if (!_rigidity_residual_ids.empty()) {
 		auto rigidity_cost = mesh.add_property_map<edge_descriptor, double>("e:rigidity_cost", 0.);
 		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _rigidity_residual_ids, rigidity_cost.first, _rigidity_factor);
-		logger.write(" max_rigidity_cost: " + std::to_string(max_and_mean_cost.first), false);
+		logger.write(" max_rigidity_cost: " + std::to_string(max_and_mean_cost.first) + " mean_rigidity_cost: " + std::to_string(max_and_mean_cost.second), false);
+
+		auto rigidity_value = mesh.add_property_map<vertex_descriptor, double>("v:rigidity", 0.).first;
+		double max_rigidity = *std::max_element(rigidity_value.begin(), rigidity_value.end());
+		double min_rigidity = *std::min_element(rigidity_value.begin(), rigidity_value.end());
+		double mean_rigidity = std::accumulate(rigidity_value.begin(), rigidity_value.end(), 0.) / mesh.number_of_vertices();
+
+		logger.write(" min_rigidity_value: " + std::to_string(min_rigidity) + " max_rigidity_value: " + std::to_string(max_rigidity) + " mean_rigidity_value: " + std::to_string(mean_rigidity), false);
 	}
 }
 
