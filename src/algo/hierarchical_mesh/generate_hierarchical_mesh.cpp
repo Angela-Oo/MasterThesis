@@ -81,9 +81,11 @@ HierarchicalMesh generateHierarchicalMesh(const SurfaceMesh & mesh, double min_r
 	for (unsigned int i = 1; i < levels; ++i) {
 		double radius = min_radius * pow(2, meshes.size());
 		auto level = levels - i - 1;
-		meshes.push_back(generateHierarchicalMeshLevel(meshes.back(), radius, level));
-		if (meshes.back().number_of_vertices() < 3)
-			throw std::exception("initial edge length to big");
+		auto mesh_of_level = generateHierarchicalMeshLevel(meshes.back(), radius, level);
+		if (meshes.back().number_of_vertices() > 3)
+			meshes.push_back(mesh_of_level);
+		else
+			std::cout << "initial edge length to big" << std::endl;
 	}
 	std::reverse(meshes.begin(), meshes.end());
 	HierarchicalMesh hierarchical_mesh(meshes);
