@@ -31,8 +31,9 @@ refinement_args = ["--refine_deformation_graph", "--min_edge_length", "0.1", "--
 refinement_args_level_3 = ["--refine_deformation_graph", "--min_edge_length", "0.1", "--levels", "3", "--smooth_cost_threshold", "0.1", "--smooth_cost_percentage_of_max", "0.1"]
 
 reduce_rigidity_args = ["--reduce_rigidity", "--fit", "5.0", "--smooth", "1.0", "--minimal_rigidity", "0.01", "--smooth_cost_threshold", "0.01", "--max_iterations", "10"]
-adaptive_rigidity_args = ["--adaptive_rigidity", "--fit", "5.0", "--smooth", "1.0", "--rigidity_cost_coefficient", "0.1", "--max_iterations", "25"]
-adaptive_rigidity_vertex_args = ["--adaptive_rigidity", "--rigidity_coefficient_per_vertex", "--fit", "5.0", "--smooth", "1.0", "--rigidity_cost_coefficient", "0.1", "--max_iterations", "25"]
+
+adaptive_rigidity_args = ["--adaptive_rigidity", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.1", "--max_iterations", "25"]
+adaptive_rigidity_vertex_args = ["--adaptive_rigidity", "--rigidity_coefficient_per_vertex", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.1", "--max_iterations", "25"]
 
 adaptive_rigidity_edge_quadratic_weight_args = ["--adaptive_rigidity", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.01", "--use_quadratic_rigid_weight", "--max_iterations", "25"]
 adaptive_rigidity_vertex_quadratic_weight_args = ["--adaptive_rigidity", "--rigidity_coefficient_per_vertex", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.01", "--use_quadratic_rigid_weight", "--max_iterations", "25"]
@@ -70,17 +71,19 @@ list_args.append(puppet_args_sequence_args)
 list_args.append(head_sequence_args)
 '''
 
+'''
 list_args.append(hand_sequence_args + adaptive_rigidity_vertex_quadratic_weight_args)
 list_args.append(paperbag_sequence_args + adaptive_rigidity_vertex_quadratic_weight_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_vertex_quadratic_weight_args)
 list_args.append(head_sequence_args + adaptive_rigidity_vertex_quadratic_weight_args)
 
+'''
 list_args.append(hand_sequence_args + adaptive_rigidity_edge_quadratic_weight_args)
 list_args.append(paperbag_sequence_args + adaptive_rigidity_edge_quadratic_weight_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_edge_quadratic_weight_args)
 list_args.append(head_sequence_args + adaptive_rigidity_edge_quadratic_weight_args)
 
-'''
+
 list_args.append(hand_sequence_args + adaptive_rigidity_vertex_args)
 list_args.append(paperbag_sequence_args + adaptive_rigidity_vertex_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_vertex_args)
@@ -91,6 +94,7 @@ list_args.append(paperbag_sequence_args + adaptive_rigidity_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_args)
 list_args.append(head_sequence_args + adaptive_rigidity_args)
 
+'''
 list_args.append(hand_sequence_args + reduce_rigidity_args)
 list_args.append(paperbag_sequence_args + reduce_rigidity_args)
 list_args.append(puppet_args_sequence_args + reduce_rigidity_args)
