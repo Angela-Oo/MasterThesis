@@ -54,7 +54,7 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::adaptiveRigidityCostEdge(cere
 	auto vertex_rigidity = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:rigidity").first;
 	ceres::CostFunction* cost_function;
 	if(_use_quadratic_rigid_weight)
-		cost_function = AdaptableRigidityWeightCostFunction::Create();
+		cost_function = AdaptableRigidityWeightCostFunction::Create(1.);
 	else
 		cost_function = RigidityWeightRegularizationCostFunction::Create(1.);
 	auto loss_function = new ceres::ScaledLoss(NULL, _rigidity_factor, ceres::TAKE_OWNERSHIP);

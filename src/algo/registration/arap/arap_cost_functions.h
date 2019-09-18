@@ -82,22 +82,25 @@ struct AsRigidAsPossibleCostFunction {
 
 struct AdaptableRigidityWeightCostFunction
 {
-	AdaptableRigidityWeightCostFunction() = default;
+	double _rigidity_weight;
+	AdaptableRigidityWeightCostFunction(double rigidity_weight)
+		: _rigidity_weight(rigidity_weight)
+	{}
 
 	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create()
+	static ceres::CostFunction* Create(double rigidity_weight)
 	{
-		return (new ceres::AutoDiffCostFunction<AdaptableRigidityWeightCostFunction, 1, 1>(new AdaptableRigidityWeightCostFunction()));
+		return (new ceres::AutoDiffCostFunction<AdaptableRigidityWeightCostFunction, 1, 1>(new AdaptableRigidityWeightCostFunction(rigidity_weight)));
 	}
 
 	template <typename T>
 	bool operator()(const T* const weight, T* residuals) const
 	{
-		T max{ 10. };
-		if (weight[0] > max)
+		T expected{ _rigidity_weight };
+		if (weight[0] > expected)
 			residuals[0] = T{ 0 };
 		else {
-			residuals[0] = ceres::pow((T{ 1. } -(weight[0] / max)), T{ 3 });
+			residuals[0] = ceres::pow((T{ 1. } - (weight[0] / expected)), T{ 3 });
 		}
 		return true;
 	}

@@ -56,6 +56,10 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 			ss << ", edge " << std::endl;
 		else
 			ss << ", vertex " << std::endl;
+		if (options.adaptive_rigidity.regular == AdaptiveRigidityRegularizer::LINEAR)
+			ss << ", linear regularizer " << std::endl;
+		else
+			ss << ", quadratic regularizer " << std::endl;
 	}
 
 	if (options.reduce_rigidity.enable)
