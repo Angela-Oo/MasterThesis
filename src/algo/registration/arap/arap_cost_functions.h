@@ -175,7 +175,7 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 		substract(vj_t, vi_t, transformed_edge);
 
 		substract(rotated_edge, transformed_edge, residuals);
-		
+
 		scalar_multiply(residuals, w[0], residuals);
 		return true;
 	}
@@ -241,7 +241,7 @@ struct ARAPAdaptiveRigidityVertexCostFunction
 		if (wj < min)
 			wj = min;
 		
-		T weight = ceres::sqrt((wi + wj) * T { 0.5 });
+		T weight = (wi + wj) * T { 0.5 };
 		scalar_multiply(residuals, weight, residuals);
 		
 		return true;

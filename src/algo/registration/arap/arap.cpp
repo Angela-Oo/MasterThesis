@@ -174,10 +174,11 @@ void AsRigidAsPossible::init()
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
 	if (_options.adaptive_rigidity.enable) {
+		bool use_quadratic_rigid_weight = _options.adaptive_rigidity.regular == AdaptiveRigidityRegularizer::SQUARED;
 		if(_options.adaptive_rigidity.refinement == Refinement::VERTEX)
-			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient);
+			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient, use_quadratic_rigid_weight);
 		else
-			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient);
+			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient, use_quadratic_rigid_weight);
 	}
 	else {
 		_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>(_options.smooth);

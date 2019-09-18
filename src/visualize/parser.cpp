@@ -227,6 +227,10 @@ void parseAdaptiveRigidity(Registration::RegistrationOptions& registration_optio
 			registration_options.adaptive_rigidity.refinement = Registration::Refinement::VERTEX;
 		else
 			registration_options.adaptive_rigidity.refinement = Registration::Refinement::EDGE;
+		if (result["use_quadratic_rigid_weight"].as<bool>())
+			registration_options.adaptive_rigidity.regular = Registration::AdaptiveRigidityRegularizer::SQUARED;
+		else
+			registration_options.adaptive_rigidity.regular = Registration::AdaptiveRigidityRegularizer::LINEAR;
 	}
 }
 
@@ -300,7 +304,8 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		options.add_options()
 			("adaptive_rigidity", "Adaptive Rigidity")
 			("rigidity_cost_coefficient", "Adaptive Rigidity cost coefficient", cxxopts::value<double>()->default_value("0.01"))
-			("rigidity_coefficient_per_vertex", "Adapt the rigid coefficient per Vertex (default per Edge)", cxxopts::value<bool>());
+			("rigidity_coefficient_per_vertex", "Adapt the rigid coefficient per Vertex (default per Edge)", cxxopts::value<bool>())
+			("use_quadratic_rigid_weight", "Regularizer for adaptive rigidity", cxxopts::value<bool>());
 
 		options.add_options()
 			("reduce_rigidity", "Reduce Rigidity")

@@ -14,12 +14,19 @@ enum class Refinement
 	EDGE,
 	VERTEX
 };
+
+enum class AdaptiveRigidityRegularizer
+{
+	LINEAR,
+	SQUARED
+};
 	
 struct AdaptiveRigidityOptions
 {
 	bool enable{ false };
 	Refinement refinement{ Refinement::EDGE };
 	double rigidity_cost_coefficient{ 0.005 };
+	AdaptiveRigidityRegularizer regular { AdaptiveRigidityRegularizer::LINEAR };
 };
 
 struct ReduceRigidityOptions

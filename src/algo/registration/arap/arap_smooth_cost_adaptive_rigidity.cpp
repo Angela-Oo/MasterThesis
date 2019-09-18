@@ -13,13 +13,13 @@ void AsRigidAsPossibleSmoothCostAdaptiveRigidity::evaluateResiduals(ceres::Probl
 	auto smooth_cost = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
 	if (!_arap_residual_ids.empty() && smooth_cost.second) {
 		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _arap_residual_ids, smooth_cost.first, _smooth_factor);
-		logger.write(" max smooth cost: " + std::to_string(max_and_mean_cost.first), false);
+		logger.write(" max_smooth_cost: " + std::to_string(max_and_mean_cost.first), false);
 	}
 
 	if (!_rigidity_residual_ids.empty()) {
 		auto rigidity_cost = mesh.add_property_map<edge_descriptor, double>("e:rigidity_cost", 0.);
 		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _rigidity_residual_ids, rigidity_cost.first, _rigidity_factor);
-		logger.write(" max rigidity cost: " + std::to_string(max_and_mean_cost.first), false);
+		logger.write(" max_rigidity_cost: " + std::to_string(max_and_mean_cost.first), false);
 	}
 }
 
@@ -49,7 +49,11 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::adaptiveRigidityCostEdge(ceres::Pro
 																	  DeformationGraph<ARAPDeformation> & deformation_graph)
 {
 	auto edge_rigidity = deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").first;
-	ceres::CostFunction* cost_function = AdaptableRigidityWeightCostFunction::Create();
+	ceres::CostFunction* cost_function;
+	if(_use_quadratic_rigid_weight)
+		cost_function = AdaptableRigidityWeightCostFunction::Create();
+	else
+		cost_function = RigidityWeightRegularizationCostFunction::Create(1.);
 	auto loss_function = new ceres::ScaledLoss(NULL, _rigidity_factor, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function, &edge_rigidity[edge]);
 }
@@ -83,9 +87,10 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCost(ceres::Proble
 	return _arap_residual_ids;
 }
 
-AsRigidAsPossibleSmoothCostAdaptiveRigidity::AsRigidAsPossibleSmoothCostAdaptiveRigidity(double smooth_factor, double rigidity_factor)
+AsRigidAsPossibleSmoothCostAdaptiveRigidity::AsRigidAsPossibleSmoothCostAdaptiveRigidity(double smooth_factor, double rigidity_factor, bool use_quadratic_rigid_weight)
 	: _smooth_factor(smooth_factor)
 	, _rigidity_factor(rigidity_factor)
+	, _use_quadratic_rigid_weight(use_quadratic_rigid_weight)
 {
 	std::cout << std::endl << " smooth factor " << _smooth_factor
 		<< ", rigidity factor " << _rigidity_factor << std::endl;

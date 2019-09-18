@@ -11,13 +11,20 @@ void AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::evaluateResiduals(ceres:
 	auto smooth_cost = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
 	if (!_arap_residual_ids.empty() && smooth_cost.second) {
 		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _arap_residual_ids, smooth_cost.first, _smooth_factor);
-		logger.write(" max smooth cost: " + std::to_string(max_and_mean_cost.first), false);
+		logger.write(" max_smooth_cost: " + std::to_string(max_and_mean_cost.first) + " mean_smooth_cost: " + std::to_string(max_and_mean_cost.second), false);
 	}
 
 	if (!_rigidity_residual_ids.empty()) {
 		auto rigidity_cost = mesh.add_property_map<edge_descriptor, double>("e:rigidity_cost", 0.);
 		auto max_and_mean_cost = ::evaluateResiduals(mesh, problem, _rigidity_residual_ids, rigidity_cost.first, _rigidity_factor);
-		logger.write(" max rigidity cost: " + std::to_string(max_and_mean_cost.first), false);
+		logger.write(" max_rigidity_cost: " + std::to_string(max_and_mean_cost.first) + " mean_rigidity_cost: " + std::to_string(max_and_mean_cost.second), false);
+
+		auto rigidity_value = mesh.add_property_map<vertex_descriptor, double>("v:rigidity", 0.).first;
+		double max_rigidity = *std::max_element(rigidity_value.begin(), rigidity_value.end());
+		double min_rigidity = *std::min_element(rigidity_value.begin(), rigidity_value.end());
+		double mean_rigidity = std::accumulate(rigidity_value.begin(), rigidity_value.end(), 0.) / mesh.number_of_vertices();
+
+		logger.write(" min_rigidity_value: " + std::to_string(min_rigidity) + " max_rigidity_value: " + std::to_string(max_rigidity) + " mean_rigidity_value: " + std::to_string(mean_rigidity), false);
 	}
 }
 
@@ -45,8 +52,11 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::adaptiveRigidityCostEdge(cere
 																			DeformationGraph<ARAPDeformation> & deformation_graph)
 {
 	auto vertex_rigidity = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:rigidity").first;
-	//ceres::CostFunction* cost_function = AdaptableRigidityWeightCostFunction::Create();
-	ceres::CostFunction* cost_function = RigidityWeightRegularizationCostFunction::Create(5.);
+	ceres::CostFunction* cost_function;
+	if(_use_quadratic_rigid_weight)
+		cost_function = AdaptableRigidityWeightCostFunction::Create();
+	else
+		cost_function = RigidityWeightRegularizationCostFunction::Create(1.);
 	auto loss_function = new ceres::ScaledLoss(NULL, _rigidity_factor, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function, &vertex_rigidity[vertex]);
 }
@@ -80,9 +90,10 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::asRigidAsPossibleCost(ceres::
 	return _arap_residual_ids;
 }
 
-AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex(double smooth_factor, double rigidity_factor)
+AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex(double smooth_factor, double rigidity_factor, bool use_quadratic_rigid_weight)
 	: _smooth_factor(smooth_factor)
 	, _rigidity_factor(rigidity_factor)
+	, _use_quadratic_rigid_weight(use_quadratic_rigid_weight)
 {
 	std::cout << std::endl << " smooth factor " << _smooth_factor
 		<< ", rigidity factor " << _rigidity_factor << std::endl;
