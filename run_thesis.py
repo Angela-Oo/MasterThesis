@@ -9,7 +9,7 @@ else:
     print("does not exists: " + exe_path)
 
 list_args= []
-base_args = [exe_path, "--image_folder_name", "images/run_2019_09_17"]
+base_args = [exe_path, "--image_folder_name", "images/run_2019_09_19"]
 
 head_args = ["-i", "head", "-p", "0.1", "-e", "0.3", "--smooth_cost_threshold", "0.03"]
 head_registration_args = base_args + head_args + ["-n", "-1"]
@@ -32,11 +32,11 @@ refinement_args_level_3 = ["--refine_deformation_graph", "--min_edge_length", "0
 
 reduce_rigidity_args = ["--reduce_rigidity", "--fit", "5.0", "--smooth", "1.0", "--minimal_rigidity", "0.01", "--smooth_cost_threshold", "0.01", "--max_iterations", "10"]
 
-adaptive_rigidity_args = ["--adaptive_rigidity", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.1", "--max_iterations", "25"]
-adaptive_rigidity_vertex_args = ["--adaptive_rigidity", "--rigidity_coefficient_per_vertex", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.1", "--max_iterations", "25"]
+adaptive_rigidity_args = ["--adaptive_rigidity", "--fit", "1.0", "--smooth", "20.0", "--rigidity_cost_coefficient", "0.1", "--max_iterations", "25"]
+adaptive_rigidity_vertex_args = ["--adaptive_rigidity", "--rigidity_coefficient_per_vertex", "--fit", "1.0", "--smooth", "20.0", "--rigidity_cost_coefficient", "0.1", "--max_iterations", "25"]
 
-adaptive_rigidity_edge_quadratic_weight_args = ["--adaptive_rigidity", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.01", "--use_quadratic_rigid_weight", "--max_iterations", "25"]
-adaptive_rigidity_vertex_quadratic_weight_args = ["--adaptive_rigidity", "--rigidity_coefficient_per_vertex", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.01", "--use_quadratic_rigid_weight", "--max_iterations", "25"]
+adaptive_rigidity_edge_quadratic_weight_args = ["--adaptive_rigidity", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.1", "--use_quadratic_rigid_weight", "--max_iterations", "25"]
+adaptive_rigidity_vertex_quadratic_weight_args = ["--adaptive_rigidity", "--rigidity_coefficient_per_vertex", "--fit", "1.0", "--smooth", "10.0", "--rigidity_cost_coefficient", "0.1", "--use_quadratic_rigid_weight", "--max_iterations", "25"]
 
 '''
 list_args.append(head_registration_args)
@@ -71,19 +71,19 @@ list_args.append(puppet_args_sequence_args)
 list_args.append(head_sequence_args)
 '''
 
-'''
+
 list_args.append(hand_sequence_args + adaptive_rigidity_vertex_quadratic_weight_args)
 list_args.append(paperbag_sequence_args + adaptive_rigidity_vertex_quadratic_weight_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_vertex_quadratic_weight_args)
 list_args.append(head_sequence_args + adaptive_rigidity_vertex_quadratic_weight_args)
 
-'''
+
 list_args.append(hand_sequence_args + adaptive_rigidity_edge_quadratic_weight_args)
 list_args.append(paperbag_sequence_args + adaptive_rigidity_edge_quadratic_weight_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_edge_quadratic_weight_args)
 list_args.append(head_sequence_args + adaptive_rigidity_edge_quadratic_weight_args)
 
-
+'''
 list_args.append(hand_sequence_args + adaptive_rigidity_vertex_args)
 list_args.append(paperbag_sequence_args + adaptive_rigidity_vertex_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_vertex_args)
@@ -94,7 +94,6 @@ list_args.append(paperbag_sequence_args + adaptive_rigidity_args)
 list_args.append(puppet_args_sequence_args + adaptive_rigidity_args)
 list_args.append(head_sequence_args + adaptive_rigidity_args)
 
-'''
 list_args.append(hand_sequence_args + reduce_rigidity_args)
 list_args.append(paperbag_sequence_args + reduce_rigidity_args)
 list_args.append(puppet_args_sequence_args + reduce_rigidity_args)
