@@ -82,38 +82,95 @@ def getAllLogFiles(path):
 
 
 
-path = "images/run_2019_09_13"
+def parseLogs(log_files, name):
+    dicts = dict()
+
+    float_pattern = ('[-+]?(?:(?:\d*\.\d+)|(?:\d+\.?))(?:[Ee][+-]?\d+)?')
+    for log in log_files:
+        key = log.replace(path + '\\', '')
+        key = key.replace('log_files\\', '')
+        key = key.replace('AllFrames', '')
+        key = key.replace('log.txt', '')
+        key = key.replace('ARAP', '')
+        key = key.replace('\\', ' ')
+        key = key.replace('_', ' ')
+        key = re.sub(r"(" + float_pattern + ")", "", key)
+        key = re.sub(' +', " ", key)
+
+        key = key.replace(name + ' ', '')
+        log_dict = parseLogFile(log)
+        dicts[key] = log_dict
+        print(key)
+    return dicts
+
+def printLogFiles(log_files):
+    for x in log_files:
+        print(x)
+
+
+def plotLogFiles(dicts):
+    import matplotlib.pyplot as plt
+    import sys
+    import os
+    plt.figure(1)
+    for key in dicts:
+        # if "hand" in key:
+        if True:
+            data = dicts[key]
+            if len(data['frame']) == len(data['error mean']):
+                plt.plot(data['frame'], data['error mean'])
+                plt.gcf().autofmt_xdate()
+
+    plt.title('frame vs mean error')
+    plt.show()
+
+
+def getLogFilesWithName(log_files, name):
+    filtered_log_files = []
+    for log in log_files:
+        if name in log:# and 'Refinement' not in log:
+            filtered_log_files.append(log)
+    return filtered_log_files
+
+
+def plotLogFilesTest(data, name):
+    import numpy as np
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    sns.set(style="darkgrid")
+
+    dataset = dict()
+    keys = []
+    for key in data:
+        d = data[key]
+        keys.append(key)
+        dataset[key] = d['error mean']
+        #dataset[key] = d['error median']
+
+    fmri = pd.DataFrame(dataset)
+    g = sns.relplot(kind="line", ci="sd", data=fmri)
+    g.fig.suptitle(name)
+    g.set(xlabel='frames', ylabel='mean error')
+    plt.show()
+
+
+def plotLogs(all_log_files, name):
+    log_files = getLogFilesWithName(all_log_files, name)
+    printLogFiles(log_files)
+    dicts = parseLogs(log_files, name)
+    plotLogFilesTest(dicts, name)
+
+
+
+path = "images/run_2019_09_17"
 log_files = getAllLogFiles(path)
-
-for x in log_files:
-    print(x)
-
-dicts = dict()
-for log in log_files:
-    key = log.replace(path + '\\', '')
-    key = key.replace('\\', '_')
-    log_dict = parseLogFile(log)
-    dicts[key] = log_dict
+plotLogs(log_files, "head")
+plotLogs(log_files, "hand")
+plotLogs(log_files, "paperbag")
+plotLogs(log_files, "puppet")
 
 
-import matplotlib.pyplot as plt
-import sys
-import os
-
-#data = {'velocity' : [2,4,6,8,12,50],
-#        'time' : [12, 12, 12, 16, 18, 210]}
-
-plt.figure(1)
-
-#data = next(iter(dicts.values()))
-for key in dicts:
-    #if "hand" in key:
-    if True:
-        data = dicts[key]
-        if len(data['frame']) == len(data['error mean']):
-            plt.plot(data['frame'] ,data['error mean'])
-            plt.gcf().autofmt_xdate()
-
-plt.title('frame vs mean error')
-plt.show()
-
+print("Press Enter to continue ...")
+input()
