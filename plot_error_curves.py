@@ -150,7 +150,7 @@ def plotLogFilesTest(data, name):
         #dataset[key] = d['error median']
 
     fmri = pd.DataFrame(dataset)
-    g = sns.relplot(kind="line", ci="sd", data=fmri)
+    g = sns.relplot(kind="line", dashes=False, style='event', data=fmri)
     g.fig.suptitle(name)
     g.set(xlabel='frames', ylabel='mean error')
     plt.show()
@@ -165,6 +165,9 @@ def plotLogs(all_log_files, name):
 
 
 path = "images/run_2019_09_17"
+
+
+
 log_files = getAllLogFiles(path)
 plotLogs(log_files, "head")
 plotLogs(log_files, "hand")
