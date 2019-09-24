@@ -45,6 +45,10 @@ std::string imageFolderName(Registration::RegistrationOptions options)
 		folder_name += "ReduceRigidity_";
 	}
 
+	if (options.reduce_smooth_factor) {
+		folder_name += "ReduceSmooth_";
+	}
+
 	if (options.refinement.enable)
 	{
 		folder_name += "Refinement_";
