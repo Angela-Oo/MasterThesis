@@ -124,7 +124,10 @@ struct RigidityWeightRegularizationCostFunction
 	bool operator()(const T* const weight, T* residuals) const
 	{
 		T expected{ _rigidity_weight };
-		residuals[0] = expected - weight[0];
+		if (weight[0] > expected)
+			residuals[0] = T{ 0 };
+		else
+			residuals[0] = expected - weight[0];
 		return true;
 	}
 };
