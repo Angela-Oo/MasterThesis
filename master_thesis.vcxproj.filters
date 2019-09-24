@@ -794,6 +794,9 @@
     <ClInclude Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity_vertex.h">
       <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
     </ClInclude>
+    <ClInclude Include="src\visualize\visualizer\save_images_visualizer.h">
+      <Filter>6 visualize\2 visualizer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -1001,6 +1004,9 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity_vertex.cpp">
       <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClCompile>
+    <ClCompile Include="src\visualize\visualizer\save_images_visualizer.cpp">
+      <Filter>6 visualize\2 visualizer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

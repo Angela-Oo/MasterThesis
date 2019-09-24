@@ -326,6 +326,7 @@
     <ClInclude Include="src\visualize\visualizer\i_registration_visualizer.h" />
     <ClInclude Include="src\visualize\visualizer\mesh_visualizer.h" />
     <ClInclude Include="src\visualize\visualizer\registration_visualizer.h" />
+    <ClInclude Include="src\visualize\visualizer\save_images_visualizer.h" />
     <ClInclude Include="src\visualize\visualizer\sequence_visualizer.h" />
   </ItemGroup>
   <ItemGroup>
@@ -406,6 +407,7 @@
     <ClCompile Include="src\visualize\visualizer\image_folder_name.cpp" />
     <ClCompile Include="src\visualize\visualizer\mesh_visualizer.cpp" />
     <ClCompile Include="src\visualize\visualizer\registration_visualizer.cpp" />
+    <ClCompile Include="src\visualize\visualizer\save_images_visualizer.cpp" />
     <ClCompile Include="src\visualize\visualizer\sequence_visualizer.cpp" />
   </ItemGroup>
   <ItemGroup>

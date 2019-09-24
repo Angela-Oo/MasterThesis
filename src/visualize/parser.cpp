@@ -144,6 +144,7 @@ void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions 
 	else if (render_mode == "DEFORMATION_GRAPH")
 		options.input_mesh_sequence.render_mode = Visualizer::ONLY_DEFORMATION_GRAPH;
 
+	options.input_mesh_sequence.only_render_images = result["only_render_images"].as<bool>();
 	options.input_mesh_sequence.term = result["term"].as<bool>();
 }
 
@@ -234,6 +235,7 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("render_mode", 
 			 "Image Render Mode: DEFORMATION (deformation, deformation_graph), ALL (deformation, target, deformation_graph), TARGET (target, deformation_graph), DEFORMATION_GRAPH (deformation_graph)",
 			 cxxopts::value<std::string>()->default_value("DEFORMATION"))
+			("only_render_images", "Enable to only save images of the input sequence (NO Registration will performed)")
 			("term", "Terminates the application after the registration finished", cxxopts::value<bool>()->default_value("true"));
 
 		options.add_options()
@@ -272,7 +274,7 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("p,probability_to_use_vertex", "Random Probability to use a input vertex", cxxopts::value<double>()->default_value("0.2"))
 			("smooth", "Smooth coefficient used for registration", cxxopts::value<double>()->default_value("1."))
 			("fit", "Fit coefficient used for registration", cxxopts::value<double>()->default_value("1."))
-			("reduce_smooth_factor", "Reduce Smooth Factor", cxxopts::value<bool>()->default_value("true"))
+			("reduce_smooth_factor", "Reduce Smooth Factor")
 			("ignore_border_vertices", "Ignore Border Vertices of target mesh", cxxopts::value<bool>()->default_value("true"));
 
 		auto result = options.parse(argc, argv);

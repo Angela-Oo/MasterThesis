@@ -91,6 +91,7 @@ struct Input
 	int number_of_frames_to_load{ -1 }; // to load all frames set to -1
 	Visualizer::RegistrationRenderMode render_mode{ Visualizer::RegistrationRenderMode::DEFORMATION };
 	bool term{ true };
+	bool only_render_images{ false };// option only used for creating images of sequences
 };
 
 struct RegistrationOptions

@@ -7,6 +7,7 @@
 #include "image_folder_name.h"
 #include <memory>
 #include "algo/registration/options/ceres_option.h"
+#include "save_images_visualizer.h"
 
 namespace Visualizer
 {
@@ -16,27 +17,35 @@ std::shared_ptr<IRegistrationVisualizer> createRegistrationVisualizer(std::share
 																	  Registration::RegistrationOptions & options)
 {
 	auto save_images_folder = imageFolderName(options);
-	auto logger = std::make_shared<FileWriter>(save_images_folder + "/" + options.input_mesh_sequence.output_folder_name + "_log.txt");
-	logger->write("Save image folder: " + save_images_folder);
 
-	options.ceres_options = ceresOption();
-	
-	logOptions(logger, options);
-
-	auto edge_coloring = Visualize::EdgeColor::SmoothCost;
-	if (options.adaptive_rigidity.enable || options.reduce_rigidity.enable || options.reduce_rigidity.enable)
-		edge_coloring = Visualize::EdgeColor::RigidityValue;
-	
-	if (options.sequence_options.enable) {
-		auto register_sequence_of_frames = Registration::createSequenceRegistration(options, logger, mesh_reader);
-		return std::make_shared<SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), renderer, save_images_folder, logger, edge_coloring);
+	if(options.input_mesh_sequence.only_render_images)
+	{
+		return std::make_shared<SaveImagesVisualizer>(mesh_reader, renderer, save_images_folder);
 	}
-	else {
-		auto & source = mesh_reader->getMesh(0);
-		auto & target = mesh_reader->getMesh(mesh_reader->size() - 1);
+	else 
+	{
+		auto logger = std::make_shared<FileWriter>(save_images_folder + "/" + options.input_mesh_sequence.output_folder_name + "_log.txt");
+		logger->write("Save image folder: " + save_images_folder);
 
-		auto registration = Registration::createRegistration(options, logger, source, target);
-		return std::make_shared<RegistrationVisualizer>(std::move(registration), renderer, save_images_folder, logger, edge_coloring);
+		options.ceres_options = ceresOption();
+
+		logOptions(logger, options);
+
+		auto edge_coloring = Visualize::EdgeColor::SmoothCost;
+		if (options.adaptive_rigidity.enable || options.reduce_rigidity.enable || options.reduce_rigidity.enable)
+			edge_coloring = Visualize::EdgeColor::RigidityValue;
+
+		if (options.sequence_options.enable) {
+			auto register_sequence_of_frames = Registration::createSequenceRegistration(options, logger, mesh_reader);
+			return std::make_shared<SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), renderer, save_images_folder, logger, edge_coloring);
+		}
+		else {
+			auto & source = mesh_reader->getMesh(0);
+			auto & target = mesh_reader->getMesh(mesh_reader->size() - 1);
+
+			auto registration = Registration::createRegistration(options, logger, source, target);
+			return std::make_shared<RegistrationVisualizer>(std::move(registration), renderer, save_images_folder, logger, edge_coloring);
+		}
 	}
 }
 
