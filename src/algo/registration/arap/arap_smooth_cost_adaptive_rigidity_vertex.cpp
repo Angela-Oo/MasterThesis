@@ -68,6 +68,10 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::asRigidAsPossibleCost(ceres::
 																		 double loss_weighting,
 																		 DeformationGraph<ARAPDeformation> & deformation_graph)
 {
+	if (_smooth_factor != loss_weighting) {
+		_smooth_factor = loss_weighting;
+		std::cout << " smooth factor " << _smooth_factor << std::endl;
+	}
 	_arap_residual_ids.clear();
 	_rigidity_residual_ids.clear();
 	auto & mesh = deformation_graph._mesh;

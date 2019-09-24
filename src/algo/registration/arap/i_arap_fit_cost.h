@@ -16,7 +16,7 @@ protected:
 	using VertexResidualIds = std::map<vertex_descriptor, ResidualIds>;
 public:
 	virtual std::vector<Point> getFixedPostions() {	return std::vector<Point>(); }
-
+	virtual void evaluateResiduals(ceres::Problem &problem, SurfaceMesh & mesh, CeresIterationLoggerGuard & logger) = 0;
 	virtual VertexResidualIds addFitCost(ceres::Problem &problem,
 										 DeformationGraph<ARAPDeformation> & deformation_graph,
 										 DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,

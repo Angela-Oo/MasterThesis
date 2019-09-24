@@ -12,7 +12,7 @@ namespace Registration
 class AsRigidAsPossibleFitCost : public IAsRigidAsPossibleFitCost
 {
 private:
-	std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> _fit_residual_ids;
+	std::map<vertex_descriptor, std::vector<ceres::ResidualBlockId>> _fit_residual_ids;
 	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 	std::vector<vertex_descriptor> _subset_of_vertices_to_fit;
 	RegistrationOptions _options;
@@ -21,10 +21,9 @@ private:
 	bool addFitCostVertex(ceres::Problem & problem, 
 						  vertex_descriptor & v, 
 						  DeformationGraph<ARAPDeformation> & deformation_graph,
-						  DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh, 
-						  VertexResidualIds &residual_ids);
+						  DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh);
 public:
-	void evaluateResiduals(ceres::Problem &problem, SurfaceMesh & mesh, CeresIterationLoggerGuard & logger);
+	void evaluateResiduals(ceres::Problem &problem, SurfaceMesh & mesh, CeresIterationLoggerGuard & logger) override;
 	VertexResidualIds addFitCost(ceres::Problem &problem,
 								 DeformationGraph<ARAPDeformation> & deformation_graph,
 								 DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,

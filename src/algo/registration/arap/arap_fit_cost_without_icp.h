@@ -25,6 +25,7 @@ private:
 								 DeformedMesh<DeformationGraph<ARAPDeformation>> & deformed_mesh,
 								 SurfaceMesh::Vertex_index & v);
 public:
+	void evaluateResiduals(ceres::Problem &problem, SurfaceMesh & mesh, CeresIterationLoggerGuard & logger) override {};
 	std::vector<Point> getFixedPostions() override;
 	VertexResidualIds addFitCost(ceres::Problem &problem,
 								 DeformationGraph<ARAPDeformation> & deformation_graph,
