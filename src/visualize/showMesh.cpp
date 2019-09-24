@@ -240,6 +240,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 	ml::mat4f transformation = transform * rotation * scale;
 
 	_render_mode.mode = Visualizer::RegistrationRenderMode::ALL;
+	_options.ceres_options = ceresOption();
 
 	bool test = false;
 

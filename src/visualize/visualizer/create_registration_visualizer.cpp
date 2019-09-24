@@ -6,6 +6,7 @@
 
 #include "image_folder_name.h"
 #include <memory>
+#include "algo/registration/options/ceres_option.h"
 
 namespace Visualizer
 {
@@ -17,6 +18,9 @@ std::shared_ptr<IRegistrationVisualizer> createRegistrationVisualizer(std::share
 	auto save_images_folder = imageFolderName(options);
 	auto logger = std::make_shared<FileWriter>(save_images_folder + "/" + options.input_mesh_sequence.output_folder_name + "_log.txt");
 	logger->write("Save image folder: " + save_images_folder);
+
+	options.ceres_options = ceresOption();
+	
 	logOptions(logger, options);
 
 	auto edge_coloring = Visualize::EdgeColor::SmoothCost;

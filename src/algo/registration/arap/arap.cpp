@@ -68,6 +68,7 @@ bool AsRigidAsPossible::solveIteration()
 		// evaluate
 		if (_options.evaluate_residuals) {
 			_smooth_cost->evaluateResiduals(problem, _deformation_graph._mesh, (*logger));
+			_fit_cost->evaluateResiduals(problem, _deformation_graph._mesh, (*logger));
 		}
 
 		_last_cost = _current_cost;
@@ -83,11 +84,11 @@ bool AsRigidAsPossible::solveIteration()
 
 void AsRigidAsPossible::updateSmoothFactor()
 {
-	bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second ||
-		_deformation_graph._mesh.property_map<vertex_descriptor, double>("v:rigidity").second;
-	if (!use_rigidity)
+	//bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second ||
+	//	_deformation_graph._mesh.property_map<vertex_descriptor, double>("v:rigidity").second;
+	if (_options.reduce_smooth_factor)// !use_rigidity)
 	{
-		auto scale_factor_tol = 0.0001;// 0.00001;
+		auto scale_factor_tol = 0.00001;// 0.00001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
 			(_options.smooth > 0.005))// && a_conf > 0.05))
 		{

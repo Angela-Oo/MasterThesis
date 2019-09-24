@@ -74,7 +74,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	ss << "Random probability to use a vertex: " << options.use_vertex_random_probability << std::endl;
 	
 	ss << "Smooth cost weight: " << options.smooth << " Fit cost weight: " << options.fit << std::endl;
-
+	ss << "Reduce smooth factor: " << std::boolalpha << options.reduce_smooth_factor << std::endl;
 	ss << "Ignore border vertices: " << std::boolalpha << options.ignore_border_vertices << std::endl;
 
 	ss << "Correspondence find criteria: " << " max distance: " << options.icp.correspondence_max_distance

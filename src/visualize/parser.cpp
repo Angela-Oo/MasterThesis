@@ -109,61 +109,7 @@ void parseInput(cxxopts::ParseResult &result, Registration::RegistrationOptions 
 	{
 		auto input = result["i"].as<std::string>();
 
-		options.input_mesh_sequence = inputById(input);
-		/*if (input == "head") {
-			options.input_mesh_sequence.file_path = "../input_data/HaoLi/head/finalRegistration/";
-			options.input_mesh_sequence.file_name = "meshOfFrame";
-			options.input_mesh_sequence.start_index = 1;
-			options.input_mesh_sequence.output_folder_name = input;
-		}
-		else if (input == "head_scan") {
-			options.input_mesh_sequence.file_path = "../input_data/HaoLi/head/headInputScans/";
-			options.input_mesh_sequence.file_name = "meshOfFrame";
-			options.input_mesh_sequence.start_index = 0;
-			options.input_mesh_sequence.output_folder_name = input;
-		}
-		else if (input == "hand")
-		{
-			options.input_mesh_sequence.file_path = "../input_data/HaoLi/hand/hand1-registrationOutput/";
-			options.input_mesh_sequence.file_name = "meshOfFrame";
-			options.input_mesh_sequence.start_index = 1;
-			options.input_mesh_sequence.output_folder_name = input;
-		}
-		else if (input == "hand_scan")
-		{
-			options.input_mesh_sequence.file_path = "../input_data/HaoLi/hand/hand-inputScans/";
-			options.input_mesh_sequence.file_name = "meshOfFrame";
-			options.input_mesh_sequence.start_index = 0;
-			options.input_mesh_sequence.output_folder_name = input;
-		}
-		else if (input == "puppet")
-		{
-			options.input_mesh_sequence.file_path = "../input_data/HaoLi/puppet/finalRegistration/";
-			options.input_mesh_sequence.file_name = "mesh_1";
-			options.input_mesh_sequence.start_index = 0;
-			options.input_mesh_sequence.output_folder_name = input;
-		}
-		else if (input == "puppet_scan")
-		{
-			options.input_mesh_sequence.file_path = "../input_data/HaoLi/puppet/puppetInputScans/";
-			options.input_mesh_sequence.file_name = "meshOfFrame";
-			options.input_mesh_sequence.start_index = 0;
-			options.input_mesh_sequence.output_folder_name = input;
-		}
-		else if (input == "paperbag")
-		{
-			options.input_mesh_sequence.file_path = "../input_data/HaoLi/paperbag/finalregistration/";
-			options.input_mesh_sequence.file_name = "meshOfFrame";
-			options.input_mesh_sequence.start_index = 1;
-			options.input_mesh_sequence.output_folder_name = input;
-		}
-		else if (input == "paperbag_scan")
-		{
-			options.input_mesh_sequence.file_path = "../input_data/HaoLi/paperbag/inputscans/";
-			options.input_mesh_sequence.file_name = "meshOfFrame";
-			options.input_mesh_sequence.start_index = 1;
-			options.input_mesh_sequence.output_folder_name = input;
-		}*/
+		options.input_mesh_sequence = inputById(input);		
 	}
 	else {
 		if (result.count("file_path") && result.count("file_name"))
@@ -249,6 +195,7 @@ void parseOptions(Registration::RegistrationOptions& registration_options, cxxop
 	registration_options.use_vertex_random_probability = result["p"].as<double>();
 	registration_options.smooth = result["smooth"].as<double>();
 	registration_options.fit = result["fit"].as<double>();
+	registration_options.reduce_smooth_factor = result["reduce_smooth_factor"].as<bool>();
 	registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
 
 	registration_options.error_evaluation = result["error_evaluation"].as<bool>();
@@ -325,6 +272,7 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("p,probability_to_use_vertex", "Random Probability to use a input vertex", cxxopts::value<double>()->default_value("0.2"))
 			("smooth", "Smooth coefficient used for registration", cxxopts::value<double>()->default_value("1."))
 			("fit", "Fit coefficient used for registration", cxxopts::value<double>()->default_value("1."))
+			("reduce_smooth_factor", "Reduce Smooth Factor", cxxopts::value<bool>()->default_value("true"))
 			("ignore_border_vertices", "Ignore Border Vertices of target mesh", cxxopts::value<bool>()->default_value("true"));
 
 		auto result = options.parse(argc, argv);

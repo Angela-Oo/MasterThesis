@@ -106,6 +106,7 @@ struct RegistrationOptions
 	unsigned int max_iterations{ 25 };
 	double use_vertex_random_probability{ 0.2 }; // value between 0. and 1.
 	bool ignore_border_vertices{ true };
+	bool reduce_smooth_factor{ true };
 	bool evaluate_residuals{ true };
 	bool error_evaluation{ true };
 	ReduceMeshStrategy mesh_reduce_strategy{ ReduceMeshStrategy::ISOTROPIC };
