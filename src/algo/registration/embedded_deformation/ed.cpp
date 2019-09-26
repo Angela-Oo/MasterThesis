@@ -29,7 +29,7 @@ SurfaceMesh EmbeddedDeformation::getInverseDeformedPoints()
 	return deformed.deformPoints();
 }
 
-std::vector<Point> EmbeddedDeformation::getFixedPostions()
+std::vector<Point> EmbeddedDeformation::getFixedPositions()
 {
 	std::vector<Point> positions;
 	for (auto & v : _fixed_positions) {

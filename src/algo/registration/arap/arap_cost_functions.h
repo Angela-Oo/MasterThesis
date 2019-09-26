@@ -138,15 +138,17 @@ struct RigidityWeightRegularizationCostFunction
 struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 	const Point _v_i; // vi
 	const Point _v_j; // vj
+	double _minimal_rigidity_weight;
 
-	AsRigidAsPossibleAdaptableRigidityCostFunction(const Point & v_i, const Point & v_j)
+	AsRigidAsPossibleAdaptableRigidityCostFunction(const Point & v_i, const Point & v_j, double minimal_rigidity_weight)
 		: _v_i(v_i)
 		, _v_j(v_j)
+		, _minimal_rigidity_weight(minimal_rigidity_weight)
 	{ }
 
 	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create(const Point & v_i, const Point & v_j) {
-		return (new ceres::AutoDiffCostFunction<AsRigidAsPossibleAdaptableRigidityCostFunction, 3, 6, 6, 1>(new AsRigidAsPossibleAdaptableRigidityCostFunction(v_i, v_j)));
+	static ceres::CostFunction* Create(const Point & v_i, const Point & v_j, double minimal_rigidity_weight) {
+		return (new ceres::AutoDiffCostFunction<AsRigidAsPossibleAdaptableRigidityCostFunction, 3, 6, 6, 1>(new AsRigidAsPossibleAdaptableRigidityCostFunction(v_i, v_j, minimal_rigidity_weight)));
 	}
 
 	// E_arap = sum_{i} sum_{j in N} |(vi-vj) - Ri(vi' - vj')|^2
@@ -182,7 +184,11 @@ struct AsRigidAsPossibleAdaptableRigidityCostFunction {
 
 		substract(rotated_edge, transformed_edge, residuals);
 
-		scalar_multiply(residuals, w[0], residuals);
+		T minimal_weight{ _minimal_rigidity_weight };
+		T weight = w[0];
+		if (weight < minimal_weight)
+			weight = minimal_weight;
+		scalar_multiply(residuals, weight, residuals);
 		return true;
 	}
 };
@@ -196,16 +202,18 @@ struct ARAPAdaptiveRigidityVertexCostFunction
 {
 	const Point _v_i; // vi
 	const Point _v_j; // vj
+	double _minimal_rigidity_weight;
 
-	ARAPAdaptiveRigidityVertexCostFunction(const Point & v_i, const Point & v_j)
+	ARAPAdaptiveRigidityVertexCostFunction(const Point & v_i, const Point & v_j, double minimal_rigidity_weight)
 		: _v_i(v_i)
 		, _v_j(v_j)
+		, _minimal_rigidity_weight(minimal_rigidity_weight)
 	{}
 
 	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create(const Point & v_i, const Point & v_j)
+	static ceres::CostFunction* Create(const Point & v_i, const Point & v_j, double minimal_rigidity_weight)
 	{
-		return (new ceres::AutoDiffCostFunction<ARAPAdaptiveRigidityVertexCostFunction, 3, 6, 6, 1, 1>(new ARAPAdaptiveRigidityVertexCostFunction(v_i, v_j)));
+		return (new ceres::AutoDiffCostFunction<ARAPAdaptiveRigidityVertexCostFunction, 3, 6, 6, 1, 1>(new ARAPAdaptiveRigidityVertexCostFunction(v_i, v_j, minimal_rigidity_weight)));
 	}
 
 	// E_arap = sum_{i} sum_{j in N} | w * [Ri(vj-vi) - ((vj + tj) - (vi + ti))] |^2
@@ -239,7 +247,7 @@ struct ARAPAdaptiveRigidityVertexCostFunction
 		substract(vj_t, vi_t, transformed_edge);
 		substract(rotated_edge, transformed_edge, residuals);
 
-		T min{ 0.01 };
+		T min{ _minimal_rigidity_weight };
 		T wi = w_i[0];
 		if (wi < min)
 			wi = min;

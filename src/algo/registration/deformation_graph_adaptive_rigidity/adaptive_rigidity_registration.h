@@ -41,6 +41,7 @@ public:
 	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 public:
 	AdaptiveRigidityRegistration(std::unique_ptr<NonRigidRegistration> non_rigid_registration);
+	void initEdgeRigidity();
 
 	AdaptiveRigidityRegistration(const SurfaceMesh& source,
 								 const SurfaceMesh& target,
@@ -94,12 +95,7 @@ SurfaceMesh AdaptiveRigidityRegistration<NonRigidRegistration>::getDeformationGr
 
 template<typename NonRigidRegistration>
 bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
-{	
-	if (!_non_rigid_registration->getDeformation()._mesh.property_map<edge_descriptor, double>("e:rigidity").second) {
-		auto deformation = _non_rigid_registration->getDeformation();
-		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 10.);
-		_non_rigid_registration->setDeformation(deformation);
-	}
+{
 	bool finished = _non_rigid_registration->finished();
 	if (finished == false) {
 		_current_iteration++;
@@ -186,6 +182,22 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 {
 }
 
+template <typename NonRigidRegistration>
+void AdaptiveRigidityRegistration<NonRigidRegistration>::initEdgeRigidity()
+{
+	auto deformation = _non_rigid_registration->getDeformation();
+	if (!deformation._mesh.property_map<edge_descriptor, double>("e:rigidity").second) {
+		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 10.);
+		_non_rigid_registration->setDeformation(deformation);
+	}
+	else
+	{
+		auto rigidity = deformation._mesh.property_map<edge_descriptor, double>("e:rigidity").first;
+		for (auto e : deformation._mesh.edges())
+			rigidity[e] = 10.;
+	}
+}
+
 template<typename NonRigidRegistration>
 AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration(const SurfaceMesh& source,
 														                         const SurfaceMesh& target,
@@ -198,6 +210,7 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, options, logger);
+	initEdgeRigidity();
 }
 
 template<typename NonRigidRegistration>
@@ -213,6 +226,7 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, deformation, options, logger);
+	initEdgeRigidity();
 };
 
 
@@ -230,6 +244,7 @@ AdaptiveRigidityRegistration<NonRigidRegistration>::AdaptiveRigidityRegistration
 	, _options(options)
 {
 	_non_rigid_registration = std::make_unique<NonRigidRegistration>(source, target, previouse_mesh, deformation, options, logger);
+	initEdgeRigidity();
 };
 
 }

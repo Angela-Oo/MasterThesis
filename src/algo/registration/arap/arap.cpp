@@ -45,7 +45,7 @@ SurfaceMesh AsRigidAsPossible::getDeformationGraphMesh()
 	return deformationGraphToSurfaceMesh(_deformation_graph);
 }
 
-std::vector<Point> AsRigidAsPossible::getFixedPostions()
+std::vector<Point> AsRigidAsPossible::getFixedPositions()
 {
 	return _fit_cost->getFixedPostions();
 }
@@ -84,11 +84,9 @@ bool AsRigidAsPossible::solveIteration()
 
 void AsRigidAsPossible::updateSmoothFactor()
 {
-	//bool use_rigidity = _deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").second ||
-	//	_deformation_graph._mesh.property_map<vertex_descriptor, double>("v:rigidity").second;
-	if (_options.reduce_smooth_factor)// !use_rigidity)
+	if (_options.reduce_smooth_factor)
 	{
-		auto scale_factor_tol = 0.00001;// 0.00001;
+		auto scale_factor_tol = 0.0001;
 		if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
 			(_options.smooth > 0.005))// && a_conf > 0.05))
 		{
@@ -175,18 +173,15 @@ void AsRigidAsPossible::init()
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
 	_ceres_logger.write("number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()), false);
 	if (_options.adaptive_rigidity.enable) {
-		bool use_quadratic_rigid_weight = _options.adaptive_rigidity.regular == AdaptiveRigidityRegularizer::SQUARED;
 		if(_options.adaptive_rigidity.refinement == Refinement::VERTEX)
-			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient, use_quadratic_rigid_weight);
+			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex>(_options);
 		else
-			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_options.smooth, _options.adaptive_rigidity.rigidity_cost_coefficient, use_quadratic_rigid_weight);
+			_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCostAdaptiveRigidity>(_options);
 	}
 	else {
 		_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>(_options.smooth);
-	}
-	
+	}	
 }
-
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 									 const SurfaceMesh& target,

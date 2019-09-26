@@ -3,7 +3,7 @@
 #include "i_arap_smooth_cost.h"
 #include "arap_deformation.h"
 #include "algo/registration/deformation_graph/deformation_graph.h"
-#include "algo/registration/deformation_graph/deformed_mesh.h"
+#include "algo/registration/interface/registration_options.h"
 #include "util/ceres_include.h"
 
 namespace Registration
@@ -16,6 +16,7 @@ private:
 	std::map<edge_descriptor, std::vector<ceres::ResidualBlockId>> _rigidity_residual_ids;
 	double _smooth_factor{ 1. };
 	double _rigidity_factor{ 0.1 };
+	double _minimal_rigidity_weight{ 0.1 };
 	bool _use_quadratic_rigid_weight{ true };
 private:
 	ceres::ResidualBlockId asRigidAsPossibleCostEdge(ceres::Problem &problem,
@@ -31,7 +32,7 @@ public:
 	EdgeResidualIds asRigidAsPossibleCost(ceres::Problem &problem,
 										  double loss_weighting,
 										  DeformationGraph<ARAPDeformation> & deformation_graph) override;
-	AsRigidAsPossibleSmoothCostAdaptiveRigidity(double smooth_factor, double rigidity_factor, bool use_quadratic_rigid_weight);
+	AsRigidAsPossibleSmoothCostAdaptiveRigidity(RegistrationOptions options);
 };
 
 

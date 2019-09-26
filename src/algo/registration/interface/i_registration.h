@@ -29,7 +29,7 @@ class INonRigidRegistration : public IRegistration
 {
 public:
 	virtual void setRigidDeformation(const RigidDeformation & rigid_deformation) = 0;
-	virtual std::vector<Point> getFixedPostions() { return std::vector<Point>(); }
+	virtual std::vector<Point> getFixedPositions() { return std::vector<Point>(); }
 	virtual SurfaceMesh getDeformationGraphMesh() = 0;
 public:
 	virtual ~INonRigidRegistration() = default;

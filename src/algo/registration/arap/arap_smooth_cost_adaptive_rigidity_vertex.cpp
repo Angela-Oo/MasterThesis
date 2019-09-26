@@ -4,6 +4,7 @@
 #include "arap_cost_functions.h"
 #include "algo/registration/util/ceres_residual_evaluation.h"
 
+
 namespace Registration {
 
 void AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::evaluateResiduals(ceres::Problem &problem, SurfaceMesh & mesh, CeresIterationLoggerGuard & logger)
@@ -37,7 +38,8 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::asRigidAsPossibleCostEdge(cer
 	auto vertex_rigidity = deformation_graph._mesh.property_map<vertex_descriptor, double>("v:rigidity").first;
 	auto deformations = deformation_graph._mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
 	ceres::CostFunction* cost_function = ARAPAdaptiveRigidityVertexCostFunction::Create(deformation_graph._mesh.point(source),
-																						deformation_graph._mesh.point(target));
+																						deformation_graph._mesh.point(target),
+																						_minimal_rigidity_weight);
 	auto loss_function = new ceres::ScaledLoss(NULL, _smooth_factor, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function,
 									deformations[source].d(),
@@ -94,10 +96,11 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::asRigidAsPossibleCost(ceres::
 	return _arap_residual_ids;
 }
 
-AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex(double smooth_factor, double rigidity_factor, bool use_quadratic_rigid_weight)
-	: _smooth_factor(smooth_factor)
-	, _rigidity_factor(rigidity_factor)
-	, _use_quadratic_rigid_weight(use_quadratic_rigid_weight)
+AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex::AsRigidAsPossibleSmoothCostAdaptiveRigidityVertex(RegistrationOptions options)
+	: _smooth_factor(options.smooth)
+	, _rigidity_factor(options.adaptive_rigidity.rigidity_cost_coefficient)
+	, _use_quadratic_rigid_weight(options.adaptive_rigidity.regular == AdaptiveRigidityRegularizer::SQUARED)
+	, _minimal_rigidity_weight(options.adaptive_rigidity.minimal_rigidity_weight)
 {
 	std::cout << std::endl << " smooth factor " << _smooth_factor
 		<< ", rigidity factor " << _rigidity_factor << std::endl;

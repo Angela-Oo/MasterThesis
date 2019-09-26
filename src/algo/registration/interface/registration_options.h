@@ -26,6 +26,7 @@ struct AdaptiveRigidityOptions
 	bool enable{ false };
 	Refinement refinement{ Refinement::EDGE };
 	double rigidity_cost_coefficient{ 0.005 };
+	double minimal_rigidity_weight{ 0.1 }; // value between 0 and 1
 	AdaptiveRigidityRegularizer regular { AdaptiveRigidityRegularizer::LINEAR };
 };
 

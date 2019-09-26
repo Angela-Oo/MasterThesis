@@ -61,7 +61,7 @@ public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	void setDeformation(const Deformation & deformation_graph);
 	const DeformationGraph<ARAPDeformation> & getDeformation();
-	std::vector<Point> getFixedPostions() override;
+	std::vector<Point> getFixedPositions() override;
 	std::pair<bool, std::string> shouldBeSavedAsImage() override;
 public:
 	// without icp

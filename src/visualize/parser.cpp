@@ -170,6 +170,8 @@ void parseAdaptiveRigidity(Registration::RegistrationOptions& registration_optio
 	if (result["adaptive_rigidity"].as<bool>()) {
 		registration_options.adaptive_rigidity.enable = true;
 		registration_options.adaptive_rigidity.rigidity_cost_coefficient = result["rigidity_cost_coefficient"].as<double>();
+		registration_options.adaptive_rigidity.minimal_rigidity_weight = result["minimal_rigidity_weight"].as<double>();
+		
 		if (result["rigidity_coefficient_per_vertex"].as<bool>())
 			registration_options.adaptive_rigidity.refinement = Registration::Refinement::VERTEX;
 		else
@@ -253,8 +255,9 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		options.add_options()
 			("adaptive_rigidity", "Adaptive Rigidity")
 			("rigidity_cost_coefficient", "Adaptive Rigidity cost coefficient", cxxopts::value<double>()->default_value("0.01"))
+			("minimal_rigidity_weight", "Minimal rigidity weight should be between 0. and 1. (0. non rigidity, 1 no adaptation possible)", cxxopts::value<double>()->default_value("0.1"))
 			("rigidity_coefficient_per_vertex", "Adapt the rigid coefficient per Vertex (default per Edge)", cxxopts::value<bool>())
-			("use_quadratic_rigid_weight", "Regularizer for adaptive rigidity", cxxopts::value<bool>());
+			("use_quadratic_rigid_weight", "Regularization for adaptive rigidity", cxxopts::value<bool>());
 
 		options.add_options()
 			("reduce_rigidity", "Reduce Rigidity")

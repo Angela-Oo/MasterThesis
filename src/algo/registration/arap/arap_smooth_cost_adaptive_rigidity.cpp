@@ -27,7 +27,7 @@ void AsRigidAsPossibleSmoothCostAdaptiveRigidity::evaluateResiduals(ceres::Probl
 		auto rigidity_value = mesh.property_map<edge_descriptor, double>("e:rigidity").first;
 		double max_rigidity = *std::max_element(rigidity_value.begin(), rigidity_value.end());
 		double min_rigidity = *std::min_element(rigidity_value.begin(), rigidity_value.end());
-		double mean_rigidity = std::accumulate(rigidity_value.begin(), rigidity_value.end(), 0.) / mesh.number_of_vertices();
+		double mean_rigidity = std::accumulate(rigidity_value.begin(), rigidity_value.end(), 0.) / mesh.number_of_edges();
 
 		logger.write(" min_rigidity_value: " + std::to_string(min_rigidity) + " max_rigidity_value: " + std::to_string(max_rigidity) + " mean_rigidity_value: " + std::to_string(mean_rigidity), false);
 	}
@@ -45,7 +45,8 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCostEdge(ceres::Pr
 	auto edge_rigidity = deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").first;
 	auto deformations = deformation_graph._mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
 	ceres::CostFunction* cost_function = AsRigidAsPossibleAdaptableRigidityCostFunction::Create(deformation_graph._mesh.point(source),
-																								deformation_graph._mesh.point(target));
+																								deformation_graph._mesh.point(target),
+																								_minimal_rigidity_weight);
 	auto loss_function = new ceres::ScaledLoss(NULL, _smooth_factor, ceres::TAKE_OWNERSHIP);
 	return problem.AddResidualBlock(cost_function, loss_function,
 									deformations[source].d(),
@@ -99,13 +100,15 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCost(ceres::Proble
 	return _arap_residual_ids;
 }
 
-AsRigidAsPossibleSmoothCostAdaptiveRigidity::AsRigidAsPossibleSmoothCostAdaptiveRigidity(double smooth_factor, double rigidity_factor, bool use_quadratic_rigid_weight)
-	: _smooth_factor(smooth_factor)
-	, _rigidity_factor(rigidity_factor)
-	, _use_quadratic_rigid_weight(use_quadratic_rigid_weight)
+AsRigidAsPossibleSmoothCostAdaptiveRigidity::AsRigidAsPossibleSmoothCostAdaptiveRigidity(RegistrationOptions options)
+	: _smooth_factor(options.smooth)
+	, _rigidity_factor(options.adaptive_rigidity.rigidity_cost_coefficient)
+	, _minimal_rigidity_weight(options.adaptive_rigidity.minimal_rigidity_weight)
+	, _use_quadratic_rigid_weight(options.adaptive_rigidity.regular == AdaptiveRigidityRegularizer::SQUARED)
 {
 	std::cout << std::endl << " smooth factor " << _smooth_factor
-		<< ", rigidity factor " << _rigidity_factor * _smooth_factor << std::endl;
+		<< ", rigidity factor " << _rigidity_factor * _smooth_factor
+		<< ", minimal rigidity weight" << _minimal_rigidity_weight << std::endl;
 }
 
 }
