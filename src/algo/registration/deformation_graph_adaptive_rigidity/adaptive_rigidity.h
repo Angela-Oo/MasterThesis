@@ -9,7 +9,7 @@ template<typename Deformation>
 size_t adaptRigidity(Deformation & deformation, double rigidity_smooth_cost_threshold, double minimal_rigidity)
 {
 	auto & edge_rigidity = deformation._mesh.property_map<edge_descriptor, double>("e:rigidity").first;
-	auto edges = getEdgesToRefine(deformation._mesh, rigidity_smooth_cost_threshold, 0.001);
+	auto edges = getEdgesToRefine(deformation._mesh, rigidity_smooth_cost_threshold, 0.9);
 	int i = 0;
 	for (auto & e : edges) {
 		if (edge_rigidity[e] > minimal_rigidity) {
