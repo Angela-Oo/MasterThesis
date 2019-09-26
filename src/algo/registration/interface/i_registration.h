@@ -12,6 +12,7 @@ class IRegistration
 public:
 	virtual bool finished() = 0;
 	virtual bool solveIteration() = 0;
+	virtual double currentError() = 0;
 	virtual size_t currentIteration() = 0;
 	virtual bool solve() = 0;
 	virtual std::pair<bool, std::string> shouldBeSavedAsImage() = 0;

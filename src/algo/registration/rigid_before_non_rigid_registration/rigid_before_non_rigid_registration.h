@@ -24,6 +24,7 @@ private:
 public:
 	bool finished() override;
 	bool solveIteration() override;
+	double currentError() override;
 	size_t currentIteration() override;
 	bool solve() override;
 public:
@@ -120,6 +121,17 @@ bool RigidBeforeNonRigidRegistration<NonRigidRegistration>::solveIteration()
 			_non_rigid_registration->setRigidDeformation(_rigid_registration->getRigidDeformation());
 		}
 		return false;
+	}
+}
+
+template<typename NonRigidRegistration>
+double RigidBeforeNonRigidRegistration<NonRigidRegistration>::currentError()
+{
+	if (_finished_rigid_registration) {
+		return _non_rigid_registration->currentError();
+	}
+	else {
+		return _rigid_registration->currentError();
 	}
 }
 

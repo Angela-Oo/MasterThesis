@@ -65,6 +65,7 @@ private:
 public:
 	bool finished() override;
 	bool solveIteration() override;
+	double currentError() override;
 	size_t currentIteration() override;
 	bool solve() override;
 public:

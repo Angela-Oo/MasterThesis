@@ -27,6 +27,7 @@ private:
 public:
 	bool finished() override;
 	bool solveIteration() override;
+	double currentError() override;
 	size_t currentIteration() override;
 	bool solve() override;
 public:
@@ -129,6 +130,12 @@ bool EvaluateRegistration<NonRigidRegistration>::solveIteration()
 	bool solved = _non_rigid_registration->solveIteration();
 	errorEvaluation();
 	return solved;
+}
+
+template<typename NonRigidRegistration>
+double EvaluateRegistration<NonRigidRegistration>::currentError()
+{
+	return _non_rigid_registration->currentError();
 }
 
 template<typename NonRigidRegistration>

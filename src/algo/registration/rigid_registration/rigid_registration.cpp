@@ -146,6 +146,11 @@ bool RigidRegistration::solveIteration()
 	return finished_registration;
 }
 
+double RigidRegistration::currentError()
+{
+	return _current_cost;
+}
+
 size_t RigidRegistration::currentIteration()
 {
 	return _solve_iteration;

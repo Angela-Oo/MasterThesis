@@ -257,6 +257,11 @@ bool EmbeddedDeformation::solveIteration()
 	return finished();
 }
 
+double EmbeddedDeformation::currentError()
+{
+	return _current_cost;
+}
+
 size_t EmbeddedDeformation::currentIteration()
 {
 	return _solve_iteration;

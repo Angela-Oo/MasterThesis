@@ -82,6 +82,11 @@ bool AsRigidAsPossible::solveIteration()
 	return finished_registration;
 }
 
+double AsRigidAsPossible::currentError()
+{
+	return _current_cost;
+}
+
 void AsRigidAsPossible::updateSmoothFactor()
 {
 	if (_options.reduce_smooth_factor)

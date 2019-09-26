@@ -32,6 +32,7 @@ private:
 public:
 	bool finished() override;
 	bool solveIteration() override;
+	double currentError() override;
 	size_t currentIteration() override;
 	bool solve() override;
 public:
@@ -135,6 +136,13 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	return _finished;
 }
 
+
+template<typename NonRigidRegistration>
+double RefineDeformationGraphRegistration<NonRigidRegistration>::currentError()
+{
+	return _non_rigid_registration->currentError();	
+}
+	
 template<typename NonRigidRegistration>
 size_t RefineDeformationGraphRegistration<NonRigidRegistration>::currentIteration()
 {

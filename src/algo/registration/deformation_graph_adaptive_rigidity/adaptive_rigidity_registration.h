@@ -19,14 +19,18 @@ public:
 	using DeformMesh = typename NonRigidRegistration::DeformMesh;
 private:
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
+	double _last_cost{ 2. };
 	bool _is_refined;
 	int _number_of_refinements;
 	unsigned int _current_iteration;
 	bool _finished;
 	RegistrationOptions _options;
+private:
+	bool needRefinement();
 public:
 	bool finished() override;
 	bool solveIteration() override;
+	double currentError() override;
 	size_t currentIteration() override;
 	bool solve() override;
 public:
@@ -91,14 +95,27 @@ template<typename NonRigidRegistration>
 SurfaceMesh AdaptiveRigidityRegistration<NonRigidRegistration>::getDeformationGraphMesh()
 {
 	return _non_rigid_registration->getDeformationGraphMesh();
-};
+}
+
+template<typename NonRigidRegistration>
+bool AdaptiveRigidityRegistration<NonRigidRegistration>::needRefinement()
+{
+	auto scale_factor_tol = 0.0001;
+	auto current_cost = _non_rigid_registration->currentError();
+	if (abs(current_cost - _last_cost) < scale_factor_tol * (1 + current_cost))
+	{
+		return true;
+	}
+	return false;
+}
 
 template<typename NonRigidRegistration>
 bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 {
-	bool finished = _non_rigid_registration->finished();
-	if (finished == false) {
+	bool need_refinement = needRefinement();
+	if (!need_refinement) {
 		_current_iteration++;
+		_last_cost = _non_rigid_registration->currentError();
 		_non_rigid_registration->solveIteration();
 	}
 	else if(_is_refined == false) {
@@ -109,9 +126,10 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 
 		if (number_adapted_edges > 0) {
 			_non_rigid_registration->setDeformation(deformation);
+			
 			_number_of_refinements++;
-
-			unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 2 : 20;
+			std::cout << std::endl << " reduced rigidity for " << std::to_string(number_adapted_edges) << " edges ";
+			unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 5 : 20;
 			if (_number_of_refinements >= max_number_of_refinement)
 				_is_refined = true;
 		}
@@ -123,6 +141,12 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 		_finished = true;
 	}
 	return _finished;
+}
+
+template<typename NonRigidRegistration>
+double AdaptiveRigidityRegistration<NonRigidRegistration>::currentError()
+{
+	return _non_rigid_registration->currentError();
 }
 
 template<typename NonRigidRegistration>
