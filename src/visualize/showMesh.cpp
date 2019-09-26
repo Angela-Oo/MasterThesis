@@ -21,13 +21,23 @@ void ShowMesh::createRegistration()
 		
 		if (_options.sequence_options.enable) {
 			auto register_sequence_of_frames = Registration::createSequenceRegistration(_options, logger, _input_mesh);
-			_registration_visualizer = std::make_shared<Visualizer::SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), _renderer, save_images_folder, logger, edge_coloring);
+			_registration_visualizer = std::make_shared<Visualizer::SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), 
+																									_renderer,
+																									save_images_folder,
+																									logger, 
+																									edge_coloring, 
+																									_options.adaptive_rigidity.minimal_rigidity_weight);
 		}
 		else if (_selected_frame_for_registration.size() == 2) {
 			auto & source = _input_mesh->getMesh(_selected_frame_for_registration[0]);
 			auto & target = _input_mesh->getMesh(_selected_frame_for_registration[1]);
 			auto registration = Registration::createRegistration(_options, logger, source, target);
-			_registration_visualizer = std::make_shared<Visualizer::RegistrationVisualizer>(std::move(registration), _renderer, save_images_folder, logger, edge_coloring);
+			_registration_visualizer = std::make_shared<Visualizer::RegistrationVisualizer>(std::move(registration), 
+																							_renderer, 
+																							save_images_folder,
+																							logger, 
+																							edge_coloring, 
+																							_options.adaptive_rigidity.minimal_rigidity_weight);
 		}
 
 		_mesh_visualizer->clear();

@@ -37,14 +37,19 @@ std::shared_ptr<IRegistrationVisualizer> createRegistrationVisualizer(std::share
 
 		if (options.sequence_options.enable) {
 			auto register_sequence_of_frames = Registration::createSequenceRegistration(options, logger, mesh_reader);
-			return std::make_shared<SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames), renderer, save_images_folder, logger, edge_coloring);
+			return std::make_shared<SequenceRegistrationVisualizer>(std::move(register_sequence_of_frames),
+																	renderer,
+																	save_images_folder,
+																	logger,
+																	edge_coloring,
+																	options.adaptive_rigidity.minimal_rigidity_weight);
 		}
 		else {
 			auto & source = mesh_reader->getMesh(0);
 			auto & target = mesh_reader->getMesh(mesh_reader->size() - 1);
 
 			auto registration = Registration::createRegistration(options, logger, source, target);
-			return std::make_shared<RegistrationVisualizer>(std::move(registration), renderer, save_images_folder, logger, edge_coloring);
+			return std::make_shared<RegistrationVisualizer>(std::move(registration), renderer, save_images_folder, logger, edge_coloring, options.adaptive_rigidity.minimal_rigidity_weight);
 		}
 	}
 }

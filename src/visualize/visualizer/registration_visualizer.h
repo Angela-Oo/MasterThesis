@@ -23,6 +23,7 @@ private:
 	std::string _image_name;
 	bool _finished{ false };
 	Visualize::EdgeColor _edge_color{ Visualize::EdgeColor::SmoothCost };
+	double _minimal_rigidity_weight {0.};
 public:
 	void registration() override;
 	void visualize(Render mode) override;
@@ -33,7 +34,8 @@ public:
 						   std::shared_ptr<Renderer> renderer,
 						   std::string image_folder_name,
 						   std::shared_ptr<FileWriter> logger,
-						   Visualize::EdgeColor edge_coloring);
+						   Visualize::EdgeColor edge_coloring,
+						   double minimal_rigidity_weight);
 };
 
 

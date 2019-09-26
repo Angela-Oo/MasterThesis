@@ -18,6 +18,6 @@ enum class EdgeColor
 	RigidityValue
 };
 
-void setDeformationGraphColor(SurfaceMesh & mesh, VertexColor vertex_color = VertexColor::Default, EdgeColor edge_color = EdgeColor::SmoothCost);
+void setDeformationGraphColor(SurfaceMesh & mesh, VertexColor vertex_color = VertexColor::Default, EdgeColor edge_color = EdgeColor::SmoothCost, double minimal_rigidity_weight = 0.);
 
 }
