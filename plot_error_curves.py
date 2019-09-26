@@ -49,19 +49,21 @@ def getErrorForEachFrame(lines):
         else:
             split_at_frames[-1].append(match.group(1))
 
-    error_dict = dict()
-    for frame in split_at_frames:
-        error_dict[frame[-1]] = parseError(frame[-2])
+    #error_dict = dict()
+    #for frame in split_at_frames:
+    #    if len(frame) > 1:
+    #        error_dict[frame[-1]] = parseError(frame[-2])
 
     from collections import defaultdict
     test_error_dict = defaultdict(list)
     for frame in split_at_frames:
-        error = parseError(frame[-2])
-        for key in error:
-            test_error_dict[key].append(error[key])
-        m = re.search('frame (\d+)', frame[-1])
-        if m:
-            test_error_dict['frame'].append(int(m.group(1)))
+        if len(frame) > 1:
+            error = parseError(frame[-2])
+            for key in error:
+                test_error_dict[key].append(error[key])
+            m = re.search('frame (\d+)', frame[-1])
+            if m:
+                test_error_dict['frame'].append(int(m.group(1)))
 
     return test_error_dict
     #return error_dict
@@ -91,10 +93,10 @@ def parseLogs(log_files, name):
         key = key.replace('log_files\\', '')
         key = key.replace('AllFrames', '')
         key = key.replace('log.txt', '')
-        key = key.replace('ARAP', '')
+        #key = key.replace('ARAP', '')
         key = key.replace('\\', ' ')
         key = key.replace('_', ' ')
-        key = re.sub(r"(" + float_pattern + ")", "", key)
+        #key = re.sub(r"(" + float_pattern + ")", "", key)
         key = re.sub(' +', " ", key)
 
         key = key.replace(name + ' ', '')
@@ -144,16 +146,21 @@ def plotLogFilesTest(data, name):
     dataset = dict()
     keys = []
     for key in data:
-        d = data[key]
-        keys.append(key)
-        dataset[key] = d['error mean']
-        #dataset[key] = d['error median']
 
-    fmri = pd.DataFrame(dataset)
-    g = sns.relplot(kind="line", dashes=False, style='event', data=fmri)
-    g.fig.suptitle(name)
-    g.set(xlabel='frames', ylabel='mean error')
-    plt.show()
+        d = data[key]
+        if len(d['frame']) == len(d['error mean']):
+            keys.append(key)
+            dataset[key] = d['error mean']
+            #dataset[key] = d['error median']
+
+    try:
+        fmri = pd.DataFrame(dataset)
+        g = sns.relplot(kind="line", dashes=False, style='event', data=fmri)
+        g.fig.suptitle(name)
+        g.set(xlabel='frames', ylabel='mean error')
+        plt.show()
+    except:
+        print("not able to show data")
 
 
 def plotLogs(all_log_files, name):
@@ -164,7 +171,7 @@ def plotLogs(all_log_files, name):
 
 
 
-path = "images/run_2019_09_17"
+path = "images/run_2019_09_24"
 
 
 

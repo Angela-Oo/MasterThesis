@@ -3,7 +3,7 @@ import re
 from shutil import copyfile
 
 
-path = "images/run_2019_09_13"
+path = "images/run_2019_09_19"
 
 log_files = []
 # r=root, d=directories, f = files
