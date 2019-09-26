@@ -22,7 +22,7 @@ table =[]
 table.append(header)
 
 for log_dict in dicts:
-    column = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {0:<12f}"
+    column = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
           .format(log_dict['name'],
                   log_dict['sequence'],
                   log_dict['refinement'],
