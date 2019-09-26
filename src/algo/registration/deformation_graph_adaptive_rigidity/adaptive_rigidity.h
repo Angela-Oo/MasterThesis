@@ -13,7 +13,7 @@ size_t adaptRigidity(Deformation & deformation, double rigidity_smooth_cost_thre
 	int i = 0;
 	for (auto & e : edges) {
 		if (edge_rigidity[e] > minimal_rigidity) {
-			edge_rigidity[e] = 0.25 * edge_rigidity[e];
+			edge_rigidity[e] = 0.5 * edge_rigidity[e];
 			i++;
 		}
 	}

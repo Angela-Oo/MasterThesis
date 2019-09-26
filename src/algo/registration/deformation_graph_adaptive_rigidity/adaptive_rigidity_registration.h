@@ -25,6 +25,7 @@ private:
 	unsigned int _current_iteration;
 	bool _finished;
 	RegistrationOptions _options;
+	bool _need_refinement {false};
 private:
 	bool needRefinement();
 public:
@@ -112,13 +113,14 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::needRefinement()
 template<typename NonRigidRegistration>
 bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 {
-	bool need_refinement = needRefinement();
-	if (!need_refinement) {
+	if (!_need_refinement) {
 		_current_iteration++;
 		_last_cost = _non_rigid_registration->currentError();
 		_non_rigid_registration->solveIteration();
+		_need_refinement = needRefinement();
 	}
 	else if(_is_refined == false) {
+		_need_refinement = false;
 		auto deformation = _non_rigid_registration->getDeformation();
 		auto number_adapted_edges = adaptRigidity(deformation, 
 												  _options.reduce_rigidity.rigidity_cost_threshold,
@@ -211,14 +213,14 @@ void AdaptiveRigidityRegistration<NonRigidRegistration>::initEdgeRigidity()
 {
 	auto deformation = _non_rigid_registration->getDeformation();
 	if (!deformation._mesh.property_map<edge_descriptor, double>("e:rigidity").second) {
-		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 10.);
+		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 5.);
 		_non_rigid_registration->setDeformation(deformation);
 	}
 	else
 	{
 		auto rigidity = deformation._mesh.property_map<edge_descriptor, double>("e:rigidity").first;
 		for (auto e : deformation._mesh.edges())
-			rigidity[e] = 10.;
+			rigidity[e] = 5.;
 	}
 }
 
