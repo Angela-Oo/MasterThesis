@@ -72,16 +72,27 @@ void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 		if (!_error_evaluation) {
 			_error_evaluation = std::make_unique<ErrorEvaluation>(_non_rigid_registration->getTarget());
 		}
-		auto errors = _error_evaluation->errorEvaluation(_deformed_points);
-		
-		double max_error = errors.max();
-		for (size_t i = 0; i < errors.size(); ++i)
-		{
-			vertex_colors[errors.v(i)] = errorToRGB(errors.error(i) / max_error, 0.9);
-		}
+		auto registration_errors = _error_evaluation->errorEvaluation(_deformed_points);
 
+		ErrorStatistics error_statistic = evalErrorStatistics(registration_errors.errors());
+		for (size_t i = 0; i < registration_errors.size(); ++i)
+		{
+			vertex_colors[registration_errors.v(i)] = errorToRGB(registration_errors.error(i) / error_statistic.max, 0.9);
+		}
+		
+		if (_options.use_hausdorff_distance)
+		{
+			auto error_evaluation_target = std::make_unique<ErrorEvaluation>(_deformed_points);		
+			auto errors_target = error_evaluation_target->errorEvaluation(_non_rigid_registration->getTarget()).errors();
+			std::vector<double> errors = registration_errors.errors();
+			errors.insert(errors.end(), errors_target.begin(), errors_target.end());
+			error_statistic = evalErrorStatistics(registration_errors.errors());
+		}
+		
 		std::stringstream ss;
-		ss << std::endl << "error: mean " << errors.mean() << ", variance " << errors.variance() << ", median " << errors.median() << ", max " << errors.max();
+		ss << std::endl << "error: mean " << error_statistic.mean << ", variance " << error_statistic.variance
+			<< ", median " << error_statistic.median
+			<< ", max " << error_statistic.max << ", min " << error_statistic.min;
 		if (_logger)
 			_logger->write(ss.str());
 	}

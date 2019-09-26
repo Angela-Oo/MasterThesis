@@ -27,49 +27,36 @@ double RegistrationError::error(size_t i) const
 	return _errors[i];
 }
 
-double RegistrationError::mean() const
+const std::vector<double> & RegistrationError::errors()
 {
-	return _mean;
-}
-
-double RegistrationError::variance() const
-{
-	return _variance;
-}
-
-double RegistrationError::median() const
-{
-	return _median;
-}
-
-double RegistrationError::min() const
-{
-	return _min;
-}
-
-double RegistrationError::max() const
-{
-	return _max;
+	return _errors;
 }
 
 RegistrationError::RegistrationError(std::vector<vertex_descriptor> v_ids, std::vector<double> errors)
 	: _v_ids(v_ids)
 	, _errors(errors)
+{ }
+
+
+
+
+ErrorStatistics evalErrorStatistics(const std::vector<double> & errors)
 {
+	ErrorStatistics statistic;
 	double sum = 0.;
-	for (auto e : _errors)
-	{
-		if (e < _min)
-			_min = e;
-		if (e > _max)
-			_max = e;
+	for (auto e : errors) {
+		if (e < statistic.min)
+			statistic.min = e;
+		if (e > statistic.max)
+			statistic.max = e;
 		sum += e;
 	}
-	if (!_errors.empty()) {
-		_mean = sum / _errors.size();
-		_variance = calculateVariance(_errors, _mean);
-		_median = _errors[floor(_errors.size() / 2.)];
+	if (!errors.empty()) {
+		statistic.mean = sum / errors.size();
+		statistic.variance = calculateVariance(errors, statistic.mean);
+		statistic.median = errors[floor(errors.size() / 2.)];
 	}
+	return statistic;
 }
 	
 }

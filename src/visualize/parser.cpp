@@ -201,6 +201,7 @@ void parseOptions(Registration::RegistrationOptions& registration_options, cxxop
 	registration_options.reduce_smooth_factor = result["reduce_smooth_factor"].as<bool>();
 	registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
 
+	registration_options.use_hausdorff_distance = result["use_hausdorff_distance"].as<bool>();
 	registration_options.error_evaluation = result["error_evaluation"].as<bool>();
 }
 }
@@ -241,7 +242,8 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("term", "Terminates the application after the registration finished", cxxopts::value<bool>()->default_value("true"));
 
 		options.add_options()
-			("error_evaluation", "Enable disable error evaluation", cxxopts::value<bool>()->default_value("true"));
+			("error_evaluation", "Enable disable error evaluation", cxxopts::value<bool>()->default_value("true"))
+			("use_hausdorff_distance", "Use hausdorff distance for error evaluation", cxxopts::value<bool>());
 
 		options
 			.add_options()
