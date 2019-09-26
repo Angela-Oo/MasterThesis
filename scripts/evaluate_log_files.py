@@ -15,27 +15,26 @@ for log in log_files:
     dicts.append(log_dict)
 
 
-header = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
-          .format('Name', 'Sequence', 'Refinement', 'Adaptive', 'Reduce', 'Vertex/Edge', 'Nodes', 'Time', 'Edge Length', 'Vertex prob', 'Error mean', 'median', 'variance'))
+header = ("{:<10} {:<22} {:<10} {:<8} {:<10} {:<14} {:<14} {:<14} {:<18} {:<8} {:<11}"
+          .format('dataset', 'name', 'sequence', 'nodes', 'time','error mean', 'median', 'variance', 'median per node', 'edge len', 'vertex prob'))
 
 table =[]
 table.append(header)
 
 for log_dict in dicts:
-    column = ("{:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12} {:<12}"
-          .format(log_dict['name'],
+    column = ("{:<10} {:<22} {:<10} {:<8} {:<10} {:<14} {:<14} {:<14} {:<18} {:<8} {:<11}"
+          .format(log_dict['input'],
+                  log_dict['name'],
                   log_dict['sequence'],
-                  log_dict['refinement'],
-                  log_dict["adaptive rigidity"],
-                  log_dict["reduce rigidity"],
-                  log_dict["refine at"],
-                  log_dict["nodes"],
+                  "{:.1f}".format(log_dict['number nodes']),
                   log_dict["time"],
+                  "{:.2f} e-04".format(log_dict['mean error']*1000),
+                  "{:.2f} e-06".format(log_dict['median error']*100000),
+                  "{:.2f} e-04".format(log_dict['variance error']*1000),
+                  "{:.2f} e-06".format(log_dict["mean per node"]*100000),
                   log_dict['edge length'],
-                  log_dict['vertex probability'],
-                  log_dict['mean error'],
-                  log_dict['median error'],
-                  log_dict['variance error']))
+                  log_dict['vertex probability'])
+              )
     table.append(column)
 
 

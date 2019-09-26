@@ -11,11 +11,11 @@ else:
 list_args= []
 base_args = [exe_path, "--image_folder_name", "images/run_2019_09_24", "--fit", "1.0", "--smooth", "2.0"]
 
-head_args = ["-i", "head", "-p", "0.1", "-e", "0.3", "--smooth_cost_threshold", "0.03", "--rigidity_cost_coefficient", "0.001"]
+head_args = ["-i", "head", "-p", "0.1", "-e", "0.3", "--smooth_cost_threshold", "0.03", "--rigidity_cost_coefficient", "0.01"]
 head_registration_args = base_args + head_args + ["-n", "-1"]
 head_sequence_args = base_args + head_args + ["-s"]
 
-hand_args = ["-i", "hand", "-p", "0.15", "-e", "0.15", "--smooth_cost_threshold", "0.02", "--rigidity_cost_coefficient", "0.001"]
+hand_args = ["-i", "hand", "-p", "0.15", "-e", "0.15", "--smooth_cost_threshold", "0.02", "--rigidity_cost_coefficient", "0.01"]
 hand_registration_args = base_args + hand_args + ["-n", "-1"]
 hand_sequence_args = base_args + hand_args + ["-s"]
 
@@ -102,35 +102,36 @@ list_args.append(head_sequence_args + adaptive_rigidity_edge_quadratic_weight_ar
 #list_args.append(paperbag_sequence_args + adaptive_rigidity_vertex_args)
 #list_args.append(paperbag_sequence_args + adaptive_rigidity_args)
 #list_args.append(paperbag_sequence_args + reduce_smooth_args)
-list_args.append(paperbag_sequence_args + reduce_rigidity_args)
+#list_args.append(paperbag_sequence_args + reduce_rigidity_args)
 #list_args.append(paperbag_sequence_args + refinement_args)
 #list_args.append(paperbag_sequence_args + refinement_args + ["--refine_at_edge"])
+
+
+
+list_args.append(hand_sequence_args)
+list_args.append(hand_sequence_args + adaptive_rigidity_vertex_args)
+list_args.append(hand_sequence_args + adaptive_rigidity_args)
+list_args.append(hand_sequence_args + reduce_smooth_args)
+list_args.append(hand_sequence_args + reduce_rigidity_args)
+list_args.append(hand_sequence_args + refinement_args_level_3)
+list_args.append(hand_sequence_args + refinement_args_level_3 + ["--refine_at_edge"])
 
 
 #list_args.append(puppet_args_sequence_args)
 #list_args.append(puppet_args_sequence_args + adaptive_rigidity_vertex_args)
 #list_args.append(puppet_args_sequence_args + adaptive_rigidity_args)
 #list_args.append(puppet_args_sequence_args + reduce_smooth_args)
-list_args.append(puppet_args_sequence_args + reduce_rigidity_args)
-#list_args.append(puppet_args_sequence_args + refinement_args)
-#list_args.append(puppet_args_sequence_args + refinement_args + ["--refine_at_edge"])
-
-
-#list_args.append(hand_sequence_args)
-#list_args.append(hand_sequence_args + adaptive_rigidity_vertex_args)
-#list_args.append(hand_sequence_args + adaptive_rigidity_args)
-#list_args.append(hand_sequence_args + reduce_smooth_args)
-list_args.append(hand_sequence_args + reduce_rigidity_args)
-#list_args.append(hand_sequence_args + refinement_args_level_3)
-#list_args.append(hand_sequence_args + refinement_args_level_3 + ["--refine_at_edge"])
+#list_args.append(puppet_args_sequence_args + reduce_rigidity_args)
+list_args.append(puppet_args_sequence_args + refinement_args)
+list_args.append(puppet_args_sequence_args + refinement_args + ["--refine_at_edge"])
 
 #list_args.append(head_sequence_args)
-#list_args.append(head_sequence_args + adaptive_rigidity_vertex_args)
-#list_args.append(head_sequence_args + adaptive_rigidity_args)
-#list_args.append(head_sequence_args + reduce_smooth_args)
-list_args.append(head_sequence_args + reduce_rigidity_args)
-#list_args.append(head_sequence_args + refinement_args)
-#list_args.append(head_sequence_args + refinement_args + ["--refine_at_edge"])
+list_args.append(head_sequence_args + adaptive_rigidity_vertex_args)
+list_args.append(head_sequence_args + adaptive_rigidity_args)
+list_args.append(head_sequence_args + reduce_smooth_args)
+#list_args.append(head_sequence_args + reduce_rigidity_args)
+list_args.append(head_sequence_args + refinement_args)
+list_args.append(head_sequence_args + refinement_args + ["--refine_at_edge"])
 
 
 

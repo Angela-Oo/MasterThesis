@@ -43,12 +43,66 @@ def plotDataset(parsed_logs, dataset, output_path):
     reduce_smooth_logs = getVariant(parsed_logs, 'reduce smooth')
     reduce_rigidity_logs = getVariant(parsed_logs, 'reduce rigidity')
 
-    make_10seeds_scatter_plot(baseline_logs + adaptive_rigidity_logs, dataset + " " + 'Adaptive Rigidity', output_path)
-    make_10seeds_scatter_plot(baseline_logs + refinement_logs, dataset + " " + 'Refinement', output_path)
-    make_10seeds_scatter_plot(baseline_logs + reduce_smooth_logs, dataset + " " + 'Reduce Smooth', output_path)
-    make_10seeds_scatter_plot(baseline_logs + reduce_rigidity_logs, dataset + " " + 'Reduce Rigidity', output_path)
+    plotDatasetMeanAndVariance(baseline_logs + adaptive_rigidity_logs, dataset + " " + 'Adaptive Rigidity', output_path)
+    plotDatasetMeanAndVariance(baseline_logs + refinement_logs, dataset + " " + 'Refinement', output_path)
+    plotDatasetMeanAndVariance(baseline_logs + reduce_smooth_logs, dataset + " " + 'Reduce Smooth', output_path)
+    plotDatasetMeanAndVariance(baseline_logs + reduce_rigidity_logs, dataset + " " + 'Reduce Rigidity', output_path)
 
-    make_10seeds_scatter_plot(baseline_logs + adaptive_rigidity_logs + refinement_logs + reduce_smooth_logs + reduce_rigidity_logs, dataset, output_path)
+    plotDatasetMeanAndVariance(baseline_logs + adaptive_rigidity_logs + refinement_logs + reduce_smooth_logs + reduce_rigidity_logs, dataset, output_path)
+
+def plotDatasetMeanAndVariance(logs, title, output_path):
+    plotAndSaveImage(logs, 'error mean', title, 'mean distance error', output_path + "/mean_")
+    plotAndSaveImage(logs, 'error median', title, 'median distance error', output_path + "/median_", True)
+    plotAndSaveImage(logs, 'mean per node', title, 'mean distance error per node', output_path + "/mean_per_node_")
+    plotAndSaveImage(logs, 'median per node', title, 'median distance error per node', output_path + "/median_per_node_", True)
+
+
+
+def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False):
+    fig = plt.figure(figsize=plt.figaspect(0.5))
+
+    plt.title(title, {'fontsize':16})
+    plt.xlabel('Frames')
+    plt.ylabel(ylabel)
+    ax1 = fig.add_subplot(1, 1, 1)
+
+    if log_scale:
+        ax1.set_yscale('log')
+
+    plot_colors = ['r', 'b', 'g', 'm', 'c', 'y', (1.0, 0.5, 0.0, 1.), (0.5, 1.0, 0.0, 1.), (0.0, 1.0, 0.5, 1.), (0.0, 0.5, 1.0, 1.)]
+
+    n = 0
+    for log in logs:
+        log_dict = log[1]
+        error_means = [(d[key]) for d in log_dict]
+        frames = [int(d['frame']) for d in log_dict]
+        std_deviations = [d['error variance'] for d in log_dict]
+
+        ax1.plot(frames, error_means, color = plot_colors[n], label=log[0]['name'])
+
+        #lower_std = [max(0, error_means[i]-(std_deviations[i])) for i in range(len(frames))]
+        #ax1.plot(frames, lower_std, color=std_dev_line_colors[n], linestyle='dashed')
+
+        #upper_std = [error_means[i]+(std_deviations[i]) for i in range(len(frames))]
+        #ax1.plot(frames, upper_std, color=std_dev_line_colors[n], linestyle='dashed')
+
+        #plt.fill_between(steps, lower_std, upper_std, color=std_dev_fill_colors[n])
+        n = n+1
+
+    ax1.set_xlim([0, max(frames)])
+    #ax1.set_ylim([0, 0.00001])
+    plt.xticks(np.arange(min(frames)-1, max(frames) + 1, 10.0))
+
+    plt.legend(loc='upper left', prop={'size': 12})
+    plt.grid(b=None, which='major', axis='both')
+    fig.tight_layout()
+    plt.savefig(output_path + title + '.png')
+    plt.clf()
+    plt.close()
+
+
+
+
 
 
 def make_10seeds_scatter_plot(logs, title, output_path):
@@ -91,6 +145,11 @@ def make_10seeds_scatter_plot(logs, title, output_path):
     #plt.show()
 
     plt.savefig(output_path +"/" + title + '.png')
+
+    #fig.clear()
+    #del fig
+    plt.clf()
+    plt.close('all')
 
 
 

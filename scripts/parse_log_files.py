@@ -132,9 +132,9 @@ def parseFrameNumberOfNodes(frame_lines):
 def parseFrameIndex(frame_line):
     m = re.search('frame (\d+)', frame_line)
     if m:
-        return (True, m.group(1))
+        return (True, float(m.group(1)))
     else:
-        return (False, -1)
+        return (False, 0)
 
 def parseFrame(frame_lines):
     from collections import defaultdict
@@ -145,6 +145,10 @@ def parseFrame(frame_lines):
         nodes = parseFrameNumberOfNodes(frame_lines)
         dict_values = {**error, **time}
         dict_values = {**dict_values, **nodes}
+
+        dict_values['mean per node'] = dict_values['error mean'] * dict_values["number nodes"]
+        dict_values['median per node'] = dict_values['error median'] * dict_values["number nodes"]
+
         dict_values['frame'] = frame
         return valid, defaultdict(str, dict_values)
     return valid, defaultdict(str)
@@ -185,10 +189,10 @@ def calculateAverageFrameError(frames):
     node_values = [f['number nodes'] for f in frames]
     error['number nodes'] = sum(node_values) / len(node_values)
 
-    mean_per_node_values = [(f['error mean'] / f['number nodes']) for f in frames]
+    mean_per_node_values = [(f['error mean'] * f['number nodes']) for f in frames]
     error['mean per node'] = sum(mean_per_node_values) / len(mean_per_node_values)
 
-    median_per_node_values = [(f['error median'] / f['number nodes']) for f in frames]
+    median_per_node_values = [(f['error median'] * f['number nodes']) for f in frames]
     error['median per node'] = sum(median_per_node_values) / len(median_per_node_values)
 
     return error
