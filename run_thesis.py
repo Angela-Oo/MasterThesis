@@ -15,7 +15,7 @@ head_args = ["-i", "head", "-p", "0.1", "-e", "0.3", "--smooth_cost_threshold", 
 head_registration_args = base_args + head_args + ["-n", "-1"]
 head_sequence_args = base_args + head_args + ["-s"]
 
-hand_args = ["-i", "hand", "-p", "0.15", "-e", "0.15", "--smooth_cost_threshold", "0.02", "--rigidity_cost_coefficient", "0.01"]
+hand_args = ["-i", "hand", "-p", "0.15", "-e", "0.15", "--smooth_cost_threshold", "0.02", "--rigidity_cost_coefficient", "0.01", "--use_hausdorff_distance"]
 hand_registration_args = base_args + hand_args + ["-n", "-1"]
 hand_sequence_args = base_args + hand_args + ["-s"]
 

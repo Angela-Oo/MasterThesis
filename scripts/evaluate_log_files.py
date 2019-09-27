@@ -31,7 +31,7 @@ for log_dict in dicts:
                   "{:.2f} e-04".format(log_dict['mean error']*1000),
                   "{:.2f} e-06".format(log_dict['median error']*100000),
                   "{:.2f} e-04".format(log_dict['variance error']*1000),
-                  "{:.2f} e-06".format(log_dict["mean per node"]*100000),
+                  "{:.2f}".format(log_dict["mean per node"]),
                   log_dict['edge length'],
                   log_dict['vertex probability'])
               )
@@ -41,7 +41,7 @@ for log_dict in dicts:
 for c in table:
     print(c)
 
-#file = open(path + "\\result.txt", "w")
-#for c in table:
-#    file.write(c + '\n')
-#file.close()
+file = open(path + "\\result.txt", "w")
+for c in table:
+    file.write(c + '\n')
+file.close()

@@ -231,10 +231,13 @@ def parseInfo(lines, frames):
 
 
 def parseLogFile(log):
-    lines = readLogFile(log)
-    frames = parseErrorPerFrame(lines)
-    info = parseInfo(lines, frames)
-    return info, frames
+    try:
+        lines = readLogFile(log)
+        frames = parseErrorPerFrame(lines)
+        info = parseInfo(lines, frames)
+        return info, frames
+    except:
+        return False, False
 
 def getAllLogFiles(path):
     log_files = []

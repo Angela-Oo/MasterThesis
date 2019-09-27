@@ -20,9 +20,12 @@ def main():
     from collections import defaultdict
     logs_datasets = defaultdict(list)
     for log in log_files:
-        parsed_log = parseLogFile(log)
-        dataset = parsed_log[0]['input']
-        logs_datasets[dataset].append(parsed_log)
+        try:
+            parsed_log = parseLogFile(log)
+            dataset = parsed_log[0]['input']
+            logs_datasets[dataset].append(parsed_log)
+        except:
+            print(log)
 
     for dataset in logs_datasets:
         output_path = path + "/" + dataset
