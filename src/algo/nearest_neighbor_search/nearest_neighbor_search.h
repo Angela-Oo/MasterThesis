@@ -29,11 +29,29 @@ class NearestNeighborSearch
 	std::unique_ptr<Tree> _tree;
 	Vertex_point_pmap _vertex_point_property_map;
 public:
-	Neighbor_search search(Point point, int K = 1);
+	Neighbor_search search(Point point, int K = 1) const;
 	NearestNeighborSearch(const SurfaceMesh & mesh);
 	NearestNeighborSearch(const SurfaceMesh & mesh,
 						  const std::vector<vertex_descriptor>::iterator vertices_begin,
 						  const std::vector<vertex_descriptor>::iterator vertices_end);
+};
+
+/// FurthestNeighborSearch search(mesh);
+/// Neighbor_search s = search.neighbor_search(Point(0., 0., 0.), 5);
+/// for (Neighbor_search::iterator it = s.begin(); it != s.end(); ++it) {
+/// 	auto distance = std::sqrt(it->second);
+/// 	auto vertex_handle = it->first;
+/// }
+class FurthestNeighborSearch
+{
+	std::unique_ptr<Tree> _tree;
+	Vertex_point_pmap _vertex_point_property_map;
+public:
+	Neighbor_search search(Point point, int K = 1) const;
+	FurthestNeighborSearch(const SurfaceMesh & mesh);
+	FurthestNeighborSearch(const SurfaceMesh & mesh,
+						   const std::vector<vertex_descriptor>::iterator vertices_begin,
+						   const std::vector<vertex_descriptor>::iterator vertices_end);
 };
 
 /// RadiusNearestNeighborSearch search(mesh);

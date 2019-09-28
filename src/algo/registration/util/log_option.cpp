@@ -33,7 +33,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	ss << std::endl;
 	
 	ss << "Deformation Graph: ";
-	ss << "edge length: " << options.deformation_graph.edge_length << std::endl;
+	ss << "edge length in percentage of surface area: " << options.deformation_graph.edge_length_percentage_of_area << std::endl;
 	
 	if (options.rigid_and_non_rigid_registration)
 		ss << "Rigid and non Rigid registration " << std::endl;

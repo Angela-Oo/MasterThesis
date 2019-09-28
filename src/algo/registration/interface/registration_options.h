@@ -77,7 +77,7 @@ struct ICPOptions
 
 struct DeformationGraphOptions
 {
-	double edge_length {0.3};
+	double edge_length_percentage_of_area {0.3};
 	unsigned int number_of_interpolation_neighbors{3};
 };
 

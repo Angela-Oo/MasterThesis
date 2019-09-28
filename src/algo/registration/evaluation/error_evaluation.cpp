@@ -71,12 +71,13 @@ RegistrationError ErrorEvaluation::errorEvaluation(const SurfaceMesh & mesh)
 {
 	std::vector<vertex_descriptor> v_ids;
 	std::vector<double> distances;
-	//std::vector<std::pair<Point, Point>> nearest_points;
+	
 	for (auto p : mesh.vertices()) {
 		auto point = mesh.point(p);
 		auto nearest_point = getNearestPointOnSurface(point);
 		auto vector = point - nearest_point;
 		double distance = sqrt(vector.squared_length());
+		//double distance = vector.squared_length();
 
 		if (isnan(distance) || isinf(distance))
 			std::cout << "bad" << std::endl;

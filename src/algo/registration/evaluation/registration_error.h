@@ -29,6 +29,7 @@ public:
 	double median{ 0. };
 	double min{ INFINITY };
 	double max{ 0. };
+	double sum{ 0. };
 };
 
 ErrorStatistics evalErrorStatistics(const std::vector<double> & errors);

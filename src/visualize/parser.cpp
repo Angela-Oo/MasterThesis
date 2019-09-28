@@ -99,7 +99,7 @@ void parseType(cxxopts::ParseResult &result, Registration::RegistrationOptions &
 
 	if (result.count("e"))
 	{
-		registration_options.deformation_graph.edge_length = result["e"].as<double>();
+		registration_options.deformation_graph.edge_length_percentage_of_area = result["e"].as<double>();
 	}
 }
 	
@@ -224,7 +224,7 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			.allow_unrecognised_options()
 			.add_options()
 			("t,type", "Registration Type: ARAP, ED", cxxopts::value<std::string>(std::string{ "ARAP" }))
-			("e,edge_length", "Deformation Graph Edge length", cxxopts::value<double>()->default_value("0.3"));
+			("e,edge_length_percentage_of_area", "Deformation Graph Edge length", cxxopts::value<double>()->default_value("0.1"));
 
 		options
 			.add_options()

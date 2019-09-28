@@ -216,8 +216,11 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 	, _ceres_logger(logger)
 	, _options(options)
 {
-	auto reduced_mesh = createReducedMesh(source, _options.deformation_graph.edge_length, _options.mesh_reduce_strategy);
-	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", _options.deformation_graph.edge_length);
+	double edge_length = deformationGraphEdgeLength(source, _options.deformation_graph.edge_length_percentage_of_area);
+	logger->write("used edge length " + std::to_string(edge_length));
+	
+	auto reduced_mesh = createReducedMesh(source, edge_length, _options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", edge_length);
 
 	auto global = createGlobalDeformation<ARAPDeformation>(source);
 	_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, _options.deformation_graph.number_of_interpolation_neighbors);
@@ -272,8 +275,8 @@ std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& sr
 										                   const RegistrationOptions & options,
 										                   std::shared_ptr<FileWriter> logger)
 {
-	auto reduced_mesh = createReducedMesh(src, options.deformation_graph.edge_length, options.mesh_reduce_strategy);
-	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", options.deformation_graph.edge_length);
+	auto reduced_mesh = createReducedMesh(src, options.deformation_graph.edge_length_percentage_of_area, options.mesh_reduce_strategy);
+	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", options.deformation_graph.edge_length_percentage_of_area);
 	auto global = createGlobalDeformation<ARAPDeformation>(reduced_mesh);
 	auto deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, options.deformation_graph.number_of_interpolation_neighbors);
 	return std::make_unique<AsRigidAsPossible>(src, dst, fixed_positions, deformation_graph, options, logger);

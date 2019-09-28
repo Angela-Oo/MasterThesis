@@ -47,4 +47,6 @@ typedef ml::TriMeshf Mesh;
 
 Mesh createReducedMesh(const Mesh & mesh, double target_edge_length = 0.05, ReduceMeshStrategy strategy = ReduceMeshStrategy::ISOTROPIC);
 
+double deformationGraphEdgeLength(const SurfaceMesh & mesh, double edge_length_percentage_of_surface_area);
+
 SurfaceMesh createReducedMesh(const SurfaceMesh & mesh, double target_edge_length = 0.05, ReduceMeshStrategy strategy = ReduceMeshStrategy::ISOTROPIC);

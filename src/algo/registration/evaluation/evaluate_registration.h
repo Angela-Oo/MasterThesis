@@ -4,7 +4,7 @@
 #include "algo/registration/interface/registration_options.h"
 #include "mesh/mesh_definition.h"
 #include "util/file_writer.h"
-#include "error_evaluation.h"
+#include "chamfer_distance.h"
 #include <memory>
 
 
@@ -18,7 +18,7 @@ public:
 	using DeformMesh = typename NonRigidRegistration::DeformMesh;
 private:
 	std::unique_ptr<NonRigidRegistration> _non_rigid_registration;
-	std::unique_ptr<ErrorEvaluation> _error_evaluation;
+	std::unique_ptr<CalculateChamferDistance> _calc_chamfer_distance;
 	std::shared_ptr<FileWriter> _logger;
 	SurfaceMesh _deformed_points;
 	RegistrationOptions _options;
@@ -60,6 +60,7 @@ public:
 						 std::shared_ptr<FileWriter> logger = nullptr);
 };
 
+
 template <typename NonRigidRegistration>
 void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 {
@@ -67,43 +68,40 @@ void EvaluateRegistration<NonRigidRegistration>::errorEvaluation()
 
 	auto vertex_colors = _deformed_points.property_map<vertex_descriptor, ml::vec4f>("v:color").first;
 
-	bool eval_error = _non_rigid_registration->finished() || _non_rigid_registration->shouldBeSavedAsImage().first;
+	const bool eval_error = _non_rigid_registration->finished() || _non_rigid_registration->shouldBeSavedAsImage().first;
 	if (eval_error && _options.error_evaluation) {
-		if (!_error_evaluation) {
-			_error_evaluation = std::make_unique<ErrorEvaluation>(_non_rigid_registration->getTarget());
+		if (!_calc_chamfer_distance) {
+			_calc_chamfer_distance = std::make_unique<CalculateChamferDistance>(_deformed_points, _non_rigid_registration->getTarget());
 		}
-		auto registration_errors = _error_evaluation->errorEvaluation(_deformed_points);
+		else {
+			_calc_chamfer_distance->setSource(_deformed_points);
+		}
+		
+		auto chamfer_distance = _calc_chamfer_distance->calculateChamferDistance();
+		
+		auto & source_error = chamfer_distance.source_vertices_distances;
+		const double max_error = *std::max_element(source_error.second.begin(), source_error.second.end());
+		for (size_t i = 0; i < source_error.first.size(); ++i) {
+			vertex_colors[source_error.first[i]] = errorToRGB(source_error.second[i] / max_error, 0.9);
+		}
 
-		ErrorStatistics error_statistic = evalErrorStatistics(registration_errors.errors());
-		for (size_t i = 0; i < registration_errors.size(); ++i)
-		{
-			vertex_colors[registration_errors.v(i)] = errorToRGB(registration_errors.error(i) / error_statistic.max, 0.9);
-		}
-		
-		if (_options.use_hausdorff_distance)
-		{
-			auto error_evaluation_target = std::make_unique<ErrorEvaluation>(_deformed_points);		
-			auto errors_target = error_evaluation_target->errorEvaluation(_non_rigid_registration->getTarget()).errors();
-			std::vector<double> errors = registration_errors.errors();
-			errors.insert(errors.end(), errors_target.begin(), errors_target.end());
-			error_statistic = evalErrorStatistics(registration_errors.errors());
-		}
-		
+		const ErrorStatistics error_statistic = evalErrorStatistics(chamfer_distance.distances());
+
 		std::stringstream ss;
-		ss << std::endl << "error: mean " << error_statistic.mean << ", variance " << error_statistic.variance
+		ss << std::endl << "distance error: chamfer_distance " << error_statistic.sum
+			<< ", mean " << error_statistic.mean << ", variance " << error_statistic.variance
 			<< ", median " << error_statistic.median
 			<< ", max " << error_statistic.max << ", min " << error_statistic.min;
 		if (_logger)
 			_logger->write(ss.str());
 	}
-	else
-	{
-		for (auto v : _deformed_points.vertices())
-		{
+	else {
+		for (auto v : _deformed_points.vertices()) {
 			vertex_colors[v] = ml::RGBColor::Cyan.toVec4f();
 		}
 	}
 }
+
 
 template<typename NonRigidRegistration>
 const SurfaceMesh & EvaluateRegistration<NonRigidRegistration>::getSource()

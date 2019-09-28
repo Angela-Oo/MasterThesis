@@ -69,10 +69,11 @@ SurfaceMesh generateHierarchicalMeshLevel(const SurfaceMesh & mesh, double radiu
 	return hierarchical_mesh;
 }
 
-HierarchicalMesh generateHierarchicalMesh(const SurfaceMesh & mesh, double min_radius, unsigned int levels)
+HierarchicalMesh generateHierarchicalMesh(const SurfaceMesh & mesh, double min_radius_percentage_of_area, unsigned int levels)
 {
 	std::vector<SurfaceMesh> meshes;
-
+		
+	double min_radius = deformationGraphEdgeLength(mesh, min_radius_percentage_of_area);
 	auto reduced_mesh = createReducedMesh(mesh, min_radius);
 	reduced_mesh.add_property_map<vertex_descriptor, MeshLevel>("v:level", MeshLevel(levels - 1));
 	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", min_radius);

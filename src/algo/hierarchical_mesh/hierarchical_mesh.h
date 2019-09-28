@@ -1,7 +1,6 @@
 #pragma once
 
 #include "mesh/mesh_definition.h"
-#include "algo/nearest_neighbor_search/nearest_neighbor_search.h"
 
 std::map<vertex_descriptor, std::vector<vertex_descriptor>> cluster(const SurfaceMesh & mesh, const SurfaceMesh & child_mesh);
 

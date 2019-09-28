@@ -43,16 +43,16 @@ RegistrationError::RegistrationError(std::vector<vertex_descriptor> v_ids, std::
 ErrorStatistics evalErrorStatistics(const std::vector<double> & errors)
 {
 	ErrorStatistics statistic;
-	double sum = 0.;
+	statistic.sum = 0.;
 	for (auto e : errors) {
 		if (e < statistic.min)
 			statistic.min = e;
 		if (e > statistic.max)
 			statistic.max = e;
-		sum += e;
+		statistic.sum += e;
 	}
 	if (!errors.empty()) {
-		statistic.mean = sum / errors.size();
+		statistic.mean = statistic.sum / errors.size();
 		statistic.variance = calculateVariance(errors, statistic.mean);
 		statistic.median = errors[floor(errors.size() / 2.)];
 	}

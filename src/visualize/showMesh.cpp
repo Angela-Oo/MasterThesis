@@ -276,7 +276,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		// options
 		_options.evaluate_residuals = true;
-		_options.deformation_graph.edge_length = 0.4;// 0.15;#
+		_options.deformation_graph.edge_length_percentage_of_area = 0.1;
 		_options.deformation_graph.number_of_interpolation_neighbors = 3;// min number of interpolation neighbors;
 
 		_options.ignore_border_vertices = false;
@@ -293,8 +293,6 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		// adaptive rigidity cost function
 		_options.adaptive_rigidity.enable = true;
-		//_options.reduce_rigidity.enable = true;
-		_options.deformation_graph.edge_length = 0.3;
 		//_renderer->_dg_edge_color = Visualize::EdgeColor::RigidityValue;
 		_options.use_vertex_random_probability = 0.1;
 	
