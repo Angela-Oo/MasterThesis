@@ -111,7 +111,6 @@ struct RegistrationOptions
 	bool reduce_smooth_factor{ true };
 	bool evaluate_residuals{ true };
 	bool error_evaluation{ true };
-	bool use_hausdorff_distance{ false };
 	ReduceMeshStrategy mesh_reduce_strategy{ ReduceMeshStrategy::ISOTROPIC };
 	bool rigid_and_non_rigid_registration{ true };
 	

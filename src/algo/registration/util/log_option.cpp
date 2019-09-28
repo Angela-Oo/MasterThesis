@@ -12,9 +12,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 		<< ", file path " << options.input_mesh_sequence.file_path
 		<< ", file name " << options.input_mesh_sequence.file_name
 		<< ", number of frames to load: " << options.input_mesh_sequence.number_of_frames_to_load << std::endl;
-
-	ss << "use hausdorff distance: " << std::boolalpha << options.use_hausdorff_distance << std::endl << std::endl;
-	
+		
 	if (options.sequence_options.enable) {
 		ss << "Sequence registration: "
 		<< " init rigid with non rigid deformation: " << std::boolalpha << options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation

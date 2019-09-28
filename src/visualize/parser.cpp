@@ -82,7 +82,7 @@ void parseSequence(cxxopts::ParseResult &result, Registration::RegistrationOptio
 		if (result.count("init_rigid_deformation_with_non_rigid_globale_deformation"))
 			registration_options.sequence_options.init_rigid_deformation_with_non_rigid_globale_deformation = result["init_rigid_with_non_rigid_deformation"].as<bool>();
 		if (result.count("use_previous_frame"))
-			registration_options.sequence_options.use_previous_frame_for_rigid_registration = result["use_previouse_frame"].as<bool>();
+			registration_options.sequence_options.use_previous_frame_for_rigid_registration = result["use_previous_frame"].as<bool>();
 	}
 }
 
@@ -200,8 +200,6 @@ void parseOptions(Registration::RegistrationOptions& registration_options, cxxop
 	registration_options.fit = result["fit"].as<double>();
 	registration_options.reduce_smooth_factor = result["reduce_smooth_factor"].as<bool>();
 	registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
-
-	registration_options.use_hausdorff_distance = result["use_hausdorff_distance"].as<bool>();
 	registration_options.error_evaluation = result["error_evaluation"].as<bool>();
 }
 }
@@ -242,8 +240,7 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 			("term", "Terminates the application after the registration finished", cxxopts::value<bool>()->default_value("true"));
 
 		options.add_options()
-			("error_evaluation", "Enable disable error evaluation", cxxopts::value<bool>()->default_value("true"))
-			("use_hausdorff_distance", "Use hausdorff distance for error evaluation", cxxopts::value<bool>());
+			("error_evaluation", "Enable disable error evaluation", cxxopts::value<bool>()->default_value("true"));
 
 		options
 			.add_options()
