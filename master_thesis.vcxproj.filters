@@ -118,6 +118,9 @@
     <Filter Include="2 algo\4 registration\12 evaluation">
       <UniqueIdentifier>{a6c1516d-ac45-4659-a6b9-82a24263f324}</UniqueIdentifier>
     </Filter>
+    <Filter Include="2 algo\4 registration\4 source point selection">
+      <UniqueIdentifier>{6c6b7549-ff68-48aa-ade7-8288be48738a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\main.h" />
@@ -800,6 +803,33 @@
     <ClInclude Include="src\algo\registration\evaluation\chamfer_distance.h">
       <Filter>2 algo\4 registration\12 evaluation</Filter>
     </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_fit_cost.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_fit_cost_without_icp.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_smooth_cost.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\i_ed_fit_cost.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\i_ed_smooth_cost.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\source_point_selection\source_point_selection.h">
+      <Filter>2 algo\4 registration\4 source point selection</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_point_to_point_cost_functions.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_point_to_plane_point_to_point_cost.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_point_to_plane_cost_functions.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
@@ -1013,6 +1043,21 @@
     </ClCompile>
     <ClCompile Include="src\algo\registration\evaluation\chamfer_distance.cpp">
       <Filter>2 algo\4 registration\12 evaluation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_fit_cost.cpp">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_fit_cost_without_icp.cpp">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_smooth_cost.cpp">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\source_point_selection\source_point_selection.cpp">
+      <Filter>2 algo\4 registration\4 source point selection</Filter>
+    </ClCompile>
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_point_to_plane_point_to_point_cost.cpp">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

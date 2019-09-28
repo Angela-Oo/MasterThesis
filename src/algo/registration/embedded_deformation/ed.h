@@ -11,6 +11,8 @@
 #include "util/file_writer.h"
 #include <vector>
 #include "util/ceres_include.h"
+#include "i_ed_smooth_cost.h"
+#include "i_ed_fit_cost.h"
 
 namespace Registration {
 
@@ -31,8 +33,11 @@ private:
 	DeformationGraph<EDDeformation> _deformation_graph;
 	std::unique_ptr<DeformedMesh<Deformation>> _deformed_mesh;
 	std::vector<vertex_descriptor> _fixed_positions;
-	std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
+	//std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
 	CeresLogger _ceres_logger;
+private:
+	std::unique_ptr<IEmbeddedDeformationFitCost> _fit_cost;
+	std::unique_ptr<IEmbeddedDeformationSmoothCost> _smooth_cost;
 private:
 	bool _with_icp = false;
 	double _current_cost = 1.;
@@ -40,28 +45,10 @@ private:
 	size_t _solve_iteration = 0;
 	size_t _max_iterations = 100;
 public:
-	double a_rigid;
-	double a_smooth;
-	double a_conf;
-	double a_fit;
-	double _find_max_distance = 0.5;
-	double _find_max_angle_deviation = 45.;
+	double a_rigid{ 100. };
 private:
-	void evaluateResidual(ceres::Problem & problem,
-						  VertexResidualIds & fit_residual_block_ids,
-						  EdgeResidualIds & smoot_residual_block_ids,
-						  VertexResidualIds & rotation_residual_block_ids,
-						  VertexResidualIds & conf_residual_block_ids);
-private:
-	ceres::ResidualBlockId addPointToPointCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point);
-	ceres::ResidualBlockId addPointToPlaneCostForNode(ceres::Problem &problem, vertex_descriptor node, const Point & target_point, const Vector & target_normal);
-	VertexResidualIds addFitCostWithoutICP(ceres::Problem &problem);
-	VertexResidualIds addFitCost(ceres::Problem &problem);
-	EdgeResidualIds addSmoothCost(ceres::Problem &problem);
-	VertexResidualIds addRotationCost(ceres::Problem &problem);
-	VertexResidualIds addConfCost(ceres::Problem &problem);
-private:
-	void setParameters();
+	void init();
+	void updateSmoothFactor();
 public:
 	bool finished() override;
 	bool solveIteration() override;
@@ -125,20 +112,20 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 															   const RegistrationOptions & registration_options,
 															   std::shared_ptr<FileWriter> logger = nullptr);
 
-
-std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
-															   const SurfaceMesh& dst,
-															   const RigidDeformation & rigid_deformation,
-															   const RegistrationOptions & registration_options,
-															   std::shared_ptr<FileWriter> logger = nullptr);
-
-
-std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
-															   const SurfaceMesh& dst,
-															   const RigidDeformation & rigid_deformation,
-															   const DeformationGraph<EDDeformation> & deformation_graph,
-															   const RegistrationOptions & registration_options,
-															   std::shared_ptr<FileWriter> logger = nullptr);
+//
+//std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
+//															   const SurfaceMesh& dst,
+//															   const RigidDeformation & rigid_deformation,
+//															   const RegistrationOptions & registration_options,
+//															   std::shared_ptr<FileWriter> logger = nullptr);
+//
+//
+//std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
+//															   const SurfaceMesh& dst,
+//															   const RigidDeformation & rigid_deformation,
+//															   const DeformationGraph<EDDeformation> & deformation_graph,
+//															   const RegistrationOptions & registration_options,
+//															   std::shared_ptr<FileWriter> logger = nullptr);
 
 
 

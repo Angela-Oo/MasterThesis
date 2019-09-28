@@ -254,6 +254,14 @@
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_fit_cost.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_fit_cost_without_icp.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_point_to_plane_cost_functions.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_point_to_plane_point_to_point_cost.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_point_to_point_cost_functions.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_smooth_cost.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\i_ed_fit_cost.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\i_ed_smooth_cost.h" />
     <ClInclude Include="src\algo\registration\evaluation\barycentric_coordinates.h" />
     <ClInclude Include="src\algo\registration\evaluation\chamfer_distance.h" />
     <ClInclude Include="src\algo\registration\evaluation\error_evaluation.h" />
@@ -274,6 +282,7 @@
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.h" />
     <ClInclude Include="src\algo\registration\rigid_registration\rigid_registration.h" />
     <ClInclude Include="src\algo\registration\sequence_registration\sequence_registration.h" />
+    <ClInclude Include="src\algo\registration\source_point_selection\source_point_selection.h" />
     <ClInclude Include="src\algo\registration\util\ceres_iteration_logger.h" />
     <ClInclude Include="src\algo\registration\util\ceres_math.h" />
     <ClInclude Include="src\algo\registration\util\ceres_residual_evaluation.h" />
@@ -348,6 +357,10 @@
     <ClCompile Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp" />
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_fit_cost.cpp" />
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_fit_cost_without_icp.cpp" />
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_point_to_plane_point_to_point_cost.cpp" />
+    <ClCompile Include="src\algo\registration\embedded_deformation\ed_smooth_cost.cpp" />
     <ClCompile Include="src\algo\registration\evaluation\barycentric_coordinates.cpp" />
     <ClCompile Include="src\algo\registration\evaluation\chamfer_distance.cpp" />
     <ClCompile Include="src\algo\registration\evaluation\error_evaluation.cpp" />
@@ -358,6 +371,7 @@
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformation.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_deformed_mesh.cpp" />
     <ClCompile Include="src\algo\registration\rigid_registration\rigid_registration.cpp" />
+    <ClCompile Include="src\algo\registration\source_point_selection\source_point_selection.cpp" />
     <ClCompile Include="src\algo\registration\util\ceres_iteration_logger.cpp" />
     <ClCompile Include="src\algo\registration\util\ceres_residual_evaluation.cpp" />
     <ClCompile Include="src\algo\registration\util\dual_quaternion.cpp" />
