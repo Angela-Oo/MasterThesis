@@ -8,6 +8,7 @@
 #include "algo/remeshing/mesh_simplification.h"
 #include "algo/registration/util/ceres_residual_evaluation.h"
 #include <random>
+#include "algo/registration/source_point_selection/source_point_selection.h"
 
 
 namespace Registration {
@@ -149,30 +150,6 @@ std::pair<bool, std::string> AsRigidAsPossible::shouldBeSavedAsImage()
 	return std::make_pair(false, "");
 }
 
-std::vector<vertex_descriptor> AsRigidAsPossible::subsetOfVerticesToFit()
-{
-	std::knuth_b rand_engine;
-	auto randomBoolWithProb = [&rand_engine](double prob)
-	{
-		std::bernoulli_distribution d(prob);
-		return d(rand_engine);
-	};
-
-	std::vector<vertex_descriptor> subset_of_vertices_to_fit;
-	// comment out for random at in each iteration step
-	if (_options.use_vertex_random_probability < 1.) {
-		for (auto & v : _deformed_mesh->vertices())
-		{
-			bool use_vertex = randomBoolWithProb(_options.use_vertex_random_probability);
-			if (use_vertex) {
-				subset_of_vertices_to_fit.push_back(v);
-			}
-		}
-		_ceres_logger.write("subset of vertices to use " + std::to_string(subset_of_vertices_to_fit.size()) + " / " + std::to_string(_deformed_mesh->number_of_vertices()), false);
-	}
-	return subset_of_vertices_to_fit;
-}
-
 void AsRigidAsPossible::init()
 {
 	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
@@ -185,7 +162,11 @@ void AsRigidAsPossible::init()
 	}
 	else {
 		_smooth_cost = std::make_unique<AsRigidAsPossibleSmoothCost>(_options.smooth);
-	}	
+	}
+
+	_selected_subset = selectRandomSubset(*_deformed_mesh.get(), _options.use_vertex_random_probability);
+	_ceres_logger.write("subset of vertices to use " + std::to_string(_selected_subset.size()) + " / " + std::to_string(_deformed_mesh->number_of_vertices()), false);
+
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
@@ -202,7 +183,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 	, _options(options)
 {
 	init();
-	_fit_cost = std::make_unique<AsRigidAsPossibleFitCostWithoutICP>(_target, fixed_positions, subsetOfVerticesToFit(), _options);
+	_fit_cost = std::make_unique<AsRigidAsPossibleFitCostWithoutICP>(_target, fixed_positions, _selected_subset, _options);
 }
 
 
@@ -225,7 +206,8 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& source,
 	auto global = createGlobalDeformation<ARAPDeformation>(source);
 	_deformation_graph = createDeformationGraphFromMesh<ARAPDeformation>(reduced_mesh, global, _options.deformation_graph.number_of_interpolation_neighbors);
 	init();
-	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_target, subsetOfVerticesToFit(), _options);
+	
+	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_target, _selected_subset, _options);
 }
 
 AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
@@ -241,7 +223,7 @@ AsRigidAsPossible::AsRigidAsPossible(const SurfaceMesh& src,
 	, _options(options)
 {
 	init();
-	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_target, subsetOfVerticesToFit(), _options);
+	_fit_cost = std::make_unique<AsRigidAsPossibleFitCost>(_target, _selected_subset, _options);
 }
 
 

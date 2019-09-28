@@ -133,11 +133,8 @@ bool EmbeddedDeformation::finished()
 	
 	double error = abs(_last_cost - _current_cost);
 	bool solved = error < (tol * _current_cost);
-	return (_solve_iteration >= _max_iterations) || (solved && _solve_iteration > 2);
+	return (_solve_iteration >= _options.max_iterations) || (solved && _solve_iteration > 2);
 }
-
-	
-
 
 
 void EmbeddedDeformation::setRigidDeformation(const RigidDeformation & rigid_deformation)
@@ -168,6 +165,8 @@ void EmbeddedDeformation::init()
 	//else {
 	_smooth_cost = std::make_unique<EmbeddedDeformationSmoothCost>(_options.smooth);
 	//}
+	_selected_subset = selectRandomSubset(*_deformed_mesh.get(), _options.use_vertex_random_probability);
+	_ceres_logger.write("subset of vertices to use " + std::to_string(_selected_subset.size()) + " / " + std::to_string(_deformed_mesh->number_of_vertices()), false);
 }
 
 
@@ -184,10 +183,9 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	, _deformation_graph(deformation_graph)
 	, _fixed_positions(fixed_positions)
 	, _ceres_logger(logger)
-	, _with_icp(false)
 {
 	init();
-	_fit_cost = std::make_unique<EmbeddedDeformationFitCostWithoutICP>(_target, fixed_positions, selectRandomSubset(_deformed_mesh->deformPoints(), _options.use_vertex_random_probability), _options);
+	_fit_cost = std::make_unique<EmbeddedDeformationFitCostWithoutICP>(_target, fixed_positions, _selected_subset, _options);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
@@ -198,7 +196,6 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	, _target(target)
 	, _options(options)
 	, _ceres_logger(logger)
-	, _with_icp(true)
 {
 	double edge_length = deformationGraphEdgeLength(source, _options.deformation_graph.edge_length_percentage_of_area);
 	logger->write("used edge length " + std::to_string(edge_length));
@@ -210,7 +207,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, _options.deformation_graph.number_of_interpolation_neighbors);
 
 	init();
-	_fit_cost = std::make_unique<EmbeddedDeformationFitCost>(_target, selectRandomSubset(_deformed_mesh->deformPoints(), _options.use_vertex_random_probability), _options);
+	_fit_cost = std::make_unique<EmbeddedDeformationFitCost>(_target, _selected_subset, _options);
 }
 
 
@@ -224,11 +221,9 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 	, _options(options)
 	, _deformation_graph(deformation_graph)
 	, _ceres_logger(logger)
-	, _with_icp(true)
 {
 	init();
-	_deformed_mesh = std::make_unique<DeformedMesh<Deformation>>(_source, _deformation_graph);
-	_fit_cost = std::make_unique<EmbeddedDeformationFitCost>(_target, selectRandomSubset(_deformed_mesh->deformPoints(), _options.use_vertex_random_probability), _options);
+	_fit_cost = std::make_unique<EmbeddedDeformationFitCost>(_target, _selected_subset, _options);
 }
 
 EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
@@ -244,10 +239,7 @@ EmbeddedDeformation::EmbeddedDeformation(const SurfaceMesh& source,
 
 EDDeformation createGlobalEDDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation)
 {	
-	auto r = rigid_deformation.rotation();
-	//double x = r.m(0,1);
-	ml::mat3d rotation(r.m(0, 0),r.m(0, 1), r.m(0, 2),r.m(1, 0), r.m(1, 1), r.m(1, 2), r.m(2, 0), r.m(2, 1), r.m(2, 2));
-	return EDDeformation(rigid_deformation._g, rotation, rigid_deformation._t);
+	return EDDeformation(rigid_deformation);
 }
 
 
@@ -278,36 +270,5 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, options.deformation_graph.number_of_interpolation_neighbors);
 	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, options, logger);
 }
-
-//
-//std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& source,
-//										                       const SurfaceMesh& target,
-//										                       const RigidDeformation & rigid_deformation,
-//										                       const RegistrationOptions & options,
-//										                       std::shared_ptr<FileWriter> logger)
-//{
-//	double edge_length = deformationGraphEdgeLength(source, options.deformation_graph.edge_length_percentage_of_area);
-//	auto reduced_mesh = createReducedMesh(source, edge_length, options.mesh_reduce_strategy);
-//	reduced_mesh.add_property_map<vertex_descriptor, double>("v:radius", edge_length);	
-//	auto global = createGlobalEDDeformationFromRigidDeformation(rigid_deformation);
-//	auto deformation_graph = createDeformationGraphFromMesh<EDDeformation>(reduced_mesh, global, options.deformation_graph.number_of_interpolation_neighbors);
-//	return std::make_unique<EmbeddedDeformation>(source, target, deformation_graph, options, logger);
-//}
-//
-//
-//std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
-//										                       const SurfaceMesh& dst,
-//										                       const RigidDeformation & rigid_deformation,
-//										                       const DeformationGraph<EDDeformation> & deformation_graph,
-//										                       const RegistrationOptions & registration_options,
-//										                       std::shared_ptr<FileWriter> logger)
-//{
-//	auto global = createGlobalEDDeformationFromRigidDeformation(rigid_deformation);
-//	auto new_deformation_graph = createDeformationGraphFromMesh<EDDeformation>(deformation_graph._mesh, global, registration_options.deformation_graph.number_of_interpolation_neighbors);
-//	return std::make_unique<EmbeddedDeformation>(src, dst, new_deformation_graph, registration_options, logger);
-//}
-//
-
-
 
 }

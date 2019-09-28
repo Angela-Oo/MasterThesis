@@ -1,9 +1,8 @@
 #pragma once
 
 #include "algo/registration/util/ceres_math.h"
-#include <vector>
 #include "util/ceres_include.h"
-#include <ceres/rotation.h>
+#include "ed_point_to_point_cost_functions.h"
 
 namespace Registration {
 namespace ED
@@ -16,13 +15,16 @@ struct RotationCostFunction {
 
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create() {
-		return (new ceres::AutoDiffCostFunction<RotationCostFunction, 1, 9>(new RotationCostFunction()));
+		return (new ceres::AutoDiffCostFunction<RotationCostFunction, 1, 12>(new RotationCostFunction()));
 	}
 
 	// E_fit = sum_{i} (c1*c2)^2+(c1*c3)^2+(c2*c3)^2+(c1*c1-1)^2+(c2*c2-1)^2+(c3*c3-1)^2
 	template <typename T>
-	bool operator()(const T* const rotation_matrix, T* residuals) const
+	bool operator()(const T* const deformation, T* residuals) const
 	{
+		T rotation_matrix[9];
+		rotation_vector_from_deformation(deformation, rotation_matrix);
+		
 		//const T *c1 = rotation_matrix;
 		//const T *c2 = rotation_matrix + 3;
 		//const T *c3 = rotation_matrix + 6;
@@ -66,22 +68,31 @@ struct SmoothCostFunction {
 
 	// Factory to hide the construction of the CostFunction object from the client code.
 	static ceres::CostFunction* Create(const Point & vi, const Point & vj) {
-		return (new ceres::AutoDiffCostFunction<SmoothCostFunction, 3, 9, 3, 3>(new SmoothCostFunction(vi, vj)));
+		return (new ceres::AutoDiffCostFunction<SmoothCostFunction, 3, 12, 12>(new SmoothCostFunction(vi, vj)));
 	}
 
 	// Esmooth = sum_i sum_j || Ai(xj-xi) + xi + ti - (xj + tj) ||^2
 	template <typename T>
-	bool operator()(const T* const rotation_matrix, const T* const translation_i, const T* const translation_j, T* residuals) const
+	bool operator()(const T* const deformation_i, const T* const deformation_j, T* residuals) const
 	{
 		T vi[3];
 		T vj[3];
 		point_to_T(_vi, vi);
 		point_to_T(_vj, vj);
+
+		T rotation_matrix_i[9];
+		rotation_vector_from_deformation(deformation_i, rotation_matrix_i);
+		T translation_i[3];
+		translation_vector_from_deformation(deformation_i, translation_i);
+		T translation_j[3];
+		translation_vector_from_deformation(deformation_j, translation_j);
+		
 		T edge_rotated[3];
 		T edge_translated[3];
+			
 
 		substract(vi, vj, edge_rotated);
-		matrix_multiplication(rotation_matrix, edge_rotated, edge_rotated);
+		matrix_multiplication(rotation_matrix_i, edge_rotated, edge_rotated);
 
 		addition(vi, translation_i, vi);
 		addition(vj, translation_j, vj);
@@ -97,24 +108,24 @@ struct SmoothCostFunction {
 
 
 
-struct ConfCostFunction {
-
-	ConfCostFunction()
-	{ }
-
-	// Factory to hide the construction of the CostFunction object from the client code.
-	static ceres::CostFunction* Create() {
-		return (new ceres::AutoDiffCostFunction<ConfCostFunction, 1, 1>(new ConfCostFunction()));
-	}
-
-	template <typename T>
-	bool operator()(const T* const weight, T* residuals) const {
-
-		T one{ 1. };
-		residuals[0] = one - (weight[0] * weight[0]);
-		return true;
-	}
-};
+//struct ConfCostFunction {
+//
+//	ConfCostFunction()
+//	{ }
+//
+//	// Factory to hide the construction of the CostFunction object from the client code.
+//	static ceres::CostFunction* Create() {
+//		return (new ceres::AutoDiffCostFunction<ConfCostFunction, 1, 1>(new ConfCostFunction()));
+//	}
+//
+//	template <typename T>
+//	bool operator()(const T* const weight, T* residuals) const {
+//
+//		T one{ 1. };
+//		residuals[0] = one - (weight[0] * weight[0]);
+//		return true;
+//	}
+//};
 
 
 }

@@ -7,6 +7,32 @@ namespace Registration {
 namespace ED
 {
 
+
+template<typename T>
+void translation_vector_from_deformation(const T * const deformation, T* translation)
+{
+	translation[0] = deformation[9];
+	translation[1] = deformation[10];
+	translation[2] = deformation[11];
+}
+
+template<typename T>
+void rotation_vector_from_deformation(const T * const deformation, T* rotation)
+{
+	rotation[0] = deformation[0];
+	rotation[1] = deformation[1];
+	rotation[2] = deformation[2];
+	
+	rotation[3] = deformation[3];
+	rotation[4] = deformation[4];
+	rotation[5] = deformation[5];
+	
+	rotation[6] = deformation[6];
+	rotation[7] = deformation[7];
+	rotation[8] = deformation[8];
+}
+
+
 // deformation of vi at node j = (Rj(vi-gj) + gj + tj)
 template<typename T>
 void deform_point_at_node_embedded_deformation(const T * const point, const T * const node_pos, const T * const deformation, T* result)

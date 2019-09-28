@@ -9,15 +9,14 @@ namespace Registration {
 class EDDeformation
 {
 private:
-	ml::mat3d _r; // rotation matrix
-	ml::vec3d _t; // translation vector	
+	std::array<double, 12> _d; // translation and rotation matrix
 	double _w; // weight
 	Point _position;
 public:
-	double * d() { return (&_r)->getData(); } // todo
-	double * r() { return (&_r)->getData(); }
-	double * t() { return (&_t)->getData(); }
+	double * d() { return _d.data(); }
 	double * w() { return &_w; }
+private:
+	void setDeformation(Matrix r, Vector t);
 public:
 	Matrix rotation() const;
 	Vector translation() const;
@@ -32,7 +31,7 @@ public:
 	EDDeformation invertDeformation() const;
 public:
 	EDDeformation(const Point & position);
-	EDDeformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w = 1.);
+	EDDeformation(const Point & position, const Matrix & r, const Vector & t, double w = 1.);
 	EDDeformation(const RigidDeformation & rigid_deformation);
 	EDDeformation();
 	EDDeformation(const EDDeformation& other);

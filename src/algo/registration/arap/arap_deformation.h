@@ -1,6 +1,5 @@
 #pragma once
 
-#include "algo/registration/deformation_graph/i_deformation.h"
 #include "algo/registration/rigid_registration/rigid_deformation.h"
 #include "mLibCore.h"
 #include "algo/registration/util/dual_quaternion.h"

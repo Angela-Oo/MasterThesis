@@ -33,17 +33,15 @@ private:
 	DeformationGraph<EDDeformation> _deformation_graph;
 	std::unique_ptr<DeformedMesh<Deformation>> _deformed_mesh;
 	std::vector<vertex_descriptor> _fixed_positions;
-	//std::unique_ptr<FindCorrespondingPoints> _find_correspondence_point;
+	std::vector<vertex_descriptor> _selected_subset;
 	CeresLogger _ceres_logger;
 private:
 	std::unique_ptr<IEmbeddedDeformationFitCost> _fit_cost;
 	std::unique_ptr<IEmbeddedDeformationSmoothCost> _smooth_cost;
 private:
-	bool _with_icp = false;
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
-	size_t _max_iterations = 100;
 public:
 	double a_rigid{ 100. };
 private:
@@ -75,7 +73,7 @@ public:
 						const DeformationGraph<EDDeformation> & deformation_graph,
 						const RegistrationOptions & options,
 						std::shared_ptr<FileWriter> logger);
-
+	// with icp
 	EmbeddedDeformation(const SurfaceMesh& source,
 						const SurfaceMesh& target,
 						const RegistrationOptions & options,
@@ -86,7 +84,7 @@ public:
 						const DeformationGraph<EDDeformation> & deformation_graph,
 						const RegistrationOptions & options,
 						std::shared_ptr<FileWriter> logger = nullptr);
-
+	// with icp
 	EmbeddedDeformation(const SurfaceMesh& source,
 						const SurfaceMesh& target,
 						const SurfaceMesh& previous_mesh,

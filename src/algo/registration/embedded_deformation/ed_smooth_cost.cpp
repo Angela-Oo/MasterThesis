@@ -32,7 +32,7 @@ EmbeddedDeformationSmoothCost::smoothCost(ceres::Problem &problem,
 		ceres::CostFunction* cost_function = ED::SmoothCostFunction::Create(mesh.point(source), mesh.point(target));
 		auto loss_function = new ceres::ScaledLoss(NULL, loss_weighting, ceres::TAKE_OWNERSHIP);
 		auto residual_id = problem.AddResidualBlock(cost_function, loss_function,
-													deformations[source].r(), deformations[source].t(), deformations[target].t());
+													deformations[source].d(), deformations[target].d());
 
 		auto edge = deformation_graph._mesh.edge(e);
 		_smooth_residual_ids[edge].push_back(residual_id);
@@ -52,13 +52,13 @@ EmbeddedDeformationSmoothCost::rotationCost(ceres::Problem &problem,
 	for (auto & v : deformation_graph._mesh.vertices()) {
 		ceres::CostFunction* cost_function = ED::RotationCostFunction::Create();
 		auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), loss_weighting, ceres::TAKE_OWNERSHIP);
-		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v].r()));
+		residual_ids[v].push_back(problem.AddResidualBlock(cost_function, loss_function, deformations[v].d()));
 	}
 
 	// add global rotation cost
 	ceres::CostFunction* cost_function = ED::RotationCostFunction::Create();
 	auto loss_function = new ceres::ScaledLoss(new ceres::SoftLOneLoss(0.001), loss_weighting, ceres::TAKE_OWNERSHIP);
-	problem.AddResidualBlock(cost_function, loss_function, deformation_graph._global.r());
+	problem.AddResidualBlock(cost_function, loss_function, deformation_graph._global.d());
 	return residual_ids;	
 }
 

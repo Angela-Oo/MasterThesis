@@ -32,6 +32,7 @@ private:
 	ceres::Solver::Options _ceres_options;
 	DeformationGraph<ARAPDeformation> _deformation_graph;
 	std::unique_ptr<DeformedMesh<Deformation>> _deformed_mesh;
+	std::vector<vertex_descriptor> _selected_subset;
 private:
 	std::unique_ptr<IAsRigidAsPossibleFitCost> _fit_cost;
 	std::unique_ptr<IAsRigidAsPossibleSmoothCost> _smooth_cost;
@@ -44,7 +45,6 @@ private:
 	CeresLogger _ceres_logger;
 private:
 	void init();
-	std::vector<vertex_descriptor> subsetOfVerticesToFit();
 	void updateSmoothFactor();
 public:
 	bool finished() override;

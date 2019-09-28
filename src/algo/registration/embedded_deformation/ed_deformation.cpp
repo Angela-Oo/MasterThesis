@@ -2,15 +2,31 @@
 
 namespace Registration {
 
+void EDDeformation::setDeformation(Matrix r, Vector t)
+{
+	_d[0] = r.m(0, 0);
+	_d[1] = r.m(0, 1);
+	_d[2] = r.m(0, 2);
+	_d[3] = r.m(1, 0);
+	_d[4] = r.m(1, 1);
+	_d[5] = r.m(1, 2);
+	_d[6] = r.m(2, 0);
+	_d[7] = r.m(2, 1);
+	_d[8] = r.m(2, 2);
+	_d[9] = t[0];
+	_d[10] = t[1];
+	_d[11] = t[2];
+}
+
 Matrix EDDeformation::rotation() const
 {
-	Matrix m(_r(0, 0), _r(0, 1), _r(0, 2), _r(1, 0), _r(1, 1), _r(1, 2), _r(2, 0), _r(2, 1), _r(2, 2));
+	Matrix m(_d[0], _d[1], _d[2], _d[3], _d[4], _d[5], _d[6], _d[7], _d[8]);
 	return m;
 }
 
 Vector EDDeformation::translation() const
 {
-	return Vector(_t[0], _t[1], _t[2]);
+	return Vector(_d[9], _d[10], _d[11]);
 }
 
 Point EDDeformation::position() const
@@ -39,38 +55,35 @@ Vector EDDeformation::deformNormal(const Vector & normal) const
 
 EDDeformation EDDeformation::invertDeformation() const
 {
-	return EDDeformation(getDeformedPosition(), _r.getInverse(), -_t, _w);
+	auto r = rotation().inverse();
+	auto t = -translation();
+	return EDDeformation(getDeformedPosition(), r, t, _w);
 }
 
-EDDeformation::EDDeformation(const Point & position, const ml::mat3d & r, const ml::vec3d & t, double w)
+EDDeformation::EDDeformation(const Point & position, const Matrix & r, const Vector & t, double w)
 	: _position(position)
-	, _r(r)
-	, _t(t)
 	, _w(w)
-{}
+{
+	setDeformation(r, t);
+}
 
 EDDeformation::EDDeformation()
-	: EDDeformation(CGAL::ORIGIN, ml::mat3d::identity(), ml::vec3f::origin)
+	: EDDeformation(CGAL::ORIGIN, Matrix(), Vector())
 {}
 
 EDDeformation::EDDeformation(const Point & position)
-	: EDDeformation(position, ml::mat3d::identity(), ml::vec3f::origin)
+	: EDDeformation(position, Matrix(), Vector())
 {}
 
 EDDeformation::EDDeformation(const RigidDeformation & rigid_deformation)
-{
-	auto r = rigid_deformation.rotation();
-	//double x = r.m(0,1);
-	ml::mat3d rotation(r.m(0, 0), r.m(0, 1), r.m(0, 2), r.m(1, 0), r.m(1, 1), r.m(1, 2), r.m(2, 0), r.m(2, 1), r.m(2, 2));
-	_r = rotation;
-	_t = rigid_deformation._t;
+{;
+	setDeformation(rigid_deformation.rotation(), rigid_deformation.translation());
 	_position = rigid_deformation._g;
 }
 
 EDDeformation::EDDeformation(const EDDeformation & other)
 	: _position(other._position)
-	, _r(other._r)
-	, _t(other._t)
+	, _d(other._d)
 	, _w(other._w)
 {}
 
@@ -78,8 +91,9 @@ EDDeformation::EDDeformation(const EDDeformation & deformation, bool inverse)
 	: EDDeformation(deformation)
 {
 	if (inverse) {
-		_r = deformation._r.getInverse();
-		_t = -deformation._t;
+		auto r = deformation.rotation().inverse();
+		auto t = -deformation.translation();
+		setDeformation(r, t);
 	}
 }
 
