@@ -101,10 +101,10 @@ public:
 ARAPDeformation createGlobalDeformationFromRigidDeformation(const RigidDeformation & rigid_deformation);
 
 
-std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& src,
-										  const SurfaceMesh& dst,
-										  std::vector<vertex_descriptor> fixed_positions,
-										  const RegistrationOptions & options,
-										  std::shared_ptr<FileWriter> logger);
+std::unique_ptr<AsRigidAsPossible> createAsRigidAsPossible(const SurfaceMesh& source,
+														   const SurfaceMesh& target,
+														   std::vector<vertex_descriptor> fixed_positions,
+														   const RegistrationOptions & options,
+														   std::shared_ptr<FileWriter> logger);
 
 }
