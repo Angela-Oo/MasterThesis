@@ -110,21 +110,5 @@ std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh
 															   const RegistrationOptions & registration_options,
 															   std::shared_ptr<FileWriter> logger = nullptr);
 
-//
-//std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
-//															   const SurfaceMesh& dst,
-//															   const RigidDeformation & rigid_deformation,
-//															   const RegistrationOptions & registration_options,
-//															   std::shared_ptr<FileWriter> logger = nullptr);
-//
-//
-//std::unique_ptr<EmbeddedDeformation> createEmbeddedDeformation(const SurfaceMesh& src,
-//															   const SurfaceMesh& dst,
-//															   const RigidDeformation & rigid_deformation,
-//															   const DeformationGraph<EDDeformation> & deformation_graph,
-//															   const RegistrationOptions & registration_options,
-//															   std::shared_ptr<FileWriter> logger = nullptr);
-
-
 
 }

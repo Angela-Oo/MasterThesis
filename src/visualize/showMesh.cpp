@@ -287,7 +287,7 @@ void ShowMesh::init(ml::ApplicationData &app)
 
 		// refine deformation graph
 		//_options.refinement.levels = 4;
-		//_options.refinement.min_edge_length = 0.05;
+		//_options.refinement.min_edge_length_percentage_of_area = 0.05;
 		//_options.use_adaptive_rigidity_cost = false;
 		//_renderer->_dg_edge_color = Visualize::EdgeColor::SmoothCost;
 

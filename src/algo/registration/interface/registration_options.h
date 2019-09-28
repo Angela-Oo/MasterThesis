@@ -40,7 +40,7 @@ struct ReduceRigidityOptions
 struct RefinementOptions
 {
 	bool enable{ false };
-	double min_edge_length {0.05};
+	double min_edge_length_percentage_of_area {0.01};
 	unsigned int levels {4};
 	Refinement refine {Refinement::VERTEX};
 	double smooth_cost_threshold{ 0.05 };
@@ -77,7 +77,7 @@ struct ICPOptions
 
 struct DeformationGraphOptions
 {
-	double edge_length_percentage_of_area {0.3};
+	double edge_length_percentage_of_area {0.1};
 	unsigned int number_of_interpolation_neighbors{3};
 };
 

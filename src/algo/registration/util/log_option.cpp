@@ -46,7 +46,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 		ss << " smooth cost threshold: max(" << options.refinement.smooth_cost_threshold
 			<< ", " << options.refinement.smooth_cost_percentage_of_max << " * max_value)"
 			<< ", levels " << options.refinement.levels
-			<< ", min edge length " << options.refinement.min_edge_length << std::endl;
+			<< ", min edge length in percentage of surface area " << options.refinement.min_edge_length_percentage_of_area << std::endl;
 	}
 	if (options.adaptive_rigidity.enable) {
 		ss << "Adaptive Rigidity by cost function:"
