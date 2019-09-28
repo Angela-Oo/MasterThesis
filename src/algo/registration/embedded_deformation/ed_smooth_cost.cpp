@@ -2,7 +2,7 @@
 
 #include "ed_smooth_cost.h"
 #include "algo/registration/util/ceres_residual_evaluation.h"
-#include "ed_cost_functions.h"
+#include "ed_smooth_cost_functions.h"
 
 namespace Registration
 {

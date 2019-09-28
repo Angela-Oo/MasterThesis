@@ -230,10 +230,12 @@
     <ClInclude Include="src\algo\nearest_neighbor_search\nearest_neighbor_search.h" />
     <ClInclude Include="src\algo\registration\arap\arap.h" />
     <ClInclude Include="src\algo\registration\arap\arap_cost.h" />
-    <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h" />
+    <ClInclude Include="src\algo\registration\arap\arap_smooth_cost_functions.h" />
     <ClInclude Include="src\algo\registration\arap\arap_deformation.h" />
     <ClInclude Include="src\algo\registration\arap\arap_fit_cost.h" />
     <ClInclude Include="src\algo\registration\arap\arap_fit_cost_without_icp.h" />
+    <ClInclude Include="src\algo\registration\arap\arap_point_to_plane_cost_function.h" />
+    <ClInclude Include="src\algo\registration\arap\arap_point_to_point_cost_function.h" />
     <ClInclude Include="src\algo\registration\arap\arap_smooth_cost.h" />
     <ClInclude Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity.h" />
     <ClInclude Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity_vertex.h" />
@@ -252,7 +254,7 @@
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_deformation.h" />
     <ClInclude Include="src\algo\registration\deformation_graph_refinement\refinement_registration.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h" />
-    <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h" />
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_smooth_cost_functions.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_deformation.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_fit_cost.h" />
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_fit_cost_without_icp.h" />

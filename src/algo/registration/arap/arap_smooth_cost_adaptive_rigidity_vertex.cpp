@@ -1,7 +1,7 @@
 #pragma once
 
 #include "arap_smooth_cost_adaptive_rigidity_vertex.h"
-#include "arap_cost_functions.h"
+#include "arap_smooth_cost_functions.h"
 #include "algo/registration/util/ceres_residual_evaluation.h"
 
 

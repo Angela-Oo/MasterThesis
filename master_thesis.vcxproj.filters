@@ -560,13 +560,7 @@
     <ClInclude Include="src\algo\registration\find_corresponding_points\find_corresponding_points.h">
       <Filter>2 algo\4 registration\4 find correspondences</Filter>
     </ClInclude>
-    <ClInclude Include="src\algo\registration\arap\arap_cost_functions.h">
-      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
-    </ClInclude>
     <ClInclude Include="src\algo\registration\embedded_deformation\ed.h">
-      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\algo\registration\embedded_deformation\ed_cost_functions.h">
       <Filter>2 algo\4 registration\7 embedded deformation</Filter>
     </ClInclude>
     <ClInclude Include="src\algo\registration\deformation_graph\deformation_graph.h">
@@ -829,6 +823,18 @@
     </ClInclude>
     <ClInclude Include="src\algo\registration\embedded_deformation\ed_point_to_plane_cost_functions.h">
       <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\embedded_deformation\ed_smooth_cost_functions.h">
+      <Filter>2 algo\4 registration\7 embedded deformation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_point_to_point_cost_function.h">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_point_to_plane_cost_function.h">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
+    </ClInclude>
+    <ClInclude Include="src\algo\registration\arap\arap_smooth_cost_functions.h">
+      <Filter>2 algo\4 registration\6 as rigid as possible</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
