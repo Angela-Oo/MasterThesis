@@ -24,9 +24,9 @@ struct FitPointToPlaneCostFunction
 	const double _n1_weight;
 	const double _n2_weight;
 	const double _n3_weight;
-	double _n4_weight;
-	double _n5_weight;
-	double _n6_weight;
+	double _n4_weight {0.};
+	double _n5_weight {0.};
+	double _n6_weight {0.};
 
 	FitPointToPlaneCostFunction(const Point& target_pos, const Vector & target_normal,
 								const Point& source_pos, const Point &global_pos,
@@ -74,7 +74,7 @@ struct FitPointToPlaneCostFunction
 									   const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos, const Point n6_pos,
 									   double n1_weight, double n2_weight, double n3_weight, double n4_weight, double n5_weight, double n6_weight)
 	{
-		return (new ceres::AutoDiffCostFunction<FitPointToPlaneCostFunction, 3, 12, 12, 12, 12, 12, 12, 12>(
+		return (new ceres::AutoDiffCostFunction<FitPointToPlaneCostFunction, 1, 12, 12, 12, 12, 12, 12, 12>(
 			new FitPointToPlaneCostFunction(target_pos, target_normal, source_pos, global_pos, n1_pos, n2_pos, n3_pos, n4_pos, n5_pos, n6_pos, n1_weight, n2_weight, n3_weight, n4_weight, n5_weight, n6_weight)));
 	}
 
@@ -84,7 +84,7 @@ struct FitPointToPlaneCostFunction
 									   const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos, const Point n5_pos,
 									   double n1_weight, double n2_weight, double n3_weight, double n4_weight, double n5_weight)
 	{
-		return (new ceres::AutoDiffCostFunction<FitPointToPlaneCostFunction, 3, 12, 12, 12, 12, 12, 12>(
+		return (new ceres::AutoDiffCostFunction<FitPointToPlaneCostFunction, 1, 12, 12, 12, 12, 12, 12>(
 			new FitPointToPlaneCostFunction(target_pos, target_normal, source_pos, global_pos, n1_pos, n2_pos, n3_pos, n4_pos, n5_pos, n1_weight, n2_weight, n3_weight, n4_weight, n5_weight)));
 	}
 
@@ -93,7 +93,7 @@ struct FitPointToPlaneCostFunction
 									   const Point& source_pos, const Point &global_pos,
 									   const Point n1_pos, const Point n2_pos, const Point n3_pos, const Point n4_pos,
 									   double n1_weight, double n2_weight, double n3_weight, double n4_weight) {
-		return (new ceres::AutoDiffCostFunction<FitPointToPlaneCostFunction, 3, 12, 12, 12, 12, 12>(
+		return (new ceres::AutoDiffCostFunction<FitPointToPlaneCostFunction, 1, 12, 12, 12, 12, 12>(
 			new FitPointToPlaneCostFunction(target_pos, target_normal, source_pos, global_pos, n1_pos, n2_pos, n3_pos, n4_pos, n1_weight, n2_weight, n3_weight, n4_weight)));
 	}
 
@@ -103,7 +103,7 @@ struct FitPointToPlaneCostFunction
 									   const Point n1_pos, const Point n2_pos, const Point n3_pos,
 									   double n1_weight, double n2_weight, double n3_weight)
 	{
-		return (new ceres::AutoDiffCostFunction<FitPointToPlaneCostFunction, 3, 12, 12, 12, 12>(
+		return (new ceres::AutoDiffCostFunction<FitPointToPlaneCostFunction, 1, 12, 12, 12, 12>(
 			new FitPointToPlaneCostFunction(target_pos, target_normal, source_pos, global_pos, n1_pos, n2_pos, n3_pos, n1_weight, n2_weight, n3_weight)));
 	}
 

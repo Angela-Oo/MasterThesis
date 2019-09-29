@@ -78,14 +78,14 @@ bool EmbeddedDeformation::solveIteration()
 
 		_fit_cost->addFitCost(problem, _deformation_graph, *(_deformed_mesh.get()), logger);
 		EdgeResidualIds smooth_residual_ids = _smooth_cost->smoothCost(problem, _options.smooth, _deformation_graph);
-		VertexResidualIds rot_residual_ids = _smooth_cost->rotationCost(problem, a_rigid, _deformation_graph);
+		VertexResidualIds rot_residual_ids = _smooth_cost->rotationCost(problem, _options.ed_rigid, _deformation_graph);
 
 		ceres::Solve(_options.ceres_options, &problem, &summary);
 
 		// evaluate
-		if (_options.evaluate_residuals) {
-			_smooth_cost->evaluateResiduals(problem, _deformation_graph._mesh, (*logger));
+		if (_options.evaluate_residuals) {			
 			_fit_cost->evaluateResiduals(problem, _deformation_graph._mesh, (*logger));
+			_smooth_cost->evaluateResiduals(problem, _deformation_graph._mesh, (*logger));
 		}
 
 		_last_cost = _current_cost;

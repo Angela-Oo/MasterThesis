@@ -21,6 +21,7 @@ EmbeddedDeformationSmoothCost::smoothCost(ceres::Problem &problem,
 										  double loss_weighting,
 										  DeformationGraph<EDDeformation> & deformation_graph)
 {
+	_smooth_factor = loss_weighting;
 	_smooth_residual_ids.clear();
 	auto & mesh = deformation_graph._mesh;
 

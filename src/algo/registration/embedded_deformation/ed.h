@@ -42,8 +42,6 @@ private:
 	double _current_cost = 1.;
 	double _last_cost = 2.;
 	size_t _solve_iteration = 0;
-public:
-	double a_rigid{ 100. };
 private:
 	void init();
 	void updateSmoothFactor();

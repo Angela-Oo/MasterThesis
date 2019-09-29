@@ -195,9 +195,10 @@ void parseReduceRigidity(Registration::RegistrationOptions& registration_options
 void parseOptions(Registration::RegistrationOptions& registration_options, cxxopts::ParseResult result)
 {
 	registration_options.max_iterations = result["max_iterations"].as<unsigned int>();
-	registration_options.use_vertex_random_probability = result["p"].as<double>();
-	registration_options.smooth = result["smooth"].as<double>();
+	registration_options.use_vertex_random_probability = result["p"].as<double>();	
 	registration_options.fit = result["fit"].as<double>();
+	registration_options.smooth = result["smooth"].as<double>();
+	registration_options.ed_rigid = result["ed_rigid"].as<double>();
 	registration_options.reduce_smooth_factor = result["reduce_smooth_factor"].as<bool>();
 	registration_options.ignore_border_vertices = result["ignore_border_vertices"].as<bool>();
 	registration_options.error_evaluation = result["error_evaluation"].as<bool>();
@@ -274,7 +275,8 @@ Registration::RegistrationOptions parse(int argc, char* argv[])
 		options.add_options()
 			("max_iterations", "Max Iterations", cxxopts::value<unsigned int>()->default_value("25"))
 			("p,probability_to_use_vertex", "Random Probability to use a input vertex", cxxopts::value<double>()->default_value("0.2"))
-			("smooth", "Smooth coefficient used for registration", cxxopts::value<double>()->default_value("1."))
+			("smooth", "Smooth coefficient used for registration", cxxopts::value<double>()->default_value("2."))
+			("ed_rigid", "Rigid coefficient used for ed registration", cxxopts::value<double>()->default_value("10."))
 			("fit", "Fit coefficient used for registration", cxxopts::value<double>()->default_value("1."))
 			("reduce_smooth_factor", "Reduce Smooth Factor")
 			("ignore_border_vertices", "Ignore Border Vertices of target mesh", cxxopts::value<bool>()->default_value("true"));

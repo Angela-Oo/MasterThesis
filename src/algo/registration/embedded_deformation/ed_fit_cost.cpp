@@ -63,13 +63,13 @@ bool EmbeddedDeformationFitCost::addFitCostVertex(ceres::Problem & problem,
 														   deformation_graph, deformed_mesh, v,
 														   target_point);
 		_fit_residual_ids[v].push_back(residual_id_point_to_point);
-
+		
 		assert(target_normal.squared_length() > 0.);
 		auto residual_id_point_to_plane = pointToPlaneCost(problem, point_to_plane_weighting,
 														   deformation_graph, deformed_mesh, v,
 														   target_point, target_normal);
 		_fit_residual_ids[v].push_back(residual_id_point_to_plane);
-
+		
 		return true;
 	}
 	return false;

@@ -23,7 +23,7 @@ void logRegistrationOptions(std::shared_ptr<FileWriter> logger, const Registrati
 	if (options.type == RegistrationType::ARAP)
 		ss << "ARAP";
 	else if (options.type == RegistrationType::ED)
-		ss << "Embedded Deformation";
+		ss << "Embedded Deformation, rigid coefficient " << options.ed_rigid;
 	else if (options.type == RegistrationType::Rigid)
 		ss << "Rigid";
 	else

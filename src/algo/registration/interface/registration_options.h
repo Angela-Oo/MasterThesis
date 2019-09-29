@@ -102,9 +102,10 @@ struct RegistrationOptions
 	RegistrationType type{ RegistrationType::ARAP };
 	DeformationGraphOptions deformation_graph;
 	ceres::Solver::Options ceres_options;
-	
-	double smooth { 1. };
-	double fit { 1. };
+
+	double fit{ 1. };
+	double smooth { 2. };
+	double ed_rigid{ 10. };	
 	unsigned int max_iterations{ 25 };
 	double use_vertex_random_probability{ 0.2 }; // value between 0. and 1.
 	bool ignore_border_vertices{ true };
