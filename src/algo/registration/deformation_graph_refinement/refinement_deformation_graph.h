@@ -37,6 +37,9 @@ void interpolateNewNodeDeformations(RefineDeformationGraphDeformation<Deformatio
 	}
 }
 
+double getSmoothnessCost(const SurfaceMesh & mesh);
+	
+
 template <typename PositionDeformation>
 size_t refineHierarchicalMeshAtEdges(RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation, double refinement_smooth_cost_threshold, double percentage_max_smooth_cost)
 {
@@ -54,13 +57,15 @@ size_t refineHierarchicalMeshAtEdges(RefineDeformationGraphDeformation<Deformati
 	return new_vertices.size();
 }
 
+
+
 template <typename PositionDeformation>
-size_t refineHierarchicalMeshAtVertices(RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation, double refeinment_smooth_cost_threshold, double percentage_max_smooth_cost)
+size_t refineHierarchicalMeshAtVertices(RefineDeformationGraphDeformation<DeformationGraph<PositionDeformation>> & deformation, double refinement_smooth_cost_threshold, double percentage_max_smooth_cost)
 {
 	SurfaceMesh refined_mesh = deformation.non_rigid_deformation._mesh;
 	HierarchicalMeshRefinement mesh_refiner(deformation.hierarchical_mesh);
 
-	auto vertices = getVerticesToRefine(refined_mesh, refeinment_smooth_cost_threshold, percentage_max_smooth_cost);
+	auto vertices = getVerticesToRefine(refined_mesh, refinement_smooth_cost_threshold, percentage_max_smooth_cost);
 	auto new_vertices = mesh_refiner.refine(vertices, refined_mesh);
 
 	interpolateNewNodeDeformations<PositionDeformation>(deformation, new_vertices, refined_mesh);
@@ -73,7 +78,7 @@ size_t refineHierarchicalMeshAtVertices(RefineDeformationGraphDeformation<Deform
 																			  deformation.non_rigid_deformation._global,
 																			  deformation.non_rigid_deformation.getNumberOfInterpolationNeighbors());
 
-	return new_vertices.size();
+	return new_vertices.size();	
 }
 	
 }

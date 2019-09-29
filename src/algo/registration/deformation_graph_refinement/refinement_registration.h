@@ -99,7 +99,7 @@ SurfaceMesh RefineDeformationGraphRegistration<NonRigidRegistration>::getDeforma
 template<typename NonRigidRegistration>
 bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 {
-	bool finished = _non_rigid_registration->finished();
+	const bool finished = _non_rigid_registration->finished();
 	if (finished == false) {
 		_current_iteration++;
 		bool solved = _non_rigid_registration->solveIteration();
@@ -108,25 +108,25 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	}
 	else if(_is_refined == false) {
 		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
-		
+
+		const double smooth_cost = getSmoothnessCost(_deformation.non_rigid_deformation._mesh);
+
 		size_t refined_vertices_edges{ 0 };
-		if(_options.refinement.refine == Refinement::VERTEX)
-			refined_vertices_edges = refineHierarchicalMeshAtVertices(_deformation, _options.refinement.smooth_cost_threshold, _options.refinement.smooth_cost_percentage_of_max);
-		else
-			refined_vertices_edges = refineHierarchicalMeshAtEdges(_deformation, _options.refinement.smooth_cost_threshold, _options.refinement.smooth_cost_percentage_of_max);
-		
-		if (_logger)
-			_logger->write("Number of new vertices: " + std::to_string(refined_vertices_edges));
+		if (smooth_cost > _options.refinement.smooth_cost_threshold) {			
+			if (_options.refinement.refine == Refinement::VERTEX)
+				refined_vertices_edges = refineHierarchicalMeshAtVertices(_deformation, 0.001, _options.refinement.smooth_cost_percentage_of_max);
+			else
+				refined_vertices_edges = refineHierarchicalMeshAtEdges(_deformation, 0.001, _options.refinement.smooth_cost_percentage_of_max);
 
-		if (refined_vertices_edges > 0) {
-			_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
-			_number_of_refinements++;
-
-			unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 2 : 20;
-			if (_number_of_refinements >= max_number_of_refinement)
-				_is_refined = true;
+			if (refined_vertices_edges > 0) {
+				_non_rigid_registration->setDeformation(_deformation.non_rigid_deformation);
+				_number_of_refinements++;
+			}
+			if (_logger)
+				_logger->write("Number of new vertices: " + std::to_string(refined_vertices_edges));
 		}
-		else {
+		unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 2 : 20;
+		if (refined_vertices_edges == 0 || _number_of_refinements >= max_number_of_refinement) {
 			_is_refined = true;
 		}
 	}

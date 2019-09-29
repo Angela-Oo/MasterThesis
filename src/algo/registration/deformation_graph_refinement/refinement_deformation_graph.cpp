@@ -75,4 +75,17 @@ std::vector<vertex_descriptor> getVerticesToRefine(SurfaceMesh & refined_mesh, d
 }
 
 
+double getSmoothnessCost(const SurfaceMesh & mesh)
+{
+	auto smooth_cost_property_map = mesh.property_map<edge_descriptor, double>("e:smooth_cost");
+	assert(smooth_cost_property_map.second);
+	auto smooth_costs_per_edge = smooth_cost_property_map.first;
+
+	double smooth_cost = 0.;
+	for (auto e : mesh.edges()) {
+		smooth_cost += smooth_costs_per_edge[e];
+	}
+	return smooth_cost;
+}
+
 }
