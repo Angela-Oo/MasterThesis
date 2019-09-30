@@ -180,6 +180,10 @@ def parseErrorPerFrame(lines):
 def calculateAverageFrameError(frames):
     import math
     error = dict()
+
+    chamfer_values = [f['error chamfer distance'] for f in frames]
+    error['chamfer'] = sum(chamfer_values) / len(chamfer_values)
+
     mean_values = [f['error mean'] for f in frames]
     error['mean'] = sum(mean_values) / len(mean_values)
 
@@ -222,6 +226,7 @@ def parseInfo(lines, frames):
     info = parseOptions(lines)
     info["time"] = parseTotalTime(lines)
     error = calculateAverageFrameError(frames)
+    info["chamfer error"] = error['chamfer']
     info["mean error"] = error['mean']
     info["variance error"] = error['variance']
     info["median error"] = error['median']
@@ -271,7 +276,7 @@ def getVariant(parsed_logs, key_value):
 def clusterDataset(parsed_logs):
     variants = dict()
     variants['arap'] = getARAP(parsed_logs)
-    variants['ed'] = getARAP(parsed_logs)
+    variants['ed'] = getED(parsed_logs)
     variants['adaptive rigidity edge'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Edge')])
     variants['adaptive rigidity vertex'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Vertex')])
     variants['refinement edge'] = getVariant(parsed_logs, [('refinement','Refine'), ('refine at', 'Edge')] )
