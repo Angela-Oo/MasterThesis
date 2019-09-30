@@ -30,7 +30,7 @@ AsRigidAsPossibleSmoothCost::asRigidAsPossibleCost(ceres::Problem &problem,
 		_smooth_factor = loss_weighting;
 		double smooth = loss_weighting;
 		if (edge_rigidity.second) {
-			smooth = edge_rigidity.first[mesh.edge(e)]; // needed for reduce rigidity!! todo move to own cost function
+			smooth = loss_weighting * edge_rigidity.first[mesh.edge(e)]; // needed for reduce rigidity!! todo move to own cost function
 		}
 		auto residual_id = Registration::asRigidAsPossibleCost(problem, smooth, deformation_graph, mesh.source(e), mesh.target(e));
 

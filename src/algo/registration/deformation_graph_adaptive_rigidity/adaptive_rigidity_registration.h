@@ -122,9 +122,10 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 	else if(_is_refined == false) {
 		_need_refinement = false;
 		auto deformation = _non_rigid_registration->getDeformation();
+		double minimal_rigidity = _options.reduce_rigidity.minimal_rigidity / _options.smooth;// normalize with the smooth factor to make the value absolut TODO check for side effects
 		auto number_adapted_edges = adaptRigidity(deformation, 
 												  _options.reduce_rigidity.rigidity_cost_threshold,
-												  _options.reduce_rigidity.minimal_rigidity);
+												  minimal_rigidity);// _options.reduce_rigidity.minimal_rigidity);
 
 		if (number_adapted_edges > 0) {
 			_non_rigid_registration->setDeformation(deformation);
@@ -213,14 +214,14 @@ void AdaptiveRigidityRegistration<NonRigidRegistration>::initEdgeRigidity()
 {
 	auto deformation = _non_rigid_registration->getDeformation();
 	if (!deformation._mesh.property_map<edge_descriptor, double>("e:rigidity").second) {
-		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 5.);
+		deformation._mesh.add_property_map<edge_descriptor, double>("e:rigidity", 1.);
 		_non_rigid_registration->setDeformation(deformation);
 	}
 	else
 	{
 		auto rigidity = deformation._mesh.property_map<edge_descriptor, double>("e:rigidity").first;
 		for (auto e : deformation._mesh.edges())
-			rigidity[e] = 5.;
+			rigidity[e] = 1.;
 	}
 }
 
