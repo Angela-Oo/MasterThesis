@@ -83,7 +83,7 @@ def createTable(parsed_logs):
 
 
 def createImprovementTable(variants):
-    header = ("{:<22} {:<10} {:<10}"
+    header = ("{:<22} {:<15} {:<15}"
               .format('name', 'improvements %', 'improvements per node %'))
 
     table = []
@@ -91,7 +91,7 @@ def createImprovementTable(variants):
 
     for key in variants:
         dataset = variants[key]
-        column = ("{:<22} {:<10} {:<10}"
+        column = ("{:<22} {:<15} {:<15}"
                   .format(dataset['name'],
                           "{:.2f}".format(dataset["improvement"]),
                           "{:.2f}".format(dataset["improvement per node"])

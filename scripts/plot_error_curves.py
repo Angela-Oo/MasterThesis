@@ -17,7 +17,7 @@ def main():
         try:
             plotDataset(logs_datasets[dataset], dataset, output_path)
         except:
-            print("not able to print log " + dataset)
+            print("not able to plot dataset " + dataset)
 
 
 def plotDataset(parsed_logs, dataset, output_path):
@@ -28,6 +28,9 @@ def plotDataset(parsed_logs, dataset, output_path):
     #refinement_vertex = parsed_logs['refinement vertex']
     #reduce_smooth = parsed_logs['reduce smooth']
     #reduce_rigidity = parsed_logs['reduce rigidity']
+    for k in parsed_logs:
+        if parsed_logs[k]:
+            print("log file " + parsed_logs[k][0]['log file'])
 
     plotDatasetMeanAndVariance(
         parsed_logs,
@@ -58,12 +61,16 @@ def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False):
 
     n = 0
     for k in logs:
-        log_dict = logs[k][1]
+        data = logs[k]
+        if not data:
+            n = n + 1
+            continue
+        log_dict = data[1]
         error_means = [(d[key]) for d in log_dict]
         frames = [int(d['frame']) for d in log_dict]
         std_deviations = [d['error variance'] for d in log_dict]
 
-        ax1.plot(frames, error_means, color = plot_colors[n], label=log[0]['name'])
+        ax1.plot(frames, error_means, color = plot_colors[n], label = data[0]['name'])
 
         #lower_std = [max(0, error_means[i]-(std_deviations[i])) for i in range(len(frames))]
         #ax1.plot(frames, lower_std, color=std_dev_line_colors[n], linestyle='dashed')
