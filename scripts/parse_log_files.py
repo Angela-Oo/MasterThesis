@@ -50,7 +50,7 @@ def parseOptions(lines):
     m = re.search('Input (\w*),', lines)
     options["input"] = m.group(1) if m else "unknown"
 
-    m = re.search('Registration Type: (\w+)', lines)
+    m = re.search('Registration Type: (\w+[ \t]?\w*)', lines)
     options["registration type"] = m.group(1) if m else "unknown"
 
     m = re.search('Sequence registration', lines)
@@ -92,7 +92,10 @@ def parseError(lines):
     log_dict = dict()
     float_pattern = '[-+]?(?:(?:\d*\.\d+)|(?:\d+\.?))(?:[Ee][+-]?\d+)?'
 
-    m = re.search('error: mean (' + float_pattern + ')', line)
+    m = re.search('chamfer_distance (' + float_pattern + ')', line)
+    log_dict["error chamfer distance"] = float(m.group(1)) if m else "unknown"
+
+    m = re.search('mean (' + float_pattern + ')', line)
     log_dict["error mean"] = float(m.group(1)) if m else "unknown"
 
     m = re.search('variance (' + float_pattern + ')', line)
@@ -235,6 +238,7 @@ def parseLogFile(log):
         lines = readLogFile(log)
         frames = parseErrorPerFrame(lines)
         info = parseInfo(lines, frames)
+        info['log file'] = log
         return info, frames
     except:
         return False, False
@@ -248,12 +252,68 @@ def getAllLogFiles(path):
     return log_files
 
 
-path = "../images/run_2019_09_24"
 
-log_files = getAllLogFiles(path)
 
-#subdirectories = [x[0] for x in os.walk(root_directory)]
-for x in log_files:
-    print(x)
+def getARAP(parsed_logs):
+    logs = [log for log in parsed_logs if (log[0]['name'] == 'ARAP')]
+    return logs[-1] if len(logs) > 0 else []
 
-parsed = parseLogFile(log_files[0])
+def getED(parsed_logs):
+    logs = [log for log in parsed_logs if (log[0]['name'] == 'Embedded Deformation')]
+    return logs[-1] if len(logs) > 0 else []
+
+def getVariant(parsed_logs, key_value):
+    logs = parsed_logs
+    for k, v in key_value:
+        logs = [log for log in logs if (log[0][k] == v)]
+    return logs[-1] if len(logs) > 0 else []
+
+def clusterDataset(parsed_logs):
+    variants = dict()
+    variants['arap'] = getARAP(parsed_logs)
+    variants['ed'] = getARAP(parsed_logs)
+    variants['adaptive rigidity edge'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Edge')])
+    variants['adaptive rigidity vertex'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Vertex')])
+    variants['refinement edge'] = getVariant(parsed_logs, [('refinement','Refine'), ('refine at', 'Edge')] )
+    variants['refinement vertex'] = getVariant(parsed_logs, [('refinement', 'Refine'),  ('refine at', 'Vertex')])
+    variants['reduce smooth'] = getVariant(parsed_logs, [('reduce smooth', 'ReduceSmooth')])
+    variants['reduce rigidity'] = getVariant(parsed_logs, [('reduce rigidity', 'ReduceRigidity')])
+    return variants
+
+
+def parseAndClusteredLogFiles(path):
+    log_files = getAllLogFiles(path)
+
+    from collections import defaultdict
+    logs_datasets = defaultdict(list)
+    for log in log_files:
+        try:
+            parsed_log = parseLogFile(log)
+            dataset = parsed_log[0]['input']
+            logs_datasets[dataset].append(parsed_log)
+            print("parsed " + log)
+        except:
+            print("not able to parse " + log)
+
+    clustered_datasets = defaultdict(dict)
+    for dataset in logs_datasets:
+        try:
+            clustered_datasets[dataset] = clusterDataset(logs_datasets[dataset])
+        except:
+            print("not able to cluster data set " + dataset)
+
+    return clustered_datasets
+
+
+
+
+def test():
+    path = "../images/run_2019_09_24"
+
+    log_files = getAllLogFiles(path)
+
+    #subdirectories = [x[0] for x in os.walk(root_directory)]
+    for x in log_files:
+        print(x)
+
+    parsed = parseLogFile(log_files[0])

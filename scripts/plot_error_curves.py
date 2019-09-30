@@ -7,15 +7,15 @@ from parse_log_files import getAllLogFiles, parseLogFile
 
 
 def main():
-    path = "../images/run_2019_09_24"
+    path = "../images/run_2019_09_28"
     #output_path = path + "/plots"
 
 
     log_files = getAllLogFiles(path)
 
     #log_files = getLogFilesWithName(log_files, 'paperbag')
-    for x in log_files:
-        print(x)
+    #for x in log_files:
+    #    print(x)
 
     from collections import defaultdict
     logs_datasets = defaultdict(list)
@@ -24,15 +24,19 @@ def main():
             parsed_log = parseLogFile(log)
             dataset = parsed_log[0]['input']
             logs_datasets[dataset].append(parsed_log)
+            print("parsed " + log)
         except:
-            print(log)
+            print("not able to parse " + log)
 
     for dataset in logs_datasets:
         output_path = path + "/" + dataset
-        plotDataset(logs_datasets[dataset], dataset, output_path)
+        try:
+            plotDataset(logs_datasets[dataset], dataset, output_path)
+        except:
+            print("not able to print log " + dataset)
 
 def getDefault(parsed_logs):
-    logs = [log for log in parsed_logs if (log[0]['name'] == 'ARAP' or log[0]['name'] == 'ED')]
+    logs = [log for log in parsed_logs if (log[0]['name'] == 'ARAP' or log[0]['name'] == 'Embedded Deformation')]
     return logs
 
 def getVariant(parsed_logs, key):
@@ -46,11 +50,12 @@ def plotDataset(parsed_logs, dataset, output_path):
     reduce_smooth_logs = getVariant(parsed_logs, 'reduce smooth')
     reduce_rigidity_logs = getVariant(parsed_logs, 'reduce rigidity')
 
-    plotDatasetMeanAndVariance(baseline_logs + adaptive_rigidity_logs, dataset + " " + 'Adaptive Rigidity', output_path)
-    plotDatasetMeanAndVariance(baseline_logs + refinement_logs, dataset + " " + 'Refinement', output_path)
-    plotDatasetMeanAndVariance(baseline_logs + reduce_smooth_logs, dataset + " " + 'Reduce Smooth', output_path)
-    plotDatasetMeanAndVariance(baseline_logs + reduce_rigidity_logs, dataset + " " + 'Reduce Rigidity', output_path)
+    #plotDatasetMeanAndVariance(baseline_logs + adaptive_rigidity_logs, dataset + " " + 'Adaptive Rigidity', output_path)
+    #plotDatasetMeanAndVariance(baseline_logs + refinement_logs, dataset + " " + 'Refinement', output_path)
+    #plotDatasetMeanAndVariance(baseline_logs + reduce_smooth_logs, dataset + " " + 'Reduce Smooth', output_path)
+    #plotDatasetMeanAndVariance(baseline_logs + reduce_rigidity_logs, dataset + " " + 'Reduce Rigidity', output_path)
 
+    #plotDatasetMeanAndVariance(baseline_logs + adaptive_rigidity_logs + reduce_rigidity_logs, dataset + " " + 'Adaptive Rigidity', output_path)
     plotDatasetMeanAndVariance(baseline_logs + adaptive_rigidity_logs + refinement_logs + reduce_smooth_logs + reduce_rigidity_logs, dataset, output_path)
 
 def plotDatasetMeanAndVariance(logs, title, output_path):
@@ -62,6 +67,7 @@ def plotDatasetMeanAndVariance(logs, title, output_path):
 
 
 def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False):
+    #print('output path' + " " + output_path + title)
     fig = plt.figure(figsize=plt.figaspect(0.5))
 
     plt.title(title, {'fontsize':16})
@@ -100,6 +106,7 @@ def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False):
     plt.grid(b=None, which='major', axis='both')
     fig.tight_layout()
     plt.savefig(output_path + title + '.png')
+    print('saved' + " " + output_path + title + '.png')
     plt.clf()
     plt.close()
 

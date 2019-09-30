@@ -28,13 +28,13 @@ def generateVideo(path, output_name):
 
     sorted_files = sorted(sorted_files, key=lambda x: x[0])
     for (k, im) in sorted_files:
-        print(str(k) + " " + im)
+        #print(str(k) + " " + im)
         img = imageio.imread(im)
         img = cv2.resize(img, (1600, 912), interpolation = cv2.INTER_AREA)
         writer.append_data(img)
     writer.close()
 
-path = "images\\run_2019_09_24"
+path = "images\\run_2019_09_28"
 
 image_dirs = []
 # r=root, d=directories, f = files
