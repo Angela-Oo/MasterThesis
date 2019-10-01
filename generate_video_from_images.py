@@ -47,7 +47,7 @@ for r, d, f in os.walk(path):
 
 for image_dir in image_dirs:
     output_file = image_dir.replace(path + '\\', '')
-    output_file = path + '\\' + output_file.replace('\\', '_') + '.avi'
+    output_file = path + '\\videos\\' + output_file.replace('\\', '_') + '.avi'
     print(output_file)
     generateVideo(image_dir, output_name = output_file)
 

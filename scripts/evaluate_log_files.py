@@ -15,7 +15,7 @@ def improvementRelativeToBaselineDataset(dataset):
             data = dataset[key][0]
             mean = data['mean error']
             mean_per_node = data['mean per node']
-            improvement = 1 - (mean / baseline_mean)
+            improvement = 1. - (mean / baseline_mean)
             improvement_in_percent = improvement * 100.
             dataset[key][0]['improvement'] = improvement_in_percent
             dataset[key][0]['improvement per node'] = (1. - (mean_per_node / baseline_mean_per_node)) * 100.
@@ -45,6 +45,7 @@ def totalImprovementOfVariants(datasets):
             improvement += d[0]['improvement']
             improvement_per_node += d[0]['improvement per node']
         improvement /= len(data)
+        improvement_per_node /= len(data)
         improvements[key] = { "improvement" : improvement, "improvement per node" : improvement_per_node, "name" : data[0][0]['name']}
     return improvements
 
@@ -52,7 +53,7 @@ def totalImprovementOfVariants(datasets):
 def createTable(parsed_logs):
     header = ("{:<10} {:<22} {:<10} {:<8} {:<10} {:<14} {:<14} {:<14} {:<18} {:<14} {:<8} {:<11}"
               .format('dataset', 'name', 'sequence', 'nodes', 'time', 'error mean', 'median', 'variance',
-                      'mean per node', 'improvement \%','edge len', 'vertex prob'))
+                      'mean per node', 'improvement \%','improvement per node\%', 'vertex prob'))
 
     table = []
     table.append(header)
@@ -74,7 +75,7 @@ def createTable(parsed_logs):
                                   "{:.2f} e-04".format(log_dict['variance error'] * 1000),
                                   "{:.4f}".format(log_dict["mean per node"]),
                                   "{:.2f}".format(log_dict["improvement"]),
-                                  log_dict['edge length'],
+                                  "{:.2f}".format(log_dict["improvement per node"]),
                                   log_dict['vertex probability'])
                           )
                 table.append(column)
@@ -120,7 +121,11 @@ print('')
 for c in improve_table:
     print(c)
 
-#file = open(path + "\\result.txt", "w")
-#for c in table:
-#    file.write(c + '\n')
-#file.close()
+file = open(path + "\\result.txt", "w")
+for c in table:
+    file.write(c + '\n')
+file.write('\n')
+for c in improve_table:
+    file.write(c + '\n')
+
+file.close()

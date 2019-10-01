@@ -20,7 +20,11 @@ def main():
             print("not able to plot dataset " + dataset)
 
 
-def plotDataset(parsed_logs, dataset, output_path):
+def plotDataset(dataset, dataset_name, output_path):
+    dataset_no_ed = dict()
+    for k in dataset:
+        if k != 'ed':
+            dataset_no_ed[k] = dataset[k]
     #arap = parsed_logs['arap']
     #adaptive_rigidity_edge = parsed_logs['adaptive rigidity edge']
     #adaptive_rigidity_vertex = parsed_logs['adaptive rigidity vertex']
@@ -28,13 +32,12 @@ def plotDataset(parsed_logs, dataset, output_path):
     #refinement_vertex = parsed_logs['refinement vertex']
     #reduce_smooth = parsed_logs['reduce smooth']
     #reduce_rigidity = parsed_logs['reduce rigidity']
-    for k in parsed_logs:
-        if parsed_logs[k]:
-            print("log file " + parsed_logs[k][0]['log file'])
+    for k in dataset:
+        if dataset[k]:
+            print("log file " + dataset[k][0]['log file'])
 
-    plotDatasetMeanAndVariance(
-        parsed_logs,
-        dataset, output_path)
+    plotDatasetMeanAndVariance(dataset, dataset_name, output_path)
+    plotDatasetMeanAndVariance(dataset_no_ed, dataset_name + ' no ed', output_path)
     #plotDatasetMeanAndVariance([arap_logs, adaptive_rigidity_edge, adaptive_rigidity_vertex, refinement_edge, reduce_smooth, reduce_rigidity], dataset, output_path)
 
 def plotDatasetMeanAndVariance(logs, title, output_path):
