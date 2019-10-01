@@ -115,7 +115,7 @@ void logCeresOptions(std::shared_ptr<FileWriter> logger, const ceres::Solver::Op
 		{ceres::LineSearchDirectionType::STEEPEST_DESCENT, "steepest descent"} };
 
 	std::map<ceres::SparseLinearAlgebraLibraryType, std::string> sparse_linear_algebra_library_type_map {
-		{ceres::SparseLinearAlgebraLibraryType::EIGEN_SPARSE, "cgnr"},
+		{ceres::SparseLinearAlgebraLibraryType::EIGEN_SPARSE, "eigen sparse"},
 		{ceres::SparseLinearAlgebraLibraryType::NO_SPARSE, "no sparse"},
 		{ceres::SparseLinearAlgebraLibraryType::SUITE_SPARSE, "suite sparse"},
 		{ceres::SparseLinearAlgebraLibraryType::CX_SPARSE, "cx sparse"}
