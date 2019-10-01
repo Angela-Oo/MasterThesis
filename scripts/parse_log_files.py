@@ -34,10 +34,25 @@ def readLogFileEnd(file, n, bs=1024):
 
 # parser
 
+def timestringToDeltaTime(timestring):
+    import datetime
+    x = datetime.datetime.strptime(timestring, '%H:%M:%S')
+    return datetime.timedelta(hours=x.hour, minutes=x.minute, seconds=x.second)
+
+def timestringToSeconds(timestring):
+    return timestringToDeltaTime(timestring).total_seconds()
+
 def parseTotalTime(lines):
     if len(lines) > 10:
         line = "".join(lines[-10:])
         m = re.search('time: \(h:min:s\) (\d+:\d+:\d+)   \-   finished registration', line)
+
+        #if m:
+        #    import datetime
+        #    datetime.datetime.strptime(m.group(1), '%H:%M:%S')
+        #    return datetime.timedelta(hours=x.tm_hour, minutes=x.tm_min, seconds=x.tm_sec).total_seconds()
+        #else:
+        #    return ""
         return m.group(1) if m else ""
     return ""
 
@@ -112,10 +127,16 @@ def parseError(lines):
 # parse frame
 
 def parseTimePerFrame(lines):
-    line = lines[-3]
+    line = "".join(lines[-4: -1])
     time_dict = dict()
-    m = re.search('time: \(h:min:s\) (\d+:\d+:\d+)', line)
-    time_dict["time"] = m.group(1) if m else "unknown"
+    m = re.search('time: \(h:min:s\) (\d+:\d+:\d+).*finished', line)
+
+    if m:
+        deltatime = timestringToDeltaTime(m.group(1))
+        time_dict["time in s"] = deltatime.total_seconds()
+    else:
+        time_dict["time in s"] = 0.0
+
     return time_dict
 
 def parseFrameNumberOfNodes(frame_lines):
@@ -202,6 +223,9 @@ def calculateAverageFrameError(frames):
     median_per_node_values = [(f['error median'] * f['number nodes']) for f in frames]
     error['median per node'] = sum(median_per_node_values) / len(median_per_node_values)
 
+    time_values = [f['time in s'] for f in frames]
+    error['time in s'] = sum(time_values) / len(time_values)
+
     return error
 
 def getNameFromInfo(info):
@@ -233,6 +257,7 @@ def parseInfo(lines, frames):
     info["number nodes"] = error['number nodes']
     info["mean per node"] = error['mean per node']
     info["median per node"] = error['median per node']
+    info["time per frame"] = error['time in s']
 
     info["name"] = getNameFromInfo(info)
     return info
@@ -275,14 +300,14 @@ def getVariant(parsed_logs, key_value):
 
 def clusterDataset(parsed_logs):
     variants = dict()
-    variants['arap'] = getARAP(parsed_logs)
-    variants['ed'] = getED(parsed_logs)
-    variants['adaptive rigidity edge'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Edge')])
-    variants['adaptive rigidity vertex'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Vertex')])
-    variants['refinement edge'] = getVariant(parsed_logs, [('refinement','Refine'), ('refine at', 'Edge')] )
-    variants['refinement vertex'] = getVariant(parsed_logs, [('refinement', 'Refine'),  ('refine at', 'Vertex')])
-    variants['reduce smooth'] = getVariant(parsed_logs, [('reduce smooth', 'ReduceSmooth')])
-    variants['reduce rigidity'] = getVariant(parsed_logs, [('reduce rigidity', 'ReduceRigidity')])
+    variants['As Rigid As Possible'] = getARAP(parsed_logs)
+    variants['Adaptive Rigidity at Edge'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Edge')])
+    variants['Adaptive Rigidity at Vertex'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Vertex')])
+    variants['Rigidity Reduction'] = getVariant(parsed_logs, [('reduce rigidity', 'ReduceRigidity')])
+    variants['Smoothness Reduction'] = getVariant(parsed_logs, [('reduce smooth', 'ReduceSmooth')])
+    variants['Refinement at Edge'] = getVariant(parsed_logs, [('refinement','Refine'), ('refine at', 'Edge')] )
+    variants['Refinement at Vertex'] = getVariant(parsed_logs, [('refinement', 'Refine'),  ('refine at', 'Vertex')])
+    variants['Embedded Deformation'] = getED(parsed_logs)
     return variants
 
 
