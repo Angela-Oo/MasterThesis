@@ -103,7 +103,7 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::needRefinement()
 {
 	auto scale_factor_tol = 0.0001;
 	auto current_cost = _non_rigid_registration->currentError();
-	if (abs(current_cost - _last_cost) < scale_factor_tol * (1 + current_cost))
+	if (abs(current_cost - _last_cost) < (scale_factor_tol * current_cost))
 	{
 		return true;
 	}

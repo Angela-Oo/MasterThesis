@@ -93,12 +93,7 @@ void AsRigidAsPossible::updateSmoothFactor()
 	if (_options.reduce_smooth_factor)
 	{
 		auto scale_factor_tol = 0.0001;
-		//if (abs(_current_cost - _last_cost) < scale_factor_tol *(1 + _current_cost) &&
-		//	(_options.smooth > 0.005))// && a_conf > 0.05))
-		//{
-		//	_options.smooth /= 2.;
-		//	std::cout << std::endl << "scale factor: smooth " << _options.smooth;
-		//}
+
 		if ((abs(_current_cost - _last_cost) / _current_cost) < scale_factor_tol &&
 			(_options.smooth > 0.005))
 		{
