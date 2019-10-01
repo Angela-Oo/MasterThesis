@@ -3,7 +3,7 @@ import re
 import imageio
 from itertools import islice
 from PIL import Image
-from skimage import transform,io
+#from skimage import transform,io
 import cv2
 
 
@@ -34,7 +34,7 @@ def generateVideo(path, output_name):
         writer.append_data(img)
     writer.close()
 
-path = "images\\run_2019_09_28"
+path = "images\\run_2019_10_01"
 
 image_dirs = []
 # r=root, d=directories, f = files
@@ -44,10 +44,14 @@ for r, d, f in os.walk(path):
             image_dirs.append(os.path.join(r, dir))
 
 
+output_path = path + '\\videos\\'
 
 for image_dir in image_dirs:
     output_file = image_dir.replace(path + '\\', '')
-    output_file = path + '\\videos\\' + output_file.replace('\\', '_') + '.avi'
+    output_file = output_path + output_file.replace('\\', '_') + '.avi'
+
+    if not os.path.exists(output_path):
+        os.makedirs(output_path)
     print(output_file)
     generateVideo(image_dir, output_name = output_file)
 
