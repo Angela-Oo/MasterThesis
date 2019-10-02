@@ -51,8 +51,8 @@ def totalImprovementOfVariants(datasets):
 
 
 def createTable(parsed_logs):
-    header = ("{:<10} {:<22} {:<10} {:<8} {:<10} {:<20} {:<14} {:<14} {:<14} {:<18} {:<14} {:<8} {:<11}"
-              .format('dataset', 'name', 'sequence', 'nodes', 'time', 'time per frame in s', 'error mean', 'median', 'variance',
+    header = ("{:<10} {:<40} {:<10} {:<8} {:<10} {:<20} {:<14} {:<14} {:<14} {:<18} {:<14} {:<8} {:<11}"
+              .format('dataset', 'name', 'sequence', 'nodes', 'time', 'time per frame in s', 'error mean', 'variance', 'num frames',
                       'mean per node', 'improvement \%','improvement per node\%', 'vertex prob'))
 
     table = []
@@ -64,7 +64,7 @@ def createTable(parsed_logs):
             log_dict = dataset[k]
             if log_dict:
                 log_dict = log_dict[0]
-                column = ("{:<10} {:<22} {:<10} {:<8} {:<10} {:<20} {:<14} {:<14} {:<14} {:<18} {:<14} {:<8} {:<11}"
+                column = ("{:<10} {:<40} {:<10} {:<8} {:<10} {:<20} {:<14} {:<14} {:<14} {:<18} {:<14} {:<8} {:<11}"
                           .format(log_dict['input'],
                                   log_dict['name'],
                                   log_dict['sequence'],
@@ -72,8 +72,8 @@ def createTable(parsed_logs):
                                   log_dict["time"],
                                   "{:.2f} s".format(log_dict["time per frame"]),
                                   "{:.2f} e-04".format(log_dict['mean error'] * 1000),
-                                  "{:.2f} e-06".format(log_dict['median error'] * 100000),
                                   "{:.2f} e-04".format(log_dict['variance error'] * 1000),
+                                  log_dict["number frames"],
                                   "{:.4f}".format(log_dict["mean per node"]),
                                   "{:.2f}".format(log_dict["improvement"]),
                                   "{:.2f}".format(log_dict["improvement per node"]),
@@ -85,7 +85,7 @@ def createTable(parsed_logs):
 
 
 def createImprovementTable(variants):
-    header = ("{:<22} {:<15} {:<15}"
+    header = ("{:<40} {:<15} {:<15}"
               .format('name', 'improvements %', 'improvements per node %'))
 
     table = []
@@ -93,7 +93,7 @@ def createImprovementTable(variants):
 
     for key in variants:
         dataset = variants[key]
-        column = ("{:<22} {:<15} {:<15}"
+        column = ("{:<40} {:<15} {:<15}"
                   .format(dataset['name'],
                           "{:.2f}".format(dataset["improvement"]),
                           "{:.2f}".format(dataset["improvement per node"])

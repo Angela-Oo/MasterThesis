@@ -257,8 +257,9 @@ def parseInfo(lines, frames):
     info["number nodes"] = error['number nodes']
     info["mean per node"] = error['mean per node']
     info["median per node"] = error['median per node']
-    info["time per frame"] = error['time in s']
-
+    info["time per frame log"] = error['time in s']
+    info["number frames"] = len(frames)
+    info["time per frame"] = timestringToSeconds(info["time"]) / info["number frames"]
     info["name"] = getNameFromInfo(info)
     return info
 
@@ -284,30 +285,28 @@ def getAllLogFiles(path):
 
 
 
-def getARAP(parsed_logs):
-    logs = [log for log in parsed_logs if (log[0]['name'] == 'ARAP')]
-    return logs[-1] if len(logs) > 0 else []
 
-def getED(parsed_logs):
-    logs = [log for log in parsed_logs if (log[0]['name'] == 'Embedded Deformation')]
-    return logs[-1] if len(logs) > 0 else []
-
-def getVariant(parsed_logs, key_value):
-    logs = parsed_logs
-    for k, v in key_value:
-        logs = [log for log in logs if (log[0][k] == v)]
+def getVariant(parsed_logs, name):
+    logs = [log for log in parsed_logs if (log[0]['name'] == name)]
     return logs[-1] if len(logs) > 0 else []
 
 def clusterDataset(parsed_logs):
     variants = dict()
-    variants['As Rigid As Possible'] = getARAP(parsed_logs)
-    variants['Adaptive Rigidity at Edge'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Edge')])
-    variants['Adaptive Rigidity at Vertex'] = getVariant(parsed_logs, [('adaptive rigidity', 'Adaptive'), ('refine at', 'Vertex')])
-    variants['Rigidity Reduction'] = getVariant(parsed_logs, [('reduce rigidity', 'ReduceRigidity')])
-    variants['Smoothness Reduction'] = getVariant(parsed_logs, [('reduce smooth', 'ReduceSmooth')])
-    variants['Refinement at Edge'] = getVariant(parsed_logs, [('refinement','Refine'), ('refine at', 'Edge')] )
-    variants['Refinement at Vertex'] = getVariant(parsed_logs, [('refinement', 'Refine'),  ('refine at', 'Vertex')])
-    variants['Embedded Deformation'] = getED(parsed_logs)
+    variants['As Rigid As Possible'] = getVariant(parsed_logs, 'ARAP')
+    variants['Rigidity Reduction'] = getVariant(parsed_logs, 'ARAP ReduceRigidity')
+    variants['Adaptive Rigidity at Edge'] = getVariant(parsed_logs, 'ARAP Adaptive Edge')
+    variants['Adaptive Rigidity at Vertex'] = getVariant(parsed_logs, 'ARAP Adaptive Vertex')
+    variants['Smoothness Reduction'] = getVariant(parsed_logs, 'ARAP ReduceSmooth')
+    variants['Refinement at Edge'] = getVariant(parsed_logs, 'ARAP Refine Edge')
+    variants['Refinement at Vertex'] = getVariant(parsed_logs, 'ARAP Refine Vertex')
+    variants['Embedded Deformation'] = getVariant(parsed_logs, 'Embedded Deformation')
+
+    variants['Adaptive Rigidity at Edge and Smoothness Reduction'] = getVariant(parsed_logs, 'ARAP Adaptive Edge ReduceSmooth')
+    variants['Adaptive Rigidity at Vertex and Smoothness Reduction'] = getVariant(parsed_logs, 'ARAP Adaptive Vertex ReduceSmooth')
+    variants['Adaptive Rigidity at Edge and Rigidity Reduction'] = getVariant(parsed_logs, 'ARAP Adaptive Edge ReduceRigidity')
+    variants['Adaptive Rigidity at Vertex and Rigidity Reduction'] = getVariant(parsed_logs, 'ARAP Adaptive Edge ReduceRigidity')
+    variants['Rigidity Reduction and Smoothness Reduction'] = getVariant(parsed_logs, 'ARAP ReduceRigidity ReduceSmooth')
+
     return variants
 
 

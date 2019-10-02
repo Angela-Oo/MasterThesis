@@ -34,7 +34,7 @@ def generateVideo(path, output_name):
         writer.append_data(img)
     writer.close()
 
-path = "images\\run_2019_10_01"
+path = "images\\run_2019_10_01_smooth_3"
 
 image_dirs = []
 # r=root, d=directories, f = files

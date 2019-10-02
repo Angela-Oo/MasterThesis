@@ -21,40 +21,50 @@ def main():
 
 
 def plotDataset(dataset, dataset_name, output_path):
+    names = ['As Rigid As Possible',
+             'Rigidity Reduction',
+             'Adaptive Rigidity at Edge',
+             'Adaptive Rigidity at Vertex',
+             'Smoothness Reduction',
+             'Refinement at Edge',
+             'Refinement at Vertex',
+             'Embedded Deformation',
+             'Adaptive Rigidity at Edge and Smoothness Reduction',
+             'Adaptive Rigidity at Vertex and Smoothness Reduction',
+             'Adaptive Rigidity at Edge and Rigidity Reduction',
+             'Adaptive Rigidity at Vertex and Rigidity Reduction',
+             'Rigidity Reduction and Smoothness Reduction']
     dataset_no_ed = dict()
     for k in dataset:
-        if k != 'Embedded Deformation':
+        if k in names[0:7]:
             dataset_no_ed[k] = dataset[k]
 
-    dataset_no_refinement = dict()
-    for k in dataset_no_ed:
-        if 'Refinement' not in k:
-            dataset_no_refinement[k] = dataset_no_ed[k]
-    #arap = parsed_logs['arap']
-    #adaptive_rigidity_edge = parsed_logs['adaptive rigidity edge']
-    #adaptive_rigidity_vertex = parsed_logs['adaptive rigidity vertex']
-    #refinement_edge = parsed_logs['refinement edge']
-    #refinement_vertex = parsed_logs['refinement vertex']
-    #reduce_smooth = parsed_logs['reduce smooth']
-    #reduce_rigidity = parsed_logs['reduce rigidity']
+
+    dataset_combinations = dict()
+    for k in dataset:
+        if k in names[8:] or k in names[0] or k in names[1]:
+            dataset_combinations[k] = dataset[k]
+
     for k in dataset:
         if dataset[k]:
             print("log file " + dataset[k][0]['log file'])
 
-    plotDatasetMeanAndVariance(dataset, dataset_name + '_with_ed', output_path)
+    #plotDatasetMeanAndVariance(dataset, dataset_name + '_with_ed', output_path)
     plotDatasetMeanAndVariance(dataset_no_ed, dataset_name, output_path)
-    plotDatasetMeanAndVariance(dataset_no_refinement, dataset_name + '_no_refinement', output_path)
+    plotDatasetMeanAndVariance(dataset_combinations, dataset_name + '_variants', output_path)
+    plotDatasetMeanAndVariance(dataset, dataset_name + '_all', output_path)
     #plotDatasetMeanAndVariance([arap_logs, adaptive_rigidity_edge, adaptive_rigidity_vertex, refinement_edge, reduce_smooth, reduce_rigidity], dataset, output_path)
 
 def plotDatasetMeanAndVariance(logs, title, output_path):
     plotAndSaveImage(logs, 'error mean', title, 'chamfer distance mean', output_path + "/mean_")
+    plotAndSaveImage(logs, 'error mean', title, 'chamfer distance mean', output_path + "/mean_legend_", False, 'lower right')
     plotAndSaveImage(logs, 'error median', title, 'chamfer distance median', output_path + "/median_", True)
     plotAndSaveImage(logs, 'mean per node', title, 'chamfer distance mean per node', output_path + "/mean_per_node_")
-    plotAndSaveImage(logs, 'median per node', title, 'chamfer distance median per node', output_path + "/median_per_node_", True)
+    #plotAndSaveImage(logs, 'median per node', title, 'chamfer distance median per node', output_path + "/median_per_node_", True)
 
 
 
-def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False):
+def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False, legend_location = 'upper left'):
     #print('output path' + " " + output_path + title)
     fig = plt.figure(figsize=plt.figaspect(0.65))
 
@@ -68,7 +78,9 @@ def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False):
     if log_scale:
         ax1.set_yscale('log')
 
-    plot_colors = ['r', 'b', 'm', 'c', 'g',  (0.0, 1.0, 0.5, 1.), (1.0, 0.5, 0.0, 1.), (0.5, 1.0, 0.0, 1.), (0.0, 0.5, 1.0, 1.), 'y']
+    plot_colors = ['r', 'b', 'm', 'c', 'g',
+                   (0.0, 1.0, 0.5, 1.), (1.0, 0.5, 0.0, 1.), (0.5, 1.0, 0.0, 1.), (0.0, 0.5, 1.0, 1.), 'y',
+                   'b', (0.25, 0.5, 0.25, 1.), (0.25, 0.5, 0.5, 1.), 'b', 'b', 'b', 'b', 'b']
 
     n = 0
     for k in logs:
@@ -96,13 +108,16 @@ def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False):
     #ax1.set_ylim([0, 0.00001])
     plt.xticks(np.arange(min(frames)-1, max(frames) + 1, 10.0))
 
-    plt.legend(loc='upper left', prop={'size': 12})
+    plt.legend(loc=legend_location, prop={'size': 12})
     plt.grid(b=None, which='major', axis='both')
     fig.tight_layout()
 
     output = output_path + title + '.pdf'
-    plt.savefig(output)
-    print('saved' + " " + output)
+    try:
+        plt.savefig(output)
+        print('saved' + " " + output)
+    except:
+        print('Could not save to ' + output)
     plt.clf()
     plt.close()
 
