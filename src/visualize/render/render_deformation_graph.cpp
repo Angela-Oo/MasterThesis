@@ -169,7 +169,8 @@ void setEdgeColorToRigidityValue(SurfaceMesh & mesh, double minimal_rigidity_wei
 {
 	
 	auto rigidity = mesh.property_map<edge_descriptor, double>("e:rigidity");
-	auto rigidity_vertex = mesh.property_map<vertex_descriptor, double>("v:rigidity");
+	auto adaptive_rigidity_vertex = mesh.property_map<vertex_descriptor, double>("v:adaptive_rigidity");
+	auto adaptive_rigidity_edge = mesh.property_map<edge_descriptor, double>("e:adaptive_rigidity");
 	if (rigidity.second) {
 		auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color");
 		bool valid;
@@ -186,20 +187,35 @@ void setEdgeColorToRigidityValue(SurfaceMesh & mesh, double minimal_rigidity_wei
 			}
 		}
 	}
-	else if(rigidity_vertex.second)
+	else if (adaptive_rigidity_edge.second) {
+		auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color");
+		bool valid;
+		double mean, max;
+		std::tie(valid, mean, max) = getMeanAndMaxEdgeValue(mesh, "e:adaptive_rigidity");
+
+		if (valid && edge_colors.second) {
+			for (auto & e : mesh.edges()) {
+				max = std::max(1., max);
+				double relative_rigidity = std::max(0., adaptive_rigidity_edge.first[e] - minimal_rigidity_weight);
+				double error = 1. - (relative_rigidity / (max - minimal_rigidity_weight));
+				edge_colors.first[e] = errorToRGB(error);
+			}
+		}
+	}
+	else if(adaptive_rigidity_vertex.second)
 	{
 		auto vertex_colors = mesh.property_map<vertex_descriptor, ml::vec4f>("v:color");
 		auto edge_colors = mesh.property_map<edge_descriptor, ml::vec4f>("e:color");
 		bool valid;
 		double mean, max;
-		std::tie(valid, mean, max) = getMeanAndMaxVertexCost(mesh, "v:rigidity");
+		std::tie(valid, mean, max) = getMeanAndMaxVertexCost(mesh, "v:adaptive_rigidity");
 		max = std::max(1., max);
 
 		if (valid && vertex_colors.second) 
 		{
 			for (auto & v : mesh.vertices()) 
 			{
-				double relative_rigidity = std::max(0., rigidity_vertex.first[v] - minimal_rigidity_weight);
+				double relative_rigidity = std::max(0., adaptive_rigidity_vertex.first[v] - minimal_rigidity_weight);
 				double error = 1. - (relative_rigidity / (max - minimal_rigidity_weight));
 				vertex_colors.first[v] = errorToRGB(error);
 			}
@@ -207,8 +223,8 @@ void setEdgeColorToRigidityValue(SurfaceMesh & mesh, double minimal_rigidity_wei
 			for (auto & e : mesh.edges()) {
 				auto source = mesh.source(mesh.halfedge(e));
 				auto target = mesh.target(mesh.halfedge(e));
-				auto source_rigidity = rigidity_vertex.first[source];
-				auto target_rigidity = rigidity_vertex.first[target];
+				auto source_rigidity = adaptive_rigidity_vertex.first[source];
+				auto target_rigidity = adaptive_rigidity_vertex.first[target];
 				double rigidity = (source_rigidity + target_rigidity) / 2.;
 				
 				//double error = (max - rigidity) / max;

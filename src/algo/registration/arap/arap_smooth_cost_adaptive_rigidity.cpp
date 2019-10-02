@@ -22,9 +22,9 @@ void AsRigidAsPossibleSmoothCostAdaptiveRigidity::evaluateResiduals(ceres::Probl
 		logger.write(" max_rigidity_cost: " + std::to_string(max_and_mean_cost.first) + " mean_rigidity_cost: " + std::to_string(max_and_mean_cost.second), false);
 
 	}
-	if(mesh.property_map<edge_descriptor, double>("e:rigidity").second)
+	if(mesh.property_map<edge_descriptor, double>("e:adaptive_rigidity").second)
 	{
-		auto rigidity_value = mesh.property_map<edge_descriptor, double>("e:rigidity").first;
+		auto rigidity_value = mesh.property_map<edge_descriptor, double>("e:adaptive_rigidity").first;
 		double max_rigidity = *std::max_element(rigidity_value.begin(), rigidity_value.end());
 		double min_rigidity = *std::min_element(rigidity_value.begin(), rigidity_value.end());
 		double mean_rigidity = std::accumulate(rigidity_value.begin(), rigidity_value.end(), 0.) / mesh.number_of_edges();
@@ -42,7 +42,7 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCostEdge(ceres::Pr
 	auto source = deformation_graph._mesh.source(he);
 	auto target = deformation_graph._mesh.target(he);
 
-	auto edge_rigidity = deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").first;
+	auto edge_rigidity = deformation_graph._mesh.property_map<edge_descriptor, double>("e:adaptive_rigidity").first;
 	auto deformations = deformation_graph._mesh.property_map<vertex_descriptor, ARAPDeformation>("v:node_deformation").first;
 
 	ceres::CostFunction* cost_function = AsRigidAsPossibleAdaptableRigidityCostFunction::Create(deformation_graph._mesh.point(source),
@@ -60,7 +60,7 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::adaptiveRigidityCostEdge(ceres::Pro
 																	  edge_descriptor edge,
 																	  DeformationGraph<ARAPDeformation> & deformation_graph)
 {
-	auto edge_rigidity = deformation_graph._mesh.property_map<edge_descriptor, double>("e:rigidity").first;
+	auto edge_rigidity = deformation_graph._mesh.property_map<edge_descriptor, double>("e:adaptive_rigidity").first;
 	ceres::CostFunction* cost_function;
 	if(_use_quadratic_rigid_weight)
 		cost_function = AdaptableRigidityWeightCostFunction::Create(1.);
@@ -87,9 +87,9 @@ AsRigidAsPossibleSmoothCostAdaptiveRigidity::asRigidAsPossibleCost(ceres::Proble
 	_rigidity_residual_ids.clear();
 	auto & mesh = deformation_graph._mesh;
 
-	if (!mesh.property_map<edge_descriptor, double>("e:rigidity").second)
+	if (!mesh.property_map<edge_descriptor, double>("e:adaptive_rigidity").second)
 	{
-		mesh.add_property_map<edge_descriptor, double>("e:rigidity", 1.);
+		mesh.add_property_map<edge_descriptor, double>("e:adaptive_rigidity", 1.);
 	}
 	for (auto he : mesh.halfedges())
 	{
