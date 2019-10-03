@@ -60,6 +60,7 @@ public:
 public:
 	void setRigidDeformation(const RigidDeformation & rigid_deformation) override;
 	const DeformationGraph<EDDeformation> & getDeformation();
+	SurfaceMesh & getDeformationMesh();
 	void setDeformation(const Deformation & deformation_graph);
 	std::vector<Point> getFixedPositions() override;
 	std::pair<bool, std::string> shouldBeSavedAsImage() override;

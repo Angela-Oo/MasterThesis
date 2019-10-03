@@ -41,6 +41,11 @@ const DeformationGraph<ARAPDeformation> & AsRigidAsPossible::getDeformation()
 	return _deformation_graph;
 }
 
+SurfaceMesh & AsRigidAsPossible::getDeformationMesh()
+{
+	return _deformation_graph._mesh;
+}
+
 SurfaceMesh AsRigidAsPossible::getDeformationGraphMesh()
 {
 	return deformationGraphToSurfaceMesh(_deformation_graph);
@@ -94,11 +99,12 @@ void AsRigidAsPossible::updateSmoothFactor()
 	{
 		auto scale_factor_tol = 0.0001;
 
-		if ((abs(_current_cost - _last_cost) / _current_cost) < scale_factor_tol &&
-			(_options.smooth > 0.005))
+		if (abs(_current_cost - _last_cost) < (scale_factor_tol * _current_cost) &&
+			(_options.smooth > 0.1))
 		{
 			_options.smooth /= 2.;
-			std::cout << std::endl << "scale factor: smooth " << _options.smooth;
+
+			_ceres_logger.write(" scale factor: smooth " + std::to_string(_options.smooth), false);			
 		}
 	}
 }
@@ -137,6 +143,8 @@ void AsRigidAsPossible::setDeformation(const Deformation & deformation_graph)
 	_ceres_logger.write("Number of deformation graph nodes " + std::to_string(_deformation_graph._mesh.number_of_vertices()));
 }
 
+
+
 void AsRigidAsPossible::setRigidDeformation(const RigidDeformation & rigid_deformation)
 {
 	_deformation_graph.setRigidDeformation(rigid_deformation);// createGlobalDeformationFromRigidDeformation(rigid_deformation));
@@ -146,7 +154,7 @@ std::pair<bool, std::string> AsRigidAsPossible::shouldBeSavedAsImage()
 {
 	if (_options.adaptive_rigidity.enable && !_options.sequence_options.enable)
 		return std::make_pair(true, "arap_adaptive_" + std::to_string(currentIteration()));
-	else if (finished())
+	if (finished())
 		return std::make_pair(true, "arap_" + std::to_string(currentIteration()));
 	return std::make_pair(false, "");
 }

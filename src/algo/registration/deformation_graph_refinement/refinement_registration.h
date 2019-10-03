@@ -103,8 +103,10 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 	if (finished == false) {
 		_current_iteration++;
 		bool solved = _non_rigid_registration->solveIteration();
-		if (solved)
+		if (solved || _current_iteration >= _options.max_iterations) {
 			_save_image = true;
+			_finished = true;
+		}
 	}
 	else if(_is_refined == false) {
 		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();

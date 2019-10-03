@@ -356,6 +356,7 @@
     <ClCompile Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity.cpp" />
     <ClCompile Include="src\algo\registration\arap\arap_smooth_cost_adaptive_rigidity_vertex.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph\extend_deformation_graph.cpp" />
+    <ClCompile Include="src\algo\registration\deformation_graph_adaptive_rigidity\adaptive_rigidity.cpp" />
     <ClCompile Include="src\algo\registration\deformation_graph_refinement\refinement_deformation_graph.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed.cpp" />
     <ClCompile Include="src\algo\registration\embedded_deformation\ed_deformation.cpp" />

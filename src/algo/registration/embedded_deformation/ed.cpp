@@ -45,6 +45,12 @@ const DeformationGraph<EDDeformation> & EmbeddedDeformation::getDeformation()
 	return _deformation_graph;
 }
 
+SurfaceMesh & EmbeddedDeformation::getDeformationMesh()
+{
+	return _deformation_graph._mesh;
+}
+
+
 void EmbeddedDeformation::setDeformation(const Deformation & deformation_graph)
 {
 	_current_cost = 1.;

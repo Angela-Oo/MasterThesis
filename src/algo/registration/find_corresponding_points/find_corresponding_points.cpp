@@ -48,8 +48,8 @@ std::pair<bool, vertex_descriptor> FindCorrespondingPoints::correspondingPoint(P
 		k_median = std::max(_min_allowed_distance, k_median);
 		bool valid_angle = angle < _max_normal_angle_deviation;
 		bool valid_distance = distance < k_median;
-
-		if (valid_angle && valid_distance) {
+		bool valid_not_boundary = !_mesh.is_border(v, true);
+		if (valid_angle && valid_distance && valid_not_boundary) {
 			valid_point_with_angle_and_distance.push_back(std::make_pair(v, std::make_pair(angle, distance)));
 		}
 		//else if(!valid_angle){
