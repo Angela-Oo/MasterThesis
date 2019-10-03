@@ -216,6 +216,8 @@ def calculateAverageFrameError(frames):
 
     node_values = [f['number nodes'] for f in frames]
     error['number nodes'] = sum(node_values) / len(node_values)
+    error['min nodes'] = min(node_values)
+    error['max nodes'] = max(node_values)
 
     mean_per_node_values = [(f['error mean'] * f['number nodes']) for f in frames]
     error['mean per node'] = sum(mean_per_node_values) / len(mean_per_node_values)
@@ -246,6 +248,46 @@ def getNameFromInfo(info):
         name += " " + info["reduce smooth"]
     return name
 
+def getLegendName(short_name):
+    if short_name == 'ARAP':
+        return 'As Rigid As Possible'
+    elif short_name == 'ARAP ReduceRigidity':
+        return 'Rigidity Reduction'
+    elif short_name == 'ARAP Adaptive Edge':
+        return 'Adaptive Rigidity at Edge'
+    elif short_name == 'ARAP Adaptive Vertex':
+        return 'Adaptive Rigidity at Vertex'
+    elif short_name == 'ARAP ReduceSmooth':
+        return 'Smoothness Reduction'
+    elif short_name == 'ARAP Refine Edge':
+        return 'Refinement at Edge'
+    elif short_name == 'ARAP Refine Vertex':
+        return 'Refinement at Vertex'
+    elif short_name == 'Embedded Deformation':
+        return 'Embedded Deformation'
+
+    elif short_name == 'ARAP Adaptive Edge ReduceSmooth':
+        return 'Adaptive Rigidity at Edge SR'
+    elif short_name == 'ARAP Adaptive Vertex ReduceSmooth':
+        return 'Adaptive Rigidity at Vertex SR'
+    elif short_name == 'ARAP Adaptive Edge ReduceRigidity':
+        return 'Adaptive Rigidity at Edge RR'
+    elif short_name == 'ARAP Adaptive Vertex ReduceRigidity':
+        return 'Adaptive Rigidity at Vertex RR'
+    elif short_name == 'ARAP ReduceRigidity ReduceSmooth':
+        return 'RR and SR'
+
+    elif short_name == 'ARAP Refine Edge ReduceSmooth':
+        return 'Refinement at Edge SR'
+    elif short_name == 'ARAP Refine Vertex ReduceSmooth':
+        return 'Refinement at Vertex SR'
+    #elif short_name == 'ARAP Refine Edge ReduceRigidity':
+    #    return 'Refinement at Edge RR'
+    #elif short_name == 'ARAP Refine Vertex ReduceRigidity':
+    #    return 'Refinement at Vertex RR'
+
+    return name
+
 def parseInfo(lines, frames):
     info = parseOptions(lines)
     info["time"] = parseTotalTime(lines)
@@ -255,12 +297,15 @@ def parseInfo(lines, frames):
     info["variance error"] = error['variance']
     info["median error"] = error['median']
     info["number nodes"] = error['number nodes']
+    info["min nodes"] = error['min nodes']
+    info["max nodes"] = error['max nodes']
     info["mean per node"] = error['mean per node']
     info["median per node"] = error['median per node']
     info["time per frame log"] = error['time in s']
     info["number frames"] = len(frames)
     info["time per frame"] = timestringToSeconds(info["time"]) / info["number frames"]
     info["name"] = getNameFromInfo(info)
+    info["legend name"] = getLegendName(info["name"])
     return info
 
 
@@ -292,21 +337,25 @@ def getVariant(parsed_logs, name):
 
 def clusterDataset(parsed_logs):
     variants = dict()
-    variants['As Rigid As Possible'] = getVariant(parsed_logs, 'ARAP')
-    variants['Rigidity Reduction'] = getVariant(parsed_logs, 'ARAP ReduceRigidity')
-    variants['Adaptive Rigidity at Edge'] = getVariant(parsed_logs, 'ARAP Adaptive Edge')
-    variants['Adaptive Rigidity at Vertex'] = getVariant(parsed_logs, 'ARAP Adaptive Vertex')
-    variants['Smoothness Reduction'] = getVariant(parsed_logs, 'ARAP ReduceSmooth')
-    variants['Refinement at Edge'] = getVariant(parsed_logs, 'ARAP Refine Edge')
-    variants['Refinement at Vertex'] = getVariant(parsed_logs, 'ARAP Refine Vertex')
+    variants['ARAP'] = getVariant(parsed_logs, 'ARAP')
+    variants['ARAP ReduceRigidity'] = getVariant(parsed_logs, 'ARAP ReduceRigidity')
+    variants['ARAP Adaptive Edge'] = getVariant(parsed_logs, 'ARAP Adaptive Edge')
+    variants['ARAP Adaptive Vertex'] = getVariant(parsed_logs, 'ARAP Adaptive Vertex')
+    variants['ARAP ReduceSmooth'] = getVariant(parsed_logs, 'ARAP ReduceSmooth')
+    variants['ARAP Refine Edge'] = getVariant(parsed_logs, 'ARAP Refine Edge')
+    variants['ARAP Refine Vertex'] = getVariant(parsed_logs, 'ARAP Refine Vertex')
     variants['Embedded Deformation'] = getVariant(parsed_logs, 'Embedded Deformation')
 
-    variants['Adaptive Rigidity at Edge and Smoothness Reduction'] = getVariant(parsed_logs, 'ARAP Adaptive Edge ReduceSmooth')
-    variants['Adaptive Rigidity at Vertex and Smoothness Reduction'] = getVariant(parsed_logs, 'ARAP Adaptive Vertex ReduceSmooth')
-    variants['Adaptive Rigidity at Edge and Rigidity Reduction'] = getVariant(parsed_logs, 'ARAP Adaptive Edge ReduceRigidity')
-    variants['Adaptive Rigidity at Vertex and Rigidity Reduction'] = getVariant(parsed_logs, 'ARAP Adaptive Edge ReduceRigidity')
-    variants['Rigidity Reduction and Smoothness Reduction'] = getVariant(parsed_logs, 'ARAP ReduceRigidity ReduceSmooth')
+    variants['ARAP Adaptive Edge ReduceSmooth'] = getVariant(parsed_logs, 'ARAP Adaptive Edge ReduceSmooth')
+    variants['ARAP Adaptive Vertex ReduceSmooth'] = getVariant(parsed_logs, 'ARAP Adaptive Vertex ReduceSmooth')
+    variants['ARAP Adaptive Edge ReduceRigidity'] = getVariant(parsed_logs, 'ARAP Adaptive Edge ReduceRigidity')
+    variants['ARAP Adaptive Vertex ReduceRigidity'] = getVariant(parsed_logs, 'ARAP Adaptive Vertex ReduceRigidity')
+    variants['ARAP ReduceRigidity ReduceSmooth'] = getVariant(parsed_logs, 'ARAP ReduceRigidity ReduceSmooth')
 
+    variants['ARAP Refine Edge ReduceSmooth'] = getVariant(parsed_logs, 'ARAP Refine Edge ReduceSmooth')
+    variants['ARAP Refine Vertex ReduceSmooth'] = getVariant(parsed_logs, 'ARAP Refine Vertex ReduceSmooth')
+    variants['ARAP Refine Edge ReduceRigidity'] = getVariant(parsed_logs, 'ARAP Refine Edge ReduceRigidity')
+    variants['ARAP Refine VertexReduceRigidity'] = getVariant(parsed_logs, 'ARAP Refine Vertex ReduceRigidity')
     return variants
 
 

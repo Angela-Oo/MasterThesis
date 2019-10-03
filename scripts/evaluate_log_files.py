@@ -2,13 +2,15 @@ from parse_log_files import parseAndClusteredLogFiles
 
 
 def improvementRelativeToBaselineDataset(dataset):
-    baseline = dataset['As Rigid As Possible']
+    baseline = dataset['ARAP']
     if not baseline:
         return False
     baseline_mean = baseline[0]['mean error']
     baseline_mean_per_node = baseline[0]['mean per node']
-    dataset['As Rigid As Possible'][0]['improvement'] = 0.
-    dataset['As Rigid As Possible'][0]['improvement per node'] = 0.
+    dataset['ARAP'][0]['improvement'] = 0.
+    dataset['ARAP'][0]['improvement per node'] = 0.
+    dataset['ARAP'][0]['relative error'] = 1.
+    dataset['ARAP'][0]['relative error per node'] = 1.
 
     for key in dataset:
         if key != 'arap' and dataset[key]:
@@ -19,6 +21,8 @@ def improvementRelativeToBaselineDataset(dataset):
             improvement_in_percent = improvement * 100.
             dataset[key][0]['improvement'] = improvement_in_percent
             dataset[key][0]['improvement per node'] = (1. - (mean_per_node / baseline_mean_per_node)) * 100.
+            dataset[key][0]['relative error'] = (mean / baseline_mean)
+            dataset[key][0]['relative error per node'] = (mean_per_node / baseline_mean_per_node)
     #return dataset
     return True
 
@@ -41,12 +45,22 @@ def totalImprovementOfVariants(datasets):
         data = variants[key]
         improvement = 0.
         improvement_per_node = 0.
+        relative_error = 0.
+        relative_error_per_node = 0.
         for d in data:
             improvement += d[0]['improvement']
             improvement_per_node += d[0]['improvement per node']
+            relative_error += d[0]['relative error']
+            relative_error_per_node += d[0]['relative error per node']
         improvement /= len(data)
         improvement_per_node /= len(data)
-        improvements[key] = { "improvement" : improvement, "improvement per node" : improvement_per_node, "name" : data[0][0]['name']}
+        relative_error /= len(data)
+        relative_error_per_node /= len(data)
+        improvements[key] = { "improvement" : improvement,
+                              "improvement per node" : improvement_per_node,
+                              "relative error": relative_error,
+                              "relative error per node": relative_error_per_node,
+                              "name" : data[0][0]['name']}
     return improvements
 
 
@@ -84,17 +98,49 @@ def createTable(parsed_logs):
 
 
 
+def createTableRelativeError(parsed_logs):
+    header = ("{:<10} {:<40} {:<10} {:<10} {:<10} {:<14} {:<14} {:<14} {:<14} {:<14}"
+              .format('dataset', 'name', 'nodes', 'nodes min', 'nodes max', 'num frames',
+                      'rel error', 'rel error node', 'improvement \%','improvement node\%'))
+
+    table = []
+    table.append(header)
+
+    for key in parsed_logs:
+        dataset = parsed_logs[key]
+        for k in dataset:
+            log_dict = dataset[k]
+            if log_dict:
+                log_dict = log_dict[0]
+                column = ("{:<10} {:<40} {:<10} {:<10} {:<10} {:<14} {:<14} {:<14} {:<14} {:<14}"
+                          .format(log_dict['input'],
+                                  log_dict['name'],
+                                  "{:.1f}".format(log_dict['number nodes']),
+                                  "{:.1f}".format(log_dict['min nodes']),
+                                  "{:.1f}".format(log_dict['max nodes']),
+                                  log_dict["number frames"],
+                                  "{:.4f}".format(log_dict["relative error"]),
+                                  "{:.4f}".format(log_dict["relative error per node"]),
+                                  "{:.2f}".format(log_dict["improvement"]),
+                                  "{:.2f}".format(log_dict["improvement per node"]))
+                          )
+                table.append(column)
+    return table
+
+
 def createImprovementTable(variants):
-    header = ("{:<40} {:<15} {:<15}"
-              .format('name', 'improvements %', 'improvements per node %'))
+    header = ("{:<40} {:<15} {:<15} {:<15} {:<15}"
+              .format('name','rel error', 'rel error node', 'improvements %', 'improvements per node %'))
 
     table = []
     table.append(header)
 
     for key in variants:
         dataset = variants[key]
-        column = ("{:<40} {:<15} {:<15}"
+        column = ("{:<40} {:<15} {:<15} {:<15} {:<15}"
                   .format(dataset['name'],
+                          "{:.2f}".format(dataset["relative error"]),
+                          "{:.2f}".format(dataset["relative error per node"]),
                           "{:.2f}".format(dataset["improvement"]),
                           "{:.2f}".format(dataset["improvement per node"])
                           ))
@@ -109,6 +155,8 @@ parsed_logs = parseAndClusteredLogFiles(path)
 improvementRelativeToBaseline(parsed_logs)
 table = createTable(parsed_logs)
 
+relative_table = createTableRelativeError(parsed_logs)
+
 improvements = totalImprovementOfVariants(parsed_logs)
 improve_table = createImprovementTable(improvements)
 #log_files = getAllLogFiles(path)
@@ -116,6 +164,10 @@ improve_table = createImprovementTable(improvements)
 
 print('')
 for c in table:
+    print(c)
+
+print('')
+for c in relative_table:
     print(c)
 
 print('')
