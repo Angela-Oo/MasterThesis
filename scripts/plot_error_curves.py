@@ -7,7 +7,7 @@ from parse_log_files import parseAndClusteredLogFiles
 
 
 def main():
-    path = "../images/run_2019_10_01_smooth_3"
+    path = "../images/run_2019_10_03_max_iterations_50_min_rigidity_0_01"
     #output_path = path + "/plots"
 
     logs_datasets = parseAndClusteredLogFiles(path)

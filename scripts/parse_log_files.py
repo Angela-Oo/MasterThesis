@@ -40,7 +40,10 @@ def timestringToDeltaTime(timestring):
     return datetime.timedelta(hours=x.hour, minutes=x.minute, seconds=x.second)
 
 def timestringToSeconds(timestring):
-    return timestringToDeltaTime(timestring).total_seconds()
+    if timestring == '':
+        return 0.
+    else:
+        return timestringToDeltaTime(timestring).total_seconds()
 
 def parseTotalTime(lines):
     if len(lines) > 10:

@@ -97,7 +97,7 @@ void AsRigidAsPossible::updateSmoothFactor()
 {
 	if (_options.reduce_smooth_factor)
 	{
-		auto scale_factor_tol = 0.0001;
+		auto scale_factor_tol = 0.005;
 
 		if (abs(_current_cost - _last_cost) < (scale_factor_tol * _current_cost) &&
 			(_options.smooth > 0.1))
