@@ -120,6 +120,7 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 		bool solved = _non_rigid_registration->solveIteration();
 		if (solved || _current_iteration >= _options.max_iterations) {
 			_finished = true;
+			//_save_image = true;
 		}
 		else {
 			_need_refinement = needRefinement();
@@ -138,9 +139,9 @@ bool AdaptiveRigidityRegistration<NonRigidRegistration>::solveIteration()
 			if (_logger) {
 				_logger->write("\n reduced rigidity for " + std::to_string(number_adapted_edges) + " edges ");
 			}
-			unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 5 : 20;
-			if (_number_of_refinements >= max_number_of_refinement)
-				_is_refined = true;
+			//unsigned int max_number_of_refinement = 20;// (_options.sequence_options.enable) ? 5 : 20;
+			//if (_number_of_refinements >= max_number_of_refinement)
+			//	_is_refined = true;
 		}
 		else {
 			_is_refined = true;

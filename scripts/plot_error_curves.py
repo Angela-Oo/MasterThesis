@@ -7,7 +7,7 @@ from parse_log_files import parseAndClusteredLogFiles
 
 
 def main():
-    path = "../images/run_2019_10_03_max_iterations_50_min_rigidity_0_01"
+    path = "../images/run_2019_10_08"
     #output_path = path + "/plots"
 
     logs_datasets = parseAndClusteredLogFiles(path)
@@ -80,6 +80,7 @@ def plotDataset(dataset, dataset_name, output_path):
 
     #plotDatasetMeanAndVariance(dataset, dataset_name + '_with_ed', output_path)
     plotDatasetMean(dataset_no_ed, dataset_name, output_path)
+    plotDatasetMedian(dataset_no_ed, dataset_name, output_path)
     plotDatasetMean(dataset_rigidity, dataset_name + ' adaptive rigidity', output_path)
     plotDatasetMean(dataset_refinment, dataset_name + ' refinement', output_path)
     plotDatasetMeanPerNode(dataset_refinment, dataset_name + ' refinement', output_path)

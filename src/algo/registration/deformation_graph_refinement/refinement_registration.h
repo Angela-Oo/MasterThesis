@@ -29,6 +29,9 @@ private:
 	unsigned int _current_iteration;
 	bool _finished;
 	bool _save_image;
+	double _last_cost{ 2. };
+	bool _need_refinement;
+	bool needRefinement();
 public:
 	bool finished() override;
 	bool solveIteration() override;
@@ -97,18 +100,34 @@ SurfaceMesh RefineDeformationGraphRegistration<NonRigidRegistration>::getDeforma
 };
 
 template<typename NonRigidRegistration>
+bool RefineDeformationGraphRegistration<NonRigidRegistration>::needRefinement()
+{
+	auto scale_factor_tol = 0.01;
+	auto current_cost = _non_rigid_registration->currentError();
+	if (abs(current_cost - _last_cost) < (scale_factor_tol * current_cost)) {
+		return true;
+	}
+	return false;
+}
+
+template<typename NonRigidRegistration>
 bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 {
 	const bool finished = _non_rigid_registration->finished();
-	if (finished == false) {
+	if (!_need_refinement) {
 		_current_iteration++;
+		_last_cost = _non_rigid_registration->currentError();
 		bool solved = _non_rigid_registration->solveIteration();
 		if (solved || _current_iteration >= _options.max_iterations) {
-			_save_image = true;
 			_finished = true;
+			_save_image = true;
+		}
+		else {
+			_need_refinement = needRefinement();
 		}
 	}
 	else if(_is_refined == false) {
+		_need_refinement = false;
 		_deformation.non_rigid_deformation = _non_rigid_registration->getDeformation();
 
 		const double smooth_cost = getSmoothnessCost(_deformation.non_rigid_deformation._mesh);
@@ -127,7 +146,7 @@ bool RefineDeformationGraphRegistration<NonRigidRegistration>::solveIteration()
 			if (_logger)
 				_logger->write("Number of new vertices: " + std::to_string(refined_vertices_edges));
 		}
-		unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 2 : 20;
+		unsigned int max_number_of_refinement = (_options.sequence_options.enable) ? 5 : 20;
 		if (refined_vertices_edges == 0 || _number_of_refinements >= max_number_of_refinement) {
 			_is_refined = true;
 		}
@@ -184,12 +203,20 @@ template<typename NonRigidRegistration>
 std::pair<bool, std::string> RefineDeformationGraphRegistration<NonRigidRegistration>::shouldBeSavedAsImage()
 {
 	auto save_image = _non_rigid_registration->shouldBeSavedAsImage();
-	auto save = _save_image || save_image.first;
-	_save_image = false;
-	if (save)
-		return std::make_pair(true, "refine_" + std::to_string(currentIteration()) + "_" + save_image.second);
-	else
-		return std::make_pair(false, "");
+	if (save_image.first) {
+		save_image.second = "refine_" + std::to_string(_number_of_refinements) + "_" + save_image.second;
+	}
+	else if (_finished)
+		return std::make_pair(true, "refine_" + std::to_string(_number_of_refinements));
+	return save_image;
+
+	//auto save_image = _non_rigid_registration->shouldBeSavedAsImage();
+	//auto save = _save_image || save_image.first;
+	//_save_image = false;
+	//if (save)
+	//	return std::make_pair(true, "refine_" + std::to_string(currentIteration()) + "_" + save_image.second);
+	//else
+	//	return std::make_pair(false, "");
 }
 
 template<typename NonRigidRegistration>
