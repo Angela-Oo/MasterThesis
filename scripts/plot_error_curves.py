@@ -74,6 +74,24 @@ def plotDataset(dataset, dataset_name, output_path):
         if k in names[12:13] or k in names[0:2] or k in names[4]:
             dataset_combinations_smoothness_rigidity_reduction[k] = dataset[k]
 
+    # Adatptive Rigidity and RR and Adaptive Rigidity and SR
+    dataset_combinations_adaptive_rigidity = dict()
+    for k in dataset:
+        if k in names[8:12] or k in names[0:2]:# or k in names[4]:
+            dataset_combinations_adaptive_rigidity[k] = dataset[k]
+
+    # Refinement and SR and RR and SR
+    dataset_combinations_refinement_and_smoothness_rigidity = dict()
+    for k in dataset:
+        if k in names[12:] or k in names[0:2]:# or k in names[4]:
+            dataset_combinations_refinement_and_smoothness_rigidity[k] = dataset[k]
+
+    # All Combinations
+    dataset_all_combinations = dict()
+    for k in dataset:
+        if k in names[8:] or k in names[0:2]:# or k in names[4]:
+            dataset_all_combinations[k] = dataset[k]
+
     for k in dataset:
         if dataset[k]:
             print("log file " + dataset[k][0]['log file'])
@@ -81,25 +99,44 @@ def plotDataset(dataset, dataset_name, output_path):
     #plotDatasetMeanAndVariance(dataset, dataset_name + '_with_ed', output_path)
     plotDatasetMean(dataset_no_ed, dataset_name, output_path)
     plotDatasetMedian(dataset_no_ed, dataset_name, output_path)
-    plotDatasetMean(dataset_rigidity, dataset_name + ' adaptive rigidity', output_path)
-    plotDatasetMean(dataset_refinment, dataset_name + ' refinement', output_path)
-    plotDatasetMeanPerNode(dataset_refinment, dataset_name + ' refinement', output_path)
+    #plotDatasetMeanScaled(dataset_no_ed, dataset_name, output_path)
+    #plotDatasetMean(dataset_rigidity, dataset_name + ' adaptive rigidity', output_path)
+    #plotDatasetMean(dataset_refinment, dataset_name + ' refinement', output_path)
+    #plotDatasetMeanPerNode(dataset_refinment, dataset_name + ' refinement', output_path)
 
     plotDatasetMeanCombinations(dataset_combinations_smoothness_reduction_adaptive, dataset_name, output_path + "/smoothness_adaptive_")
     plotDatasetMeanCombinations(dataset_combinations_smoothness_reduction_refinement, dataset_name,
                                 output_path + "/smoothness_refinement_")
     plotDatasetMeanCombinations(dataset_combinations_rigidity_reduction, dataset_name, output_path + "/rigidity_")
     plotDatasetMeanCombinations(dataset_combinations_smoothness_rigidity_reduction, dataset_name, output_path + "/rigidity_smoothness_")
+
+
+    # tests
+    plotDatasetMeanCombinations(dataset_combinations_refinement_and_smoothness_rigidity, dataset_name,
+                                output_path + "/refinement_and_rr_sr_")
+    plotDatasetMeanCombinations(dataset_combinations_adaptive_rigidity, dataset_name,
+                                output_path + "/adaptive_rigidity_")
+
+    plotAndSaveImage(dataset_combinations_refinement_and_smoothness_rigidity, 'error mean', dataset_name, 'Mean Chamfer Distance',
+                     output_path + "/mean_refinement_and_rr_sr_")
+    plotAndSaveImage(dataset_combinations_adaptive_rigidity, 'error mean', dataset_name, 'Mean Chamfer Distance',
+                     output_path + "/mean_adaptive_rigidity_")
+    plotAndSaveImage(dataset_all_combinations, 'error mean', dataset_name, 'Mean Chamfer Distance',
+                     output_path + "/mean_all_combinations_")
     #plotDatasetMeanAndVariance(dataset, dataset_name + '_all', output_path)
     #plotDatasetMeanAndVariance([arap_logs, adaptive_rigidity_edge, adaptive_rigidity_vertex, refinement_edge, reduce_smooth, reduce_rigidity], dataset, output_path)
 
 def plotDatasetMean(logs, title, output_path):
-    plotAndSaveImage(logs, 'error mean', title, 'Chamfer Distance Mean', output_path + "/mean_")
-    plotAndSaveImage(logs, 'error mean', title, 'Chamfer Distance Mean', output_path + "/legend_mean_", False, 'lower right')
+    plotAndSaveImage(logs, 'error mean', title, 'Mean Chamfer Distance', output_path + "/mean_")
+    plotAndSaveImage(logs, 'error mean', title, 'Mean Chamfer Distance', output_path + "/legend_mean_", False, 'lower right')
+
+def plotDatasetMeanScaled(logs, title, output_path):
+    plotAndSaveImage(logs, 'scaled error mean', title, 'Mean Chamfer Distance in 10−4', output_path + "/mean_")
+    plotAndSaveImage(logs, 'scaled error mean', title, 'Mean Chamfer Distance', output_path + "/legend_mean_", False, 'lower right')
 
 def plotDatasetMeanCombinations(logs, title, output_path):
-    plotAndSaveImageCombinations(logs, 'error mean', title, 'Chamfer Distance Mean', output_path + "mean_")
-    plotAndSaveImageCombinations(logs, 'error mean', title, 'Chamfer Distance Mean', output_path + "legend_mean_", False, 'lower right')
+    plotAndSaveImageCombinations(logs, 'error mean', title, 'Mean Chamfer Distance', output_path + "mean_")
+    plotAndSaveImageCombinations(logs, 'error mean', title, 'Mean Chamfer Distance', output_path + "legend_mean_", False, 'lower right')
 
 def plotDatasetMeanPerNode(logs, title, output_path):
     plotAndSaveImage(logs, 'mean per node', title, 'Chamfer Distance Mean per Node', output_path + "/mean_per_node_")
@@ -121,6 +158,9 @@ def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False, l
     ax1 = fig.add_subplot(1, 1, 1)
     ax1.set_xlabel('Frames', fontsize=14)  # xlabel
     ax1.set_ylabel(ylabel, fontsize=14)  # ylabel
+
+    #import matplotlib.ticker as mtick
+    #ax1.yaxis.set_major_formatter(mtick.FormatStrFormatter('%.0e'))
 
     if log_scale:
         ax1.set_yscale('log')
@@ -152,6 +192,10 @@ def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False, l
         n = n+1
 
     ax1.set_xlim([0, max(frames)])
+
+    if title == 'head':
+        ax1.set_ylim([0, 0.00016])
+
     #ax1.set_ylim([0, 0.00001])
     x_step_size = 10. if max(frames) < 75 else 20.
     plt.xticks(np.arange(min(frames)-1, max(frames) + 1, x_step_size))
@@ -175,13 +219,13 @@ def plotAndSaveImage(logs, key, title, ylabel, output_path, log_scale = False, l
 
 def plotAndSaveImageCombinations(logs, key, title, ylabel, output_path, log_scale = False, legend_location = 'upper left'):
     #print('output path' + " " + output_path + title)
-    plt.rcParams.update({'font.size': 14})
-    fig = plt.figure(figsize=plt.figaspect(0.75))
+    plt.rcParams.update({'font.size': 11})
+    fig = plt.figure(figsize=plt.figaspect(0.9))
 
     plt.title(title, {'fontsize':18})
     ax1 = fig.add_subplot(1, 1, 1)
-    ax1.set_xlabel('Frames', fontsize=14)  # xlabel
-    ax1.set_ylabel(ylabel, fontsize=14)  # ylabel
+    ax1.set_xlabel('Frames', fontsize=12)  # xlabel
+    ax1.set_ylabel(ylabel, fontsize=12)  # ylabel
 
     if log_scale:
         ax1.set_yscale('log')
@@ -207,18 +251,18 @@ def plotAndSaveImageCombinations(logs, key, title, ylabel, output_path, log_scal
 
     ax1.set_xlim([0, max(frames)])
     if title == 'paperbag':
-        ax1.set_ylim([0, 0.00085])
+        ax1.set_ylim([0, 0.0009])
     elif title == 'puppet':
-        ax1.set_ylim([0, 0.0006])
+        ax1.set_ylim([0, 0.0008])
     elif title == 'hand':
         ax1.set_ylim([0, 0.0004])
     elif title == 'head':
-        ax1.set_ylim([0, 0.0001])
+        ax1.set_ylim([0, 0.00016])
 
     x_step_size = 10. if max(frames) < 75 else 20.
     plt.xticks(np.arange(min(frames)-1, max(frames) + 1, x_step_size))
 
-    plt.legend(loc=legend_location, prop={'size': 14})
+    plt.legend(loc=legend_location, prop={'size': 12})
     plt.grid(b=None, which='major', axis='both')
     fig.tight_layout()
 

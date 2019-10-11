@@ -115,6 +115,7 @@ def parseError(lines):
 
     m = re.search('mean (' + float_pattern + ')', line)
     log_dict["error mean"] = float(m.group(1)) if m else "unknown"
+    log_dict["scaled error mean"] = float(m.group(1))*1000 if m else "0."
 
     m = re.search('variance (' + float_pattern + ')', line)
     log_dict["error variance"] = float(m.group(1)) if m else "unknown"
@@ -253,7 +254,7 @@ def getNameFromInfo(info):
 
 def getLegendName(short_name):
     if short_name == 'ARAP':
-        return 'As Rigid As Possible'
+        return 'As-Rigid-As-Possible'
     elif short_name == 'ARAP ReduceRigidity':
         return 'Rigidity Reduction'
     elif short_name == 'ARAP Adaptive Edge':

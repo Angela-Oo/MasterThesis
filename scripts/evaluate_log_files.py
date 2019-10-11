@@ -52,22 +52,26 @@ def totalImprovementOfVariants(datasets):
         relative_error = 0.
         relative_error_median = 0.
         relative_error_per_node = 0.
+        variance = 0.
         for d in data:
             improvement += d[0]['improvement']
             improvement_per_node += d[0]['improvement per node']
             relative_error += d[0]['relative error']
             relative_error_median += d[0]['relative error median']
             relative_error_per_node += d[0]['relative error per node']
+            variance += d[0]['variance error']
         improvement /= len(data)
         improvement_per_node /= len(data)
         relative_error /= len(data)
         relative_error_median /= len(data)
         relative_error_per_node /= len(data)
+        variance /= len(data)
         improvements[key] = { "improvement" : improvement,
                               "improvement per node" : improvement_per_node,
                               "relative error": relative_error,
                               "relative error median": relative_error_median,
                               "relative error per node": relative_error_per_node,
+                              "mean variance": variance,
                               "name" : data[0][0]['name']}
     return improvements
 
@@ -107,9 +111,9 @@ def createTable(parsed_logs):
 
 
 def createTableRelativeError(parsed_logs):
-    header = ("{:<10} {:<40} {:<10} {:<10} {:<10} {:<14} {:<14} {:<14} {:<14} {:<14} {:<14}"
+    header = ("{:<10} {:<40} {:<10} {:<10} {:<10} {:<14} {:<14} {:<16} {:<16} {:<16} {:<16}"
               .format('dataset', 'name', 'nodes', 'nodes min', 'nodes max', 'num frames',
-                      'rel error', 'rel error node', 'rel error median', 'improvement \%','improvement node\%'))
+                      'rel error', 'rel error node', 'rel error median', 'improvement \%','variance'))
 
     table = []
     table.append(header)
@@ -120,7 +124,7 @@ def createTableRelativeError(parsed_logs):
             log_dict = dataset[k]
             if log_dict:
                 log_dict = log_dict[0]
-                column = ("{:<10} {:<40} {:<10} {:<10} {:<10} {:<14} {:<14} {:<14} {:<14} {:<14} {:<14}"
+                column = ("{:<10} {:<40} {:<10} {:<10} {:<10} {:<14} {:<14} {:<16} {:<16} {:<16} {:<16}"
                           .format(log_dict['input'],
                                   log_dict['name'],
                                   "{:.1f}".format(log_dict['number nodes']),
@@ -131,7 +135,7 @@ def createTableRelativeError(parsed_logs):
                                   "{:.4f}".format(log_dict["relative error per node"]),
                                   "{:.4f}".format(log_dict["relative error median"]),
                                   "{:.2f}".format(log_dict["improvement"]),
-                                  "{:.2f}".format(log_dict["improvement per node"]))
+                                  "{:.4f} e-05".format(log_dict['variance error'] * 10000))
                           )
                 table.append(column)
     return table
@@ -139,7 +143,7 @@ def createTableRelativeError(parsed_logs):
 
 def createImprovementTable(variants):
     header = ("{:<40} {:<15} {:<15} {:<15} {:<15} {:<15}"
-              .format('name','rel error', 'rel error median', 'rel error node', 'improvements %', 'improvements per node %'))
+              .format('name','rel error', 'rel error median', 'rel error node', 'improvements %', "mean variance"))
 
     table = []
     table.append(header)
@@ -152,7 +156,7 @@ def createImprovementTable(variants):
                           "{:.4f}".format(dataset["relative error median"]),
                           "{:.4f}".format(dataset["relative error per node"]),
                           "{:.4f}".format(dataset["improvement"]),
-                          "{:.4f}".format(dataset["improvement per node"])
+                          "{:.4f} e-04".format(dataset["mean variance"] * 1000.)
                           ))
         table.append(column)
     return table
@@ -187,6 +191,11 @@ for c in improve_table:
 file = open(path + "\\result.txt", "w")
 for c in table:
     file.write(c + '\n')
+
+file.write('\n')
+for c in relative_table:
+    file.write(c + '\n')
+
 file.write('\n')
 for c in improve_table:
     file.write(c + '\n')
